@@ -108,7 +108,7 @@ if(!assert.failed) { // only if tests passed will we bench
 
       .add('goArrayAsync.cancel()', function(deferred) {
         const p = fuzzysort.goArrayAsync('search', random_strings)
-        p.then(()=>{deferred.resolve()})
+        p.then(()=>{deferred.resolve()}, ()=>{deferred.resolve()})
         p.cancel()
       }, {defer:true})
 

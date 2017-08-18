@@ -10,13 +10,7 @@ USAGE:
 
   require('fuzzysort').go('doesnt exist', 'target')
   // {}
-
-HOW: todo
 */
-
-// const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
-// const isWorker = typeof require === 'undefined' && typeof window === 'undefined'
-// const isBrowser = typeof window !== 'undefined'
 
 let fuzzysort = {
 
@@ -213,47 +207,6 @@ let fuzzysort = {
     return results
   },
 
-  // goArrayWorkers: (search, targets) => {
-  //   return new Promise((resolve, reject) => {
-
-  //     if(isBrowser) {
-  //       const len = targets.length
-  //       const encoder = new TextEncoder()
-  //       // const threads = navigator.hardwareConcurrency
-  //       const threads = 2
-  //       const perThreadSize = Math.round(len/threads)
-  //       let combinedResults = []
-  //       let responseCount = 0
-  //       for (var i = 0; i < threads; i++) {
-  //         console.log('creating worker',Date.now())
-  //         const myWorker = new Worker('./fuzzysort.js')
-
-  //         let diff = 0
-  //         if(i===threads-1) {
-  //           // last iteration might have more or less than perThreadSize because rounding
-  //           diff = len - (threads*perThreadSize)
-  //         }
-
-  //         const slice = targets.slice(perThreadSize*i, perThreadSize*(i+1)+diff)
-  //         const encodedSlice = encoder.encode(slice.join(String.fromCharCode(0)))
-  //         myWorker.postMessage({search, targets:encodedSlice.buffer}, [encodedSlice.buffer])
-  //         myWorker.onmessage = function(e) {
-  //           console.log('worker done',Date.now())
-  //           combinedResults = combinedResults.concat(e.data)
-  //           responseCount += 1
-  //           if(responseCount === threads) {
-  //             // combinedResults.sort((a, b) => a.score - b.score)
-  //             resolve(combinedResults)
-  //           }
-  //         }
-  //       }
-  //     } else {
-  //       // TODO: do a fake timeout async
-  //       reject('multithreaded async only supported in browsers')
-  //     }
-  //   })
-  // },
-
   goArrayAsync: (search, targets) => {
     let canceled = false
     const p = new Promise((resolve, reject) => {
@@ -272,7 +225,6 @@ let fuzzysort = {
 
           if(i%itemsPerCheck===0) {
             if(Date.now() - startMs >= 16) {
-              // console.log('break',i,Date.now() - startMs)
               ;(typeof setImmediate !== 'undefined')?setImmediate(step):setTimeout(step)
               return
             }
@@ -291,18 +243,6 @@ let fuzzysort = {
     }
     return p
   }
-
-
-
 }
 
 if(typeof module!=='undefined' && module.exports) module.exports = fuzzysort
-
-// if(isWorker) {
-//   onmessage = function(e) {
-//     console.log('worker starting', Date.now())
-//     const results = fuzzysort.goArray(e.data.search, e.data.targets)
-//     postMessage(results)
-//     close()
-//   }
-// }
