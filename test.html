@@ -100,7 +100,7 @@
       const inputValue = $input.val()
       startms = Date.now()
       promise = fuzzysort.goAsync(inputValue, testdata[currenttest])
-      promise.then(renderResults, ()=>{console.log(`search canceled`)})
+      promise.then(renderResults, err=>console.log(err))
     } else {
       startms = Date.now()
       renderResults(fuzzysort.go($input.val(), testdata[currenttest]))
