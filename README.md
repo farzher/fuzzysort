@@ -9,6 +9,11 @@ Fast SublimeText-like fuzzy search for node or the browser.
 ![](http://i.imgur.com/tleIW3b.gif)
 
 
+![](http://i.imgur.com/dN2cd7z.png)
+
+![](http://i.imgur.com/4kKfMK4.png)
+
+
 
 ## Installation Node
 
