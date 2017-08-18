@@ -6,7 +6,7 @@ Fast SublimeText-like fuzzy search for node or the browser.
 
 ## [Demo](https://rawgit.com/farzher/fuzzysort/master/test.html)
 
-![](http://i.imgur.com/nlt692a.gif)
+![](http://i.imgur.com/tleIW3b.gif)
 
 
 
