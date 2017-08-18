@@ -1,0 +1,9 @@
+node_modules/
+
+testdata.js
+
+.npmignore
+package.json
+README.md
+test.html
+test.js
