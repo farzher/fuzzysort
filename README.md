@@ -56,7 +56,7 @@ fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
 // ,{score: 6.009, highlighted: "<b>M</b>onito<b>r</b>.cpp"}]
 ```
 
-### `fuzzysort.goAsync`
+### `fuzzysort.goAsync(search, targets)`
 
 ```js
 let promise = fuzzysort.goAsync('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
