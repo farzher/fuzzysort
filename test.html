@@ -16,6 +16,18 @@
 
 <div class="jumbotron" style="background:none">
   <div class="container">
+    <div>
+      <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-secondary active">
+          <input type="radio" name="gotype" value="async"> Async
+        </label>
+        <label class="btn btn-secondary">
+          <input type="radio" name="gotype" value="sync"> Sync
+        </label>
+      </div>
+    </div>
+    <br>
+
     <div id="buttons"></div><br>
 
     <input id="input" autofocus style="width:300px" />
@@ -30,7 +42,8 @@
   const $buttons = $('#buttons')
   const $results = $('#results')
   const testdatas = Object.keys(testdata)
-  let currenttest = 'ue4_filenames'
+  var currenttest = 'ue4_filenames'
+  var gotype = 'async'
 
 
   document.onkeyup = (e) => {
@@ -58,29 +71,40 @@
   })
   $input.attr('placeholder', currenttest)
 
+  $(document).on('change', '[name="gotype"]', function() {
+    gotype = $(this).val()
+    $input.trigger('input')
+  })
 
+  function renderResults(results) {
+    const duration = Date.now() - startms
+    const len = results.length
 
-  let promise
+    var html = `<p>${results.length} matches in ${duration}ms</p>`
+    html += '<ul>'
+    for (var i = 0; i < len; i++) {
+      if(i >= 100) break
+      const result = results[i]
+      html += `<li>${Math.round(result.score*1000)} - ${result.highlighted}</li>`
+    }
+    html += '</ul>'
+
+    $results.html(html)
+  }
+
+  var promise, startms
   $input.on('input', function(e) {
-    if(promise) promise.cancel()
+    if(gotype === 'async') {
+      if(promise) promise.cancel()
 
-    const startms = Date.now()
-    promise = fuzzysort.goAsync($input.val(), testdata[currenttest])
-    promise.then(results=>{
-      const duration = Date.now() - startms
-      const len = results.length
-
-      let html = `<p>${results.length} matches in ${duration}ms</p>`
-      html += '<ul>'
-      for (var i = 0; i < len; i++) {
-        if(i >= 100) break
-        const result = results[i]
-        html += `<li>${Math.round(result.score*1000)} - ${result.highlighted}</li>`
-      }
-      html += '</ul>'
-
-      $results.html(html)
-    })
+      const inputValue = $input.val()
+      startms = Date.now()
+      promise = fuzzysort.goAsync(inputValue, testdata[currenttest])
+      promise.then(renderResults, ()=>{console.log(`search canceled`)})
+    } else {
+      startms = Date.now()
+      renderResults(fuzzysort.go($input.val(), testdata[currenttest]))
+    }
   })
 
 </script>
