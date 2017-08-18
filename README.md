@@ -4,7 +4,7 @@ Fast javascript SublimeText-like fuzzy search for node or the browser.
 
 
 
-## [Demo](https://raw.github.com/farzher/fuzzysort/master/test.html)
+## [Demo](https://rawgit.com/farzher/fuzzysort/master/test.html)
 
 ![](http://i.imgur.com/lMw0HDP.gif)
 
