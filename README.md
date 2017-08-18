@@ -20,7 +20,7 @@ Fast SublimeText-like fuzzy search for node or the browser.
 ```
 npm i fuzzysort
 node
-> require('fuzzysort').go('t', 'test')
+> require('fuzzysort').single('t', 'test')
 { score: 0.003, highlighted: '<b>t</b>est' }
 ```
 
@@ -36,30 +36,30 @@ node
 
 ## Usage
 
-### `fuzzysort.go(search, target)`
+### `fuzzysort.single(search, target)`
 
 ```js
-fuzzysort.go('query', 'some string that contains my query.')
+fuzzysort.single('query', 'some string that contains my query.')
 // {score: 0.059, highlighted: "some string that contains my <b>query</b>."}
 
-fuzzysort.go('query', 'irrelevant string') // null
+fuzzysort.single('query', 'irrelevant string') // null
 
 // exact match returns a score of 0. lower score is better
-fuzzysort.go('query', 'query') // {score: 0, highlighted: "<b>query</b>"}
+fuzzysort.single('query', 'query') // {score: 0, highlighted: "<b>query</b>"}
 ```
 
-### `fuzzysort.goArray(search, targets)`
+### `fuzzysort.go(search, targets)`
 
 ```js
-fuzzysort.goArray('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
+fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
 // [{score: 0.018, highlighted: "<b>M</b>esh<b>R</b>enderer.cpp"}
 // ,{score: 6.009, highlighted: "<b>M</b>onito<b>r</b>.cpp"}]
 ```
 
-### `fuzzysort.goArrayAsync`
+### `fuzzysort.goAsync`
 
 ```js
-let promise = fuzzysort.goArrayAsync('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
+let promise = fuzzysort.goAsync('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
 promise.then(results => console.log(results))
 if(invalidated) promise.cancel()
 ```

@@ -65,7 +65,7 @@
     if(promise) promise.cancel()
 
     const startms = Date.now()
-    promise = fuzzysort.goArrayAsync($input.val(), testdata[currenttest])
+    promise = fuzzysort.goAsync($input.val(), testdata[currenttest])
     promise.then(results=>{
       const duration = Date.now() - startms
       const len = results.length

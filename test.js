@@ -82,7 +82,7 @@ if(!assert.failed) { // only if tests passed will we bench
     //   //   const results = []
     //   //   let currentLen = 0
     //   //   for (var i = 0; i < len; i++) {
-    //   //     const result = fuzzysort.go('search', random_strings[i])
+    //   //     const result = fuzzysort.single('search', random_strings[i])
     //   //     if(result) results[currentLen++] = result
     //   //   }
     //   //   results.sort((a, b) => a.score - b.score)
@@ -92,40 +92,40 @@ if(!assert.failed) { // only if tests passed will we bench
         const len = random_strings.length
         const results = []
         for (var i = 0; i < len; i++) {
-          const result = fuzzysort.go('search', random_strings[i])
+          const result = fuzzysort.single('search', random_strings[i])
           if(result) results.push(result)
         }
         results.sort((a, b) => a.score - b.score)
       })
 
-      .add('goArray', function() {
-        fuzzysort.goArray('search', random_strings)
+      .add('go', function() {
+        fuzzysort.go('search', random_strings)
       })
 
-      .add('goArrayAsync', function(deferred) {
-        fuzzysort.goArrayAsync('search', random_strings).then(()=>{deferred.resolve()})
+      .add('goAsync', function(deferred) {
+        fuzzysort.goAsync('search', random_strings).then(()=>{deferred.resolve()})
       }, {defer:true})
 
-      .add('goArrayAsync.cancel()', function(deferred) {
-        const p = fuzzysort.goArrayAsync('search', random_strings)
+      .add('goAsync.cancel()', function(deferred) {
+        const p = fuzzysort.goAsync('search', random_strings)
         p.then(()=>{deferred.resolve()}, ()=>{deferred.resolve()})
         p.cancel()
       }, {defer:true})
 
       .add('huge', function() {
-        fuzzysort.go('a', 'noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
+        fuzzysort.single('a', 'noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
       })
 
       .add('tricky', function() {
-        fuzzysort.go('prrun', 'C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat')
+        fuzzysort.single('prrun', 'C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat')
       })
 
       .add('small', function() {
-        fuzzysort.go('al', 'alexstrasa')
+        fuzzysort.single('al', 'alexstrasa')
       })
 
       .add('nomatch', function() {
-        fuzzysort.go('texxx', 'template/index')
+        fuzzysort.single('texxx', 'template/index')
       })
 
 
@@ -184,7 +184,7 @@ function test(target, ...searches) {
       continue
     }
 
-    const result = fuzzysort.go(searches[i], target)
+    const result = fuzzysort.single(searches[i], target)
     let score = undefined
     if(result) score = result.score
 

@@ -2,13 +2,13 @@
 WHAT: SublimeText-like Fuzzy Search
 
 USAGE:
-  require('fuzzysort').go('fs', 'Fuzzy Search')
+  require('fuzzysort').single('fs', 'Fuzzy Search')
   // {score: 0.1, highlighted: '<b>F</b>uzzy <b>S</b>earch'}
 
-  require('fuzzysort').go('test', 'test')
+  require('fuzzysort').single('test', 'test')
   // {score: 0, highlighted}
 
-  require('fuzzysort').go('doesnt exist', 'target')
+  require('fuzzysort').single('doesnt exist', 'target')
   // {}
 */
 
@@ -19,7 +19,7 @@ let fuzzysort = {
   highlightOpen: '<b>',
   highlightClose: '</b>',
 
-  go: (search, target) => {
+  single: (search, target) => {
     let searchI = 0 // where we at
     let targetI = 0 // where you at
 
@@ -196,18 +196,18 @@ let fuzzysort = {
     return ret
   },
 
-  goArray: (search, targets) => {
+  go: (search, targets) => {
     const len = targets.length
     const results = []
     for (var i = 0; i < len; i++) {
-      const result = fuzzysort.go(search, targets[i])
+      const result = fuzzysort.single(search, targets[i])
       if(result) results.push(result)
     }
     results.sort((a, b) => a.score - b.score)
     return results
   },
 
-  goArrayAsync: (search, targets) => {
+  goAsync: (search, targets) => {
     let canceled = false
     const p = new Promise((resolve, reject) => {
       let i = targets.length
@@ -220,7 +220,7 @@ let fuzzysort = {
 
         while(i > 0) {
           i -= 1
-          const result = fuzzysort.go(search, targets[i])
+          const result = fuzzysort.single(search, targets[i])
           if(result) results.push(result)
 
           if(i%itemsPerCheck===0) {
