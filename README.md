@@ -1,6 +1,6 @@
 # [fuzzysort](https://raw.github.com/farzher/fuzzysort/master/fuzzysort.js)
 
-Fast javascript SublimeText-like fuzzy search for node or the browser.
+Fast SublimeText-like fuzzy search for node or the browser.
 
 
 
