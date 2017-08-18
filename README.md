@@ -10,13 +10,13 @@ Fast SublimeText-like fuzzy search for node or the browser.
 
 
 
-
-
-
 ## Installation Node
 
-```js
-const fuzzysort = require('fuzzysort')
+```
+npm i fuzzysort
+node
+> require('fuzzysort').go('t', 'test')
+{ score: 0.003, highlighted: '<b>t</b>est' }
 ```
 
 
