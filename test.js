@@ -45,9 +45,11 @@ async function tests() {
 
   var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'ba'])
   assert(tmp[0].score===0, 'go sorting')
+  assert(tmp.length===5, 'go sorting length')
 
   var tmp = await fuzzysort.goAsync('a', ['ba', 'bA', 'a', 'bA', 'ba'])
   assert(tmp[0].score===0, 'goAsync sorting')
+  assert(tmp.length===5, 'goAsync sorting length')
 }
 
 
