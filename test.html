@@ -68,17 +68,23 @@
     $input.focus()
   }
 
-  async function refresh() {
-    if(app.gotype === 'Async') {
-      if(promise) promise.cancel()
+  function refresh() {
+    setTimeout(function() { // This is here to avoid performance issues with vue
+      if(app.gotype === 'Async') {
+        if(promise) promise.cancel()
 
-      startms = Date.now()
-      app.results = await fuzzysort.goAsync(app.inputValue, testdata[app.testdatakey])
-      app.duration = Date.now() - startms
-    } else {
-      startms = Date.now()
-      app.results = fuzzysort.go(app.inputValue, testdata[app.testdatakey])
-      app.duration = Date.now() - startms
-    }
+        startms = Date.now()
+        promise = fuzzysort.goAsync(app.inputValue, testdata[app.testdatakey])
+        promise.then(renderResults, err=>console.log(err))
+      } else {
+        startms = Date.now()
+        renderResults(fuzzysort.go(app.inputValue, testdata[app.testdatakey]))
+      }
+    })
+  }
+
+  function renderResults(results) {
+    app.duration = Date.now() - startms
+    app.results = results
   }
 </script>
