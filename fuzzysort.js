@@ -22,7 +22,10 @@ USAGE:
     limit: null, // don't return more results than this
 
     single: (search, target) => {
-      const result = fuzzysort.info(search.toLowerCase(), target)
+      const lowerSearch = search.toLowerCase()
+      const searchLength = lowerSearch.length
+      const searchCode = lowerSearch.charCodeAt(0)
+      const result = fuzzysort.info(lowerSearch, searchLength, searchCode, target)
       if(result === null) return null
 
       if(fuzzysort.highlightMatches) {
@@ -32,19 +35,24 @@ USAGE:
     },
 
     go: (search, targets) => {
+      if(search === '') {const a=[];a.total=0;return a}
       const lowerSearch = search.toLowerCase()
+      const searchLength = lowerSearch.length
+      const searchCode = lowerSearch.charCodeAt(0)
       var i = targets.length-1
       const results = []
+      var resultsLen = 0
       for(; i>=0; i-=1) {
-        const result = fuzzysort.info(lowerSearch, targets[i])
-        if(result) results.push(result)
+        const result = fuzzysort.info(lowerSearch, searchLength, searchCode, targets[i])
+        if(result) results[resultsLen++] = result
       }
 
       const len = results.length
-      quickSortResults(results, 0, len)
+      results.sort(compareResults)
+      // quickSortResults(results, 0, len)
 
       results.total = len
-      if(fuzzysort.limit!=null && len > fuzzysort.limit) {
+      if(fuzzysort.limit!==null && len > fuzzysort.limit) {
         results.length = fuzzysort.limit
       }
       if(fuzzysort.highlightMatches) {
@@ -60,18 +68,22 @@ USAGE:
     goAsync: (search, targets) => {
       var canceled = false
       const p = new Promise((resolve, reject) => {
+        if(search === '') {const a=[];a.total=0;return resolve(a)}
         var i = targets.length-1
         const results = []
+        var resultsLen = 0
         const itemsPerCheck = 1000
         const lowerSearch = search.toLowerCase()
+        const searchLength = lowerSearch.length
+        const searchCode = lowerSearch.charCodeAt(0)
         function step() {
           if(canceled) return reject('canceled')
 
           const startMs = Date.now()
 
           for(; i>=0; i-=1) {
-            const result = fuzzysort.info(lowerSearch, targets[i])
-            if(result) results.push(result)
+            const result = fuzzysort.info(lowerSearch, searchLength, searchCode, targets[i])
+            if(result) results[resultsLen++] = result
 
             if(i%itemsPerCheck===0) {
               if(Date.now() - startMs >= 12) {
@@ -82,10 +94,11 @@ USAGE:
           }
 
           const len = results.length
-          quickSortResults(results, 0, len)
+          results.sort(compareResults)
+          // quickSortResults(results, 0, len)
 
           results.total = len
-          if(fuzzysort.limit!=null && len > fuzzysort.limit) {
+          if(fuzzysort.limit!==null && len > fuzzysort.limit) {
             results.length = fuzzysort.limit
           }
           if(fuzzysort.highlightMatches) {
@@ -112,35 +125,35 @@ USAGE:
       return p
     },
 
-    info: (lowerSearch, target) => {
+    info: (lowerSearch, searchLength, searchCode, target) => {
       var searchI = 0 // where we at
       var targetI = 0 // where you at
 
       var noMatchCount = 0 // how long since we've seen a match
       var matches // target indexes
+      var matchesLen = 1
 
       const lowerTarget = target.toLowerCase()
-      const searchLength = lowerSearch.length
       const targetLength = target.length
-      var currentSearchCode = lowerSearch.charCodeAt(0)
-      var currentTargetCode = lowerTarget.charCodeAt(0)
+      var targetCode = lowerTarget.charCodeAt(0)
 
       // very basic fuzzy match; to remove targets with no match ASAP
       // walk through search and target. find sequential matches.
       // if all chars aren't found then exit
       while(true) {
-        const isMatch = currentSearchCode === currentTargetCode
+        const isMatch = searchCode === targetCode
 
         if(isMatch) {
           if(matches === undefined) {
             matches = [targetI]
+            // matchesLen = 1
           } else {
-            matches.push(targetI)
+            matches[matchesLen++] = targetI
           }
 
           searchI += 1
           if(searchI === searchLength) break
-          currentSearchCode = lowerSearch.charCodeAt(searchI)
+          searchCode = lowerSearch.charCodeAt(searchI)
           noMatchCount = 0
         } else {
           noMatchCount += 1
@@ -149,7 +162,7 @@ USAGE:
 
         targetI += 1
         if(targetI === targetLength) return null
-        currentTargetCode = lowerTarget.charCodeAt(targetI)
+        targetCode = lowerTarget.charCodeAt(targetI)
       }
 
 
@@ -163,10 +176,10 @@ USAGE:
 
       var strictSuccess = false
       var strictMatches
-      const upperTarget = target.toUpperCase()
+      var strictMatchesLen = 1
 
       var wasUpper = null
-      var wasChar = false
+      var wasWord = false
       var isConsec = false
 
       searchI = 0
@@ -175,9 +188,9 @@ USAGE:
       if(matches[0]>0) {
         // skip and backfill history
         targetI = matches[0]
-        wasUpper = target.charCodeAt(targetI-1) === upperTarget.charCodeAt(targetI-1)
-        const targetCharCode = lowerTarget.charCodeAt(targetI-1)
-        wasChar = targetCharCode>=48&&targetCharCode<=57 || targetCharCode>=97&&targetCharCode<=122
+        const targetCode = target.charCodeAt(targetI-1)
+        wasUpper = targetCode>=65&&targetCode<=90
+        wasWord = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
       } else {
         targetI = 0
       }
@@ -190,35 +203,40 @@ USAGE:
           if (searchI <= 0) break
           searchI -= 1
 
-          const lastMatch = strictMatches.pop()
+          const lastMatch = strictMatches[--strictMatchesLen]
           targetI = lastMatch + 1
 
           isConsec = false
           // backfill history
-          const upperCharCode = upperTarget.charCodeAt(targetI-1)
-          wasUpper = target.charCodeAt(targetI-1) === upperCharCode
-          wasChar = upperCharCode>=48&&upperCharCode<=57 || upperCharCode>=65&&upperCharCode<=90
+          const targetCode = target.charCodeAt(targetI-1)
+          wasUpper = targetCode>=65&&targetCode<=90
+          wasWord = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
           continue
         }
 
-        const isUpper = target.charCodeAt(targetI) === upperTarget.charCodeAt(targetI)
-        const targetCharCode = lowerTarget.charCodeAt(targetI)
-        const isChar = targetCharCode>=48&&targetCharCode<=57 || targetCharCode>=97&&targetCharCode<=122
-        const isBeginning = isUpper && !wasUpper || isChar && !wasChar
-        wasUpper = isUpper
-        wasChar = isChar
-        if (!isBeginning && !isConsec) {
-          targetI += 1
-          continue
+        const lowerTargetCode = lowerTarget.charCodeAt(targetI)
+        if(!isConsec) {
+          const targetCode = target.charCodeAt(targetI)
+          const isUpper = targetCode>=65&&targetCode<=90
+          const isWord = lowerTargetCode>=97&&lowerTargetCode<=122 || lowerTargetCode>=48&&lowerTargetCode<=57
+          const isBeginning = isUpper && !wasUpper || !wasWord || !isWord
+          wasUpper = isUpper
+          wasWord = isWord
+          if (!isBeginning) {
+            targetI += 1
+            continue
+          }
         }
 
-        const isMatch = lowerSearch.charCodeAt(searchI) === targetCharCode
+        // const isMatch = lowerSearch.charCodeAt(searchI) === targetCharCode
+        const isMatch = lowerSearch.charCodeAt(searchI) === lowerTargetCode
 
         if(isMatch) {
           if(strictMatches === undefined) {
             strictMatches = [targetI]
+            // strictMatchesLen = 1
           } else {
-            strictMatches.push(targetI)
+            strictMatches[strictMatchesLen++] = targetI
           }
 
           searchI += 1
@@ -236,9 +254,9 @@ USAGE:
               // skip and backfill history
               targetI = matches[searchI]
               isConsec = false
-              const upperCharCode = upperTarget.charCodeAt(targetI-1)
-              wasUpper = target.charCodeAt(targetI-1) === upperCharCode
-              wasChar = upperCharCode>=48&&upperCharCode<=57 || upperCharCode>=65&&upperCharCode<=90
+              const targetCode = target.charCodeAt(targetI-1)
+              wasUpper = targetCode>=65&&targetCode<=90
+              wasWord = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
             }
           }
 
@@ -337,6 +355,10 @@ USAGE:
       quickSortResults(results, left, p)
       quickSortResults(results, p + 1, right)
     }
+  }
+
+  function compareResults(a,b) {
+    return a.score - b.score
   }
 
 
