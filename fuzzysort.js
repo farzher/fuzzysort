@@ -23,7 +23,7 @@ USAGE:
 
     single: (search, target) => {
       const result = fuzzysort.info(search, target)
-      if(result == null) return null
+      if(result === null) return null
 
       if(fuzzysort.highlightMatches) {
         result.highlighted = fuzzysort.highlight(result)
@@ -110,24 +110,31 @@ USAGE:
       var targetI = 0 // where you at
 
       var noMatchCount = 0 // how long since we've seen a match
-      const matches = [] // target indexes
+      var matches // target indexes
 
       const lowerSearch = search.toLowerCase()
       const lowerTarget = target.toLowerCase()
       const searchLength = search.length
       const targetLength = target.length
+      var currentSearchCode = lowerSearch.charCodeAt(0)
+      var currentTargetCode = lowerTarget.charCodeAt(0)
 
       // very basic fuzzy match; to remove targets with no match ASAP
       // walk through search and target. find sequential matches.
       // if all chars aren't found then exit
       while(true) {
-        const isMatch = lowerSearch[searchI] === lowerTarget[targetI]
+        const isMatch = currentSearchCode === currentTargetCode
 
         if(isMatch) {
-          matches.push(targetI)
+          if(matches === undefined) {
+            matches = [targetI]
+          } else {
+            matches.push(targetI)
+          }
 
           searchI += 1
           if(searchI === searchLength) break
+          currentSearchCode = lowerSearch.charCodeAt(searchI)
           noMatchCount = 0
         } else {
           noMatchCount += 1
@@ -136,6 +143,7 @@ USAGE:
 
         targetI += 1
         if(targetI === targetLength) return null
+        currentTargetCode = lowerTarget.charCodeAt(targetI)
       }
 
 
@@ -148,7 +156,7 @@ USAGE:
       // we use information about previous matches to skip around here and improve performance
 
       var strictSuccess = false
-      const strictMatches = []
+      var strictMatches
       const upperTarget = target.toUpperCase()
 
       var wasUpper = null
@@ -161,8 +169,8 @@ USAGE:
       if(matches[0]>0) {
         // skip and backfill history
         targetI = matches[0]
-        wasUpper = target[targetI-1] === upperTarget[targetI-1]
-        const targetCharCode = lowerTarget[targetI-1].charCodeAt(0)
+        wasUpper = target.charCodeAt(targetI-1) === upperTarget.charCodeAt(targetI-1)
+        const targetCharCode = lowerTarget.charCodeAt(targetI-1)
         wasChar = targetCharCode>=48&&targetCharCode<=57 || targetCharCode>=97&&targetCharCode<=122
       } else {
         targetI = 0
@@ -181,15 +189,14 @@ USAGE:
 
           isConsec = false
           // backfill history
-          wasUpper = target[targetI-1] === upperTarget[targetI-1]
-          const targetCharCode = lowerTarget[targetI-1].charCodeAt(0)
-          wasChar = targetCharCode>=48&&targetCharCode<=57 || targetCharCode>=97&&targetCharCode<=122
+          const upperCharCode = upperTarget.charCodeAt(targetI-1)
+          wasUpper = target.charCodeAt(targetI-1) === upperCharCode
+          wasChar = upperCharCode>=48&&upperCharCode<=57 || upperCharCode>=65&&upperCharCode<=90
           continue
         }
 
-        const isUpper = target[targetI] === upperTarget[targetI]
-        const targetChar = lowerTarget[targetI]
-        const targetCharCode = targetChar.charCodeAt(0)
+        const isUpper = target.charCodeAt(targetI) === upperTarget.charCodeAt(targetI)
+        const targetCharCode = lowerTarget.charCodeAt(targetI)
         const isChar = targetCharCode>=48&&targetCharCode<=57 || targetCharCode>=97&&targetCharCode<=122
         const isBeginning = isUpper && !wasUpper || isChar && !wasChar
         wasUpper = isUpper
@@ -199,10 +206,14 @@ USAGE:
           continue
         }
 
-        const isMatch = lowerSearch[searchI] === targetChar
+        const isMatch = lowerSearch.charCodeAt(searchI) === targetCharCode
 
         if(isMatch) {
-          strictMatches.push(targetI)
+          if(strictMatches === undefined) {
+            strictMatches = [targetI]
+          } else {
+            strictMatches.push(targetI)
+          }
 
           searchI += 1
           if(searchI === searchLength) {
@@ -214,14 +225,14 @@ USAGE:
           isConsec = true
           const wouldSkipAhead = matches[searchI] > targetI
           if(wouldSkipAhead) {
-            const nextMatchIsNextTarget = matches[searchI] == targetI
+            const nextMatchIsNextTarget = matches[searchI] === targetI
             if(!nextMatchIsNextTarget) {
               // skip and backfill history
               targetI = matches[searchI]
               isConsec = false
-              wasUpper = target[targetI-1] === upperTarget[targetI-1]
-              const targetCharCode = lowerTarget[targetI-1].charCodeAt(0)
-              wasChar = targetCharCode>=48&&targetCharCode<=57 || targetCharCode>=97&&targetCharCode<=122
+              const upperCharCode = upperTarget.charCodeAt(targetI-1)
+              wasUpper = target.charCodeAt(targetI-1) === upperCharCode
+              wasChar = upperCharCode>=48&&upperCharCode<=57 || upperCharCode>=65&&upperCharCode<=90
             }
           }
 
