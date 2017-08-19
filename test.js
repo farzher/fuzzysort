@@ -13,7 +13,7 @@ if(typeof fuzzysort === 'undefined') fuzzysort = require('./fuzzysort')
   // fuzzysort.highlightMatches = false
   fuzzysort.noMatchLimit = 100
   fuzzysort.limit = 100
-  const benchmark_duration = .1
+  const benchmark_duration = 1
 
 
 setTimeout(() => {
