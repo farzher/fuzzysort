@@ -228,7 +228,6 @@ USAGE:
           }
         }
 
-        // const isMatch = lowerSearch.charCodeAt(searchI) === targetCharCode
         const isMatch = lowerSearch.charCodeAt(searchI) === lowerTargetCode
 
         if(isMatch) {
