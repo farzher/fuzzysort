@@ -23,7 +23,7 @@ https://rawgit.com/farzher/fuzzysort/master/test.html
 npm i fuzzysort
 node
 > require('fuzzysort').single('t', 'test')
-{ score: 0.003, highlighted: '<b>t</b>est' }
+{ score: 3, highlighted: '<b>t</b>est' }
 ```
 
 
@@ -42,7 +42,7 @@ node
 
 ```js
 fuzzysort.single('query', 'some string that contains my query.')
-// {score: 0.059, highlighted: "some string that contains my <b>query</b>."}
+// {score: 59, highlighted: "some string that contains my <b>query</b>."}
 
 fuzzysort.single('query', 'irrelevant string') // null
 
@@ -54,8 +54,8 @@ fuzzysort.single('query', 'query') // {score: 0, highlighted: "<b>query</b>"}
 
 ```js
 fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
-// [{score: 0.018, highlighted: "<b>M</b>esh<b>R</b>enderer.cpp"}
-// ,{score: 6.009, highlighted: "<b>M</b>onito<b>r</b>.cpp"}]
+// [{score: 18, highlighted: "<b>M</b>esh<b>R</b>enderer.cpp"}
+// ,{score: 6009, highlighted: "<b>M</b>onito<b>r</b>.cpp"}]
 ```
 
 ### `fuzzysort.goAsync(search, targets)`

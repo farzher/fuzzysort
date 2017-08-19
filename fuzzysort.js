@@ -264,8 +264,8 @@ USAGE:
 
         lastTargetI = targetI
       }
-      if(strictSuccess) ret.score /= 1000
-      ret.score += targetLength/1000 - searchLength/1000
+      if(!strictSuccess) ret.score *= 1000
+      ret.score += targetLength - searchLength
 
       if(fuzzysort.highlightMatches) {
         ret.target = target
