@@ -30,7 +30,7 @@
   var promise, startms
 
 
-  function reload() {
+  function search() {
     $input.focus()
     const inputValue = $input.val()
 
@@ -45,15 +45,13 @@
       renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
     }
   }
-  $input.on('input', reload)
 
   function renderResults(results) {
     const duration = Date.now() - startms
-    const len = results.length
 
     var html = `<p>${results.total} matches in ${duration}ms</p>`
     html += '<ul>'
-    for (var i = 0; i < len; i++) {
+    for (var i = 0; i < results.length; i++) {
       const result = results[i]
       html += `<li>${result.score} - ${result.highlighted}</li>`
     }
@@ -61,15 +59,16 @@
     $results.html(html)
   }
 
-
+  // Run a search on input change
+    $input.on('input', search)
   // Select input when escape pressed
-  document.onkeyup = (e) => {
-    if(e.keyCode === 27) $input.select()
-  }
+    document.onkeyup = (e) => {
+      if(e.keyCode === 27) $input.select()
+    }
   // Focus input when any key pressed
-  document.onkeydown = (e) => {
-    $input.focus()
-  }
+    document.onkeydown = (e) => {
+      $input.focus()
+    }
 
   $('#async-buttons').html(`
     <div class="btn-group" data-toggle="buttons">
@@ -82,7 +81,7 @@
   `)
   $(document).on('change', '[name="isAsync"]', function() {
     isAsync = $(this).val() === '1'
-    setTimeout(reload)
+    setTimeout(search)
   })
 
   $('#buttons').html(`
@@ -97,6 +96,6 @@
   $(document).on('change', '[name="testdatakeys"]', function() {
     testdatakey = $(this).val()
     $input.attr('placeholder', testdatakey)
-    setTimeout(reload)
+    setTimeout(search)
   })
 </script>
