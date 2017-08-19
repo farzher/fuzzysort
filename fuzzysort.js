@@ -47,12 +47,11 @@ USAGE:
         if(result) results[resultsLen++] = result
       }
 
-      const len = results.length
       results.sort(compareResults)
-      // quickSortResults(results, 0, len)
+      // quickSortResults(results, 0, resultsLen)
 
-      results.total = len
-      if(fuzzysort.limit!==null && len > fuzzysort.limit) {
+      results.total = resultsLen
+      if(fuzzysort.limit!==null && resultsLen > fuzzysort.limit) {
         results.length = fuzzysort.limit
       }
       if(fuzzysort.highlightMatches) {
@@ -93,12 +92,11 @@ USAGE:
             }
           }
 
-          const len = results.length
           results.sort(compareResults)
-          // quickSortResults(results, 0, len)
+          // quickSortResults(results, 0, resultsLen)
 
-          results.total = len
-          if(fuzzysort.limit!==null && len > fuzzysort.limit) {
+          results.total = resultsLen
+          if(fuzzysort.limit!==null && resultsLen > fuzzysort.limit) {
             results.length = fuzzysort.limit
           }
           if(fuzzysort.highlightMatches) {
