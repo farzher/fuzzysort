@@ -16,8 +16,8 @@ if(typeof fuzzysort === 'undefined') fuzzysort = require('./fuzzysort')
   const benchmark_duration = 1
 
 
-setTimeout(() => {
-  tests()
+setTimeout(async function() {
+  await tests()
 
   if(!assert.failed) { // only if tests passed will we bench
     console.log('all tests passed')
@@ -44,13 +44,15 @@ async function tests() {
   test('noodle monster', 'nomon', null, 'qrs')
   test('noodle monster '.repeat(100), null, 'a')
 
-  var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'ba'])
+  var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
   assert(tmp[0].score===0, 'go sorting')
   assert(tmp.length===5, 'go sorting length')
+  assert(tmp.total===5, 'go sorting length')
 
-  var tmp = await fuzzysort.goAsync('a', ['ba', 'bA', 'a', 'bA', 'ba'])
+  var tmp = await fuzzysort.goAsync('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
   assert(tmp[0].score===0, 'goAsync sorting')
   assert(tmp.length===5, 'goAsync sorting length')
+  assert(tmp.total===5, 'goAsync sorting length')
 }
 
 
@@ -82,10 +84,15 @@ function bench() {
 
   suite.add('go', function() {
     fuzzysort.go('e', random_strings)
+    fuzzysort.go('a', random_strings)
+    fuzzysort.go('mrender.h', random_strings)
   })
 
   suite.add('goAsync', function(deferred) {
-    fuzzysort.goAsync('e', random_strings).then(()=>{deferred.resolve()})
+    var count = 0
+    fuzzysort.goAsync('e', random_strings).then(()=>{count+=1; if(count===3)deferred.resolve()})
+    fuzzysort.goAsync('a', random_strings).then(()=>{count+=1; if(count===3)deferred.resolve()})
+    fuzzysort.goAsync('mrender.h', random_strings).then(()=>{count+=1; if(count===3)deferred.resolve()})
   }, {defer:true})
 
   suite.add('goAsync.cancel()', function(deferred) {
