@@ -74,7 +74,7 @@ USAGE:
             if(result) results.push(result)
 
             if(i%itemsPerCheck===0) {
-              if(Date.now() - startMs >= 16) {
+              if(Date.now() - startMs >= 12) {
                 ;(typeof setImmediate !== 'undefined')?setImmediate(step):setTimeout(step)
                 return
               }
@@ -98,8 +98,13 @@ USAGE:
           resolve(results)
         }
 
-        // step()
-        ;(typeof setImmediate !== 'undefined')?setImmediate(step):setTimeout(step)
+        if(typeof setImmediate !== 'undefined') {
+          setImmediate(step)
+        } else {
+          step()
+        }
+        // step() // This speeds up the browser a lot. setTimeout is slow
+        // // ;(typeof setImmediate !== 'undefined')?setImmediate(step):setTimeout(step)
       })
       p.cancel = () => {
         canceled = true
