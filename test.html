@@ -51,9 +51,9 @@
       results: [],
     },
     watch: {
-      inputValue: refresh,
-      gotype: refresh,
-      testdatakey: refresh,
+      // inputValue: () => { setTimeout(refresh) }, // timeout to avoid vue performance issues
+      gotype: () => { setTimeout(refresh) }, // timeout to avoid vue performance issues
+      testdatakey: () => { setTimeout(refresh) }, // timeout to avoid vue performance issues
     },
   })
   var promise, startms
@@ -67,20 +67,20 @@
   document.onkeydown = (e) => {
     $input.focus()
   }
+  // Refresh on input change
+  $input.on('input', refresh)
 
   function refresh() {
-    setTimeout(function() { // This is here to avoid performance issues with vue
-      if(app.gotype === 'Async') {
-        if(promise) promise.cancel()
+    if(app.gotype === 'Async') {
+      if(promise) promise.cancel()
 
-        startms = Date.now()
-        promise = fuzzysort.goAsync(app.inputValue, testdata[app.testdatakey])
-        promise.then(renderResults, err=>console.log(err))
-      } else {
-        startms = Date.now()
-        renderResults(fuzzysort.go(app.inputValue, testdata[app.testdatakey]))
-      }
-    })
+      startms = Date.now()
+      promise = fuzzysort.goAsync(app.inputValue, testdata[app.testdatakey])
+      promise.then(renderResults, err=>console.log(err))
+    } else {
+      startms = Date.now()
+      renderResults(fuzzysort.go(app.inputValue, testdata[app.testdatakey]))
+    }
   }
 
   function renderResults(results) {
