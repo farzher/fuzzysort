@@ -22,7 +22,7 @@ USAGE:
     limit: null, // don't return more results than this
 
     single: (search, target) => {
-      const result = fuzzysort.info(search, target)
+      const result = fuzzysort.info(search.toLowerCase(), target)
       if(result === null) return null
 
       if(fuzzysort.highlightMatches) {
@@ -32,10 +32,11 @@ USAGE:
     },
 
     go: (search, targets) => {
+      const lowerSearch = search.toLowerCase()
       var i = targets.length-1
       const results = []
       for(; i>=0; i-=1) {
-        const result = fuzzysort.info(search, targets[i])
+        const result = fuzzysort.info(lowerSearch, targets[i])
         if(result) results.push(result)
       }
 
@@ -62,13 +63,14 @@ USAGE:
         var i = targets.length-1
         const results = []
         const itemsPerCheck = 1000
+        const lowerSearch = search.toLowerCase()
         function step() {
           if(canceled) return reject('canceled')
 
           const startMs = Date.now()
 
           for(; i>=0; i-=1) {
-            const result = fuzzysort.info(search, targets[i])
+            const result = fuzzysort.info(lowerSearch, targets[i])
             if(result) results.push(result)
 
             if(i%itemsPerCheck===0) {
@@ -105,16 +107,15 @@ USAGE:
       return p
     },
 
-    info: (search, target) => {
+    info: (lowerSearch, target) => {
       var searchI = 0 // where we at
       var targetI = 0 // where you at
 
       var noMatchCount = 0 // how long since we've seen a match
       var matches // target indexes
 
-      const lowerSearch = search.toLowerCase()
       const lowerTarget = target.toLowerCase()
-      const searchLength = search.length
+      const searchLength = lowerSearch.length
       const targetLength = target.length
       var currentSearchCode = lowerSearch.charCodeAt(0)
       var currentTargetCode = lowerTarget.charCodeAt(0)
