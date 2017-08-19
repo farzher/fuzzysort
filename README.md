@@ -70,3 +70,4 @@ if(invalidated) promise.cancel()
  - `fuzzysort.highlightMatches = true` Turn this off if you don't care about `highlighted`
  - `fuzzysort.highlightOpen = '<b>'`
  - `fuzzysort.highlightClose = '</b>'`
+ - `fuzzysort.limit = null` Don't return more results than this (improve performance by not highlighting everything)

@@ -13,44 +13,99 @@ USAGE:
 */
 
 ;(function() {
-  function quickSortPartition(results, left, right) {
-    const cmp = results[right-1].score
-    var minEnd = left
-    var maxEnd = left
-    for (; maxEnd < right-1; maxEnd += 1) {
-      if (results[maxEnd].score <= cmp) {
-        swap(results, maxEnd, minEnd)
-        minEnd += 1
-      }
-    }
-    swap(results, minEnd, right-1)
-    return minEnd
-  }
-
-  function swap(results, i, j) {
-    const temp = results[i]
-    results[i] = results[j]
-    results[j] = temp
-  }
-
-  function quickSortResults(results, left, right) {
-    if (left < right) {
-      var p = quickSortPartition(results, left, right)
-      quickSortResults(results, left, p)
-      quickSortResults(results, p + 1, right)
-    }
-  }
-
-
-
   var fuzzysort = {
 
     noMatchLimit: 100, // if there's no match for a span this long, give up
     highlightMatches: true,
     highlightOpen: '<b>',
     highlightClose: '</b>',
+    limit: null, // don't return more results than this
 
     single: (search, target) => {
+      const result = fuzzysort.info(search, target)
+      if(result == null) return null
+
+      if(fuzzysort.highlightMatches) {
+        result.highlighted = fuzzysort.highlight(result)
+      }
+      return result
+    },
+
+    go: (search, targets) => {
+      var i = targets.length-1
+      const results = []
+      for(; i>=0; i-=1) {
+        const result = fuzzysort.info(search, targets[i])
+        if(result) results.push(result)
+      }
+
+      const len = results.length
+      quickSortResults(results, 0, len)
+
+      results.total = len
+      if(fuzzysort.limit!=null && len > fuzzysort.limit) {
+        results.length = fuzzysort.limit
+      }
+      if(fuzzysort.highlightMatches) {
+        for (i = results.length - 1; i >= 0; i--) {
+          const result = results[i]
+          result.highlighted = fuzzysort.highlight(result)
+        }
+      }
+
+      return results
+    },
+
+    goAsync: (search, targets) => {
+      var canceled = false
+      const p = new Promise((resolve, reject) => {
+        var i = targets.length-1
+        const results = []
+        const itemsPerCheck = 1000
+        function step() {
+          if(canceled) return reject('canceled')
+
+          const startMs = Date.now()
+
+          for(; i>=0; i-=1) {
+            const result = fuzzysort.info(search, targets[i])
+            if(result) results.push(result)
+
+            if(i%itemsPerCheck===0) {
+              if(Date.now() - startMs >= 16) {
+                ;(typeof setImmediate !== 'undefined')?setImmediate(step):setTimeout(step)
+                return
+              }
+            }
+          }
+
+          const len = results.length
+          quickSortResults(results, 0, len)
+
+          results.total = len
+          if(fuzzysort.limit!=null && len > fuzzysort.limit) {
+            results.length = fuzzysort.limit
+          }
+          if(fuzzysort.highlightMatches) {
+            for (i = results.length - 1; i >= 0; i--) {
+              const result = results[i]
+              result.highlighted = fuzzysort.highlight(result)
+            }
+          }
+
+          resolve(results)
+        }
+
+        // step()
+        ;(typeof setImmediate !== 'undefined')?setImmediate(step):setTimeout(step)
+      })
+      p.cancel = () => {
+        canceled = true
+      }
+      return p
+    },
+
+    info: (search, target) => {
       var searchI = 0 // where we at
       var targetI = 0 // where you at
 
@@ -182,101 +237,93 @@ USAGE:
 
       const ret = {}
 
-      // tally up the score
+      // tally up the score & keep track of matches for highlighting later
       ret.score = 0
       var lastTargetI = -1
-      var theMatches = strictSuccess ? strictMatches : matches
+      const theMatches = strictSuccess ? strictMatches : matches
       for(const targetI of theMatches) {
         // score only goes up if they not consecutive
-        if(lastTargetI !== targetI - 1) {
-          ret.score += targetI
-        }
+        if(lastTargetI !== targetI - 1) ret.score += targetI
 
         lastTargetI = targetI
       }
       if(strictSuccess) ret.score /= 1000
       ret.score += targetLength/1000 - searchLength/1000
 
-      // highlight matches
       if(fuzzysort.highlightMatches) {
-        ret.highlighted = ''
-        var matchesIndex = 0
-        var opened = false
-        for(var i=0; i<targetLength; i++) {
-          if(theMatches[matchesIndex] === i) {
-            matchesIndex += 1
-            if(!opened) {
-              ret.highlighted += fuzzysort.highlightOpen
-              opened = true
-            }
-
-            if(matchesIndex === theMatches.length) {
-              ret.highlighted += `${target[i]}${fuzzysort.highlightClose}${target.substr(i+1)}`
-              break
-            }
-          } else {
-            if(opened) {
-              ret.highlighted += fuzzysort.highlightClose
-              opened = false
-            }
-          }
-          ret.highlighted += target[i]
-        }
+        ret.target = target
+        ret.theMatches = strictSuccess ? strictMatches : matches
       }
 
       return ret
     },
 
-    go: (search, targets) => {
-      var i = targets.length-1
-      const results = []
-      for(; i>=0; i-=1) {
-        const result = fuzzysort.single(search, targets[i])
-        if(result) results.push(result)
-      }
-
-      quickSortResults(results, 0, results.length)
-      // results.sort((a, b) => a.score - b.score)
-      return results
-    },
-
-    goAsync: (search, targets) => {
-      var canceled = false
-      const p = new Promise((resolve, reject) => {
-        var i = targets.length-1
-        const results = []
-        const itemsPerCheck = 1000
-        function step() {
-          if(canceled) return reject('canceled')
-
-          const startMs = Date.now()
-
-          for(; i>=0; i-=1) {
-            const result = fuzzysort.single(search, targets[i])
-            if(result) results.push(result)
-
-            if(i%itemsPerCheck===0) {
-              if(Date.now() - startMs >= 16) {
-                ;(typeof setImmediate !== 'undefined')?setImmediate(step):setTimeout(step)
-                return
-              }
-            }
+    highlight: (result) => {
+      var highlighted = ''
+      var matchesIndex = 0
+      var opened = false
+      const target = result.target
+      const targetLength = target.length
+      const theMatches = result.theMatches
+      for(var i=0; i<targetLength; i++) {
+        if(theMatches[matchesIndex] === i) {
+          matchesIndex += 1
+          if(!opened) {
+            highlighted += fuzzysort.highlightOpen
+            opened = true
           }
 
-          quickSortResults(results, 0, results.length)
-          // results.sort((a, b) => a.score - b.score)
-          resolve(results)
+          if(matchesIndex === theMatches.length) {
+            highlighted += `${target[i]}${fuzzysort.highlightClose}${target.substr(i+1)}`
+            break
+          }
+        } else {
+          if(opened) {
+            highlighted += fuzzysort.highlightClose
+            opened = false
+          }
         }
-
-        // step()
-        ;(typeof setImmediate !== 'undefined')?setImmediate(step):setTimeout(step)
-      })
-      p.cancel = () => {
-        canceled = true
+        highlighted += target[i]
       }
-      return p
+
+      return highlighted
     }
   }
+
+
+
+
+
+  function quickSortPartition(results, left, right) {
+    const cmp = results[right-1].score
+    var minEnd = left
+    var maxEnd = left
+    for (; maxEnd < right-1; maxEnd += 1) {
+      if (results[maxEnd].score <= cmp) {
+        swap(results, maxEnd, minEnd)
+        minEnd += 1
+      }
+    }
+    swap(results, minEnd, right-1)
+    return minEnd
+  }
+
+  function swap(results, i, j) {
+    const temp = results[i]
+    results[i] = results[j]
+    results[j] = temp
+  }
+
+  function quickSortResults(results, left, right) {
+    if (left < right) {
+      var p = quickSortPartition(results, left, right)
+      quickSortResults(results, left, p)
+      quickSortResults(results, p + 1, right)
+    }
+  }
+
+
+
 
   // Export fuzzysort
     if(typeof module !== 'undefined' && module.exports) {

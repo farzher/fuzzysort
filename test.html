@@ -80,10 +80,9 @@
     const duration = Date.now() - startms
     const len = results.length
 
-    var html = `<p>${results.length} matches in ${duration}ms</p>`
+    var html = `<p>${results.total} matches in ${duration}ms</p>`
     html += '<ul>'
     for (var i = 0; i < len; i++) {
-      if(i >= 100) break
       const result = results[i]
       html += `<li>${Math.round(result.score*1000)} - ${result.highlighted}</li>`
     }

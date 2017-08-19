@@ -12,6 +12,7 @@ if(typeof fuzzysort === 'undefined') fuzzysort = require('./fuzzysort')
 // Config
   // fuzzysort.highlightMatches = false
   fuzzysort.noMatchLimit = 100
+  fuzzysort.limit = 100
   const benchmark_duration = .1
 
 
@@ -69,43 +70,32 @@ function bench() {
   if(typeof testdata === 'undefined') testdata = require('./testdata')
   random_strings = testdata.ue4_filenames
 
-  // suite.add('loop++', function() {
+  // suite.add('single', function() {
   //   const len = random_strings.length
   //   const results = []
-  //   var currentLen = 0
   //   for (var i = 0; i < len; i++) {
-  //     const result = fuzzysort.single('search', random_strings[i])
-  //     if(result) results[currentLen++] = result
+  //     const result = fuzzysort.single('a', random_strings[i])
+  //     if(result) results.push(result)
   //   }
   //   results.sort((a, b) => a.score - b.score)
   // })
 
-  suite.add('loop.push()', function() {
-    const len = random_strings.length
-    const results = []
-    for (var i = 0; i < len; i++) {
-      const result = fuzzysort.single('search', random_strings[i])
-      if(result) results.push(result)
-    }
-    results.sort((a, b) => a.score - b.score)
-  })
-
   suite.add('go', function() {
-    fuzzysort.go('search', random_strings)
+    fuzzysort.go('e', random_strings)
   })
 
   suite.add('goAsync', function(deferred) {
-    fuzzysort.goAsync('search', random_strings).then(()=>{deferred.resolve()})
+    fuzzysort.goAsync('e', random_strings).then(()=>{deferred.resolve()})
   }, {defer:true})
 
   suite.add('goAsync.cancel()', function(deferred) {
-    const p = fuzzysort.goAsync('search', random_strings)
+    const p = fuzzysort.goAsync('e', random_strings)
     p.then(()=>{deferred.resolve()}, ()=>{deferred.resolve()})
     p.cancel()
   }, {defer:true})
 
   suite.add('huge', function() {
-    fuzzysort.single('a', 'noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
+    fuzzysort.single('xxx', 'noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
   })
 
   suite.add('tricky', function() {
@@ -119,6 +109,7 @@ function bench() {
   suite.add('nomatch', function() {
     fuzzysort.single('texxx', 'template/index')
   })
+
 
   suite.on('cycle', function(e) {
     console.log(String(e.target))
