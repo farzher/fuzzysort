@@ -1,11 +1,10 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">
 <style>
-  b {color: #dc3545 !important;}
+  b {color: #dc3545!important}
   html {overflow-y: scroll;}
 </style>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.4/platform.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/benchmark/2.1.4/benchmark.min.js"></script>
@@ -13,51 +12,52 @@
 <script src="./testdata.js"></script>
 <script src="./test.js"></script>
 
-<div id="app" class="jumbotron" style="background:none">
+<div class="jumbotron" style="background:none">
   <div class="container">
-    <div><div class="btn-group" data-toggle="buttons">
-      <label v-for="it in gotypes" class="btn btn-secondary" :class="{active: it===gotype}" @click="gotype = it">
-        <input type="radio"> {{it}}
-      </label>
-    </div></div><br>
-
-    <div><div class="btn-group" data-toggle="buttons">
-      <label v-for="it in testdatakeys" class="btn btn-secondary" :class="{active: it===testdatakey}" @click="testdatakey = it">
-        <input type="radio"> {{it}}
-      </label>
-    </div></div><br>
-
-    <input id="input" autofocus style="width:300px" v-model="inputValue" :placeholder="testdatakey" />
-
-    <div v-if="results.total !== undefined">
-      <p>{{results.total}} matches in {{duration}}ms</p>
-      <ul>
-        <li v-for="result in results">{{result.score}} - <span v-html="result.highlighted"></span></li>
-      </ul>
-    </div>
+    <div id="async-buttons"></div><br>
+    <div id="buttons"></div><br>
+    <input id="input" autofocus style="width:300px" placeholder="ue4_filenames" />
+    <div id="results"></div>
   </div>
 </div>
 
 <script>
-  window.app = new Vue({
-    el: '#app',
-    data: {
-      gotypes: ['Async', 'Sync'],
-      gotype: 'Async',
-      testdatakeys: Object.keys(testdata),
-      testdatakey: 'ue4_filenames',
-      inputValue: '',
-      duration: null,
-      results: [],
-    },
-    watch: {
-      // inputValue: () => { setTimeout(refresh) }, // timeout to avoid vue performance issues
-      gotype: () => { setTimeout(refresh) }, // timeout to avoid vue performance issues
-      testdatakey: () => { setTimeout(refresh) }, // timeout to avoid vue performance issues
-    },
-  })
+  const $input = $('#input')
+  const $results = $('#results')
+  const testdatakeys = Object.keys(testdata)
+  var testdatakey = 'ue4_filenames'
+  var isAsync = true
   var promise, startms
-  var $input = $('#input')
+
+
+  $input.on('input', function(e) {
+    if(isAsync) {
+      if(promise) promise.cancel()
+
+      const inputValue = $input.val()
+      startms = Date.now()
+      promise = fuzzysort.goAsync(inputValue, testdata[testdatakey])
+      promise.then(renderResults, err=>console.log(err))
+    } else {
+      startms = Date.now()
+      renderResults(fuzzysort.go($input.val(), testdata[testdatakey]))
+    }
+  })
+
+  function renderResults(results) {
+    const duration = Date.now() - startms
+    const len = results.length
+
+    var html = `<p>${results.total} matches in ${duration}ms</p>`
+    html += '<ul>'
+    for (var i = 0; i < len; i++) {
+      const result = results[i]
+      html += `<li>${result.score} - ${result.highlighted}</li>`
+    }
+    html += '</ul>'
+    $results.html(html)
+  }
+
 
   // Select input when escape pressed
   document.onkeyup = (e) => {
@@ -67,24 +67,35 @@
   document.onkeydown = (e) => {
     $input.focus()
   }
-  // Refresh on input change
-  $input.on('input', refresh)
 
-  function refresh() {
-    if(app.gotype === 'Async') {
-      if(promise) promise.cancel()
+  $('#async-buttons').html(`
+    <div class="btn-group" data-toggle="buttons">
+      ${['Async', 'Sync'].map(name => `
+        <label class="btn btn-secondary ${name==='Async'?'active':''}">
+          <input type="radio" name="isAsync" value="${name==='Async'?1:0}"> ${name}
+        </label>
+      `).join('')}
+    </div>
+  `)
+  $(document).on('change', '[name="isAsync"]', function() {
+    isAsync = $(this).val() === '1'
+    $input.trigger('input')
+    setTimeout(function(){$input.focus()})
+  })
 
-      startms = Date.now()
-      promise = fuzzysort.goAsync(app.inputValue, testdata[app.testdatakey])
-      promise.then(renderResults, err=>console.log(err))
-    } else {
-      startms = Date.now()
-      renderResults(fuzzysort.go(app.inputValue, testdata[app.testdatakey]))
-    }
-  }
-
-  function renderResults(results) {
-    app.duration = Date.now() - startms
-    app.results = results
-  }
+  $('#buttons').html(`
+    <div class="btn-group" data-toggle="buttons">
+      ${testdatakeys.map(name => `
+        <label class="btn btn-secondary ${name===testdatakey?'active':''}">
+          <input type="radio" name="testdatakeys" value="${name}"> ${name}
+        </label>
+      `).join('')}
+    </div>
+  `)
+  $(document).on('change', '[name="testdatakeys"]', function() {
+    testdatakey = $(this).val()
+    $input.attr('placeholder', testdatakey)
+    $input.trigger('input')
+    setTimeout(function(){$input.focus()})
+  })
 </script>
