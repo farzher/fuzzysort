@@ -1,10 +1,12 @@
 # [fuzzysort](https://raw.github.com/farzher/fuzzysort/master/fuzzysort.js)
 
-Fast SublimeText-like fuzzy search for node or the browser.
+Fast SublimeText-like fuzzy search for JavaScript.
 
 
 
 ## [Demo](https://rawgit.com/farzher/fuzzysort/master/test.html)
+
+https://rawgit.com/farzher/fuzzysort/master/test.html
 
 ![](http://i.imgur.com/tleIW3b.gif)
 
