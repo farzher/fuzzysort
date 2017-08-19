@@ -30,19 +30,22 @@
   var promise, startms
 
 
-  $input.on('input', function(e) {
+  function reload() {
+    $input.focus()
+    const inputValue = $input.val()
+
     if(isAsync) {
       if(promise) promise.cancel()
 
-      const inputValue = $input.val()
       startms = Date.now()
       promise = fuzzysort.goAsync(inputValue, testdata[testdatakey])
       promise.then(renderResults, err=>console.log(err))
     } else {
       startms = Date.now()
-      renderResults(fuzzysort.go($input.val(), testdata[testdatakey]))
+      renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
     }
-  })
+  }
+  $input.on('input', reload)
 
   function renderResults(results) {
     const duration = Date.now() - startms
@@ -79,8 +82,7 @@
   `)
   $(document).on('change', '[name="isAsync"]', function() {
     isAsync = $(this).val() === '1'
-    $input.trigger('input')
-    setTimeout(function(){$input.focus()})
+    setTimeout(reload)
   })
 
   $('#buttons').html(`
@@ -95,7 +97,6 @@
   $(document).on('change', '[name="testdatakeys"]', function() {
     testdatakey = $(this).val()
     $input.attr('placeholder', testdatakey)
-    $input.trigger('input')
-    setTimeout(function(){$input.focus()})
+    setTimeout(reload)
   })
 </script>
