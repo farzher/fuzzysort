@@ -17,6 +17,8 @@ https://rawgit.com/farzher/fuzzysort/master/test.html
 
 ![](http://i.imgur.com/4kKfMK4.png)
 
+![](http://i.imgur.com/PFIp7WR.png)
+
 
 
 ## Installation Node
