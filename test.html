@@ -33,10 +33,8 @@
   for(const testdatakey of testdatakeys) {
     if(cache[testdatakey]===undefined) cache[testdatakey] = {}
     for(const char of 'abcdefghijklmnopqrstuvwxyz') {
-      fuzzysort.goAsync(char, testdata[testdatakey]).then(results => {
-        results.cached = true
-        cache[testdatakey][char] = results
-      })
+      const results = fuzzysort.go(char, testdata[testdatakey])
+      cache[testdatakey][char] = {total:results.total, html:resultsToHtml(results)}
     }
   }
 
@@ -47,7 +45,7 @@
     if(searchMode==='Ludicrous Mode') {
       startms = Date.now()
       if(cache[testdatakey]&&cache[testdatakey][inputValue]) {
-        return renderResults(cache[testdatakey][inputValue])
+        return renderCache(cache[testdatakey][inputValue])
       } else {
         return renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
       }
@@ -65,22 +63,30 @@
     }
   }
 
-  function renderResults(results) {
-    const duration = Date.now() - startms
-    const wasCached = results.cached
-
-    if(cache[testdatakey]===undefined) cache[testdatakey] = {}
-    cache[testdatakey][$input.val()] = results
-    results.cached = true
-
-    var html = `<p>${results.total} matches in ${duration}ms ${wasCached?' <small class="text-muted"><i>cached</i></small>':''}</p>`
-    html += '<ul>'
+  function resultsToHtml(results) {
+    var html = '<ul>'
     for (var i = 0; i < results.length; i++) {
       const result = results[i]
       html += `<li>${result.score} - ${result.highlighted}</li>`
     }
     html += '</ul>'
-    $results.html(html)
+    return html
+  }
+  function renderResults(results) {
+    const duration = Date.now() - startms
+
+    const header = `<p>${results.total} matches in ${duration}ms</p>`
+    const html = resultsToHtml(results)
+
+    if(cache[testdatakey]===undefined) cache[testdatakey] = {}
+    cache[testdatakey][$input.val()] = {total:results.total, html}
+
+    $results.html(header+html)
+  }
+  function renderCache(cached) {
+    const duration = Date.now() - startms
+    const header = `<p>${cached.total} matches in ${duration}ms <small class="text-muted"><i>cached</i></small></p>`
+    $results.html(header+cached.html)
   }
 
   // Run a search on input change
