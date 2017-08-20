@@ -23,7 +23,7 @@ https://rawgit.com/farzher/fuzzysort/master/test.html
 
 ## Installation Node
 
-```
+```sh
 npm i fuzzysort
 node
 > require('fuzzysort').single('t', 'test')
