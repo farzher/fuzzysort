@@ -10,7 +10,7 @@ Sublime's fuzzy search is... sublime. I wish everything used it. So here's an op
 
 https://rawgit.com/farzher/fuzzysort/master/test.html
 
-![](http://i.imgur.com/tleIW3b.gif)
+![](http://i.imgur.com/1M6ZrgS.gif)
 
 
 ![](http://i.imgur.com/dN2cd7z.png)
