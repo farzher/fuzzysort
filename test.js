@@ -1,3 +1,64 @@
+// function f1(a, o=null) {
+//   if(o===null) o = {b:false}
+//   return o.b
+// }
+// function f12(a, o={}) {
+//   if(o.b===undefined) o.b=false
+//   return o.b
+// }
+// function f13(a, o=null) {
+//   return o&&o.b
+// }
+// function f2(a, {b}={b:false}) {
+//   return b
+// }
+// function f3(a, b=false) {
+//   return b
+// }
+
+
+// if(typeof Benchmark === 'undefined') Benchmark = require('benchmark')
+// Benchmark.options.maxTime = 1
+// const suite = new Benchmark.Suite
+// suite.add('f1', function() {
+//   return f1(1, {b:false})
+// })
+// suite.add('f12', function() {
+//   return f12(1, {b:false})
+// })
+// suite.add('f13', function() {
+//   return f13(1, {b:false})
+// })
+// suite.add('f2', function() {
+//   return f2(1, {b:false})
+// })
+// suite.add('f3', function() {
+//   return f3(1, false)
+// })
+// suite.add('f1 null', function() {
+//   return f1(1)
+// })
+// suite.add('f12 null', function() {
+//   return f12(1)
+// })
+// suite.add('f13 null', function() {
+//   return f13(1)
+// })
+// suite.add('f2 null', function() {
+//   return f2(1)
+// })
+// suite.add('f3 null', function() {
+//   return f3(1)
+// })
+// suite.on('cycle', function(e) {
+//   console.log(String(e.target))
+// })
+// suite.run()
+// process.exit()
+
+
+
+
 /*
 WHAT: Test and then benchmark
 USAGE: Run this file in node
@@ -11,16 +72,37 @@ if(typeof fuzzysort === 'undefined') fuzzysort = require('./fuzzysort')
 
 // Config
   // fuzzysort.highlightMatches = false
-  fuzzysort.noMatchLimit = 100
+  // fuzzysort.noMatchLimit = 100
+  fuzzysort.noMatchLimit = 50
   fuzzysort.limit = 100
   const benchmark_duration = 1
+
+
+if(typeof testdata === 'undefined') testdata = require('./testdata')
+// random_strings = new Array(100000)
+// for (var i = 0; i < 100000; i++) random_strings[i] = randomString(seededRand(1, 100))
+
+for(var key of Object.keys(testdata)) {
+  for(var i = testdata[key].length-1; i>=0; i-=1) {
+    const lower = testdata[key][i].toLowerCase()
+    testdata[key][i] = {
+      target: testdata[key][i],
+      lower: lower,
+      // len: lower.length,
+      // firstCharCode: lower.charCodeAt(0)
+    }
+  }
+}
+
+random_strings = testdata.ue4_filenames
 
 
 setTimeout(async function() {
   await tests()
 
   if(!assert.failed) { // only if tests passed will we bench
-    console.log('all tests passed')
+    if(assert.count>0) console.log('all tests passed')
+    else console.log('testing is disabled!')
 
     const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
     // Only bench on node. Don't want the demo to lag
@@ -67,11 +149,6 @@ function bench() {
   Benchmark.options.maxTime = benchmark_duration
   const suite = new Benchmark.Suite
 
-  // random_strings = new Array(100000)
-  // for (var i = 0; i < 100000; i++) random_strings[i] = randomString(seededRand(1, 100))
-  if(typeof testdata === 'undefined') testdata = require('./testdata')
-  random_strings = testdata.ue4_filenames
-
   // suite.add('single', function() {
   //   const len = random_strings.length
   //   const results = []
@@ -101,7 +178,7 @@ function bench() {
     p.cancel()
   }, {defer:true})
 
-  suite.add('huge', function() {
+  suite.add('huge nomatch', function() {
     fuzzysort.single('xxx', 'noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
   })
 
@@ -113,7 +190,7 @@ function bench() {
     fuzzysort.single('al', 'alexstrasa')
   })
 
-  suite.add('nomatch', function() {
+  suite.add('somematch', function() {
     fuzzysort.single('texxx', 'template/index')
   })
 
