@@ -26,15 +26,34 @@
   const $results = $('#results')
   const testdatakeys = Object.keys(testdata)
   var testdatakey = 'ue4_filenames'
-  var isAsync = true
+  var searchMode = 'Async'
+  var cache = {}
   var promise, startms
 
+  for(const testdatakey of testdatakeys) {
+    if(cache[testdatakey]===undefined) cache[testdatakey] = {}
+    for(const char of 'abcdefghijklmnopqrstuvwxyz') {
+      fuzzysort.goAsync(char, testdata[testdatakey]).then(results => {
+        results.cached = true
+        cache[testdatakey][char] = results
+      })
+    }
+  }
 
   function search() {
     $input.focus()
     const inputValue = $input.val()
 
-    if(isAsync) {
+    if(searchMode==='Ludicrous Mode') {
+      startms = Date.now()
+      if(cache[testdatakey]&&cache[testdatakey][inputValue]) {
+        return renderResults(cache[testdatakey][inputValue])
+      } else {
+        return renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
+      }
+    }
+
+    if(searchMode === 'Async') {
       if(promise) promise.cancel()
 
       startms = Date.now()
@@ -48,8 +67,13 @@
 
   function renderResults(results) {
     const duration = Date.now() - startms
+    const wasCached = results.cached
 
-    var html = `<p>${results.total} matches in ${duration}ms</p>`
+    if(cache[testdatakey]===undefined) cache[testdatakey] = {}
+    cache[testdatakey][$input.val()] = results
+    results.cached = true
+
+    var html = `<p>${results.total} matches in ${duration}ms ${wasCached?' <small class="text-muted"><i>cached</i></small>':''}</p>`
     html += '<ul>'
     for (var i = 0; i < results.length; i++) {
       const result = results[i]
@@ -72,15 +96,15 @@
 
   $('#async-buttons').html(`
     <div class="btn-group" data-toggle="buttons">
-      ${['Async', 'Sync'].map(name => `
+      ${['Async', 'Sync', 'Ludicrous Mode'].map(name => `
         <label class="btn btn-secondary ${name==='Async'?'active':''}">
-          <input type="radio" name="isAsync" value="${name==='Async'?1:0}"> ${name}
+          <input type="radio" name="searchMode" value="${name}"> ${name}
         </label>
       `).join('')}
     </div>
   `)
-  $(document).on('change', '[name="isAsync"]', function() {
-    isAsync = $(this).val() === '1'
+  $(document).on('change', '[name="searchMode"]', function() {
+    searchMode = $(this).val()
     setTimeout(search)
   })
 
