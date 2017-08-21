@@ -123,6 +123,8 @@ async function tests() {
 
   test('Thoug ht', 'ht', 'hh')
 
+  test('sax saxax y', 'y', 'sx') // this is caused if isConsec gets messedup
+
   test('noodle monster', 'nomon', null, 'qrs')
   test('noodle monster '.repeat(100), null, 'a')
 
