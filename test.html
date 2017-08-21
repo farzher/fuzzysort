@@ -4,7 +4,8 @@
   html {overflow-y: scroll;}
 </style>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script> -->
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.4/platform.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/benchmark/2.1.4/benchmark.min.js"></script>
@@ -22,110 +23,140 @@
 </div>
 
 <script>
-  const $input = $('#input')
-  const $results = $('#results')
-  const testdatakeys = Object.keys(testdata)
-  var testdatakey = 'ue4_filenames'
-  var searchMode = 'Async'
-  var cache = {}
-  var promise, startms
+  ;(function() {
+    const $input = $('#input')
+    const $results = $('#results')
+    const testdatakeys = Object.keys(testdata)
+    var testdatakey = 'ue4_filenames'
+    var searchMode = 'Ludicrous Mode'
+    var cache = {}
+    const cacheChars = 'abcdefghijklmnopqrstuvwxyz'
+    var promise, cachePromise, cacheCanceled, startms
 
-  for(const testdatakey of testdatakeys) {
-    if(cache[testdatakey]===undefined) cache[testdatakey] = {}
-    for(const char of 'abcdefghijklmnopqrstuvwxyz') {
-      const results = fuzzysort.go(char, testdata[testdatakey])
-      cache[testdatakey][char] = {total:results.total, html:resultsToHtml(results)}
-    }
-  }
+    cacheNextLevel()
 
-  function search() {
-    $input.focus()
-    const inputValue = $input.val()
+    function getSearchLower() { return $input.val().toLowerCase() }
 
-    if(searchMode==='Ludicrous Mode') {
-      startms = Date.now()
-      if(cache[testdatakey]&&cache[testdatakey][inputValue]) {
-        return renderCache(cache[testdatakey][inputValue])
-      } else {
-        return renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
+    function search() {
+      $input.focus()
+      const inputValue = getSearchLower()
+
+      if(cachePromise) { cachePromise.cancel() }; cacheCanceled = true
+
+      if(searchMode==='Ludicrous Mode') {
+        startms = Date.now()
+        if(cache[testdatakey]&&cache[testdatakey][inputValue]) {
+          renderCache(cache[testdatakey][inputValue])
+          cacheNextLevel()
+        } else {
+          renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
+          cacheNextLevel()
+        }
+
+      } else if(searchMode === 'Async') {
+        if(promise) promise.cancel()
+
+        startms = Date.now()
+        promise = fuzzysort.goAsync(inputValue, testdata[testdatakey])
+        promise.then(renderResults, err=>console.log(err))
+
+      } else { // Sync
+        startms = Date.now()
+        renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
       }
     }
 
-    if(searchMode === 'Async') {
-      if(promise) promise.cancel()
+    function cacheNextLevel(nextIndex=0) {
+      setTimeout(function() {
+        if(nextIndex >= cacheChars.length+testdatakeys.length) return
 
-      startms = Date.now()
-      promise = fuzzysort.goAsync(inputValue, testdata[testdatakey])
-      promise.then(renderResults, err=>console.log(err))
-    } else {
-      startms = Date.now()
-      renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
-    }
-  }
+        const inputValue = getSearchLower()
+        var nextInputValue
+        var nextdatakey
+        if(nextIndex >= cacheChars.length) {
+          nextInputValue = inputValue
+          nextdatakey = testdatakeys[nextIndex - cacheChars.length]
+        } else {
+          nextInputValue = inputValue+cacheChars[nextIndex]
+          nextdatakey = testdatakey
+        }
 
-  function resultsToHtml(results) {
-    var html = '<ul>'
-    for (var i = 0; i < results.length; i++) {
-      const result = results[i]
-      html += `<li>${result.score} - ${result.highlighted}</li>`
-    }
-    html += '</ul>'
-    return html
-  }
-  function renderResults(results) {
-    const duration = Date.now() - startms
+        const isCached = cache[nextdatakey]&&cache[nextdatakey][nextInputValue]
+        if(isCached) return cacheNextLevel(nextIndex + 1)
 
-    const header = `<p>${results.total} matches in ${duration}ms</p>`
-    const html = resultsToHtml(results)
-
-    if(cache[testdatakey]===undefined) cache[testdatakey] = {}
-    cache[testdatakey][$input.val()] = {total:results.total, html}
-
-    $results.html(header+html)
-  }
-  function renderCache(cached) {
-    const duration = Date.now() - startms
-    const header = `<p>${cached.total} matches in ${duration}ms <small class="text-muted"><i>cached</i></small></p>`
-    $results.html(header+cached.html)
-  }
-
-  // Run a search on input change
-    $input.on('input', search)
-  // Select input when escape pressed
-    document.onkeyup = (e) => {
-      if(e.keyCode === 27) $input.select()
-    }
-  // Focus input when any key pressed
-    document.onkeydown = (e) => {
-      $input.focus()
+        if(nextIndex===0) cacheCanceled = false
+        cachePromise = fuzzysort.goAsync(nextInputValue, testdata[nextdatakey])
+        cachePromise.then(results => {
+          if(cache[nextdatakey]===undefined) cache[nextdatakey] = {}
+          cache[nextdatakey][nextInputValue] = {total:results.total, html:resultsToHtml(results)}
+          if(!cacheCanceled) cacheNextLevel(nextIndex + 1)
+        })
+      })
     }
 
-  $('#async-buttons').html(`
-    <div class="btn-group" data-toggle="buttons">
-      ${['Async', 'Sync', 'Ludicrous Mode'].map(name => `
-        <label class="btn btn-secondary ${name==='Async'?'active':''}">
-          <input type="radio" name="searchMode" value="${name}"> ${name}
-        </label>
-      `).join('')}
-    </div>
-  `)
-  $(document).on('change', '[name="searchMode"]', function() {
-    searchMode = $(this).val()
-    setTimeout(search)
-  })
+    function resultsToHtml(results) {
+      var html = '<ul>'
+      for (var i = 0; i < results.length; i++) {
+        const result = results[i]
+        html += `<li>${result.score} - ${result.highlighted}</li>`
+      }
+      html += '</ul>'
+      return html
+    }
+    function renderResults(results) {
+      const duration = Date.now() - startms
+      const header = `<p>${results.total} matches in ${duration}ms</p>`
+      const html = resultsToHtml(results)
 
-  $('#buttons').html(`
-    <div class="btn-group" data-toggle="buttons">
-      ${testdatakeys.map(name => `
-        <label class="btn btn-secondary ${name===testdatakey?'active':''}">
-          <input type="radio" name="testdatakeys" value="${name}"> ${name}
-        </label>
-      `).join('')}
-    </div>
-  `)
-  $(document).on('change', '[name="testdatakeys"]', function() {
-    testdatakey = $(this).val()
-    $input.attr('placeholder', testdatakey)
-    setTimeout(search)
-  })
+      if(cache[testdatakey]===undefined) cache[testdatakey] = {}
+      cache[testdatakey][getSearchLower()] = {total:results.total, html}
+
+      $results.html(header+html)
+    }
+    function renderCache(cached) {
+      const duration = Date.now() - startms
+      const header = `<p>${cached.total} matches in ${duration}ms <small class="text-muted"><i>cached</i></small></p>`
+      $results.html(header+cached.html)
+    }
+
+    // Run a search on input change
+      $input.on('input', search)
+    // Select input when escape pressed
+      document.onkeyup = (e) => {
+        if(e.keyCode === 27) $input.select()
+      }
+    // Focus input when any key pressed
+      document.onkeydown = (e) => {
+        $input.focus()
+      }
+
+    $('#async-buttons').html(`
+      <div class="btn-group" data-toggle="buttons">
+        ${['Async', 'Sync', 'Ludicrous Mode'].map(name => `
+          <label class="btn btn-secondary ${name===searchMode?'active':''}">
+            <input type="radio" name="searchMode" value="${name}"> ${name}
+          </label>
+        `).join('')}
+      </div>
+    `)
+    $(document).on('change', '[name="searchMode"]', function() {
+      searchMode = $(this).val()
+      setTimeout(search)
+    })
+
+    $('#buttons').html(`
+      <div class="btn-group" data-toggle="buttons">
+        ${testdatakeys.map(name => `
+          <label class="btn btn-secondary ${name===testdatakey?'active':''}">
+            <input type="radio" name="testdatakeys" value="${name}"> ${name}
+          </label>
+        `).join('')}
+      </div>
+    `)
+    $(document).on('change', '[name="testdatakeys"]', function() {
+      testdatakey = $(this).val()
+      $input.attr('placeholder', testdatakey)
+      setTimeout(search)
+    })
+  })()
 </script>
