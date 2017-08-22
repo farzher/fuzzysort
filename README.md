@@ -75,8 +75,9 @@ if(invalidated) promise.cancel()
 
 ##### Options
 
- - `fuzzysort.noMatchLimit = 100` If there's no match for a span this long, give up
- - `fuzzysort.highlightMatches = true` Turn this off if you don't care about `highlighted`
+ - `fuzzysort.noMatchLimit = 100` If there's no match for a span this long, give up (improves performance of long search targets)
+ - `fuzzysort.highlightMatches = true` Turn this off if you don't care about `highlighted` (improves performance)
  - `fuzzysort.highlightOpen = '<b>'`
  - `fuzzysort.highlightClose = '</b>'`
- - `fuzzysort.limit = null` Don't return more results than this (improve performance by not highlighting everything)
+ - `fuzzysort.threshold = null` Don't return matches worse than this (improves performance) (irrelevant for `single`)
+ - `fuzzysort.limit = null` Don't return more results than this (improves performance if `highlightMatches` is on) (irrelevant for `single`)

@@ -68,17 +68,20 @@ HOW TO WRITE TESTS:
 test('APPLES',      'app', 'l', 'E',               null,     'xxx')
                matches must not get better
 */
-if(typeof fuzzysort === 'undefined') fuzzysort = require('./fuzzysort')
+const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
+if(isNode) fuzzysort = require('./fuzzysort')
 
 // Config
   // fuzzysort.highlightMatches = false
   // fuzzysort.noMatchLimit = 100
   fuzzysort.noMatchLimit = 50
   fuzzysort.limit = 100
+  // fuzzysort.threshold = 999
   const benchmark_duration = 1
+  const enable_tests = true
 
 
-if(typeof testdata === 'undefined') testdata = require('./testdata')
+if(isNode) testdata = require('./testdata')
 // random_strings = new Array(100000)
 // for (var i = 0; i < 100000; i++) random_strings[i] = randomString(seededRand(1, 100))
 
@@ -86,8 +89,8 @@ for(var key of Object.keys(testdata)) {
   for(var i = testdata[key].length-1; i>=0; i-=1) {
     const lower = testdata[key][i].toLowerCase()
     testdata[key][i] = {
-      target: testdata[key][i],
-      lower: lower,
+      _target: testdata[key][i],
+      _targetLower: lower,
       // len: lower.length,
       // firstCharCode: lower.charCodeAt(0)
     }
@@ -98,13 +101,12 @@ random_strings = testdata.ue4_filenames
 
 
 setTimeout(async function() {
-  await tests()
+  if(enable_tests) await tests()
 
   if(!assert.failed) { // only if tests passed will we bench
     if(assert.count>0) console.log('all tests passed')
     else console.log('testing is disabled!')
 
-    const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
     // Only bench on node. Don't want the demo to lag
       if(isNode) bench()
   }
@@ -147,7 +149,7 @@ async function tests() {
 
 
 function bench() {
-  if(typeof Benchmark === 'undefined') Benchmark = require('benchmark')
+  if(isNode) Benchmark = require('benchmark')
   Benchmark.options.maxTime = benchmark_duration
   const suite = new Benchmark.Suite
 
