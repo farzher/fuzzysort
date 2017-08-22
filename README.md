@@ -34,7 +34,10 @@ node
 ## Installation Browser
 
 ```html
-<script src="fuzzysort.js"></script>
+<script src="https://rawgit.com/farzher/fuzzysort/master/fuzzysort.js"></script>
+<script>
+console.log(fuzzysort.single('t', 'test'))
+</script>
 ```
 
 
