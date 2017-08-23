@@ -81,3 +81,32 @@ if(invalidated) promise.cancel()
  - `fuzzysort.highlightClose = '</b>'`
  - `fuzzysort.threshold = null` Don't return matches worse than this (improves performance) (irrelevant for `single`)
  - `fuzzysort.limit = null` Don't return more results than this (improves performance if `highlightMatches` is on) (irrelevant for `single`)
+
+### Advanced Usage
+
+Search a list of objects, by multiple fields, with custom weights.
+
+```js
+let objects = [{title:'Favorite Color', desc:'Chrome'}, {title:'Google Chrome', desc:'Launch Chrome'}]
+let search = 'chr'
+let results = []
+for(const myObj of objects) {
+  const titleInfo = fuzzysort.single(search, myObj.title)
+  const descInfo = fuzzysort.single(search, myObj.desc)
+
+  // Create a custom combined score to sort by. +100 to the desc score makes it a worse match
+  const myScore = Math.min(titleInfo?titleInfo.score:1000, descInfo?descInfo.score+100:1000)
+  if(myScore >= 1000) continue
+
+  results.push({
+    myObj,
+    myScore,
+    titleHtml: titleInfo ? titleInfo.highlighted : myObj.title,
+    descHtml: descInfo ? descInfo.highlighted : myObj.desc,
+  })
+}
+results.sort((a, b) => a.myScore - b.myScore)
+console.log(results)
+```
+
+This will be a simple method call when I figure out how to make it fast.
