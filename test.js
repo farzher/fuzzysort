@@ -87,6 +87,7 @@ async function tests() {
   testStrict('abcefg', 'acbefg')
   testStrict('a ac acb', 'abc')
   testStrict('MeshRendering.h', 'mrnederh')
+  testNomatch('AndroidRuntimeSettings.h', 'nothing')
 
   test('noodle monster', 'nomon', null, 'qrs')
   test('noodle monster '.repeat(100), null, 'a')
