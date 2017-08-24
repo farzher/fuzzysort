@@ -170,7 +170,7 @@ USAGE:
               if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
               typoSimpleI -= 1
               searchI = typoSimpleI
-              targetI = matchesSimple[searchI - 1] + 1
+              targetI = matchesSimple[--matchesSimpleLen - 1] + 1
             } else {
               if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
               searchI -= 1
@@ -234,7 +234,7 @@ USAGE:
               if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
               typoSimpleI -= 1
               searchI = typoSimpleI
-              targetI = matchesSimple[searchI - 1] + 1
+              targetI = matchesSimple[--matchesSimpleLen - 1] + 1
             } else {
               if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
               searchI -= 1
