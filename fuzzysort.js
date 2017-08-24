@@ -159,27 +159,32 @@ USAGE:
 
         targetI += 1
         if(targetI === targetLen) { // Failed to find searchI
-          if(fuzzysort.allowTypo) {
-            // Check for typo or exit
-            // we go as far as possible before trying to transpose
-            // then we transpose backwards until we reach the beginning
+          if(!fuzzysort.allowTypo) return null
 
+          // Check for typo or exit
+          // we go as far as possible before trying to transpose
+          // then we transpose backwards until we reach the beginning
+          do {
             if(searchI <= 1) return null // not allowed to transpose first char
-            if(typoSimpleI !== 0) { // we're searching an already transposed search
+            if(typoSimpleI === 0) { // we're searching an already transposed search
+              searchI -= 1
+              const searchLowerCodeNew = searchLower.charCodeAt(searchI)
+              if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
+              typoSimpleI = searchI
+              matchesSimpleLen = searchI
+              targetI = matchesSimple[matchesSimpleLen - 1] + 1
+            } else {
               if(typoSimpleI===1) return null // reached the end of the line for transposing
-              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
               typoSimpleI -= 1
               searchI = typoSimpleI
-              targetI = matchesSimple[--matchesSimpleLen - 1] + 1
-            } else {
-              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
-              searchI -= 1
-              typoSimpleI = searchI
-              targetI = matchesSimple[--matchesSimpleLen - 1] + 1
+              searchLowerCode = searchLower.charCodeAt(searchI+1)
+              const searchLowerCodeNew = searchLower.charCodeAt(searchI)
+              if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
+              matchesSimpleLen = searchI
+              targetI = matchesSimple[matchesSimpleLen - 1]
             }
-          } else {
-            return null
-          }
+            break
+          } while(true)
         }
         targetLowerCode = targetLower.charCodeAt(targetI)
       }
@@ -223,27 +228,32 @@ USAGE:
         targetI += 1
 
         if(targetI === targetLen) { // Failed to find searchI
-          if(fuzzysort.allowTypo) {
-            // Check for typo or exit
-            // we go as far as possible before trying to transpose
-            // then we transpose backwards until we reach the beginning
+          if(!fuzzysort.allowTypo) return null
 
+          // Check for typo or exit
+          // we go as far as possible before trying to transpose
+          // then we transpose backwards until we reach the beginning
+          do {
             if(searchI <= 1) return null // not allowed to transpose first char
-            if(typoSimpleI !== 0) { // we're searching an already transposed search
+            if(typoSimpleI === 0) { // we're searching an already transposed search
+              searchI -= 1
+              const searchLowerCodeNew = searchLower.charCodeAt(searchI)
+              if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
+              typoSimpleI = searchI
+              matchesSimpleLen = searchI
+              targetI = matchesSimple[matchesSimpleLen - 1] + 1
+            } else {
               if(typoSimpleI===1) return null // reached the end of the line for transposing
-              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
               typoSimpleI -= 1
               searchI = typoSimpleI
-              targetI = matchesSimple[--matchesSimpleLen - 1] + 1
-            } else {
-              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
-              searchI -= 1
-              typoSimpleI = searchI
-              targetI = matchesSimple[--matchesSimpleLen - 1] + 1
+              searchLowerCode = searchLower.charCodeAt(searchI+1)
+              const searchLowerCodeNew = searchLower.charCodeAt(searchI)
+              if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
+              matchesSimpleLen = searchI
+              targetI = matchesSimple[matchesSimpleLen - 1]
             }
-          } else {
-            return null
-          }
+            break
+          } while(true)
         }
         targetLowerCode = targetLower.charCodeAt(targetI)
       }
