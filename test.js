@@ -91,6 +91,10 @@ async function tests() {
   test('noodle monster', 'nomon', null, 'qrs')
   test('noodle monster '.repeat(100), null, 'a')
 
+  // typoPenalty
+  assert(fuzzysort.single('acb', 'abc').score===20, 'typoPenalty strict')
+  assert(fuzzysort.single('acb', 'axbxc').score===6022, 'typoPenalty simple')
+
   var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
   assert(tmp[0].score===0, 'go sorting')
   assert(tmp.length===5, 'go sorting length')
