@@ -283,12 +283,16 @@ USAGE:
       var successStrict = false
       var matchesStrict
       var matchesStrictLen = 1
+      // var wasUpperFirstMatch
+      // var wasAlphanumFirstMatch
 
       if(matchesSimple[0] > 0) {
         // skip and backfill history
         targetI = matchesSimple[0]
         const targetCode = target.charCodeAt(targetI-1)
+        // wasUpperFirstMatch=
         wasUpper = targetCode>=65&&targetCode<=90
+        // wasAlphanumFirstMatch=
         wasAlphanum = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
       } else {
         targetI = 0
@@ -299,19 +303,27 @@ USAGE:
         if (targetI >= targetLen) {
           // We failed to find a good spot for this search char, go back to the previous search char and force it forward
           if (searchI <= 0) { // We failed to push chars forward for a better match
-            if(fuzzysort.allowTypo) {
-              typoStrictI += 1
-              if(typoStrictI > searchLen-2) break
-              // if(typoStrictI > obj._typoSimpleI) break // Could this help performance?
-              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
-              targetI = 0 // TODO: should figure out how to skip - perf
-              isConsec = false
+            if(!fuzzysort.allowTypo) break
+
+            typoStrictI += 1
+            if(typoStrictI > searchLen-2) break
+            // if(obj._typoSimpleI>0 && typoStrictI>obj._typoSimpleI) break // Could this help performance?
+            if(searchLower.charCodeAt(typoStrictI) === searchLower.charCodeAt(typoStrictI+1)) continue // doesn't make sense to transpose a repeat char
+            isConsec = false
+            if(matchesSimple[0] > 0) {
+              // skip and backfill history
+              targetI = matchesSimple[0]
+              // wasUpper = wasUpperFirstMatch
+              // wasAlphanum = wasAlphanumFirstMatch
+              const targetCode = target.charCodeAt(targetI-1)
+              wasUpper = targetCode>=65&&targetCode<=90
+              wasAlphanum = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
+            } else {
+              targetI = 0
               wasAlphanum = false
               // wasUpper = false // unnecessary
-              continue
-            } else {
-              break
             }
+            continue
           }
           searchI -= 1
 
