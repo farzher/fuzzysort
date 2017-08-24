@@ -68,6 +68,46 @@ HOW TO WRITE TESTS:
 test('APPLES',      'app', 'l', 'E',               null,     'xxx')
                matches must not get better
 */
+async function tests() {
+  test('APPLES', 'app', 'l', 'E')
+  test('C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat', 'po', 'p', 'po ru', 'pr', 'prrun', 'ocket umble')
+  test('123abc', '12', '1', 'a', null, 'cc')
+
+
+  test('Thoug ht', 'ht', 'hh')
+
+  test('az bx cyy y', 'az', 'ab', 'ay', 'ax', 'ayy')
+  testSimple('aab x', 'ab') // this could cause a to get pushed forward then strict match ab in the middle
+  testSimple('sax saxax', 'sx') // this is caused if isConsec gets messedup
+  testSimple('aabb b', 'abb') // this is cause if isConsec gets messedup
+  testSimple('aabb b b b', 'abbbb')
+
+  // typos
+  testStrict('abc', 'acb')
+  testStrict('abcefg', 'acbefg')
+  testStrict('a ac acb', 'abc')
+  testStrict('MeshRendering.h', 'mrnederh')
+
+  test('noodle monster', 'nomon', null, 'qrs')
+  test('noodle monster '.repeat(100), null, 'a')
+
+  var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
+  assert(tmp[0].score===0, 'go sorting')
+  assert(tmp.length===5, 'go sorting length')
+  assert(tmp.total===5, 'go sorting total')
+
+  var tmp = await fuzzysort.goAsync('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
+  assert(tmp[0].score===0, 'goAsync sorting')
+  assert(tmp.length===5, 'goAsync sorting length')
+  assert(tmp.total===5, 'goAsync sorting total')
+}
+
+
+
+
+
+
+
 const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
 if(isNode) fuzzysort = require('./fuzzysort')
 
@@ -76,28 +116,26 @@ if(isNode) fuzzysort = require('./fuzzysort')
   // fuzzysort.noMatchLimit = 100
   fuzzysort.noMatchLimit = 50
   fuzzysort.limit = 100
+  // fuzzysort.allowTypo = false
   // fuzzysort.threshold = 999
-  const benchmark_duration = 1
-  const enable_tests = true
+  const benchmark_duration = 2
+  var enable_tests
+  enable_tests = true
 
 
 if(isNode) testdata = require('./testdata')
-// random_strings = new Array(100000)
-// for (var i = 0; i < 100000; i++) random_strings[i] = randomString(seededRand(1, 100))
-
-for(var key of Object.keys(testdata)) {
-  for(var i = testdata[key].length-1; i>=0; i-=1) {
-    const lower = testdata[key][i].toLowerCase()
+var testdata_rawstring = testdata; testdata = {}
+for(var key of Object.keys(testdata_rawstring)) {
+  testdata[key] = new Array(testdata_rawstring[key].length)
+  for(var i = testdata_rawstring[key].length-1; i>=0; i-=1) {
     testdata[key][i] = {
-      _target: testdata[key][i],
-      _targetLower: lower,
-      // len: lower.length,
+      _target: testdata_rawstring[key][i],
+      _targetLower: testdata_rawstring[key][i].toLowerCase(),
+      // _targetLowerLen: lower.length,
       // firstCharCode: lower.charCodeAt(0)
     }
   }
 }
-
-random_strings = testdata.ue4_filenames
 
 
 setTimeout(async function() {
@@ -115,31 +153,7 @@ setTimeout(async function() {
 
 
 
-async function tests() {
-  test('APPLES', 'app', 'l', 'E')
-  test('C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat', 'po', 'p', 'po ru', 'pr', 'prrun', 'ocket umble')
-  test('123abc', '12', '1', 'a', null, 'cc')
 
-  test('az bx cyy y', 'az', 'ab', 'ay', 'ax', 'ayy')
-  test('aab x', 'ax', 'ab') // this could cause a to get pushed forward then strict match ab in the middle
-
-  test('Thoug ht', 'ht', 'hh')
-
-  test('sax saxax y', 'y', 'sx') // this is caused if isConsec gets messedup
-
-  test('noodle monster', 'nomon', null, 'qrs')
-  test('noodle monster '.repeat(100), null, 'a')
-
-  var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
-  assert(tmp[0].score===0, 'go sorting')
-  assert(tmp.length===5, 'go sorting length')
-  assert(tmp.total===5, 'go sorting length')
-
-  var tmp = await fuzzysort.goAsync('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
-  assert(tmp[0].score===0, 'goAsync sorting')
-  assert(tmp.length===5, 'goAsync sorting length')
-  assert(tmp.total===5, 'goAsync sorting length')
-}
 
 
 
@@ -153,34 +167,47 @@ function bench() {
   Benchmark.options.maxTime = benchmark_duration
   const suite = new Benchmark.Suite
 
-  // suite.add('single', function() {
-  //   const len = random_strings.length
-  //   const results = []
-  //   for (var i = 0; i < len; i++) {
-  //     const result = fuzzysort.single('a', random_strings[i])
-  //     if(result) results.push(result)
-  //   }
-  //   results.sort((a, b) => a.score - b.score)
+  suite.add('go indexed', function() {
+    fuzzysort.go('e', testdata.ue4_filenames)
+    fuzzysort.go('a', testdata.ue4_filenames)
+    fuzzysort.go('mrender.h', testdata.ue4_filenames)
+  })
+  suite.add('go str', function() {
+    fuzzysort.go('e', testdata_rawstring.ue4_filenames)
+    fuzzysort.go('a', testdata_rawstring.ue4_filenames)
+    fuzzysort.go('mrender.h', testdata_rawstring.ue4_filenames)
+  })
+
+  // suite.add('goKey', function() {
+  //   fuzzysort.go('e', objects, {key:'target'})
+  //   fuzzysort.go('a', objects, {key:'target'})
+  //   fuzzysort.go('mrender.h', objects, {key:'target'})
+
+  //   // objs = [{str:'naytunfwuyt', str2:'nautfn'}, {str:'pant', str2:'tunntuftf889323'}, {str:'tame', str2:'n&*(*&o'}]
+  //   // fuzzysort.go('t', objs, {keys:['str', 'str2'], scoreFn:metas=> (metas[0]&&metas[0].score||1000) + (metas[1]&&metas[1].score||1000) })
   // })
 
-  suite.add('go', function() {
-    fuzzysort.go('e', random_strings)
-    fuzzysort.go('a', random_strings)
-    fuzzysort.go('mrender.h', random_strings)
-  })
+  // suite.add('goKeys', function() {
+  //   fuzzysort.go('e', objects, {key:['target']})
+  //   fuzzysort.go('a', objects, {key:['target']})
+  //   fuzzysort.go('mrender.h', objects, {key:['target']})
+
+  //   // objs = [{str:'naytunfwuyt', str2:'nautfn'}, {str:'pant', str2:'tunntuftf889323'}, {str:'tame', str2:'n&*(*&o'}]
+  //   // fuzzysort.go('t', objs, {keys:['str', 'str2'], scoreFn:metas=> (metas[0]&&metas[0].score||1000) + (metas[1]&&metas[1].score||1000) })
+  // })
 
   suite.add('goAsync', function(deferred) {
     var count = 0
-    fuzzysort.goAsync('e', random_strings).then(()=>{count+=1; if(count===3)deferred.resolve()})
-    fuzzysort.goAsync('a', random_strings).then(()=>{count+=1; if(count===3)deferred.resolve()})
-    fuzzysort.goAsync('mrender.h', random_strings).then(()=>{count+=1; if(count===3)deferred.resolve()})
+    fuzzysort.goAsync('e', testdata.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
+    fuzzysort.goAsync('a', testdata.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
+    fuzzysort.goAsync('mrender.h', testdata.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
   }, {defer:true})
 
-  suite.add('goAsync.cancel()', function(deferred) {
-    const p = fuzzysort.goAsync('e', random_strings)
-    p.then(()=>{deferred.resolve()}, ()=>{deferred.resolve()})
-    p.cancel()
-  }, {defer:true})
+  // suite.add('goAsync.cancel()', function(deferred) {
+  //   const p = fuzzysort.goAsync('e', testdata.ue4_filenames)
+  //   p.then(()=>{deferred.resolve()}, ()=>{deferred.resolve()})
+  //   p.cancel()
+  // }, {defer:true})
 
   suite.add('huge nomatch', function() {
     fuzzysort.single('xxx', 'noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
@@ -242,7 +269,6 @@ assert.count = 0
 function test(target, ...searches) {
   var last_score = -1
   var needs_to_fail = false
-
   for (var i = 0; i < searches.length; i++) {
 
     var search = searches[i]
@@ -263,6 +289,24 @@ function test(target, ...searches) {
       assert(score>=last_score, info)
       last_score = score
     }
+  }
+}
+function testStrict(target, ...searches) {
+  for(const search of searches) {
+    const result = fuzzysort.single(search, target)
+    assert(result && result.score<1000, {search, result})
+  }
+}
+function testSimple(target, ...searches) {
+  for(const search of searches) {
+    const result = fuzzysort.single(search, target)
+    assert(result && result.score>=1000, {search, result})
+  }
+}
+function testNomatch(target, ...searches) {
+  for(const search of searches) {
+    const result = fuzzysort.single(search, target)
+    assert(result===null, {search, result})
   }
 }
 
