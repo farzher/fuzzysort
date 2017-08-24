@@ -13,7 +13,7 @@ https://rawgit.com/farzher/fuzzysort/master/test.html
 ![](http://i.imgur.com/1M6ZrgS.gif)
 
 
-![](http://i.imgur.com/dN2cd7z.png)
+![](http://i.imgur.com/kdZxnJ0.png)
 
 ![](http://i.imgur.com/4kKfMK4.png)
 
