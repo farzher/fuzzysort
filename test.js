@@ -87,6 +87,7 @@ async function tests() {
   testStrict('abcefg', 'acbefg')
   testStrict('a ac acb', 'abc')
   testStrict('MeshRendering.h', 'mrnederh')
+  testStrict('MMommOMMommO', 'moom')
   testNomatch('AndroidRuntimeSettings.h', 'nothing')
 
   test('noodle monster', 'nomon', null, 'qrs')
@@ -173,13 +174,13 @@ function bench() {
   const suite = new Benchmark.Suite
 
   suite.add('go indexed', function() {
+    fuzzysort.go('nnnne', testdata.ue4_filenames)
     fuzzysort.go('e', testdata.ue4_filenames)
-    fuzzysort.go('a', testdata.ue4_filenames)
     fuzzysort.go('mrender.h', testdata.ue4_filenames)
   })
   suite.add('go str', function() {
+    fuzzysort.go('nnnne', testdata_rawstring.ue4_filenames)
     fuzzysort.go('e', testdata_rawstring.ue4_filenames)
-    fuzzysort.go('a', testdata_rawstring.ue4_filenames)
     fuzzysort.go('mrender.h', testdata_rawstring.ue4_filenames)
   })
 
@@ -300,12 +301,14 @@ function testStrict(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
     assert(result && result.score<1000, {search, result})
+    assert(result._matchesBest.length === search.length)
   }
 }
 function testSimple(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
     assert(result && result.score>=1000, {search, result})
+    assert(result._matchesBest.length === search.length)
   }
 }
 function testNomatch(target, ...searches) {
