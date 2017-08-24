@@ -14,7 +14,6 @@ USAGE:
 
 ;(function() {
   const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
-  var isCallToSingle // global instead of passed as argument for peformance
 
   const fuzzysort = {
 
@@ -28,11 +27,10 @@ USAGE:
     single: (search, target) => {
       const searchLower = search.toLowerCase()
       const searchLen = searchLower.length
-      const searchCode = searchLower.charCodeAt(0)
+      const searchLowerCode = searchLower.charCodeAt(0)
       const isObj = typeof target === 'object'
-      const infoFunc = isObj ? fuzzysort.infoObj : fuzzysort.info
-      isCallToSingle = true
-      const result = infoFunc(searchLower, searchLen, searchCode, target)
+      const infoFn = isObj ? fuzzysort.infoObj : fuzzysort.info
+      const result = infoFn(searchLower, searchLen, searchLowerCode, target)
       if(result === null) return null
       if(fuzzysort.highlightMatches) result.highlighted = fuzzysort.highlight(result)
       return result
@@ -41,18 +39,16 @@ USAGE:
     go: (search, targets) => {
       if(search === '') { const a=[]; a.total=0; return a }
       const isObj = typeof targets[0] === 'object'
-      const infoFunc = isObj ? fuzzysort.infoObj : fuzzysort.info
-      isCallToSingle = false
+      const infoFn = isObj ? fuzzysort.infoObj : fuzzysort.info
       const searchLower = search.toLowerCase()
       const searchLen = searchLower.length
-      const searchCode = searchLower.charCodeAt(0)
-      const results = []
-      var resultsLen = 0
+      const searchLowerCode = searchLower.charCodeAt(0)
+      const results = []; var resultsLen = 0
       results.thresholdCount = 0
       for(var i = targets.length-1; i>=0; i-=1) {
-        const result = infoFunc(searchLower, searchLen, searchCode, targets[i])
+        const result = infoFn(searchLower, searchLen, searchLowerCode, targets[i])
         if(result === null) continue
-        if(result === 'threshold') { results.thresholdCount += 1; continue }
+        if(fuzzysort.threshold!==null && result.score > fuzzysort.threshold) { results.thresholdCount += 1; continue }
         results[resultsLen++] = result
       }
 
@@ -75,13 +71,12 @@ USAGE:
       const p = new Promise((resolve, reject) => {
         if(search === '') { const a=[]; a.total=0; return resolve(a) }
         const isObj = typeof targets[0] === 'object'
-        const infoFunc = isObj ? fuzzysort.infoObj : fuzzysort.info
+        const infoFn = isObj ? fuzzysort.infoObj : fuzzysort.info
         const itemsPerCheck = 1000
         const searchLower = search.toLowerCase()
         const searchLen = searchLower.length
-        const searchCode = searchLower.charCodeAt(0)
-        const results = []
-        var resultsLen = 0
+        const searchLowerCode = searchLower.charCodeAt(0)
+        const results = []; var resultsLen = 0
         var i = targets.length-1
         results.thresholdCount = 0
         function step() {
@@ -89,12 +84,10 @@ USAGE:
 
           const startMs = Date.now()
 
-          isCallToSingle = false
-
           for(; i>=0; i-=1) {
-            const result = infoFunc(searchLower, searchLen, searchCode, targets[i])
+            const result = infoFn(searchLower, searchLen, searchLowerCode, targets[i])
             if(result === null) continue
-            if(result === 'threshold') { results.thresholdCount += 1; continue }
+            if(fuzzysort.threshold!==null && result.score > fuzzysort.threshold) { results.thresholdCount += 1; continue }
             results[resultsLen++] = result
 
             if(i%itemsPerCheck===0) {
@@ -133,34 +126,28 @@ USAGE:
     // Below this point is only internal code
 
 
-    // very basic fuzzy match; to remove targets with no match ASAP!
+    // very basic fuzzy match; to remove non-matching targets ASAP!
     // walk through target. find sequential matches.
     // if all chars aren't found then exit
-    info: (searchLower, searchLen, searchCode, target) => {
+    info: (searchLower, searchLen, searchLowerCode, target) => {
       const targetLower = target.toLowerCase()
       const targetLen = targetLower.length
-      var targetCode = targetLower.charCodeAt(0)
-
+      var targetLowerCode = targetLower.charCodeAt(0)
       var searchI = 0 // where we at
       var targetI = 0 // where you at
-
       var noMatchCount = 0 // how long since we've seen a match
       var matchesSimple // target indexes
       var matchesSimpleLen = 1
 
       while(true) {
-        const isMatch = searchCode === targetCode
+        const isMatch = searchLowerCode === targetLowerCode
 
         if(isMatch) {
-          if(matchesSimple === undefined) {
-            matchesSimple = [targetI]
-          } else {
-            matchesSimple[matchesSimpleLen++] = targetI
-          }
+          matchesSimple===undefined ? matchesSimple = [targetI] : matchesSimple[matchesSimpleLen++] = targetI
 
           searchI += 1
           if(searchI === searchLen) break
-          searchCode = searchLower.charCodeAt(searchI)
+          searchLowerCode = searchLower.charCodeAt(searchI)
           noMatchCount = 0
         } else {
           noMatchCount += 1
@@ -169,43 +156,38 @@ USAGE:
 
         targetI += 1
         if(targetI === targetLen) return null
-        targetCode = targetLower.charCodeAt(targetI)
+        targetLowerCode = targetLower.charCodeAt(targetI)
       }
 
       { // This obj creation needs to be scoped for performance
+        // Otherwise this causes a big slowdown, even if it's never executed, weird!
         const obj = {_target:target, _targetLower:targetLower, _matchesSimple:matchesSimple}
-        return fuzzysort.infoStrict(searchLower, searchLen, searchCode, obj)
+        return fuzzysort.infoStrict(searchLower, searchLen, searchLowerCode, obj)
       }
     },
 
 
     // This code is basically a copy/paste of `info` for performance reasons :(
-    infoObj: (searchLower, searchLen, searchCode, obj) => {
+    infoObj: (searchLower, searchLen, searchLowerCode, obj) => {
       // if(obj._targetLower === undefined) obj._targetLower = obj._target.toLowerCase()
       const targetLower = obj._targetLower
       const targetLen = targetLower.length
-
-      var targetCode = targetLower.charCodeAt(0)
+      var targetLowerCode = targetLower.charCodeAt(0)
       var searchI = 0 // where we at
       var targetI = 0 // where you at
-
       var noMatchCount = 0 // how long since we've seen a match
       var matchesSimple // target indexes
       var matchesSimpleLen = 1
 
       while(true) {
-        const isMatch = searchCode === targetCode
+        const isMatch = searchLowerCode === targetLowerCode
 
         if(isMatch) {
-          if(matchesSimple === undefined) {
-            matchesSimple = [targetI]
-          } else {
-            matchesSimple[matchesSimpleLen++] = targetI
-          }
+          matchesSimple===undefined ? matchesSimple = [targetI] : matchesSimple[matchesSimpleLen++] = targetI
 
           searchI += 1
           if(searchI === searchLen) break
-          searchCode = searchLower.charCodeAt(searchI)
+          searchLowerCode = searchLower.charCodeAt(searchI)
           noMatchCount = 0
         } else {
           noMatchCount += 1
@@ -214,30 +196,28 @@ USAGE:
 
         targetI += 1
         if(targetI === targetLen) return null
-        targetCode = targetLower.charCodeAt(targetI)
+        targetLowerCode = targetLower.charCodeAt(targetI)
       }
 
       obj._matchesSimple = matchesSimple
-      return fuzzysort.infoStrict(searchLower, searchLen, searchCode, obj)
+      return fuzzysort.infoStrict(searchLower, searchLen, searchLowerCode, obj)
     },
 
     // Our target string successfully matched all characters in sequence!
     // Let's try a more advanced and strict test to improve the score
     // only count it as a match if it's consecutive or a beginning character!
     // we use information about previous matches to skip around here and improve performance
-    infoStrict: (searchLower, searchLen, searchCode, obj) => {
+    infoStrict: (searchLower, searchLen, searchLowerCode, obj) => {
       const matchesSimple = obj._matchesSimple
       const targetLower = obj._targetLower
       const targetLen = targetLower.length
       const target = obj._target
-
-      var wasUpper = null
+      var wasUpper = false
       var wasAlphanum = false
       var isConsec = false
-
       var searchI = 0
+      // var targetI // It's faster if this variable is not defined... ??????
       var noMatchCount = 0
-
       var strictSuccess = false
       var matchesStrict
       var matchesStrictLen = 1
@@ -255,61 +235,48 @@ USAGE:
       while(true) {
 
         if (targetI >= targetLen) {
-          // We failed to find a good spot for the search char, go back to the previous search char and force it forward
+          // We failed to find a good spot for this search char, go back to the previous search char and force it forward
           if (searchI <= 0) break
           searchI -= 1
 
           const lastMatch = matchesStrict[--matchesStrictLen]
           targetI = lastMatch + 1
 
-          isConsec = false // TODO: removing this doesn't break tests
+          isConsec = false
           // backfill history
           const targetCode = target.charCodeAt(targetI-1)
           wasUpper = targetCode>=65&&targetCode<=90
           wasAlphanum = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
 
         } else {
-          const lowerTargetCode = targetLower.charCodeAt(targetI)
+          const targetLowerCode = targetLower.charCodeAt(targetI)
           if(!isConsec) {
             const targetCode = target.charCodeAt(targetI)
             const isUpper = targetCode>=65&&targetCode<=90
-            const isAlphanum = lowerTargetCode>=97&&lowerTargetCode<=122 || lowerTargetCode>=48&&lowerTargetCode<=57
+            const isAlphanum = targetLowerCode>=97&&targetLowerCode<=122 || targetLowerCode>=48&&targetLowerCode<=57
             const isBeginning = isUpper && !wasUpper || !wasAlphanum || !isAlphanum
             wasUpper = isUpper
             wasAlphanum = isAlphanum
-            if (!isBeginning) {
-              targetI += 1
-              continue
-            }
+            if (!isBeginning) { targetI += 1; continue }
           }
 
-          const isMatch = searchLower.charCodeAt(searchI) === lowerTargetCode
+          const isMatch = searchLower.charCodeAt(searchI) === targetLowerCode
           if(isMatch) {
-            if(matchesStrict === undefined) {
-              matchesStrict = [targetI]
-            } else {
-              matchesStrict[matchesStrictLen++] = targetI
-            }
+            matchesStrict===undefined ? matchesStrict = [targetI] : matchesStrict[matchesStrictLen++] = targetI
 
             searchI += 1
-            if(searchI === searchLen) {
-              strictSuccess = true
-              break
-            }
+            if(searchI === searchLen) { strictSuccess = true; break }
 
             targetI += 1
             isConsec = true
-            const wouldSkipAhead = matchesSimple[searchI] > targetI
-            if(wouldSkipAhead) {
-              const nextMatchIsNextTarget = matchesSimple[searchI] === targetI
-              if(!nextMatchIsNextTarget) {
-                // skip and backfill history
-                targetI = matchesSimple[searchI]
-                isConsec = false
-                const targetCode = target.charCodeAt(targetI-1)
-                wasUpper = targetCode>=65&&targetCode<=90
-                wasAlphanum = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
-              }
+            const canSkipAhead = matchesSimple[searchI] > targetI
+            if(canSkipAhead) {
+              // skip and backfill history
+              targetI = matchesSimple[searchI]
+              isConsec = false
+              const targetCode = target.charCodeAt(targetI-1)
+              wasUpper = targetCode>=65&&targetCode<=90
+              wasAlphanum = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
             }
 
             noMatchCount = 0
@@ -334,14 +301,6 @@ USAGE:
         }
         if(!strictSuccess) obj.score *= 1000
         obj.score += targetLen - searchLen
-
-        if(!isCallToSingle) {
-          if(fuzzysort.threshold !== null) {
-            if(obj.score > fuzzysort.threshold) {
-              return 'threshold'
-            }
-          }
-        }
 
         return obj
       }
@@ -386,4 +345,10 @@ USAGE:
     else window.fuzzysort = fuzzysort
 })()
 
-// TODO: is it important to make sure highlighted property always exists for hidden class optimization?
+// TODO: is it important to make sure `highlighted` property always exists for hidden class optimization?
+
+// TODO: strip spaces from search input
+
+// TODO: backslash === forwardslash
+
+// TODO: allow a single transpose typo for inputs >= 3 chars. Don't allow first char to transpose
