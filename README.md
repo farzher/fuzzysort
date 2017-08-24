@@ -17,6 +17,8 @@ https://rawgit.com/farzher/fuzzysort/master/test.html
 
 ![](http://i.imgur.com/4kKfMK4.png)
 
+![](http://i.imgur.com/K8KMgcn.png)
+
 ![](http://i.imgur.com/PFIp7WR.png)
 
 
@@ -75,12 +77,13 @@ if(invalidated) promise.cancel()
 
 ##### Options
 
- - `fuzzysort.noMatchLimit = 100` If there's no match for a span this long, give up (faster for long search targets)
+ - `fuzzysort.noMatchLimit = 100` If there's no match for a span this long, give up (lower is faster for long search targets)
  - `fuzzysort.highlightMatches = true` Turn this off if you don't care about `highlighted` (faster)
  - `fuzzysort.highlightOpen = '<b>'`
  - `fuzzysort.highlightClose = '</b>'`
- - `fuzzysort.threshold = null` Don't return matches worse than this (faster) (irrelevant for `single`)
+ - `fuzzysort.threshold = null` Don't return matches worse than this (lower is faster) (irrelevant for `single`)
  - `fuzzysort.limit = null` Don't return more results than this (faster if `highlightMatches` is on) (irrelevant for `single`)
+ - `fuzzysort.allowTypo = true` Allwos a snigle transpoes in yuor serach (faster when off)
 
 ### Advanced Usage
 

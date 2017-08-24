@@ -15,14 +15,16 @@ USAGE:
 ;(function() {
   const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
 
+  const typoPenalty = 20
   const fuzzysort = {
 
-    noMatchLimit: 100, // If there's no match for a span this long, give up (faster for long search targets)
+    noMatchLimit: 100, // If there's no match for a span this long, give up (lower is faster for long search targets)
     highlightMatches: true, // Turn this off if you don't care about `highlighted` (faster)
     highlightOpen: '<b>',
     highlightClose: '</b>',
-    threshold: null, // Don't return matches worse than this (faster) (irrelevant for `single`)
+    threshold: null, // Don't return matches worse than this (lower is faster) (irrelevant for `single`)
     limit: null, // Don't return more results than this (faster if `highlightMatches` is on) (irrelevant for `single`)
+    allowTypo: true, // Allwos a snigle transpoes in yuor serach (faster when off)
 
     single: (search, target) => {
       const searchLower = search.toLowerCase()
@@ -135,6 +137,7 @@ USAGE:
       var targetLowerCode = targetLower.charCodeAt(0)
       var searchI = 0 // where we at
       var targetI = 0 // where you at
+      var typoSimpleI = 0
       var noMatchCount = 0 // how long since we've seen a match
       var matchesSimple // target indexes
       var matchesSimpleLen = 1
@@ -147,7 +150,7 @@ USAGE:
 
           searchI += 1
           if(searchI === searchLen) break
-          searchLowerCode = searchLower.charCodeAt(searchI)
+          searchLowerCode = searchLower.charCodeAt(typoSimpleI===0?searchI : (typoSimpleI===searchI?searchI+1 : (typoSimpleI===searchI-1?searchI-1 : searchI)))
           noMatchCount = 0
         } else {
           noMatchCount += 1
@@ -155,13 +158,35 @@ USAGE:
         }
 
         targetI += 1
-        if(targetI === targetLen) return null
+        if(targetI === targetLen) { // Failed to find searchI
+          if(fuzzysort.allowTypo) {
+            // Check for typo or exit
+            // we go as far as possible before trying to transpose
+            // then we transpose backwards until we reach the beginning
+
+            if(searchI <= 1) return null // not allowed to transpose first char
+            if(typoSimpleI !== 0) { // we're searching an already transposed search
+              if(typoSimpleI===1) return null // reached the end of the line for transposing
+              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
+              typoSimpleI -= 1
+              searchI = typoSimpleI
+              targetI = matchesSimple[searchI - 1] + 1
+            } else {
+              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
+              searchI -= 1
+              typoSimpleI = searchI
+              targetI = matchesSimple[--matchesSimpleLen - 1] + 1
+            }
+          } else {
+            return null
+          }
+        }
         targetLowerCode = targetLower.charCodeAt(targetI)
       }
 
       { // This obj creation needs to be scoped for performance
         // Otherwise this causes a big slowdown, even if it's never executed, weird!
-        const obj = {_target:target, _targetLower:targetLower, _matchesSimple:matchesSimple}
+        const obj = {_target:target, _targetLower:targetLower, _matchesSimple:matchesSimple, _typoSimpleI:typoSimpleI}
         return fuzzysort.infoStrict(searchLower, searchLen, searchLowerCode, obj)
       }
     },
@@ -175,6 +200,7 @@ USAGE:
       var targetLowerCode = targetLower.charCodeAt(0)
       var searchI = 0 // where we at
       var targetI = 0 // where you at
+      var typoSimpleI = 0
       var noMatchCount = 0 // how long since we've seen a match
       var matchesSimple // target indexes
       var matchesSimpleLen = 1
@@ -187,7 +213,7 @@ USAGE:
 
           searchI += 1
           if(searchI === searchLen) break
-          searchLowerCode = searchLower.charCodeAt(searchI)
+          searchLowerCode = searchLower.charCodeAt(typoSimpleI===0?searchI : (typoSimpleI===searchI?searchI+1 : (typoSimpleI===searchI-1?searchI-1 : searchI)))
           noMatchCount = 0
         } else {
           noMatchCount += 1
@@ -195,11 +221,35 @@ USAGE:
         }
 
         targetI += 1
-        if(targetI === targetLen) return null
+
+        if(targetI === targetLen) { // Failed to find searchI
+          if(fuzzysort.allowTypo) {
+            // Check for typo or exit
+            // we go as far as possible before trying to transpose
+            // then we transpose backwards until we reach the beginning
+
+            if(searchI <= 1) return null // not allowed to transpose first char
+            if(typoSimpleI !== 0) { // we're searching an already transposed search
+              if(typoSimpleI===1) return null // reached the end of the line for transposing
+              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
+              typoSimpleI -= 1
+              searchI = typoSimpleI
+              targetI = matchesSimple[searchI - 1] + 1
+            } else {
+              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
+              searchI -= 1
+              typoSimpleI = searchI
+              targetI = matchesSimple[--matchesSimpleLen - 1] + 1
+            }
+          } else {
+            return null
+          }
+        }
         targetLowerCode = targetLower.charCodeAt(targetI)
       }
 
       obj._matchesSimple = matchesSimple
+      obj._typoSimpleI = typoSimpleI
       return fuzzysort.infoStrict(searchLower, searchLen, searchLowerCode, obj)
     },
 
@@ -208,6 +258,7 @@ USAGE:
     // only count it as a match if it's consecutive or a beginning character!
     // we use information about previous matches to skip around here and improve performance
     infoStrict: (searchLower, searchLen, searchLowerCode, obj) => {
+      // TODO: actually use searchLowerCode
       const matchesSimple = obj._matchesSimple
       const targetLower = obj._targetLower
       const targetLen = targetLower.length
@@ -216,9 +267,10 @@ USAGE:
       var wasAlphanum = false
       var isConsec = false
       var searchI = 0
+      var typoStrictI = 0
       // var targetI // It's faster if this variable is not defined... ??????
       var noMatchCount = 0
-      var strictSuccess = false
+      var successStrict = false
       var matchesStrict
       var matchesStrictLen = 1
 
@@ -236,7 +288,21 @@ USAGE:
 
         if (targetI >= targetLen) {
           // We failed to find a good spot for this search char, go back to the previous search char and force it forward
-          if (searchI <= 0) break
+          if (searchI <= 0) { // We failed to push chars forward for a better match
+            if(fuzzysort.allowTypo) {
+              typoStrictI += 1
+              if(typoStrictI > searchLen-2) break
+              // if(typoStrictI > obj._typoSimpleI) break // Could this help performance?
+              if(searchLowerCode === searchLower.charCodeAt(searchI-1)) return null // not possible to transpose a repeat char
+              targetI = 0 // TODO: should figure out how to skip - perf
+              isConsec = false
+              wasAlphanum = false
+              // wasUpper = false // unnecessary
+              continue
+            } else {
+              break
+            }
+          }
           searchI -= 1
 
           const lastMatch = matchesStrict[--matchesStrictLen]
@@ -260,16 +326,15 @@ USAGE:
             if (!isBeginning) { targetI += 1; continue }
           }
 
-          const isMatch = searchLower.charCodeAt(searchI) === targetLowerCode
+          const isMatch = searchLower.charCodeAt(typoStrictI===0?searchI : (typoStrictI===searchI?searchI+1 : (typoStrictI===searchI-1?searchI-1 : searchI))) === targetLowerCode
           if(isMatch) {
             matchesStrict===undefined ? matchesStrict = [targetI] : matchesStrict[matchesStrictLen++] = targetI
 
             searchI += 1
-            if(searchI === searchLen) { strictSuccess = true; break }
+            if(searchI === searchLen) { successStrict = true; break }
 
             targetI += 1
-            isConsec = true
-            const canSkipAhead = matchesSimple[searchI] > targetI
+            const canSkipAhead = typoStrictI>0?false : matchesSimple[searchI] > targetI // TODO: skip during typos
             if(canSkipAhead) {
               // skip and backfill history
               targetI = matchesSimple[searchI]
@@ -277,6 +342,8 @@ USAGE:
               const targetCode = target.charCodeAt(targetI-1)
               wasUpper = targetCode>=65&&targetCode<=90
               wasAlphanum = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
+            } else {
+              isConsec = true
             }
 
             noMatchCount = 0
@@ -290,17 +357,22 @@ USAGE:
       }
 
       { // tally up the score & keep track of matches for highlighting later
-        obj._matchesBest = strictSuccess ? matchesStrict : matchesSimple
-        obj.score = 0
+        obj._matchesBest = successStrict ? matchesStrict : matchesSimple
+        var score = 0
         var lastTargetI = -1
         for(const targetI of obj._matchesBest) {
           // score only goes up if they're not consecutive
-          if(lastTargetI !== targetI - 1) obj.score += targetI
-
+          if(lastTargetI !== targetI - 1) score += targetI
           lastTargetI = targetI
         }
-        if(!strictSuccess) obj.score *= 1000
-        obj.score += targetLen - searchLen
+        if(!successStrict) {
+          score *= 1000
+          if(obj._typoSimpleI!==0) score += typoPenalty
+        } else {
+          if(typoStrictI!==0) score += typoPenalty
+        }
+        score += targetLen - searchLen
+        obj.score = score
 
         return obj
       }
@@ -351,6 +423,6 @@ USAGE:
 
 // TODO: (like sublime) backslash === forwardslash
 
-// TODO: (like sublime) allow a single transpose typo for inputs >= 3 chars. Don't allow first char to transpose
+// TODO: (performance) i have no idea how well optizmied the allowing typos algorithm is
 
 // TODO: (performance) search should always be assumed to be lower already?
