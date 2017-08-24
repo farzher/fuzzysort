@@ -75,12 +75,12 @@ if(invalidated) promise.cancel()
 
 ##### Options
 
- - `fuzzysort.noMatchLimit = 100` If there's no match for a span this long, give up (improves performance of long search targets)
- - `fuzzysort.highlightMatches = true` Turn this off if you don't care about `highlighted` (improves performance)
+ - `fuzzysort.noMatchLimit = 100` If there's no match for a span this long, give up (faster for long search targets)
+ - `fuzzysort.highlightMatches = true` Turn this off if you don't care about `highlighted` (faster)
  - `fuzzysort.highlightOpen = '<b>'`
  - `fuzzysort.highlightClose = '</b>'`
- - `fuzzysort.threshold = null` Don't return matches worse than this (improves performance) (irrelevant for `single`)
- - `fuzzysort.limit = null` Don't return more results than this (improves performance if `highlightMatches` is on) (irrelevant for `single`)
+ - `fuzzysort.threshold = null` Don't return matches worse than this (faster) (irrelevant for `single`)
+ - `fuzzysort.limit = null` Don't return more results than this (faster if `highlightMatches` is on) (irrelevant for `single`)
 
 ### Advanced Usage
 
@@ -109,4 +109,4 @@ results.sort((a, b) => a.myScore - b.myScore)
 console.log(results)
 ```
 
-This will be a simple method call when I figure out how to make it fast.
+This will be a simple method call once I'm able to make it fast.

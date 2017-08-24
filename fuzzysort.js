@@ -17,12 +17,12 @@ USAGE:
 
   const fuzzysort = {
 
-    noMatchLimit: 100, // If there's no match for a span this long, give up (improves performance of long search targets)
-    highlightMatches: true, // Turn this off if you don't care about `highlighted` (improves performance)
+    noMatchLimit: 100, // If there's no match for a span this long, give up (faster for long search targets)
+    highlightMatches: true, // Turn this off if you don't care about `highlighted` (faster)
     highlightOpen: '<b>',
     highlightClose: '</b>',
-    threshold: null, // Don't return matches worse than this (improves performance) (irrelevant for `single`)
-    limit: null, // Don't return more results than this (improves performance if `highlightMatches` is on) (irrelevant for `single`)
+    threshold: null, // Don't return matches worse than this (faster) (irrelevant for `single`)
+    limit: null, // Don't return more results than this (faster if `highlightMatches` is on) (irrelevant for `single`)
 
     single: (search, target) => {
       const searchLower = search.toLowerCase()
@@ -345,10 +345,12 @@ USAGE:
     else window.fuzzysort = fuzzysort
 })()
 
-// TODO: is it important to make sure `highlighted` property always exists for hidden class optimization?
+// TODO: (performance) is it important to make sure `highlighted` property always exists for hidden class optimization?
 
-// TODO: strip spaces from search input
+// TODO: (like sublime) strip spaces from search input
 
-// TODO: backslash === forwardslash
+// TODO: (like sublime) backslash === forwardslash
 
-// TODO: allow a single transpose typo for inputs >= 3 chars. Don't allow first char to transpose
+// TODO: (like sublime) allow a single transpose typo for inputs >= 3 chars. Don't allow first char to transpose
+
+// TODO: (performance) search should always be assumed to be lower already?
