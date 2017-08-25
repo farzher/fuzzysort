@@ -12,7 +12,12 @@ USAGE:
   // null
 */
 
-;(function() {
+// UMD (Universal Module Definition) for fuzzysort
+;(function(root, factory) {
+    if (typeof define === 'function' && define.amd) define([], factory)
+    else if (typeof module === 'object' && module.exports) module.exports = factory()
+    else root.fuzzysort = factory()
+}(this, function() {
   const typoPenalty = 20
   const fuzzysort = {
 
@@ -451,11 +456,8 @@ USAGE:
   var isNode = typeof require !== 'undefined' && typeof window === 'undefined'
   var fastpriorityqueue=function(){function r(r){this.array=[],this.size=0,this.compare=r||t}var t=function(r,t){return r<t};return r.prototype.add=function(r){var t=this.size;this.array[this.size++]=r;for(var i=t-1>>1;t>0&&this.compare(r,this.array[i]);t=i,i=t-1>>1)this.array[t]=this.array[i];this.array[t]=r},r.prototype.heapify=function(r){this.array=r,this.size=r.length;for(var t=this.size>>1;t>=0;t--)this._percolateDown(t)},r.prototype._percolateUp=function(r){for(var t=this.array[r],i=r-1>>1;r>0&&this.compare(t,this.array[i]);r=i,i=r-1>>1)this.array[r]=this.array[i]},r.prototype._percolateDown=function(r){for(var t=this.size,i=this.array[r],a=1+(r<<1);a<t;){var s=a+1;r=a,s<t&&this.compare(this.array[s],this.array[a])&&(r=s),this.array[r-1>>1]=this.array[r],a=1+(r<<1)}for(var e=r-1>>1;r>0&&this.compare(i,this.array[e]);r=e,e=r-1>>1)this.array[r]=this.array[e];this.array[r]=i},r.prototype.peek=function(r){return this.array[0]},r.prototype.poll=function(r){var t=this.array[0];return this.array[0]=this.array[--this.size],this._percolateDown(0),t},r.prototype.trim=function(){this.array=this.array.slice(0,this.size)},r.prototype.isEmpty=function(r){return 0==this.size},r}()
   var q = new fastpriorityqueue(compareResultsMaxBool)
-
-  // Export fuzzysort
-    if(isNode) module.exports = fuzzysort
-    else window.fuzzysort = fuzzysort
-})()
+  return fuzzysort
+}))
 
 // TODO: (performance) is it important to make sure `highlighted` property always exists for hidden class optimization?
 
