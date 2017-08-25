@@ -82,7 +82,7 @@ if(invalidated) promise.cancel()
  - `fuzzysort.highlightOpen = '<b>'`
  - `fuzzysort.highlightClose = '</b>'`
  - `fuzzysort.threshold = null` Don't return matches worse than this (lower is faster) (irrelevant for `single`)
- - `fuzzysort.limit = null` Don't return more results than this (faster if `highlightMatches` is on) (irrelevant for `single`)
+ - `fuzzysort.limit = null` Don't return more results than this (faster) (irrelevant for `single`)
  - `fuzzysort.allowTypo = true` Allwos a snigle transpoes in yuor serach (faster when off)
 
 ### Advanced Usage

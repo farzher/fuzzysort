@@ -125,8 +125,6 @@ if(isNode) fuzzysort = require('./fuzzysort')
   // fuzzysort.allowTypo = false
   // fuzzysort.threshold = 999
   const benchmark_duration = 2
-  var enable_tests
-  enable_tests = true
 
 
 if(isNode) testdata = require('./testdata')
@@ -145,15 +143,12 @@ for(var key of Object.keys(testdata_rawstring)) {
 
 
 setTimeout(async function() {
-  if(enable_tests) await tests()
+  await tests()
 
-  if(!assert.failed) { // only if tests passed will we bench
-    if(assert.count>0) console.log('all tests passed')
-    else console.log('testing is disabled!')
+  if(!assert.failed) console.log('all tests passed')
 
-    // Only bench on node. Don't want the demo to lag
-      if(isNode) bench()
-  }
+  // Only bench on node. Don't want the demo to lag
+    if(isNode) bench()
 })
 
 
