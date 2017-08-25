@@ -1,9 +1,9 @@
+.npmignore
+package.json
+package-lock.json
+README.md
 node_modules/
 
 testdata.js
-
-.npmignore
-package.json
-README.md
 test.html
 test.js
