@@ -45,7 +45,7 @@ USAGE:
       const searchLowerCode = searchLower.charCodeAt(0)
       var resultsLen = 0
       var thresholdCount = 0
-      var limitCount = 0
+      var limitedCount = 0
       for(var i = targets.length-1; i>=0; i-=1) {
         const result = infoFn(searchLower, searchLen, searchLowerCode, targets[i])
         if(result === null) continue
@@ -54,13 +54,13 @@ USAGE:
           resultsLen += 1
           q.add(result)
         } else {
-          limitCount += 1
+          limitedCount += 1
           if(result.score < q.peek().score) { q.poll(); q.add(result) }
         }
       }
       var results = new Array(resultsLen)
       for (var i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
-      results.total = resultsLen + limitCount
+      results.total = resultsLen + limitedCount
       results.thresholdCount = thresholdCount
 
       if(fuzzysort.highlightMatches) {
@@ -84,30 +84,38 @@ USAGE:
         const searchLen = searchLower.length
         const searchLowerCode = searchLower.charCodeAt(0)
         const q = new fastpriorityqueue(compareResultsMaxBool)
-        var i = targets.length-1
+        var iCurrent = targets.length-1
         var resultsLen = 0
         var thresholdCount = 0
-        var limitCount = 0
+        var limitedCount = 0
         function step() {
           if(canceled) return reject('canceled')
 
           const startMs = Date.now()
 
-          for(i = targets.length-1; i>=0; i-=1) {
-            const result = infoFn(searchLower, searchLen, searchLowerCode, targets[i])
+          for(; iCurrent>=0; iCurrent-=1) {
+            const result = infoFn(searchLower, searchLen, searchLowerCode, targets[iCurrent])
             if(result === null) continue
             if(fuzzysort.threshold!==null && result.score > fuzzysort.threshold) { thresholdCount += 1; continue }
             if(!fuzzysort.limit || resultsLen<fuzzysort.limit)  {
               resultsLen += 1
               q.add(result)
             } else {
-              limitCount += 1
+              limitedCount += 1
               if(result.score < q.peek().score) { q.poll(); q.add(result) }
             }
+
+            if(iCurrent%itemsPerCheck===0) {
+              if(Date.now() - startMs >= 32) {
+                isNode?setImmediate(step):setTimeout(step)
+                return
+              }
+            }
           }
+
           var results = new Array(resultsLen)
           for (i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
-          results.total = resultsLen + limitCount
+          results.total = resultsLen + limitedCount
           results.thresholdCount = thresholdCount
 
           if(fuzzysort.highlightMatches) {
