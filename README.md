@@ -89,7 +89,9 @@ You can help the algorithm go fast by providing prepared targets instead of raw 
 
 ```js
 myObj.titlePrepared = fuzzysort.prepare(myObj.title)
-fuzzysort.single(search, myObj.titlePrepared)
+fuzzysort.single('gotta', myObj.titlePrepared)
+fuzzysort.single('go', myObj.titlePrepared)
+fuzzysort.single('fast', myObj.titlePrepared)
 ```
 
 
