@@ -237,7 +237,7 @@ function testStrict(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
     assert(result && result.score<1000, {search, result})
-    assert(result._matchesBest.length === search.length)
+    assert(result.indexes.length === search.length)
     assertResultIntegrity(result)
   }
 }
@@ -245,7 +245,7 @@ function testSimple(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
     assert(result && result.score>=1000, {search, result})
-    assert(result._matchesBest.length === search.length)
+    assert(result.indexes.length === search.length)
     assertResultIntegrity(result)
   }
 }
@@ -257,9 +257,9 @@ function testNomatch(target, ...searches) {
 }
 function assertResultIntegrity(result) {
   if(result === null) return true
-  if(result._matchesBest) {
+  if(result.indexes) {
     var lastMatchI = null
-    for(const matchI of result._matchesBest) {
+    for(const matchI of result.indexes) {
       if(lastMatchI === null) {
         lastMatchI = matchI
       } else {
