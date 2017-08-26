@@ -200,7 +200,7 @@ USAGE:
               const searchLowerCodeNew = searchLower.charCodeAt(searchI)
               if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
               matchesSimpleLen = searchI
-              targetI = matchesSimple[matchesSimpleLen - 1]
+              targetI = matchesSimple[matchesSimpleLen - 1] + 1
             }
             break
           } while(true)
@@ -269,7 +269,7 @@ USAGE:
               const searchLowerCodeNew = searchLower.charCodeAt(searchI)
               if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
               matchesSimpleLen = searchI
-              targetI = matchesSimple[matchesSimpleLen - 1]
+              targetI = matchesSimple[matchesSimpleLen - 1] + 1
             }
             break
           } while(true)
