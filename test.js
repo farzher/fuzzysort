@@ -1,64 +1,3 @@
-// function f1(a, o=null) {
-//   if(o===null) o = {b:false}
-//   return o.b
-// }
-// function f12(a, o={}) {
-//   if(o.b===undefined) o.b=false
-//   return o.b
-// }
-// function f13(a, o=null) {
-//   return o&&o.b
-// }
-// function f2(a, {b}={b:false}) {
-//   return b
-// }
-// function f3(a, b=false) {
-//   return b
-// }
-
-
-// if(typeof Benchmark === 'undefined') Benchmark = require('benchmark')
-// Benchmark.options.maxTime = 1
-// const suite = new Benchmark.Suite
-// suite.add('f1', function() {
-//   return f1(1, {b:false})
-// })
-// suite.add('f12', function() {
-//   return f12(1, {b:false})
-// })
-// suite.add('f13', function() {
-//   return f13(1, {b:false})
-// })
-// suite.add('f2', function() {
-//   return f2(1, {b:false})
-// })
-// suite.add('f3', function() {
-//   return f3(1, false)
-// })
-// suite.add('f1 null', function() {
-//   return f1(1)
-// })
-// suite.add('f12 null', function() {
-//   return f12(1)
-// })
-// suite.add('f13 null', function() {
-//   return f13(1)
-// })
-// suite.add('f2 null', function() {
-//   return f2(1)
-// })
-// suite.add('f3 null', function() {
-//   return f3(1)
-// })
-// suite.on('cycle', function(e) {
-//   console.log(String(e.target))
-// })
-// suite.run()
-// process.exit()
-
-
-
-
 /*
 WHAT: Test and then benchmark
 USAGE: Run this file in node
@@ -68,6 +7,17 @@ HOW TO WRITE TESTS:
 test('APPLES',      'app', 'l', 'E',               null,     'xxx')
                matches must not get better
 */
+
+setTimeout(async function() {
+  await tests()
+
+  if(assert.count==0) console.log('testing disabled!')
+  else if(!assert.failed) console.log('all tests passed')
+
+  if(isNode) bench() // Only bench on node. Don't want the demo to freeze
+})
+
+
 async function tests() {
   test('APPLES', 'app', 'l', 'E')
   test('C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat', 'po', 'p', 'po ru', 'pr', 'prrun', 'ocket umble')
@@ -89,6 +39,7 @@ async function tests() {
   testStrict('MeshRendering.h', 'mrnederh')
   testStrict('MMommOMMommO', 'moom')
   testNomatch('AndroidRuntimeSettings.h', 'nothing')
+  testNomatch('atsta', 'atast')
 
   test('noodle monster', 'nomon', null, 'qrs')
   test('noodle monster '.repeat(100), null, 'a')
@@ -119,7 +70,7 @@ if(isNode) fuzzysort = require('./fuzzysort')
 
 // Config
   // fuzzysort.highlightMatches = false
-  // fuzzysort.noMatchLimit = 100
+  // fuzzysort.noMatchLimit = 100000
   fuzzysort.noMatchLimit = 50
   fuzzysort.limit = 100
   // fuzzysort.allowTypo = false
@@ -142,14 +93,7 @@ for(var key of Object.keys(testdata_rawstring)) {
 }
 
 
-setTimeout(async function() {
-  await tests()
 
-  if(!assert.failed) console.log('all tests passed')
-
-  // Only bench on node. Don't want the demo to lag
-    if(isNode) bench()
-})
 
 
 
@@ -279,6 +223,7 @@ function test(target, ...searches) {
     }
 
     const result = fuzzysort.single(searches[i], target)
+    assertResultIntegrity(result)
     var score = undefined
     if(result) score = result.score
 
@@ -297,6 +242,7 @@ function testStrict(target, ...searches) {
     const result = fuzzysort.single(search, target)
     assert(result && result.score<1000, {search, result})
     assert(result._matchesBest.length === search.length)
+    assertResultIntegrity(result)
   }
 }
 function testSimple(target, ...searches) {
@@ -304,12 +250,30 @@ function testSimple(target, ...searches) {
     const result = fuzzysort.single(search, target)
     assert(result && result.score>=1000, {search, result})
     assert(result._matchesBest.length === search.length)
+    assertResultIntegrity(result)
   }
 }
 function testNomatch(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
     assert(result===null, {search, result})
+  }
+}
+function assertResultIntegrity(result) {
+  if(result === null) return true
+  if(result._matchesBest) {
+    var lastMatchI = null
+    for(const matchI of result._matchesBest) {
+      if(lastMatchI === null) {
+        lastMatchI = matchI
+      } else {
+        if(lastMatchI >= matchI) {
+          assert(false, result)
+          return false
+        }
+        lastMatchI = matchI
+      }
+    }
   }
 }
 
