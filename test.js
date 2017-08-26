@@ -75,20 +75,16 @@ if(isNode) fuzzysort = require('./fuzzysort')
   fuzzysort.limit = 100
   // fuzzysort.allowTypo = false
   // fuzzysort.threshold = 999
+  // fuzzysort.searchIsLower = true
   const benchmark_duration = 2
-
 
 if(isNode) testdata = require('./testdata')
 var testdata_rawstring = testdata; testdata = {}
 for(var key of Object.keys(testdata_rawstring)) {
   testdata[key] = new Array(testdata_rawstring[key].length)
   for(var i = testdata_rawstring[key].length-1; i>=0; i-=1) {
-    testdata[key][i] = {
-      _target: testdata_rawstring[key][i],
-      _targetLower: testdata_rawstring[key][i].toLowerCase(),
-      // _targetLowerLen: lower.length,
-      // firstCharCode: lower.charCodeAt(0)
-    }
+    testdata[key][i] = fuzzysort.prepare(testdata_rawstring[key][i])
+    // testdata[key][i] = testdata_rawstring[key][i]
   }
 }
 
@@ -112,7 +108,7 @@ function bench() {
   Benchmark.options.maxTime = benchmark_duration
   const suite = new Benchmark.Suite
 
-  suite.add('go indexed', function() {
+  suite.add('go prepared', function() {
     fuzzysort.go('nnnne', testdata.ue4_filenames)
     fuzzysort.go('e', testdata.ue4_filenames)
     fuzzysort.go('mrender.h', testdata.ue4_filenames)
