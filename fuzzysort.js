@@ -397,10 +397,10 @@ USAGE:
       }
 
       { // tally up the score & keep track of matches for highlighting later
-        obj._matchesBest = successStrict ? matchesStrict : matchesSimple
+        const matchesBest = successStrict ? matchesStrict : matchesSimple
         var score = 0
         var lastTargetI = -1
-        for(const targetI of obj._matchesBest) {
+        for(const targetI of matchesBest) {
           // score only goes up if they're not consecutive
           if(lastTargetI !== targetI - 1) score += targetI
           lastTargetI = targetI
@@ -413,6 +413,7 @@ USAGE:
         }
         score += targetLen - searchLen
         obj.score = score
+        obj._matchesBest = matchesBest
 
         return obj
       }
