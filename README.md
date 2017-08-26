@@ -37,9 +37,7 @@ node
 
 ```html
 <script src="https://rawgit.com/farzher/fuzzysort/master/fuzzysort.js"></script>
-<script>
-console.log(fuzzysort.single('t', 'test'))
-</script>
+<script> console.log(fuzzysort.single('t', 'test')) </script>
 ```
 
 
@@ -85,6 +83,16 @@ if(invalidated) promise.cancel()
  - `fuzzysort.limit = null` Don't return more results than this (faster) (irrelevant for `single`)
  - `fuzzysort.allowTypo = true` Allwos a snigle transpoes in yuor serach (faster when off)
 
+## How To Go Fast
+
+You can help the algorithm go fast by providing prepared targets instead of raw strings. Preparing strings is slow, do this ahead of time and only prepare each target once.
+
+```js
+myObj.titlePrepared = fuzzysort.prepare(myObj.title)
+fuzzysort.single(search, myObj.titlePrepared)
+```
+
+
 ### Advanced Usage
 
 Search a list of objects, by multiple fields, with custom weights.
@@ -104,12 +112,23 @@ for(const myObj of objects) {
   results.push({
     myObj,
     myScore,
-    titleHtml: titleInfo ? titleInfo.highlighted : myObj.title,
-    descHtml: descInfo ? descInfo.highlighted : myObj.desc,
+    titleHighlighted: titleInfo ? titleInfo.highlighted : myObj.title,
+    descHighlighted: descInfo ? descInfo.highlighted : myObj.desc,
   })
 }
 results.sort((a, b) => a.myScore - b.myScore)
 console.log(results)
 ```
 
-This will be a simple method call once I'm able to make it fast.
+Multiple instances, each with different options.
+
+```js
+const boringsort = fuzzysort.new()
+boringsort.allowTypo = false
+```
+
+Get the matched Indexes.
+
+```js
+fuzzysort.single('tt', 'test').indexes // [0, 3]
+```
