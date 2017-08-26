@@ -14,11 +14,11 @@ USAGE:
 
 // UMD (Universal Module Definition) for fuzzysort
 ;(function(root, factory) {
-    if (typeof define === 'function' && define.amd) define([], factory)
-    else if (typeof module === 'object' && module.exports) module.exports = factory()
-    else root.fuzzysort = factory()
+  if (typeof define === 'function' && define.amd) define([], factory)
+  else if (typeof module === 'object' && module.exports) module.exports = factory()
+  else root.fuzzysort = factory()
 }(this, function() {
-  const typoPenalty = 20
+
   const fuzzysort = {
 
     noMatchLimit: 100, // If there's no match for a span this long, give up (lower is faster for long search targets)
@@ -88,7 +88,7 @@ USAGE:
         const searchLower = search.toLowerCase()
         const searchLen = searchLower.length
         const searchLowerCode = searchLower.charCodeAt(0)
-        const q = new fastpriorityqueue(compareResultsMaxBool)
+        const q = fastpriorityqueue(compareResultsMaxBool)
         var iCurrent = targets.length-1
         var resultsLen = 0
         var thresholdCount = 0
@@ -356,18 +356,17 @@ USAGE:
           wasAlphanum = wasUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
 
         } else {
-          const targetLowerCode = targetLower.charCodeAt(targetI)
           if(!isConsec) {
             const targetCode = target.charCodeAt(targetI)
             const isUpper = targetCode>=65&&targetCode<=90
-            const isAlphanum = targetLowerCode>=97&&targetLowerCode<=122 || targetLowerCode>=48&&targetLowerCode<=57
+            const isAlphanum = isUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
             const isBeginning = isUpper && !wasUpper || !wasAlphanum || !isAlphanum
             wasUpper = isUpper
             wasAlphanum = isAlphanum
             if (!isBeginning) { targetI += 1; continue }
           }
 
-          const isMatch = searchLower.charCodeAt(typoStrictI===0?searchI : (typoStrictI===searchI?searchI+1 : (typoStrictI===searchI-1?searchI-1 : searchI))) === targetLowerCode
+          const isMatch = searchLower.charCodeAt(typoStrictI===0?searchI : (typoStrictI===searchI?searchI+1 : (typoStrictI===searchI-1?searchI-1 : searchI))) === targetLower.charCodeAt(targetI)
           if(isMatch) {
             matchesStrict===undefined ? matchesStrict = [targetI] : matchesStrict[matchesStrictLen++] = targetI
 
@@ -451,11 +450,13 @@ USAGE:
     }
   }
 
-  function compareResultsMin(a, b) { return a.score - b.score }
+  // function compareResultsMin(a, b) { return a.score - b.score }
   function compareResultsMaxBool(a, b) { return a.score > b.score }
-  var isNode = typeof require !== 'undefined' && typeof window === 'undefined'
-  var fastpriorityqueue=function(){function r(r){this.array=[],this.size=0,this.compare=r||t}var t=function(r,t){return r<t};return r.prototype.add=function(r){var t=this.size;this.array[this.size++]=r;for(var i=t-1>>1;t>0&&this.compare(r,this.array[i]);t=i,i=t-1>>1)this.array[t]=this.array[i];this.array[t]=r},r.prototype.heapify=function(r){this.array=r,this.size=r.length;for(var t=this.size>>1;t>=0;t--)this._percolateDown(t)},r.prototype._percolateUp=function(r){for(var t=this.array[r],i=r-1>>1;r>0&&this.compare(t,this.array[i]);r=i,i=r-1>>1)this.array[r]=this.array[i]},r.prototype._percolateDown=function(r){for(var t=this.size,i=this.array[r],a=1+(r<<1);a<t;){var s=a+1;r=a,s<t&&this.compare(this.array[s],this.array[a])&&(r=s),this.array[r-1>>1]=this.array[r],a=1+(r<<1)}for(var e=r-1>>1;r>0&&this.compare(i,this.array[e]);r=e,e=r-1>>1)this.array[r]=this.array[e];this.array[r]=i},r.prototype.peek=function(r){return this.array[0]},r.prototype.poll=function(r){var t=this.array[0];return this.array[0]=this.array[--this.size],this._percolateDown(0),t},r.prototype.trim=function(){this.array=this.array.slice(0,this.size)},r.prototype.isEmpty=function(r){return 0==this.size},r}()
-  var q = new fastpriorityqueue(compareResultsMaxBool)
+  // https://github.com/lemire/FastPriorityQueue.js
+  const fastpriorityqueue=function(){function t(t){function i(i){for(var s=r[i],h=1+(i<<1);h<a;){var o=h+1;i=h,o<a&&t(r[o],r[h])&&(i=o),r[i-1>>1]=r[i],h=1+(i<<1)}for(var n=i-1>>1;i>0&&t(s,r[n]);i=n,n=i-1>>1)r[i]=r[n];r[i]=s}var r=[],a=0,s={};return s.add=function(i){var s=a;r[a++]=i;for(var h=s-1>>1;s>0&&t(i,r[h]);s=h,h=s-1>>1)r[s]=r[h];r[s]=i},s.poll=function(t){var s=r[0];return r[0]=r[--a],i(0),s},s.peek=function(t){return r[0]},s}return t}()
+  const q = fastpriorityqueue(compareResultsMaxBool)
+  const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
+  const typoPenalty = 20
   return fuzzysort
 }))
 
