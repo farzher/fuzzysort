@@ -1,3 +1,44 @@
+// fuzzysort = require('./fuzzysort')
+// Benchmark = require('benchmark')
+// Benchmark.options.maxTime = 2
+// const suite = new Benchmark.Suite
+// Things = [1,2323,231,3123,131,313,124,124124,1421,2]
+// function doit(x) { return x+1 }
+// suite.add('go prepared', function() {
+//   sum=0
+//   for (var i = Things.length - 1; i >= 0; i--) {
+//     sum+=Things[i]+Things[i]+Things[i]+Things[i]
+//   }
+//   return sum
+// })
+// suite.add('go prepared', function() {
+//   sum=0
+//   for (var i = Things.length - 1; i >= 0; i--) {
+//     var thing = Things[i]
+//     sum+=thing+thing+thing+thing
+//   }
+//   return sum
+// })
+
+
+
+// suite.on('cycle', function(e) {
+//   console.log(String(e.target))
+// })
+
+// console.log('now benching')
+// suite.run()
+// process.exit()
+
+
+
+
+
+
+
+
+
+
 /*
 WHAT: Test and then benchmark
 USAGE: Run this file in node
