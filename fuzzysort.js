@@ -129,11 +129,11 @@ USAGE:
           }
           if(resultsLen === 0) return resolve(noResults)
           var results = new Array(resultsLen)
-          for (i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
+          for (var i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
           results.total = resultsLen + limitedCount
 
           if(fuzzysort.highlightMatches) {
-            for (i = results.length - 1; i >= 0; i--) { var result = results[i]
+            for (var i = results.length - 1; i >= 0; i--) { var result = results[i]
               result.highlighted = fuzzysort.highlight(result)
             }
           }
