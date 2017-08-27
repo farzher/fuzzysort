@@ -49,15 +49,14 @@ USAGE:
     },
 
     go: function(search, targets) {
-      if(search === '') { var a=[]; a.total=0; return a }
+      if(search === '') return noResults
       if(typeof search !== 'object') {
         var preparedSearch = preparedSearchCache.get(search)
         if(preparedSearch !== undefined) search = preparedSearch
         else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
       }
-      var resultsLen = 0; var thresholdCount = 0; var limitedCount = 0
-      for(var i = targets.length-1; i>=0; i-=1) {
-        var target = targets[i]
+      var resultsLen = 0; var limitedCount = 0
+      for(var i = targets.length-1; i>=0; i-=1) { var target = targets[i]
         if(typeof target !== 'object') {
           var targetPrepared = preparedCache.get(target)
           if(targetPrepared !== undefined) target = targetPrepared
@@ -65,23 +64,21 @@ USAGE:
         }
         var result = fuzzysort.infoPrepared(search, target, search[0])
         if(result === null) continue
-        if(fuzzysort.threshold!==null && result.score > fuzzysort.threshold) { thresholdCount += 1; continue }
+        if(fuzzysort.threshold!==null && result.score > fuzzysort.threshold) continue
         if(!fuzzysort.limit || resultsLen<fuzzysort.limit) {
-          resultsLen += 1
-          q.add(result)
+          q.add(result); resultsLen += 1
         } else {
           limitedCount += 1
           if(result.score < q.peek().score) q.replaceTop(result)
         }
       }
+      if(resultsLen === 0) return noResults
       var results = new Array(resultsLen)
       for (var i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
       results.total = resultsLen + limitedCount
-      results.thresholdCount = thresholdCount
 
       if(fuzzysort.highlightMatches) {
-        for (var i = results.length - 1; i >= 0; i--) {
-          var result = results[i]
+        for (var i = results.length - 1; i >= 0; i--) { var result = results[i]
           result.highlighted = fuzzysort.highlight(result)
         }
       }
@@ -92,7 +89,7 @@ USAGE:
     goAsync: function(search, targets) {
       var canceled = false
       var p = new Promise(function(resolve, reject) {
-        if(search === '') { var a=[]; a.total=0; return resolve(a) }
+        if(search === '') return resolve(noResults)
         if(typeof search !== 'object') {
           var preparedSearch = preparedSearchCache.get(search)
           if(preparedSearch !== undefined) search = preparedSearch
@@ -101,14 +98,13 @@ USAGE:
         var itemsPerCheck = 1000
         var q = fastpriorityqueue()
         var iCurrent = targets.length-1
-        var resultsLen = 0; var thresholdCount = 0; var limitedCount = 0
+        var resultsLen = 0; var limitedCount = 0
         function step() {
           if(canceled) return reject('canceled')
 
           var startMs = Date.now()
 
-          for(; iCurrent>=0; iCurrent-=1) {
-            var target = targets[iCurrent]
+          for(; iCurrent>=0; iCurrent-=1) { var target = targets[iCurrent]
             if(typeof target !== 'object') {
               var targetPrepared = preparedCache.get(target)
               if(targetPrepared !== undefined) target = targetPrepared
@@ -116,10 +112,9 @@ USAGE:
             }
             var result = fuzzysort.infoPrepared(search, target, search[0])
             if(result === null) continue
-            if(fuzzysort.threshold!==null && result.score > fuzzysort.threshold) { thresholdCount += 1; continue }
+            if(fuzzysort.threshold!==null && result.score > fuzzysort.threshold) continue
             if(!fuzzysort.limit || resultsLen<fuzzysort.limit) {
-              resultsLen += 1
-              q.add(result)
+              q.add(result); resultsLen += 1
             } else {
               limitedCount += 1
               if(result.score < q.peek().score) q.replaceTop(result)
@@ -132,15 +127,13 @@ USAGE:
               }
             }
           }
-
+          if(resultsLen === 0) return resolve(noResults)
           var results = new Array(resultsLen)
           for (i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
           results.total = resultsLen + limitedCount
-          results.thresholdCount = thresholdCount
 
           if(fuzzysort.highlightMatches) {
-            for (i = results.length - 1; i >= 0; i--) {
-              var result = results[i]
+            for (i = results.length - 1; i >= 0; i--) { var result = results[i]
               result.highlighted = fuzzysort.highlight(result)
             }
           }
@@ -196,7 +189,7 @@ USAGE:
           // then we transpose backwards until we reach the beginning
           do {
             if(searchI <= 1) return null // not allowed to transpose first char
-            if(typoSimpleI === 0) { // we're searching an already transposed search
+            if(typoSimpleI === 0) { // we haven't tried to transpose yet
               searchI -= 1
               var searchLowerCodeNew = searchLowerCodes[searchI]
               if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
@@ -295,7 +288,7 @@ USAGE:
       var target = result._target
       var targetLen = target.length
       var matchesBest = result.indexes
-      for(var i=0; i<targetLen; i++) {
+      for(var i=0; i<targetLen; i++) { var char = target[i]
         if(matchesBest[matchesIndex] === i) {
           matchesIndex += 1
           if(!opened) {
@@ -304,7 +297,7 @@ USAGE:
           }
 
           if(matchesIndex === matchesBest.length) {
-            highlighted += target[i] + fuzzysort.highlightClose + target.substr(i+1)
+            highlighted += char + fuzzysort.highlightClose + target.substr(i+1)
             break
           }
         } else {
@@ -313,7 +306,7 @@ USAGE:
             opened = false
           }
         }
-        highlighted += target[i]
+        highlighted += char
       }
 
       return highlighted
@@ -388,6 +381,7 @@ var typoPenalty = 20
 // cleanup()
 var preparedCache = new Map()
 var preparedSearchCache = new Map()
+var noResults = []; noResults.total = 0
 function cleanup() { preparedCache.clear(); preparedSearchCache.clear() }
 return fuzzysortNew()
 }) // UMD
