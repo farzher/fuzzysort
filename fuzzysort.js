@@ -30,16 +30,19 @@ USAGE:
     allowTypo: true, // Allwos a snigle transpoes in yuor serach (faster when off)
 
     single: function(search, target) {
-      var searchLower = search.toLowerCase()
-      var searchLen = searchLower.length
-      var searchLowerCode = searchLower.charCodeAt(0)
-      var isPrepared = typeof target === 'object'
-      if(!isPrepared) {
+      if(typeof search !== 'object') {
+        var preparedSearch = preparedSearchCache.get(search)
+        if(preparedSearch !== undefined) search = preparedSearch
+        else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
+      }
+
+      if(typeof target !== 'object') {
         var targetPrepared = preparedCache.get(target)
         if(targetPrepared !== undefined) target = targetPrepared
         else preparedCache.set(target, target = fuzzysort.prepareFast(target))
       }
-      var result = fuzzysort.infoPrepared(searchLower, searchLen, searchLowerCode, target)
+
+      var result = fuzzysort.infoPrepared(search, target, search[0])
       if(result === null) return null
       if(fuzzysort.highlightMatches) result.highlighted = fuzzysort.highlight(result)
       return result
@@ -47,19 +50,20 @@ USAGE:
 
     go: function(search, targets) {
       if(search === '') { var a=[]; a.total=0; return a }
-      var searchLower = search.toLowerCase()
-      var searchLen = searchLower.length
-      var searchLowerCode = searchLower.charCodeAt(0)
+      if(typeof search !== 'object') {
+        var preparedSearch = preparedSearchCache.get(search)
+        if(preparedSearch !== undefined) search = preparedSearch
+        else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
+      }
       var resultsLen = 0; var thresholdCount = 0; var limitedCount = 0
       for(var i = targets.length-1; i>=0; i-=1) {
         var target = targets[i]
-        var isPrepared = typeof target === 'object'
-        if(!isPrepared) {
+        if(typeof target !== 'object') {
           var targetPrepared = preparedCache.get(target)
           if(targetPrepared !== undefined) target = targetPrepared
           else preparedCache.set(target, target = fuzzysort.prepareFast(target))
         }
-        var result = fuzzysort.infoPrepared(searchLower, searchLen, searchLowerCode, target)
+        var result = fuzzysort.infoPrepared(search, target, search[0])
         if(result === null) continue
         if(fuzzysort.threshold!==null && result.score > fuzzysort.threshold) { thresholdCount += 1; continue }
         if(!fuzzysort.limit || resultsLen<fuzzysort.limit) {
@@ -89,10 +93,12 @@ USAGE:
       var canceled = false
       var p = new Promise(function(resolve, reject) {
         if(search === '') { var a=[]; a.total=0; return resolve(a) }
-        var searchLower = search.toLowerCase()
+        if(typeof search !== 'object') {
+          var preparedSearch = preparedSearchCache.get(search)
+          if(preparedSearch !== undefined) search = preparedSearch
+          else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
+        }
         var itemsPerCheck = 1000
-        var searchLen = searchLower.length
-        var searchLowerCode = searchLower.charCodeAt(0)
         var q = fastpriorityqueue()
         var iCurrent = targets.length-1
         var resultsLen = 0; var thresholdCount = 0; var limitedCount = 0
@@ -103,13 +109,12 @@ USAGE:
 
           for(; iCurrent>=0; iCurrent-=1) {
             var target = targets[iCurrent]
-            var isPrepared = typeof target === 'object'
-            if(!isPrepared) {
+            if(typeof target !== 'object') {
               var targetPrepared = preparedCache.get(target)
               if(targetPrepared !== undefined) target = targetPrepared
               else preparedCache.set(target, target = fuzzysort.prepareFast(target))
             }
-            var result = fuzzysort.infoPrepared(searchLower, searchLen, searchLowerCode, target)
+            var result = fuzzysort.infoPrepared(search, target, search[0])
             if(result === null) continue
             if(fuzzysort.threshold!==null && result.score > fuzzysort.threshold) { thresholdCount += 1; continue }
             if(!fuzzysort.limit || resultsLen<fuzzysort.limit) {
@@ -158,38 +163,32 @@ USAGE:
 
 
 
-    infoPrepared: function(searchLower, searchLen, searchLowerCode, prepared) {
-      var targetLower = prepared._targetLower
-      var targetLen = targetLower.length
-      var targetLowerCode = targetLower.charCodeAt(0)
+    infoPrepared: function(searchLowerCodes, prepared, searchLowerCode) {
+      // var targetLower = prepared._targetLower
+      var targetLowerCodes = prepared._targetLowerCodes
+      var searchLen = searchLowerCodes.length
+      var targetLen = targetLowerCodes.length
       var searchI = 0 // where we at
       var targetI = 0 // where you at
       var typoSimpleI = 0
       var noMatchCount = 0 // how long since we've seen a match
-      var matchesSimple // target indexes
-      var matchesSimpleLen = 1
+      var matchesSimple; var matchesSimpleLen = 1 // target indexes
 
       // very basic fuzzy match; to remove non-matching targets ASAP!
       // walk through target. find sequential matches.
       // if all chars aren't found then exit
       while(true) {
-        var isMatch = searchLowerCode === targetLowerCode
-
+        var isMatch = searchLowerCode === targetLowerCodes[targetI]
         if(isMatch) {
           matchesSimple===undefined ? matchesSimple = [targetI] : matchesSimple[matchesSimpleLen++] = targetI
-
-          searchI += 1
-          if(searchI === searchLen) break
-          searchLowerCode = searchLower.charCodeAt(typoSimpleI===0?searchI : (typoSimpleI===searchI?searchI+1 : (typoSimpleI===searchI-1?searchI-1 : searchI)))
+          searchI += 1; if(searchI === searchLen) break
+          searchLowerCode = searchLowerCodes[typoSimpleI===0?searchI : (typoSimpleI===searchI?searchI+1 : (typoSimpleI===searchI-1?searchI-1 : searchI))]
           noMatchCount = 0
         } else {
-          noMatchCount += 1
-          if(noMatchCount >= fuzzysort.noMatchLimit) return null
+          noMatchCount += 1; if(noMatchCount >= fuzzysort.noMatchLimit) return null
         }
 
-        targetI += 1
-
-        if(targetI === targetLen) { // Failed to find searchI
+        targetI += 1; if(targetI === targetLen) { // Failed to find searchI
           if(!fuzzysort.allowTypo) return null
 
           // Check for typo or exit
@@ -199,7 +198,7 @@ USAGE:
             if(searchI <= 1) return null // not allowed to transpose first char
             if(typoSimpleI === 0) { // we're searching an already transposed search
               searchI -= 1
-              var searchLowerCodeNew = searchLower.charCodeAt(searchI)
+              var searchLowerCodeNew = searchLowerCodes[searchI]
               if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
               typoSimpleI = searchI
               matchesSimpleLen = searchI
@@ -208,8 +207,8 @@ USAGE:
               if(typoSimpleI===1) return null // reached the end of the line for transposing
               typoSimpleI -= 1
               searchI = typoSimpleI
-              searchLowerCode = searchLower.charCodeAt(searchI+1)
-              var searchLowerCodeNew = searchLower.charCodeAt(searchI)
+              searchLowerCode = searchLowerCodes[searchI+1]
+              var searchLowerCodeNew = searchLowerCodes[searchI]
               if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
               matchesSimpleLen = searchI
               targetI = matchesSimple[matchesSimpleLen - 1] + 1
@@ -217,14 +216,12 @@ USAGE:
             break
           } while(true)
         }
-        targetLowerCode = targetLower.charCodeAt(targetI)
       }
 
       var searchI = 0
       var typoStrictI = 0
       var successStrict = false
-      var matchesStrict
-      var matchesStrictLen = 1
+      var matchesStrict; var matchesStrictLen = 1 // target indexes
 
       if(prepared._nextBeginningIndexes === null) prepared._nextBeginningIndexes = fuzzysort.prepareNextBeginningIndexes(prepared._target)
       var nextBeginningIndexes = prepared._nextBeginningIndexes
@@ -233,19 +230,18 @@ USAGE:
       // var beginningIndexes = prepared._beginningIndexes
       // var beginning = targetI = matchesSimple[0]===0 ? 0 : binarySearchMinGreater(beginningIndexes, matchesSimple[0]-1)||targetLen
 
-      // // Our target string successfully matched all characters in sequence!
-      // // Let's try a more advanced and strict test to improve the score
-      // // only count it as a match if it's consecutive or a beginning character!
-      // // we use information about previous matches to skip around here and improve performance
+      // Our target string successfully matched all characters in sequence!
+      // Let's try a more advanced and strict test to improve the score
+      // only count it as a match if it's consecutive or a beginning character!
+      // we use information about previous matches to skip around here and improve performance
       if(targetI!==targetLen) while(true) {
         if (targetI >= targetLen) {
           // We failed to find a good spot for this search char, go back to the previous search char and force it forward
           if (searchI <= 0) { // We failed to push chars forward for a better match
             if(!fuzzysort.allowTypo) break
 
-            typoStrictI += 1
-            if(typoStrictI > searchLen-2) break
-            if(searchLower.charCodeAt(typoStrictI) === searchLower.charCodeAt(typoStrictI+1)) continue // doesn't make sense to transpose a repeat char
+            typoStrictI += 1; if(typoStrictI > searchLen-2) break
+            if(searchLowerCodes[typoStrictI] === searchLowerCodes[typoStrictI+1]) continue // doesn't make sense to transpose a repeat char
             targetI = beginning
             continue
           }
@@ -256,12 +252,10 @@ USAGE:
           // targetI = binarySearchMinGreater(beginningIndexes, lastMatch)||targetLen
 
         } else {
-          var isMatch = searchLower.charCodeAt(typoStrictI===0?searchI : (typoStrictI===searchI?searchI+1 : (typoStrictI===searchI-1?searchI-1 : searchI))) === targetLower.charCodeAt(targetI)
+          var isMatch = searchLowerCodes[typoStrictI===0?searchI : (typoStrictI===searchI?searchI+1 : (typoStrictI===searchI-1?searchI-1 : searchI))] === targetLowerCodes[targetI]
           if(isMatch) {
             matchesStrict===undefined ? matchesStrict = [targetI] : matchesStrict[matchesStrictLen++] = targetI
-
-            searchI += 1
-            if(searchI === searchLen) { successStrict = true; break }
+            searchI += 1; if(searchI === searchLen) { successStrict = true; break }
             targetI += 1
           } else {
             targetI = nextBeginningIndexes[targetI]
@@ -274,14 +268,8 @@ USAGE:
         var matchesBest = successStrict ? matchesStrict : matchesSimple
         var score = 0
         var lastTargetI = -1
-        // for(var i in matchesBest) {
-        // for (var i = 0; i < searchLen; i++) {
-        //   const targetI = matchesBest[i]
-        //   // score only goes up if they're not consecutive
-        //   if(lastTargetI !== targetI - 1) score += targetI
-        //   lastTargetI = targetI
-        // }
-        for(var targetI of matchesBest) {
+        for (var i = 0; i < searchLen; i++) {
+          targetI = matchesBest[i]
           // score only goes up if they're not consecutive
           if(lastTargetI !== targetI - 1) score += targetI
           lastTargetI = targetI
@@ -333,8 +321,21 @@ USAGE:
 
     // prepare: function(target) { return {_target:target, _targetLower:target.toLowerCase(), _beginningIndexes:fuzzysort.prepareBeginningIndexes(target)} },
     // prepareFast: function(target) { return {_target:target, _targetLower:target.toLowerCase(), _beginningIndexes:null} },
-    prepare: function(target) { return {_target:target, _targetLower:target.toLowerCase(), _nextBeginningIndexes:fuzzysort.prepareNextBeginningIndexes(target)} },
-    prepareFast: function(target) { return {_target:target, _targetLower:target.toLowerCase(), _nextBeginningIndexes:null} },
+    prepare: function(target) {
+      return {_target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:fuzzysort.prepareNextBeginningIndexes(target)}
+    },
+    prepareFast: function(target) {
+      return {_target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:null}
+    },
+    prepareSearch: function(search) {
+      return fuzzysort.prepareLowerCodes(search)
+    },
+    prepareLowerCodes: function(str) {
+      var lowerCodes = new Array(str.length)
+      var lower = str.toLowerCase()
+      for (var i = str.length - 1; i >= 0; i--) lowerCodes[i] = lower.charCodeAt(i)
+      return lowerCodes
+    },
     prepareBeginningIndexes: function(target) {
       var targetLen = target.length
       var beginningIndexes = []; var beginningIndexesLen = 0
@@ -386,7 +387,8 @@ var typoPenalty = 20
 // }
 // cleanup()
 var preparedCache = new Map()
-function cleanup() { preparedCache.clear() }
+var preparedSearchCache = new Map()
+function cleanup() { preparedCache.clear(); preparedSearchCache.clear() }
 return fuzzysortNew()
 }) // UMD
 
