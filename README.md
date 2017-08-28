@@ -75,13 +75,11 @@ if(invalidated) promise.cancel()
 
 ##### Options
 
- - `fuzzysort.noMatchLimit = 100` If there's no match for a span this long, give up (lower is faster for long search targets)
  - `fuzzysort.highlightMatches = true` Turn this off if you don't care about `highlighted` (faster)
  - `fuzzysort.highlightOpen = '<b>'`
  - `fuzzysort.highlightClose = '</b>'`
  - `fuzzysort.threshold = null` Don't return matches worse than this (lower is faster) (irrelevant for `single`)
  - `fuzzysort.limit = null` Don't return more results than this (faster) (irrelevant for `single`)
- - `fuzzysort.allowTypo = true` Allwos a snigle transpoes in yuor serach (faster when off)
 
 ## How To Go Fast
 
@@ -125,8 +123,8 @@ console.log(results)
 Multiple instances, each with different options.
 
 ```js
-const boringsort = fuzzysort.new()
-boringsort.allowTypo = false
+const strictsort = fuzzysort.new()
+strictsort.threshold = 999
 ```
 
 Get the matched Indexes.
