@@ -41,7 +41,7 @@ declare module "fuzzysort" {
     cancel(): void
   }
 
-  const fuzzysort: {
+  interface fuzzysort {
     /**
     * Turn this off if you don't care about `highlighted` (faster)
     */
@@ -68,7 +68,13 @@ declare module "fuzzysort" {
     single(search: string, target: string | Prepared): Result | null
     go(search: string, targets: string[] | Prepared[]): Results
     goAsync(search: string, targets: string[] | Prepared[]): CancelablePromise<Results>
+
+    /**
+     * Returns a new instance of fuzzysort, which you can give different options to
+     */
+    'new'(): fuzzysort
   }
 
+  const fuzzysort: fuzzysort
   export = fuzzysort
 }
