@@ -301,8 +301,6 @@ USAGE:
       return highlighted
     },
 
-    // prepare: function(target) { return {_target:target, _targetLower:target.toLowerCase(), _beginningIndexes:fuzzysort.prepareBeginningIndexes(target)} },
-    // prepareFast: function(target) { return {_target:target, _targetLower:target.toLowerCase(), _beginningIndexes:null} },
     prepare: function(target) {
       return {_target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:fuzzysort.prepareNextBeginningIndexes(target)}
     },
@@ -360,15 +358,9 @@ USAGE:
 // Slightly hacked version of https://github.com/lemire/FastPriorityQueue.js
 var fastpriorityqueue=function(){function t(){function t(){for(var t=0,a=r[t],s=1;s<i;){var o=s+1;t=s,o<i&&r[o].score>r[s].score&&(t=o),r[t-1>>1]=r[t],s=1+(t<<1)}for(var n=t-1>>1;t>0&&a.score>r[n].score;t=n,n=t-1>>1)r[t]=r[n];r[t]=a}var r=[],i=0,a=Object.assign({});return a.add=function(t){var a=i;r[i++]=t;for(var s=a-1>>1;a>0&&t.score>r[s].score;a=s,s=a-1>>1)r[a]=r[s];r[a]=t},a.poll=function(){var a=r[0];return r[0]=r[--i],t(),a},a.peek=function(t){return r[0]},a.replaceTop=function(i){r[0]=i,t()},a}return t}()
 var q = fastpriorityqueue()
-// function binarySearchMinGreater(a,v){for(var e,c=0,d=a.length;c!=d;)e=0|(c+d)/2,a[e]<=v?c=e+1:d=e;return a[c]}
 var isNode = typeof require !== 'undefined' && typeof window === 'undefined'
 var typoPenalty = 20
 var asyncInterval = 32
-// var preparedCache
-// function cleanup() {
-//   preparedCache = {}; preparedCache['-'] = true; delete preparedCache['-'] // Force the object into hash mode now, instead of at runtime
-// }
-// cleanup()
 var preparedCache = new Map()
 var preparedSearchCache = new Map()
 var noResults = []; noResults.total = 0
