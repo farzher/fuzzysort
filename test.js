@@ -98,6 +98,13 @@ async function tests() {
   assert(tmp[0].score===0, 'goAsync sorting')
   assert(tmp.length===5, 'goAsync sorting length')
   assert(tmp.total===5, 'goAsync sorting total')
+
+  if (isNode) {
+    console.log('testing for the infinitive loop')
+    fuzzysort.single('', '');
+    fuzzysort.single('s', '');
+    fuzzysort.single('s', ' ');
+  }
 }
 
 

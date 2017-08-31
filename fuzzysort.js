@@ -171,6 +171,8 @@ USAGE:
       var typoSimpleI = 0
       var matchesSimple; var matchesSimpleLen = 1 // target indexes
 
+      if (targetLowerCodes.length === 0) return null
+
       // very basic fuzzy match; to remove non-matching targets ASAP!
       // walk through target. find sequential matches.
       // if all chars aren't found then exit
