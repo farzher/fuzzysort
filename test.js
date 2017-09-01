@@ -98,6 +98,13 @@ async function tests() {
   assert(tmp[0].score===0, 'goAsync sorting')
   assert(tmp.length===5, 'goAsync sorting length')
   assert(tmp.total===5, 'goAsync sorting total')
+
+  console.log('checking for infinite loops')
+  testNomatch('a', '')
+  testNomatch('', 'a')
+  testNomatch('', '')
+  testNomatch('', ' ')
+  testNomatch(' ', '')
 }
 
 
@@ -278,7 +285,6 @@ function testStrict(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
     assert(result && result.score<1000, {search, result})
-    assert(result && result.indexes.length === search.length)
     assertResultIntegrity(result)
   }
 }
@@ -286,7 +292,6 @@ function testSimple(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
     assert(result && result.score>=1000, {search, result})
-    assert(result && result.indexes.length === search.length)
     assertResultIntegrity(result)
   }
 }
@@ -298,18 +303,16 @@ function testNomatch(target, ...searches) {
 }
 function assertResultIntegrity(result) {
   if(result === null) return true
-  if(result.indexes) {
-    var lastMatchI = null
-    for(const matchI of result.indexes) {
-      if(lastMatchI === null) {
-        lastMatchI = matchI
-      } else {
-        if(lastMatchI >= matchI) {
-          assert(false, result)
-          return false
-        }
-        lastMatchI = matchI
+  var lastMatchI = null
+  for(const matchI of result.indexes) {
+    if(lastMatchI === null) {
+      lastMatchI = matchI
+    } else {
+      if(lastMatchI >= matchI) {
+        assert(false, result)
+        return false
       }
+      lastMatchI = matchI
     }
   }
 }

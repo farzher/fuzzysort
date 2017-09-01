@@ -29,16 +29,18 @@ USAGE:
 
     single: function(search, target) {
       if(typeof search !== 'object') {
-        var preparedSearch = preparedSearchCache.get(search)
-        if(preparedSearch !== undefined) search = preparedSearch
+        var searchPrepared = preparedSearchCache.get(search)
+        if(searchPrepared !== undefined) search = searchPrepared
         else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
       }
+      if(search.length === 0) return null
 
       if(typeof target !== 'object') {
         var targetPrepared = preparedCache.get(target)
         if(targetPrepared !== undefined) target = targetPrepared
         else preparedCache.set(target, target = fuzzysort.prepareFast(target))
       }
+      if(target._targetLowerCodes.length === 0) return null
 
       var result = fuzzysort.infoPrepared(search, target, search[0])
       if(result === null) return null
@@ -47,13 +49,12 @@ USAGE:
     },
 
     go: function(search, targets) {
-      if(search === '') return noResults
-
       if(typeof search !== 'object') {
-        var preparedSearch = preparedSearchCache.get(search)
-        if(preparedSearch !== undefined) search = preparedSearch
+        var searchPrepared = preparedSearchCache.get(search)
+        if(searchPrepared !== undefined) search = searchPrepared
         else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
       }
+      if(search.length === 0) return noResults
       var searchLowerCode = search[0]
 
       var resultsLen = 0; var limitedCount = 0
@@ -63,6 +64,7 @@ USAGE:
           if(targetPrepared !== undefined) target = targetPrepared
           else preparedCache.set(target, target = fuzzysort.prepareFast(target))
         }
+        if(target._targetLowerCodes.length === 0) continue
 
         var result = fuzzysort.infoPrepared(search, target, searchLowerCode)
         if(result === null) continue
@@ -91,13 +93,12 @@ USAGE:
     goAsync: function(search, targets) {
       var canceled = false
       var p = new Promise(function(resolve, reject) {
-        if(search === '') return resolve(noResults)
-
         if(typeof search !== 'object') {
-          var preparedSearch = preparedSearchCache.get(search)
-          if(preparedSearch !== undefined) search = preparedSearch
+          var searchPrepared = preparedSearchCache.get(search)
+          if(searchPrepared !== undefined) search = searchPrepared
           else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
         }
+        if(search.length === 0) return resolve(noResults)
         var searchLowerCode = search[0]
 
         var itemsPerCheck = 1000
@@ -115,6 +116,7 @@ USAGE:
               if(targetPrepared !== undefined) target = targetPrepared
               else preparedCache.set(target, target = fuzzysort.prepareFast(target))
             }
+            if(target._targetLowerCodes.length === 0) continue
 
             var result = fuzzysort.infoPrepared(search, target, searchLowerCode)
             if(result === null) continue
@@ -182,7 +184,7 @@ USAGE:
           searchLowerCode = searchLowerCodes[typoSimpleI===0?searchI : (typoSimpleI===searchI?searchI+1 : (typoSimpleI===searchI-1?searchI-1 : searchI))]
         }
 
-        targetI += 1; if(targetI === targetLen) { // Failed to find searchI
+        targetI += 1; if(targetI >= targetLen) { // Failed to find searchI
           // Check for typo or exit
           // we go as far as possible before trying to transpose
           // then we transpose backwards until we reach the beginning
