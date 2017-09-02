@@ -14,8 +14,8 @@ USAGE:
 
 // UMD (Universal Module Definition) for fuzzysort
 ;(function(root, UMD) {
-  if (typeof define === 'function' && define.amd) define([], UMD)
-  else if (typeof module === 'object' && module.exports) module.exports = UMD()
+  if(typeof define === 'function' && define.amd) define([], UMD)
+  else if(typeof module === 'object' && module.exports) module.exports = UMD()
   else root.fuzzysort = UMD()
 })(this, function UMD() { function fuzzysortNew() {
 
@@ -58,7 +58,7 @@ USAGE:
       var searchLowerCode = search[0]
 
       var resultsLen = 0; var limitedCount = 0
-      for(var i = targets.length-1; i>=0; i-=1) { var target = targets[i]
+      for(var i = targets.length - 1; i >= 0; i -= 1) { var target = targets[i]
         if(typeof target !== 'object') {
           var targetPrepared = preparedCache.get(target)
           if(targetPrepared !== undefined) target = targetPrepared
@@ -78,11 +78,11 @@ USAGE:
       }
       if(resultsLen === 0) return noResults
       var results = new Array(resultsLen)
-      for (var i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
+      for(var i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
       results.total = resultsLen + limitedCount
 
       if(fuzzysort.highlightMatches) {
-        for (var i = results.length - 1; i >= 0; i--) { var result = results[i]
+        for(var i = results.length - 1; i >= 0; i--) { var result = results[i]
           result.highlighted = fuzzysort.highlight(result)
         }
       }
@@ -103,14 +103,14 @@ USAGE:
 
         var itemsPerCheck = 1000
         var q = fastpriorityqueue()
-        var iCurrent = targets.length-1
+        var iCurrent = targets.length - 1
         var resultsLen = 0; var limitedCount = 0
         function step() {
           if(canceled) return reject('canceled')
 
           var startMs = Date.now()
 
-          for(; iCurrent>=0; iCurrent-=1) { var target = targets[iCurrent]
+          for(; iCurrent >= 0; iCurrent -= 1) { var target = targets[iCurrent]
             if(typeof target !== 'object') {
               var targetPrepared = preparedCache.get(target)
               if(targetPrepared !== undefined) target = targetPrepared
@@ -128,7 +128,7 @@ USAGE:
               if(result.score < q.peek().score) q.replaceTop(result)
             }
 
-            if(iCurrent%itemsPerCheck===0) {
+            if(iCurrent%itemsPerCheck === 0) {
               if(Date.now() - startMs >= asyncInterval) {
                 isNode?setImmediate(step):setTimeout(step)
                 return
@@ -137,11 +137,11 @@ USAGE:
           }
           if(resultsLen === 0) return resolve(noResults)
           var results = new Array(resultsLen)
-          for (var i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
+          for(var i = resultsLen - 1; i >= 0; i--) results[i] = q.poll()
           results.total = resultsLen + limitedCount
 
           if(fuzzysort.highlightMatches) {
-            for (var i = results.length - 1; i >= 0; i--) { var result = results[i]
+            for(var i = results.length - 1; i >= 0; i--) { var result = results[i]
               result.highlighted = fuzzysort.highlight(result)
             }
           }
@@ -176,7 +176,7 @@ USAGE:
       // very basic fuzzy match; to remove non-matching targets ASAP!
       // walk through target. find sequential matches.
       // if all chars aren't found then exit
-      while(true) {
+      for(;;) {
         var isMatch = searchLowerCode === targetLowerCodes[targetI]
         if(isMatch) {
           matchesSimple===undefined ? matchesSimple = [targetI] : matchesSimple[matchesSimpleLen++] = targetI
@@ -188,7 +188,7 @@ USAGE:
           // Check for typo or exit
           // we go as far as possible before trying to transpose
           // then we transpose backwards until we reach the beginning
-          do {
+          for(;;) {
             if(searchI <= 1) return null // not allowed to transpose first char
             if(typoSimpleI === 0) { // we haven't tried to transpose yet
               searchI -= 1
@@ -196,17 +196,17 @@ USAGE:
               if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
               typoSimpleI = searchI
             } else {
-              if(typoSimpleI===1) return null // reached the end of the line for transposing
+              if(typoSimpleI === 1) return null // reached the end of the line for transposing
               typoSimpleI -= 1
               searchI = typoSimpleI
-              searchLowerCode = searchLowerCodes[searchI+1]
+              searchLowerCode = searchLowerCodes[searchI + 1]
               var searchLowerCodeNew = searchLowerCodes[searchI]
               if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
             }
             matchesSimpleLen = searchI
             targetI = matchesSimple[matchesSimpleLen - 1] + 1
             break
-          } while(true)
+          }
         }
       }
 
@@ -215,17 +215,17 @@ USAGE:
       var successStrict = false
       var matchesStrict; var matchesStrictLen = 1 // target indexes
 
-      if(prepared._nextBeginningIndexes === null) prepared._nextBeginningIndexes = fuzzysort.prepareNextBeginningIndexes(prepared._target)
       var nextBeginningIndexes = prepared._nextBeginningIndexes
+      if(nextBeginningIndexes === null) nextBeginningIndexes = prepared._nextBeginningIndexes = fuzzysort.prepareNextBeginningIndexes(prepared._target)
       var firstPossibleI = targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
 
       // Our target string successfully matched all characters in sequence!
       // Let's try a more advanced and strict test to improve the score
       // only count it as a match if it's consecutive or a beginning character!
-      if(targetI!==targetLen) while(true) {
-        if (targetI >= targetLen) {
+      if(targetI !== targetLen) for(;;) {
+        if(targetI >= targetLen) {
           // We failed to find a good spot for this search char, go back to the previous search char and force it forward
-          if (searchI <= 0) { // We failed to push chars forward for a better match
+          if(searchI <= 0) { // We failed to push chars forward for a better match
             // transpose, starting from the beginning
             typoStrictI += 1; if(typoStrictI > searchLen-2) break
             if(searchLowerCodes[typoStrictI] === searchLowerCodes[typoStrictI+1]) continue // doesn't make sense to transpose a repeat char
@@ -253,16 +253,16 @@ USAGE:
         var matchesBest = successStrict ? matchesStrict : matchesSimple
         var score = 0
         var lastTargetI = -1
-        for (var i = 0; i < searchLen; i++) { var targetI = matchesBest[i]
+        for(var i = 0; i < searchLen; i++) { var targetI = matchesBest[i]
           // score only goes up if they're not consecutive
           if(lastTargetI !== targetI - 1) score += targetI
           lastTargetI = targetI
         }
         if(!successStrict) {
           score *= 1000
-          if(typoSimpleI!==0) score += typoPenalty
+          if(typoSimpleI !== 0) score += typoPenalty
         } else {
-          if(typoStrictI!==0) score += typoPenalty
+          if(typoStrictI !== 0) score += typoPenalty
         }
         score += targetLen - searchLen
         prepared.score = score
@@ -279,7 +279,7 @@ USAGE:
       var target = result._target
       var targetLen = target.length
       var matchesBest = result.indexes
-      for(var i=0; i<targetLen; i++) { var char = target[i]
+      for(var i = 0; i < targetLen; i++) { var char = target[i]
         if(matchesBest[matchesIndex] === i) {
           matchesIndex += 1
           if(!opened) {
@@ -315,7 +315,7 @@ USAGE:
     prepareLowerCodes: function(str) {
       var lowerCodes = new Array(str.length)
       var lower = str.toLowerCase()
-      for (var i = str.length - 1; i >= 0; i--) lowerCodes[i] = lower.charCodeAt(i)
+      for(var i = str.length - 1; i >= 0; i--) lowerCodes[i] = lower.charCodeAt(i)
       return lowerCodes
     },
     prepareBeginningIndexes: function(target) {
@@ -323,7 +323,7 @@ USAGE:
       var beginningIndexes = []; var beginningIndexesLen = 0
       var wasUpper = false
       var wasAlphanum = false
-      for (var i = 0; i < targetLen; i++) {
+      for(var i = 0; i < targetLen; i++) {
         var targetCode = target.charCodeAt(i)
         var isUpper = targetCode>=65&&targetCode<=90
         var isAlphanum = isUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
@@ -340,8 +340,8 @@ USAGE:
       var nextBeginningIndexes = new Array(targetLen)
       var lastIsBeginning = beginningIndexes[0]
       var lastIsBeginningI = 0
-      for (var i = 0; i < targetLen; i++) {
-        if(lastIsBeginning>i) {
+      for(var i = 0; i < targetLen; i++) {
+        if(lastIsBeginning > i) {
           nextBeginningIndexes[i] = lastIsBeginning
         } else {
           lastIsBeginning = beginningIndexes[++lastIsBeginningI]
