@@ -50,6 +50,7 @@ test('APPLES',      'app', 'l', 'E',               null,     'xxx')
 */
 
 setTimeout(async function() {
+  // for (var i = 0; i < 1000; i++) await tests()
   await tests()
 
   if(assert.count==0) console.log('testing disabled!')
@@ -99,7 +100,7 @@ async function tests() {
   assert(tmp.length===5, 'goAsync sorting length')
   assert(tmp.total===5, 'goAsync sorting total')
 
-  console.log('checking for infinite loops')
+  // checking for infinite loops
   testNomatch('a', '')
   testNomatch('', 'a')
   testNomatch('', '')
