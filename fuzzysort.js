@@ -28,10 +28,20 @@ USAGE:
     limit: Number.MAX_SAFE_INTEGER, // Don't return more results than this (faster) (irrelevant for `single`)
 
     single: function(search, target) {
-      search = fuzzysort.ensurePreparedSearch(search)
+      // search = fuzzysort.ensurePreparedSearch(search)
+      if(typeof search !== 'object') {
+        var searchPrepared = preparedSearchCache.get(search)
+        if(searchPrepared !== undefined) search = searchPrepared
+        else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
+      }
       if(search.length === 0) return null
 
-      target = fuzzysort.ensurePrepared(target)
+      // target = fuzzysort.ensurePrepared(target)
+      if(typeof target !== 'object') {
+        var targetPrepared = preparedCache.get(target)
+        if(targetPrepared !== undefined) target = targetPrepared
+        else preparedCache.set(target, target = fuzzysort.prepareFast(target))
+      }
       if(target._targetLowerCodes.length === 0) return null
 
       var result = fuzzysort.infoPrepared(search, target, search[0])
@@ -41,13 +51,23 @@ USAGE:
     },
 
     go: function(search, targets) {
-      search = fuzzysort.ensurePreparedSearch(search)
+      // search = fuzzysort.ensurePreparedSearch(search)
+      if(typeof search !== 'object') {
+        var searchPrepared = preparedSearchCache.get(search)
+        if(searchPrepared !== undefined) search = searchPrepared
+        else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
+      }
       if(search.length === 0) return noResults
       var searchLowerCode = search[0]
 
       var resultsLen = 0; var limitedCount = 0
       for(var i = targets.length - 1; i >= 0; --i) { var target = targets[i]
-        target = fuzzysort.ensurePrepared(target)
+        // target = fuzzysort.ensurePrepared(target)
+        if(typeof target !== 'object') {
+          var targetPrepared = preparedCache.get(target)
+          if(targetPrepared !== undefined) target = targetPrepared
+          else preparedCache.set(target, target = fuzzysort.prepareFast(target))
+        }
         if(target._targetLowerCodes.length === 0) continue
 
         var result = fuzzysort.infoPrepared(search, target, searchLowerCode)
@@ -76,7 +96,12 @@ USAGE:
     goAsync: function(search, targets) {
       var canceled = false
       var p = new Promise(function(resolve, reject) {
-        search = fuzzysort.ensurePreparedSearch(search)
+        // search = fuzzysort.ensurePreparedSearch(search)
+        if(typeof search !== 'object') {
+          var searchPrepared = preparedSearchCache.get(search)
+          if(searchPrepared !== undefined) search = searchPrepared
+          else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
+        }
         if(search.length === 0) return resolve(noResults)
         var searchLowerCode = search[0]
 
@@ -90,7 +115,12 @@ USAGE:
           var startMs = Date.now()
 
           for(; iCurrent >= 0; --iCurrent) { var target = targets[iCurrent]
-            target = fuzzysort.ensurePrepared(target)
+            // target = fuzzysort.ensurePrepared(target)
+            if(typeof target !== 'object') {
+              var targetPrepared = preparedCache.get(target)
+              if(targetPrepared !== undefined) target = targetPrepared
+              else preparedCache.set(target, target = fuzzysort.prepareFast(target))
+            }
             if(target._targetLowerCodes.length === 0) continue
 
             var result = fuzzysort.infoPrepared(search, target, searchLowerCode)
@@ -152,7 +182,7 @@ USAGE:
       var searchI = 0 // where we at
       var targetI = 0 // where you at
       var typoSimpleI = 0
-      var matchesSimple; var matchesSimpleLen = 1 // target indexes
+      var matchesSimpleLen = 0
 
       // very basic fuzzy match; to remove non-matching targets ASAP!
       // walk through target. find sequential matches.
@@ -160,7 +190,7 @@ USAGE:
       for(;;) {
         var isMatch = searchLowerCode === targetLowerCodes[targetI]
         if(isMatch) {
-          matchesSimple===undefined ? matchesSimple = [targetI] : matchesSimple[matchesSimpleLen++] = targetI
+          matchesSimple[matchesSimpleLen++] = targetI
           ++searchI; if(searchI === searchLen) break
           searchLowerCode = searchLowerCodes[typoSimpleI===0?searchI : (typoSimpleI===searchI?searchI+1 : (typoSimpleI===searchI-1?searchI-1 : searchI))]
         }
@@ -194,7 +224,7 @@ USAGE:
       var searchI = 0
       var typoStrictI = 0
       var successStrict = false
-      var matchesStrict; var matchesStrictLen = 1 // target indexes
+      var matchesStrictLen = 0
 
       var nextBeginningIndexes = prepared._nextBeginningIndexes
       if(nextBeginningIndexes === null) nextBeginningIndexes = prepared._nextBeginningIndexes = fuzzysort.prepareNextBeginningIndexes(prepared._target)
@@ -221,7 +251,7 @@ USAGE:
         } else {
           var isMatch = searchLowerCodes[typoStrictI===0?searchI : (typoStrictI===searchI?searchI+1 : (typoStrictI===searchI-1?searchI-1 : searchI))] === targetLowerCodes[targetI]
           if(isMatch) {
-            matchesStrict===undefined ? matchesStrict = [targetI] : matchesStrict[matchesStrictLen++] = targetI
+            matchesStrict[matchesStrictLen++] = targetI
             ++searchI; if(searchI === searchLen) { successStrict = true; break }
             ++targetI
           } else {
@@ -231,7 +261,8 @@ USAGE:
       }
 
       { // tally up the score & keep track of matches for highlighting later
-        var matchesBest = successStrict ? matchesStrict : matchesSimple
+        if(successStrict) { var matchesBest = matchesStrict; var matchesBestLen = matchesStrictLen }
+        else { var matchesBest = matchesSimple; var matchesBestLen = matchesSimpleLen }
         var score = 0
         var lastTargetI = -1
         for(var i = 0; i < searchLen; ++i) { var targetI = matchesBest[i]
@@ -247,7 +278,7 @@ USAGE:
         }
         score += targetLen - searchLen
         prepared.score = score
-        prepared.indexes = matchesBest
+        prepared.indexes = new Array(matchesBestLen); for(var i = matchesBestLen - 1; i >= 0; --i) prepared.indexes[i] = matchesBest[i]
 
         return prepared
       }
@@ -326,20 +357,20 @@ USAGE:
       return nextBeginningIndexes
     },
 
-    ensurePrepared: function(target) {
-      if(typeof target === 'object') return target
-      var targetPrepared = preparedCache.get(target)
-      if(targetPrepared !== undefined) return targetPrepared
-      preparedCache.set(target, targetPrepared = fuzzysort.prepareFast(target))
-      return targetPrepared
-    },
-    ensurePreparedSearch: function(search) {
-      if(typeof search === 'object') return search
-      var searchPrepared = preparedSearchCache.get(search)
-      if(searchPrepared !== undefined) return searchPrepared
-      preparedSearchCache.set(search, searchPrepared = fuzzysort.prepareSearch(search))
-      return searchPrepared
-    },
+    // ensurePrepared: function(target) {
+    //   if(typeof target === 'object') return target
+    //   var targetPrepared = preparedCache.get(target)
+    //   if(targetPrepared !== undefined) return targetPrepared
+    //   preparedCache.set(target, targetPrepared = fuzzysort.prepareFast(target))
+    //   return targetPrepared
+    // },
+    // ensurePreparedSearch: function(search) {
+    //   if(typeof search === 'object') return search
+    //   var searchPrepared = preparedSearchCache.get(search)
+    //   if(searchPrepared !== undefined) return searchPrepared
+    //   preparedSearchCache.set(search, searchPrepared = fuzzysort.prepareSearch(search))
+    //   return searchPrepared
+    // },
 
     cleanup: function() { cleanup() },
     new: fuzzysortNew,
@@ -357,9 +388,12 @@ var asyncInterval = 32
 var preparedCache = new Map()
 var preparedSearchCache = new Map()
 var noResults = []; noResults.total = 0
+var matchesSimple = []; var matchesStrict = []
 function cleanup() { preparedCache.clear(); preparedSearchCache.clear() }
 return fuzzysortNew()
 }) // UMD
+
+// TODO: (performance) layout memory in an optimal way to go fast by avoiding cache misses
 
 // TODO: (performance) preparedCache is a memory leak
 
