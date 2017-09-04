@@ -100,6 +100,8 @@ async function tests() {
   assert(tmp.length===5, 'goAsync sorting length')
   assert(tmp.total===5, 'goAsync sorting total')
 
+  fuzzysort.cleanup()
+
   // checking for infinite loops
   testNomatch('a', '')
   testNomatch('', 'a')

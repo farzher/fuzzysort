@@ -372,7 +372,7 @@ USAGE:
     //   return searchPrepared
     // },
 
-    cleanup: function() { cleanup() },
+    cleanup: cleanup,
     new: fuzzysortNew,
   }
   return fuzzysort
@@ -389,7 +389,7 @@ var preparedCache = new Map()
 var preparedSearchCache = new Map()
 var noResults = []; noResults.total = 0
 var matchesSimple = []; var matchesStrict = []
-function cleanup() { preparedCache.clear(); preparedSearchCache.clear() }
+function cleanup() { preparedCache.clear(); preparedSearchCache.clear(); matchesSimple = []; matchesStrict = [] }
 return fuzzysortNew()
 }) // UMD
 
