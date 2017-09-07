@@ -4,20 +4,29 @@
 // const suite = new Benchmark.Suite
 // Things = [1,2323,231,3123,131,313,124,124124,1421,2]
 // function doit(x) { return x+1 }
+// var hasOwn = {}.hasOwnProperty
+// var o = {a:true}
+// o['   - - - -'] = true
+// var xxxxxx = {target:'pants', indexes:[0,1,3]}
+// fuzzysort.highlightOpen = fuzzysort.highlightClose = '*'
 // suite.add('go prepared', function() {
-//   sum=0
-//   for (var i = Things.length - 1; i >= 0; i--) {
-//     sum+=Things[i]+Things[i]+Things[i]+Things[i]
-//   }
-//   return sum
+//   return fuzzysort.highlight(xxxxxx)
 // })
 // suite.add('go prepared', function() {
-//   sum=0
-//   for (var i = Things.length - 1; i >= 0; i--) {
-//     var thing = Things[i]
-//     sum+=thing+thing+thing+thing
-//   }
-//   return sum
+//   return fuzzysort.highlight2(xxxxxx, '*', '*')
+// })
+
+// suite.add('go prepared', function() {
+//   return hasOwn.call(o, 'a')
+// })
+// suite.add('go prepared', function() {
+//   return o.hasOwnProperty('a')
+// })
+// suite.add('go prepared', function() {
+//   return 'a' in o
+// })
+// suite.add('go prepared', function() {
+//   return o['a'] !== undefined
 // })
 
 
@@ -87,8 +96,8 @@ async function tests() {
   test('noodle monster '.repeat(100), null, 'a')
 
   // typoPenalty
-  assert(fuzzysort.single('acb', 'abc').score===20, 'typoPenalty strict')
-  assert(fuzzysort.single('acb', 'axbxc').score===6022, 'typoPenalty simple')
+  assert(fuzzysort.single('acb', 'abc').score===-20, 'typoPenalty strict')
+  assert(fuzzysort.single('acb', 'axbxc').score===-6022, 'typoPenalty simple')
 
   var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
   assert(tmp[0].score===0, 'go sorting')
@@ -102,12 +111,63 @@ async function tests() {
 
   fuzzysort.cleanup()
 
+  assert(fuzzysort.go('a', ['a', 'a']).length===2, 'length')
+  var tmpfuzz = fuzzysort.new({limit:1})
+  assert(tmpfuzz.go('a', ['a', 'a']).length===1, 'length')
+
   // checking for infinite loops
   testNomatch('a', '')
   testNomatch('', 'a')
   testNomatch('', '')
   testNomatch('', ' ')
   testNomatch(' ', '')
+
+  var tmpObjs = [{'s.s':'str', arr:[{o:'obj'}]}]
+  // key
+  var tmp = fuzzysort.go('str', tmpObjs, {key: 's.s'})[0]
+  assert(tmp.score===0, 'goKey s.s')
+  var tmp = fuzzysort.go('obj', tmpObjs, {key: 'arr.0.o'})[0]
+  assert(tmp.score===0, 'goKey arr.0.o')
+  var tmp = fuzzysort.go('str', tmpObjs, {key: 'arr.0.o'})[0]
+  assert(tmp===undefined, 'goKey')
+  var tmp = fuzzysort.go('obj', tmpObjs, {key: ['arr', '0', 'o']})[0]
+  assert(tmp.score===0, 'goKey arr.0.o')
+
+  // keys
+  var tmp = fuzzysort.go('str', tmpObjs, {keys: ['s.s']})[0]
+  assert(tmp.score===0, 'goKeys s.s')
+  var tmp = fuzzysort.go('obj', tmpObjs, {keys: ['arr.0.o']})[0]
+  assert(tmp.score===0, 'goKeys arr.0.o')
+  var tmp = fuzzysort.go('str', tmpObjs, {keys: ['arr.0.o']})[0]
+  assert(tmp===undefined, 'goKeys')
+  var tmp = fuzzysort.go('obj', tmpObjs, {keys: [ ['arr', '0', 'o'] ]})[0]
+  assert(tmp.score===0, 'goKeys arr.0.o')
+  var tmp = fuzzysort.go('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ]})[0]
+  assert(tmp.score===0, 'goKeys s.s || arr.0.o')
+  var tmp = fuzzysort.go('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}})[0]
+  assert(tmp.score===1, 'goKeys s.s || arr.0.o score')
+
+  // keyAsync
+  var tmp = (await fuzzysort.goAsync('str', tmpObjs, {key: 's.s'}))[0]
+  assert(tmp.score===0, 'goKey s.s')
+  var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {key: 'arr.0.o'}))[0]
+  assert(tmp.score===0, 'goKey arr.0.o')
+  var tmp = (await fuzzysort.goAsync('str', tmpObjs, {key: 'arr.0.o'}))[0]
+  assert(tmp===undefined, 'goKey')
+  var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {key: ['arr', '0', 'o']}))[0]
+  assert(tmp.score===0, 'goKey arr.0.o')
+
+  // keysAsync
+  var tmp = (await fuzzysort.goAsync('str', tmpObjs, {keys: ['s.s']}))[0]
+  assert(tmp.score===0, 'goKeys s.s')
+  var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {keys: ['arr.0.o']}))[0]
+  assert(tmp.score===0, 'goKeys arr.0.o')
+  var tmp = (await fuzzysort.goAsync('str', tmpObjs, {keys: ['arr.0.o']}))[0]
+  assert(tmp===undefined, 'goKeys')
+  var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {keys: [ ['arr', '0', 'o'] ]}))[0]
+  assert(tmp.score===0, 'goKeys arr.0.o')
+  var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}}))[0]
+  assert(tmp.score===1, 'goKeys s.s || arr.0.o score')
 }
 
 
@@ -120,22 +180,24 @@ const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
 if(isNode) fuzzysort = require('./fuzzysort')
 
 // Config
-  // fuzzysort.highlightMatches = false
-  // fuzzysort.noMatchLimit = 100000
-  fuzzysort.noMatchLimit = 50
-  fuzzysort.limit = 100
-  // fuzzysort.allowTypo = false
-  // fuzzysort.threshold = 999
-  // fuzzysort.searchIsLower = true
+  fuzzysort = fuzzysort.new({
+    limit: 100,
+    // threshold: 999,
+  })
   const benchmark_duration = 2
 
 if(isNode) testdata = require('./testdata')
-var testdata_rawstring = testdata; testdata = {}
-for(var key of Object.keys(testdata_rawstring)) {
-  testdata[key] = new Array(testdata_rawstring[key].length)
-  for(var i = testdata_rawstring[key].length-1; i>=0; i-=1) {
-    testdata[key][i] = fuzzysort.prepare(testdata_rawstring[key][i])
-    // testdata[key][i] = testdata_rawstring[key][i]
+var testdata_prepared = {}; var testdata_obj = {}
+for(var key of Object.keys(testdata)) {
+  testdata_prepared[key] = new Array(testdata[key].length)
+  for(var i = testdata[key].length-1; i>=0; i-=1) {
+    testdata_prepared[key][i] = fuzzysort.prepare(testdata[key][i])
+  }
+}
+for(var key of Object.keys(testdata)) {
+  testdata_obj[key] = new Array(testdata[key].length)
+  for(var i = testdata[key].length-1; i>=0; i-=1) {
+    testdata_obj[key][i] = {str: fuzzysort.prepare(testdata[key][i])}
   }
 }
 
@@ -160,14 +222,24 @@ function bench() {
   const suite = new Benchmark.Suite
 
   suite.add('go prepared', function() {
+    fuzzysort.go('nnnne', testdata_prepared.ue4_filenames)
+    fuzzysort.go('e', testdata_prepared.ue4_filenames)
+    fuzzysort.go('mrender.h', testdata_prepared.ue4_filenames)
+  })
+  suite.add('go key', function() {
+    fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {key: 'str'})
+    fuzzysort.go('e', testdata_obj.ue4_filenames, {key: 'str'})
+    fuzzysort.go('mrender.h', testdata_obj.ue4_filenames, {key: 'str'})
+  })
+  suite.add('go keys', function() {
+    fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {keys: ['str']})
+    fuzzysort.go('e', testdata_obj.ue4_filenames, {keys: ['str']})
+    fuzzysort.go('mrender.h', testdata_obj.ue4_filenames, {keys: ['str']})
+  })
+  suite.add('go str', function() {
     fuzzysort.go('nnnne', testdata.ue4_filenames)
     fuzzysort.go('e', testdata.ue4_filenames)
     fuzzysort.go('mrender.h', testdata.ue4_filenames)
-  })
-  suite.add('go str', function() {
-    fuzzysort.go('nnnne', testdata_rawstring.ue4_filenames)
-    fuzzysort.go('e', testdata_rawstring.ue4_filenames)
-    fuzzysort.go('mrender.h', testdata_rawstring.ue4_filenames)
   })
 
   // suite.add('goKey', function() {
@@ -190,13 +262,13 @@ function bench() {
 
   suite.add('goAsync', function(deferred) {
     var count = 0
-    fuzzysort.goAsync('e', testdata.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
-    fuzzysort.goAsync('a', testdata.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
-    fuzzysort.goAsync('mrender.h', testdata.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
+    fuzzysort.goAsync('e', testdata_prepared.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
+    fuzzysort.goAsync('a', testdata_prepared.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
+    fuzzysort.goAsync('mrender.h', testdata_prepared.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
   }, {defer:true})
 
   // suite.add('goAsync.cancel()', function(deferred) {
-  //   const p = fuzzysort.goAsync('e', testdata.ue4_filenames)
+  //   const p = fuzzysort.goAsync('e', testdata_prepared.ue4_filenames)
   //   p.then(()=>{deferred.resolve()}, ()=>{deferred.resolve()})
   //   p.cancel()
   // }, {defer:true})
@@ -259,7 +331,7 @@ function assert(b, m=undefined) {
 assert.count = 0
 
 function test(target, ...searches) {
-  var last_score = -1
+  var last_score = Infinity
   var needs_to_fail = false
   for (var i = 0; i < searches.length; i++) {
 
@@ -279,7 +351,7 @@ function test(target, ...searches) {
       assert(score===undefined, info)
     } else {
       assert(score!==undefined, info)
-      assert(score>=last_score, info)
+      assert(score<=last_score, info)
       last_score = score
     }
   }
@@ -287,14 +359,14 @@ function test(target, ...searches) {
 function testStrict(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
-    assert(result && result.score<1000, {search, result})
+    assert(result && result.score>-1000, {search, result})
     assertResultIntegrity(result)
   }
 }
 function testSimple(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
-    assert(result && result.score>=1000, {search, result})
+    assert(result && result.score<=-1000, {search, result})
     assertResultIntegrity(result)
   }
 }

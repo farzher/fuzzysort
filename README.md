@@ -29,7 +29,7 @@ https://rawgit.com/farzher/fuzzysort/master/test.html
 npm i fuzzysort
 node
 > require('fuzzysort').single('t', 'test')
-{ score: 3, highlighted: '<b>t</b>est' }
+{ score: -3, indexes: [0], target: 'test' }
 ```
 
 
@@ -48,24 +48,30 @@ node
 ### `fuzzysort.single(search, target)`
 
 ```js
-fuzzysort.single('query', 'some string that contains my query.')
-// {score: 59, highlighted: "some string that contains my <b>query</b>."}
+var result=  fuzzysort.single('query', 'some string that contains my query.')
+result.score // -59
+result.indexes // [29, 30, 31, 32, 33]
+fuzzysort.highlight(result, '<b>', '</b>') // some string that contains my <b>query</b>.
 
 fuzzysort.single('query', 'irrelevant string') // null
 
-// exact match returns a score of 0. lower score is better
-fuzzysort.single('query', 'query') // {score: 0, highlighted: "<b>query</b>"}
+// exact match returns a score of 0. lower is worse
+fuzzysort.single('query', 'query').score // 0
 ```
 
-### `fuzzysort.go(search, targets)`
+
+### `fuzzysort.go(search, targets, options=null)`
 
 ```js
 fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
-// [{score: 18, highlighted: "<b>M</b>esh<b>R</b>enderer.cpp"}
-// ,{score: 6009, highlighted: "<b>M</b>onito<b>r</b>.cpp"}]
+// [{score: -18, target: "MeshRenderer.cpp"}, {score: -6009, target: "Monitor.cpp"}]
+
+// When using `key`, the results will have an extra property, `obj`, which referencese the original obj
+fuzzysort.go('mr', [{file:'Monitor.cpp'}, {file:'MeshRenderer.cpp'}], {key: 'file'})
+// [{score: -18, target: "MeshRenderer.cpp", obj}, {score: -6009, target: "Monitor.cpp", obj}]
 ```
 
-### `fuzzysort.goAsync(search, targets)`
+### `fuzzysort.goAsync(search, targets, options=null)`
 
 ```js
 let promise = fuzzysort.goAsync('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
@@ -75,11 +81,24 @@ if(invalidated) promise.cancel()
 
 ##### Options
 
- - `fuzzysort.highlightMatches = true` Turn this off if you don't care about `highlighted` (faster)
- - `fuzzysort.highlightOpen = '<b>'`
- - `fuzzysort.highlightClose = '</b>'`
- - `fuzzysort.threshold = null` Don't return matches worse than this (lower is faster) (irrelevant for `single`)
- - `fuzzysort.limit = null` Don't return more results than this (faster) (irrelevant for `single`)
+```js
+fuzzysort.go(search, targets, {
+  threshold: -Infinity, // Don't return matches worse than this (faster)
+  limit: Infinity, // Don't return more results than this (faster)
+
+  key: null, // For when targets are objects (see its example usage)
+  keys: null, // For when targets are objects (see its example usage)
+  scoreFn: null, // For use with `keys` (see its example usage)
+})
+```
+
+#### `fuzzysort.highlight(result, highlightOpen='<b>', highlightClose='</b>')`
+
+```js
+fuzzysort.highlight(fuzzysort.single('tt', 'test'), '*', '*') // *t*es*t*
+```
+
+
 
 ## How To Go Fast
 
@@ -99,32 +118,23 @@ Search a list of objects, by multiple fields, with custom weights.
 
 ```js
 let objects = [{title:'Favorite Color', desc:'Chrome'}, {title:'Google Chrome', desc:'Launch Chrome'}]
-let search = 'chr'
-let results = []
-for(const myObj of objects) {
-  const titleInfo = fuzzysort.single(search, myObj.title)
-  const descInfo = fuzzysort.single(search, myObj.desc)
+let results = fuzzysort.go('chr', objects, {
+  keys: ['title', 'desc'],
+  // Create a custom combined score to sort by. -100 to the desc score makes it a worse match
+  scoreFn(a) => Math.max(a[0]?a[0].score:-1000, a[1]?a[1].score-100:-1000)
+})
 
-  // Create a custom combined score to sort by. +100 to the desc score makes it a worse match
-  const myScore = Math.min(titleInfo?titleInfo.score:1000, descInfo?descInfo.score+100:1000)
-  if(myScore >= 1000) continue
-
-  results.push({
-    myObj,
-    myScore,
-    titleHighlighted: titleInfo ? titleInfo.highlighted : myObj.title,
-    descHighlighted: descInfo ? descInfo.highlighted : myObj.desc,
-  })
-}
-results.sort((a, b) => a.myScore - b.myScore)
-console.log(results)
+var bestResult = results[0]
+// When using multiple `keys`, results are different. They're indexable to get each normal result
+fuzzysort.highlight(bestResult[0]) // 'Google <b>Chr</b>ome'
+fuzzysort.highlight(bestResult[1]) // 'Launch <b>Chr</b>ome'
+bestResult.obj.title // 'Google Chrome'
 ```
 
-Multiple instances, each with different options.
+Multiple instances, each with different default options.
 
 ```js
-const strictsort = fuzzysort.new()
-strictsort.threshold = 999
+const strictsort = fuzzysort.new({threshold: -999})
 ```
 
 Get the matched Indexes.
@@ -132,3 +142,17 @@ Get the matched Indexes.
 ```js
 fuzzysort.single('tt', 'test').indexes // [0, 3]
 ```
+
+
+### Changelog
+
+#### v1.0.0
+
+- Inverted scores; they're now negative instead of positive, so that higher scores are better
+- Added ability to search objects by keys with custom weights
+- Removed the option to automatically highlight and exposed `fuzzysort.highlight`
+- Removed all options from `fuzzysort` and moved them into `fuzzysort.go` optional params
+
+#### v0.x.x
+
+- init

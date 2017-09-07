@@ -4,7 +4,8 @@
   "description": "",
   "main": "fuzzysort.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "build": "uglifyjs fuzzysort.js -m -c -o fuzzysort.min.js"
   },
   "author": "farzher",
   "repository": {

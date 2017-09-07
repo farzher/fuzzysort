@@ -26,7 +26,7 @@
   ;(function() {
     const $input = $('#input')
     const $results = $('#results')
-    const testdatakeys = Object.keys(testdata)
+    const testdatakeys = Object.keys(testdata_prepared)
     var testdatakey = 'ue4_filenames'
     var searchMode = 'Ludicrous Mode'
     var cache = {}
@@ -49,7 +49,7 @@
           renderCache(cache[testdatakey][inputValue])
           cacheNextLevel()
         } else {
-          renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
+          renderResults(fuzzysort.go(inputValue, testdata_prepared[testdatakey]))
           cacheNextLevel()
         }
 
@@ -57,12 +57,12 @@
         if(promise) promise.cancel()
 
         startms = Date.now()
-        promise = fuzzysort.goAsync(inputValue, testdata[testdatakey])
+        promise = fuzzysort.goAsync(inputValue, testdata_prepared[testdatakey])
         promise.then(renderResults, err=>console.log(err))
 
       } else { // Sync
         startms = Date.now()
-        renderResults(fuzzysort.go(inputValue, testdata[testdatakey]))
+        renderResults(fuzzysort.go(inputValue, testdata_prepared[testdatakey]))
       }
     }
 
@@ -85,7 +85,7 @@
         if(isCached) return cacheNextLevel(nextIndex + 1)
 
         if(nextIndex===0) cacheCanceled = false
-        cachePromise = fuzzysort.goAsync(nextInputValue, testdata[nextdatakey])
+        cachePromise = fuzzysort.goAsync(nextInputValue, testdata_prepared[nextdatakey])
         cachePromise.then(results => {
           if(cache[nextdatakey]===undefined) cache[nextdatakey] = {}
           cache[nextdatakey][nextInputValue] = {total:results.total, html:resultsToHtml(results)}
@@ -98,7 +98,7 @@
       var html = '<ul>'
       for (var i = 0; i < results.length; i++) {
         const result = results[i]
-        html += `<li>${result.score} - ${result.highlighted}</li>`
+        html += `<li>${result.score} - ${fuzzysort.highlight(result)}</li>`
       }
       html += '</ul>'
       return html

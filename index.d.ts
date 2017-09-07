@@ -2,38 +2,52 @@ declare module "fuzzysort" {
 
   interface Result {
     /**
-    * Lower is better
+    * Higher is better
     *
-    * 0 is a perfect match; 1000 is a bad match
+    * 0 is a perfect match; -1000 is a bad match
     */
-    score: number
+    readonly score: number
 
-    /**
-    * HTML
-    *
-    * The target string but with matches <b>bolded</b>
-    */
-    highlighted: string
+    /** Your original target string */
+    readonly target: string
 
-    /**
-    * Indexes of the matching target characters
-    */
-    indexes: number[]
+    /** Indexes of the matching target characters */
+    readonly indexes: number[]
+  }
+  interface KeyResult extends Result {
+    /** Your original object */
+    readonly obj: any
   }
 
   interface Results {
-    [index: number]: Result
+    readonly [index: number]: Result
+
+    /** Total matches before limit */
+    readonly total: number
+  }
+  interface KeyResults extends Results {
+    readonly [index: number]: KeyResult
+  }
+  interface KeysResults {
+    readonly [index: number]: Array<KeyResult>
+
+    /** Total matches before limit */
+    readonly total: number
+
+    /** Your original object */
+    readonly obj: any
 
     /**
-    * Total matches before limit
+    * Higher is better
+    *
+    * 0 is a perfect match; -1000 is a bad match
     */
-    total: number
+    readonly score: number
   }
 
+
   interface Prepared {
-    /**
-    * The original target string
-    */
+    /** Your original target string */
     readonly _target: string
   }
 
@@ -41,23 +55,21 @@ declare module "fuzzysort" {
     cancel(): void
   }
 
+  interface Options {
+    /** Don't return matches worse than this (faster) */
+    threshold?: number
+
+    /** Don't return more results than this (faster) */
+    limit?: number
+  }
+  interface KeyOptions extends Options {
+    key: string | Array<string>
+  }
+  interface KeysOptions extends Options {
+    keys: Array<string | Array<string>>
+  }
+
   interface fuzzysort {
-    /**
-    * Turn this off if you don't care about `highlighted` (faster)
-    */
-    highlightMatches: boolean
-    highlightOpen: string
-    highlightClose: string
-
-    /**
-    * Don't return matches worse than this (lower is faster) (irrelevant for `single`)
-    */
-    threshold: number
-
-    /**
-    * Don't return more results than this (faster) (irrelevant for `single`)
-    */
-    limit: number
 
     /**
     * Help the algorithm go fast by providing prepared targets instead of raw strings
@@ -65,14 +77,19 @@ declare module "fuzzysort" {
     * Preparing is slow. Do it ahead of time and only once for each target string
     */
     prepare(target: string): Prepared
-    single(search: string, target: string | Prepared): Result | null
-    go(search: string, targets: string[] | Prepared[]): Results
-    goAsync(search: string, targets: string[] | Prepared[]): CancelablePromise<Results>
 
-    /**
-     * Returns a new instance of fuzzysort, which you can give different options to
-     */
-    'new'(): fuzzysort
+    highlight(result: Result, highlightOpen?: string, highlightClose?: string): string
+
+    single(search: string, target: string | Prepared): Result | null
+    go(search: string, targets: string[] | Prepared[], options?: Options): Results
+    go(search: string, targets: string[] | Prepared[], options: KeyOptions): KeyResults
+    go(search: string, targets: string[] | Prepared[], options: KeysOptions): KeysResults
+    goAsync(search: string, targets: string[] | Prepared[], options?: Options): CancelablePromise<Results>
+    goAsync(search: string, targets: string[] | Prepared[], options: KeyOptions): CancelablePromise<KeyResults>
+    goAsync(search: string, targets: string[] | Prepared[], options: KeysOptions): CancelablePromise<KeysResults>
+
+    /** Returns a new instance of fuzzysort, which you can give different default options to */
+    'new'(options?: Options): fuzzysort
   }
 
   const fuzzysort: fuzzysort
