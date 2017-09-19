@@ -3,10 +3,10 @@ WHAT: SublimeText-like Fuzzy Search
 
 USAGE:
   require('fuzzysort').single('fs', 'Fuzzy Search')
-  // {score: -16, highlighted: '<b>F</b>uzzy <b>S</b>earch'}
+  // {score: -16}
 
   require('fuzzysort').single('test', 'test')
-  // {score: 0, highlighted: '<b>test</b>'}
+  // {score: 0}
 
   require('fuzzysort').single('doesnt exist', 'target')
   // null

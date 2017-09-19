@@ -48,9 +48,10 @@ node
 ### `fuzzysort.single(search, target)`
 
 ```js
-var result=  fuzzysort.single('query', 'some string that contains my query.')
+var result = fuzzysort.single('query', 'some string that contains my query.')
 result.score // -59
 result.indexes // [29, 30, 31, 32, 33]
+result.target // some string that contains my query.
 fuzzysort.highlight(result, '<b>', '</b>') // some string that contains my <b>query</b>.
 
 fuzzysort.single('query', 'irrelevant string') // null
@@ -137,19 +138,13 @@ Multiple instances, each with different default options.
 const strictsort = fuzzysort.new({threshold: -999})
 ```
 
-Get the matched Indexes.
-
-```js
-fuzzysort.single('tt', 'test').indexes // [0, 3]
-```
-
 
 ### Changelog
 
 #### v1.0.0
 
 - Inverted scores; they're now negative instead of positive, so that higher scores are better
-- Added ability to search objects by keys with custom weights
+- Added ability to search objects by `key`/`keys` with custom weights
 - Removed the option to automatically highlight and exposed `fuzzysort.highlight`
 - Removed all options from `fuzzysort` and moved them into `fuzzysort.go` optional params
 
