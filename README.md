@@ -66,10 +66,6 @@ fuzzysort.single('query', 'query').score // 0
 ```js
 fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
 // [{score: -18, target: "MeshRenderer.cpp"}, {score: -6009, target: "Monitor.cpp"}]
-
-// When using `key`, the results will have an extra property, `obj`, which referencese the original obj
-fuzzysort.go('mr', [{file:'Monitor.cpp'}, {file:'MeshRenderer.cpp'}], {key: 'file'})
-// [{score: -18, target: "MeshRenderer.cpp", obj}, {score: -6009, target: "Monitor.cpp", obj}]
 ```
 
 ### `fuzzysort.goAsync(search, targets, options=null)`
@@ -114,6 +110,14 @@ fuzzysort.single('fast', myObj.titlePrepared)
 
 
 ### Advanced Usage
+
+Search a list of objects by key
+
+```js
+fuzzysort.go('mr', [{file:'Monitor.cpp'}, {file:'MeshRenderer.cpp'}], {key: 'file'})
+// When using `key`, the results will have an extra property, `obj`, which referencese the original obj
+// [{score: -18, target: "MeshRenderer.cpp", obj}, {score: -6009, target: "Monitor.cpp", obj}]
+```
 
 Search a list of objects, by multiple fields, with custom weights.
 
