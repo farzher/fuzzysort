@@ -17,11 +17,11 @@ USAGE:
   if(typeof define === 'function' && define.amd) define([], UMD)
   else if(typeof module === 'object' && module.exports) module.exports = UMD()
   else root.fuzzysort = UMD()
-})(this, function UMD() { function fuzzysortNew(instanceOptions=null) {
+})(this, function UMD() { function fuzzysortNew(instanceOptions) {
 
   var fuzzysort = {
 
-    single: function(search, target, options=null) {
+    single: function(search, target, options) {
       // search = fuzzysort.ensurePreparedSearch(search)
         if(typeof search !== 'object') {
           var searchPrepared = preparedSearchCache.get(search)
@@ -41,7 +41,7 @@ USAGE:
       return fuzzysort.algorithm(search, target, search[0])
     },
 
-    go: function(search, targets, options=null) {
+    go: function(search, targets, options) {
       // search = fuzzysort.ensurePreparedSearch(search)
         if(typeof search !== 'object') {
           var searchPrepared = preparedSearchCache.get(search)
@@ -144,7 +144,7 @@ USAGE:
       return results
     },
 
-    goAsync: function(search, targets, options=null) {
+    goAsync: function(search, targets, options) {
       var canceled = false
       var p = new Promise(function(resolve, reject) {
         // search = fuzzysort.ensurePreparedSearch(search)
@@ -283,8 +283,10 @@ USAGE:
       return p
     },
 
-    highlight: function(result, hOpen='<b>', hClose='</b>') {
+    highlight: function(result, hOpen, hClose) {
       if(result === null) return null
+      if(hOpen === undefined) hOpen = '<b>'
+      if(hClose === undefined) hClose = '</b>'
       var highlighted = ''
       var matchesIndex = 0
       var opened = false
@@ -314,7 +316,7 @@ USAGE:
     },
 
     prepare: function(target) {
-      return {target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:fuzzysort.prepareNextBeginningIndexes(target), score:null, indexes:null, obj:null}
+      return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:fuzzysort.prepareNextBeginningIndexes(target), score:null, indexes:null, obj:null}
     },
     prepareSearch: function(search) {
       return fuzzysort.prepareLowerCodes(search)
@@ -439,7 +441,7 @@ USAGE:
     },
 
     prepareFast: function(target) {
-      return {target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:null, score:null, indexes:null, obj:null}
+      return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:null, score:null, indexes:null, obj:null}
     },
 
     prepareLowerCodes: function(str) {
