@@ -160,7 +160,7 @@ USAGE:
         var q = fastpriorityqueue()
         var iCurrent = targets.length - 1
         var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -Infinity
-        var limit = options && options.limit || instanceOptions && instanceOptions.limit || Infinit
+        var limit = options && options.limit || instanceOptions && instanceOptions.limit || Infinity
         var resultsLen = 0; var limitedCount = 0
         function step() {
           if(canceled) return reject('canceled')
