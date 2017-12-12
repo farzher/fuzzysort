@@ -107,7 +107,11 @@ USAGE:
           var result = fuzzysort.algorithm(search, target, searchLowerCode)
           if(result === null) continue
           if(result.score < threshold) continue
-          result.obj = obj
+          // result = Object.create(result)
+          // result = Object.assign({}, result)
+          // result = {result:result}
+          // result.obj = obj
+          result = {score:result.score, target:result.target, indexes:result.indexes, obj:obj} // hardcoded all public fields
           if(resultsLen < limit) { q.add(result); ++resultsLen }
           else {
             ++limitedCount
@@ -226,7 +230,11 @@ USAGE:
               var result = fuzzysort.algorithm(search, target, searchLowerCode)
               if(result === null) continue
               if(result.score < threshold) continue
-              result.obj = obj
+              // result = Object.create(result)
+              // result = Object.assign({}, result)
+              // result = {result:result}
+              // result.obj = obj
+              result = {score:result.score, target:result.target, indexes:result.indexes, obj:obj} // hardcoded all public fields
               if(resultsLen < limit) { q.add(result); ++resultsLen }
               else {
                 ++limitedCount

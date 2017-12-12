@@ -168,6 +168,19 @@ async function tests() {
   assert(tmp.score===0, 'goKeys arr.0.o')
   var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}}))[0]
   assert(tmp.score===1, 'goKeys s.s || arr.0.o score')
+
+  var targets = [
+    {name: 'Typography', version: '3.1.0'},
+    {name: 'Typography', version: '2.1.0'},
+  ]
+  var results = fuzzysort.go('typography', targets, {key: 'name'})
+  assert(results[0].obj.version != results[1].obj.version, 'key same object bug')
+  var results = fuzzysort.go('typography', targets, {keys: ['name']})
+  assert(results[0].obj.version != results[1].obj.version, 'keys same object bug')
+  var results = (await fuzzysort.goAsync('typography', targets, {key: 'name'}))
+  assert(results[0].obj.version != results[1].obj.version, 'key same object bug async')
+  var results = (await fuzzysort.goAsync('typography', targets, {keys: ['name']}))
+  assert(results[0].obj.version != results[1].obj.version, 'keys same object bug async')
 }
 
 
@@ -197,7 +210,8 @@ for(var key of Object.keys(testdata)) {
 for(var key of Object.keys(testdata)) {
   testdata_obj[key] = new Array(testdata[key].length)
   for(var i = testdata[key].length-1; i>=0; i-=1) {
-    testdata_obj[key][i] = {str: fuzzysort.prepare(testdata[key][i])}
+    // testdata_obj[key][i] = {str: fuzzysort.prepare(testdata[key][i])}
+    testdata_obj[key][i] = {str: testdata[key][i]}
   }
 }
 
