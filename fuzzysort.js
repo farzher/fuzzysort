@@ -78,10 +78,10 @@ USAGE:
 
             objResults[keyI] = fuzzysort.algorithm(search, target, searchLowerCode)
           }
+          objResults.obj = obj // before scoreFn so scoreFn can use it
           var score = scoreFn(objResults)
           if(score === null) continue
           if(score < threshold) continue
-          objResults.obj = obj
           objResults.score = score
           if(resultsLen < limit) { q.add(objResults); ++resultsLen }
           else {
@@ -111,7 +111,8 @@ USAGE:
           // result = Object.assign({}, result)
           // result = {result:result}
           // result.obj = obj
-          result = {score:result.score, target:result.target, indexes:result.indexes, obj:obj} // hardcoded all public fields
+          // result = {score:result.score, target:result.target, indexes:result.indexes, obj:obj} // hardcoded all public fields
+          result = {target:result.target, _targetLowerCodes:null, _nextBeginningIndexes:null, score:result.score, indexes:result.indexes, obj:obj} // has to match hidden class
           if(resultsLen < limit) { q.add(result); ++resultsLen }
           else {
             ++limitedCount
@@ -194,10 +195,10 @@ USAGE:
 
                 objResults[keyI] = fuzzysort.algorithm(search, target, searchLowerCode)
               }
+              objResults.obj = obj // before scoreFn so scoreFn can use it
               var score = scoreFn(objResults)
               if(score === null) continue
               if(score < threshold) continue
-              objResults.obj = obj
               objResults.score = score
               if(resultsLen < limit) { q.add(objResults); ++resultsLen }
               else {
@@ -234,7 +235,8 @@ USAGE:
               // result = Object.assign({}, result)
               // result = {result:result}
               // result.obj = obj
-              result = {score:result.score, target:result.target, indexes:result.indexes, obj:obj} // hardcoded all public fields
+              // result = {score:result.score, target:result.target, indexes:result.indexes, obj:obj} // hardcoded all public fields
+              result = {target:result.target, _targetLowerCodes:null, _nextBeginningIndexes:null, score:result.score, indexes:result.indexes, obj:obj} // has to match hidden class
               if(resultsLen < limit) { q.add(result); ++resultsLen }
               else {
                 ++limitedCount
@@ -556,10 +558,8 @@ return fuzzysortNew()
 
 // TODO: (performance) preparedCache is a memory leak
 
-// TODO: (performance) is it important to make sure `highlighted` property always exists for hidden class optimization?
-
 // TODO: (like sublime) backslash === forwardslash
 
-// TODO: (performance) i have no idea how well optizmied the allowing typos algorithm is (or if it even works)
+// TODO: (performance) i have no idea how well optizmied the allowing typos algorithm is
 
 // TODO: (performance) search could assume to be lowercase?
