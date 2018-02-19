@@ -75,7 +75,7 @@ USAGE:
                 if(targetPrepared !== undefined) target = targetPrepared
                 else preparedCache.set(target, target = fuzzysort.prepareFast(target))
               }
-            if(target._targetLowerCodes.length === 0) { objResults[keyI] = null; continue }
+            if(target._targetLowerCodes === undefined || target._targetLowerCodes === null || target._targetLowerCodes.length === 0) { objResults[keyI] = null; continue }
 
             objResults[keyI] = fuzzysort.algorithm(search, target, searchLowerCode)
           }
@@ -104,7 +104,7 @@ USAGE:
               if(targetPrepared !== undefined) target = targetPrepared
               else preparedCache.set(target, target = fuzzysort.prepareFast(target))
             }
-          if(target._targetLowerCodes.length === 0) continue
+          if(target._targetLowerCodes === undefined || target._targetLowerCodes === null || target._targetLowerCodes.length === 0) {continue }            
 
           var result = fuzzysort.algorithm(search, target, searchLowerCode)
           if(result === null) continue
@@ -129,7 +129,7 @@ USAGE:
               if(targetPrepared !== undefined) target = targetPrepared
               else preparedCache.set(target, target = fuzzysort.prepareFast(target))
             }
-          if(target._targetLowerCodes.length === 0) continue
+          if(target._targetLowerCodes === undefined || target._targetLowerCodes === null || target._targetLowerCodes.length === 0) { continue }          
 
           var result = fuzzysort.algorithm(search, target, searchLowerCode)
           if(result === null) continue
