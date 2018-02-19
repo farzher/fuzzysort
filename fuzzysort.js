@@ -21,7 +21,7 @@ USAGE:
 
   var fuzzysort = {
 
-    single: function(search, target, options) {
+    single: function(search, target) {
       // search = fuzzysort.ensurePreparedSearch(search)
         if(typeof search !== 'object') {
           var searchPrepared = preparedSearchCache.get(search)
@@ -109,12 +109,10 @@ USAGE:
           var result = fuzzysort.algorithm(search, target, searchLowerCode)
           if(result === null) continue
           if(result.score < threshold) continue
-          // result = Object.create(result)
-          // result = Object.assign({}, result)
-          // result = {result:result}
-          // result.obj = obj
-          // result = {score:result.score, target:result.target, indexes:result.indexes, obj:obj} // hardcoded all public fields
-          result = {target:result.target, _targetLowerCodes:null, _nextBeginningIndexes:null, score:result.score, indexes:result.indexes, obj:obj} // has to match hidden class
+
+          // have to clone result so duplicate targets from different obj can each reference the correct obj
+          result = {target:result.target, _targetLowerCodes:null, _nextBeginningIndexes:null, score:result.score, indexes:result.indexes, obj:obj} // hidden
+
           if(resultsLen < limit) { q.add(result); ++resultsLen }
           else {
             ++limitedCount
@@ -235,12 +233,10 @@ USAGE:
               var result = fuzzysort.algorithm(search, target, searchLowerCode)
               if(result === null) continue
               if(result.score < threshold) continue
-              // result = Object.create(result)
-              // result = Object.assign({}, result)
-              // result = {result:result}
-              // result.obj = obj
-              // result = {score:result.score, target:result.target, indexes:result.indexes, obj:obj} // hardcoded all public fields
-              result = {target:result.target, _targetLowerCodes:null, _nextBeginningIndexes:null, score:result.score, indexes:result.indexes, obj:obj} // has to match hidden class
+
+              // have to clone result so duplicate targets from different obj can each reference the correct obj
+              result = {target:result.target, _targetLowerCodes:null, _nextBeginningIndexes:null, score:result.score, indexes:result.indexes, obj:obj} // hidden
+
               if(resultsLen < limit) { q.add(result); ++resultsLen }
               else {
                 ++limitedCount
@@ -330,7 +326,7 @@ USAGE:
     },
 
     prepare: function(target) {
-      return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:fuzzysort.prepareNextBeginningIndexes(target), score:null, indexes:null, obj:null}
+      return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:fuzzysort.prepareNextBeginningIndexes(target), score:null, indexes:null, obj:null} // hidden
     },
     prepareSearch: function(search) {
       return fuzzysort.prepareLowerCodes(search)
@@ -455,7 +451,7 @@ USAGE:
     },
 
     prepareFast: function(target) {
-      return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:null, score:null, indexes:null, obj:null}
+      return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:null, score:null, indexes:null, obj:null} // hidden
     },
 
     prepareLowerCodes: function(str) {
@@ -541,6 +537,9 @@ function defaultScoreFn(a) {
   return max
 }
 
+// prop = 'key'              25ms
+// prop = 'key1.key2         100ms
+// prop = ['key1', 'key'2]   270ms
 function getValue(obj, prop) {
   var tmp = obj[prop]; if(tmp !== undefined) return tmp
   var segs = prop
