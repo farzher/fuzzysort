@@ -67,6 +67,7 @@ USAGE:
           for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
             var key = keys[keyI]
             var target = getValue(obj, key)
+            if(target === undefined) { objResults[keyI] = null; continue }
 
             // target = fuzzysort.ensurePrepared(target)
               if(typeof target !== 'object') {
@@ -95,6 +96,7 @@ USAGE:
         var key = options.key
         for(var i = targets.length - 1; i >= 0; --i) { var obj = targets[i]
           var target = getValue(obj, key)
+          if(target === undefined) continue
 
           // target = fuzzysort.ensurePrepared(target)
             if(typeof target !== 'object') {
@@ -184,6 +186,7 @@ USAGE:
               for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
                 var key = keys[keyI]
                 var target = getValue(obj, key)
+                if(target === undefined) { objResults[keyI] = null; continue }
 
                 // target = fuzzysort.ensurePrepared(target)
                   if(typeof target !== 'object') {
@@ -219,6 +222,7 @@ USAGE:
             var key = options.key
             for(; iCurrent >= 0; --iCurrent) { var obj = targets[iCurrent]
               var target = getValue(obj, key)
+              if(target === undefined) continue
 
               // target = fuzzysort.ensurePrepared(target)
                 if(typeof target !== 'object') {

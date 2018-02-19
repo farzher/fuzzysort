@@ -181,6 +181,16 @@ async function tests() {
   assert(results[0].obj.version != results[1].obj.version, 'key same object bug async')
   var results = (await fuzzysort.goAsync('typography', targets, {keys: ['name']}))
   assert(results[0].obj.version != results[1].obj.version, 'keys same object bug async')
+
+  // missing key
+  var targets = [
+    {},
+    {name: 'Typography'},
+  ]
+  var results = fuzzysort.go('typography', targets, {key: 'name'})
+  var results = fuzzysort.go('typography', targets, {keys: ['name']})
+  var results = (await fuzzysort.goAsync('typography', targets, {key: 'name'}))
+  var results = (await fuzzysort.goAsync('typography', targets, {keys: ['name']}))
 }
 
 
