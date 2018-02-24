@@ -54,6 +54,7 @@ USAGE:
       var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -Infinity
       var limit = options && options.limit || instanceOptions && instanceOptions.limit || Infinity
       var resultsLen = 0; var limitedCount = 0
+      var targetsLen = targets.length
 
       // This code is copy/pasted 3 times for performance reasons [options.keys, options.key, no keys]
 
@@ -62,7 +63,7 @@ USAGE:
         var scoreFn = options.scoreFn || defaultScoreFn
         var keys = options.keys
         var keysLen = keys.length
-        for(var i = targets.length - 1; i >= 0; --i) { var obj = targets[i]
+        for(var i = targetsLen - 1; i >= 0; --i) { var obj = targets[i]
           var objResults = new Array(keysLen)
           for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
             var key = keys[keyI]
@@ -94,7 +95,7 @@ USAGE:
       // options.key
       } else if(options && options.key) {
         var key = options.key
-        for(var i = targets.length - 1; i >= 0; --i) { var obj = targets[i]
+        for(var i = targetsLen - 1; i >= 0; --i) { var obj = targets[i]
           var target = getValue(obj, key)
           if(target === undefined) continue
 
@@ -122,7 +123,7 @@ USAGE:
 
       // no keys
       } else {
-        for(var i = targets.length - 1; i >= 0; --i) { var target = targets[i]
+        for(var i = targetsLen - 1; i >= 0; --i) { var target = targets[i]
           // target = fuzzysort.ensurePrepared(target)
             if(!isObj(target)) {
               var targetPrepared = preparedCache.get(target)
