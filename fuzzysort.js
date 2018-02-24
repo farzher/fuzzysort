@@ -456,9 +456,9 @@ USAGE:
     },
 
     prepareLowerCodes: function(str) {
-      var lowerCodes = new Array(str.length)
-      var lower = str.toLowerCase()
       var strLen = str.length
+      var lowerCodes = new Array(strLen)
+      var lower = str.toLowerCase()
       for(var i = 0; i < strLen; ++i) lowerCodes[i] = lower.charCodeAt(i)
       return lowerCodes
     },
