@@ -180,7 +180,7 @@ USAGE:
             var scoreFn = options.scoreFn || defaultScoreFn
             var keys = options.keys
             var keysLen = keys.length
-            for(var i = targets.length - 1; i >= 0; --i) { var obj = targets[i]
+            for(; iCurrent >= 0; --iCurrent) { var obj = targets[iCurrent]
               var objResults = new Array(keysLen)
               for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
                 var key = keys[keyI]
