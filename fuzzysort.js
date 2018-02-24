@@ -23,7 +23,7 @@ USAGE:
 
     single: function(search, target) {
       // search = fuzzysort.ensurePreparedSearch(search)
-        if(typeof search !== 'object') {
+        if(!isObj(search)) {
           var searchPrepared = preparedSearchCache.get(search)
           if(searchPrepared !== undefined) search = searchPrepared
           else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
@@ -31,7 +31,7 @@ USAGE:
       if(search.length === 0) return null
 
       // target = fuzzysort.ensurePrepared(target)
-        if(typeof target !== 'object') {
+        if(!isObj(target)) {
           var targetPrepared = preparedCache.get(target)
           if(targetPrepared !== undefined) target = targetPrepared
           else preparedCache.set(target, target = fuzzysort.prepareFast(target))
@@ -43,7 +43,7 @@ USAGE:
 
     go: function(search, targets, options) {
       // search = fuzzysort.ensurePreparedSearch(search)
-        if(typeof search !== 'object') {
+        if(!isObj(search)) {
           var searchPrepared = preparedSearchCache.get(search)
           if(searchPrepared !== undefined) search = searchPrepared
           else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
@@ -70,7 +70,7 @@ USAGE:
             if(target === undefined) { objResults[keyI] = null; continue }
 
             // target = fuzzysort.ensurePrepared(target)
-              if(typeof target !== 'object') {
+              if(!isObj(target)) {
                 var targetPrepared = preparedCache.get(target)
                 if(targetPrepared !== undefined) target = targetPrepared
                 else preparedCache.set(target, target = fuzzysort.prepareFast(target))
@@ -99,7 +99,7 @@ USAGE:
           if(target === undefined) continue
 
           // target = fuzzysort.ensurePrepared(target)
-            if(typeof target !== 'object') {
+            if(!isObj(target)) {
               var targetPrepared = preparedCache.get(target)
               if(targetPrepared !== undefined) target = targetPrepared
               else preparedCache.set(target, target = fuzzysort.prepareFast(target))
@@ -124,7 +124,7 @@ USAGE:
       } else {
         for(var i = targets.length - 1; i >= 0; --i) { var target = targets[i]
           // target = fuzzysort.ensurePrepared(target)
-            if(typeof target !== 'object') {
+            if(!isObj(target)) {
               var targetPrepared = preparedCache.get(target)
               if(targetPrepared !== undefined) target = targetPrepared
               else preparedCache.set(target, target = fuzzysort.prepareFast(target))
@@ -153,7 +153,7 @@ USAGE:
       var canceled = false
       var p = new Promise(function(resolve, reject) {
         // search = fuzzysort.ensurePreparedSearch(search)
-          if(typeof search !== 'object') {
+          if(!isObj(search)) {
             var searchPrepared = preparedSearchCache.get(search)
             if(searchPrepared !== undefined) search = searchPrepared
             else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
@@ -187,7 +187,7 @@ USAGE:
                 if(target === undefined) { objResults[keyI] = null; continue }
 
                 // target = fuzzysort.ensurePrepared(target)
-                  if(typeof target !== 'object') {
+                  if(!isObj(target)) {
                     var targetPrepared = preparedCache.get(target)
                     if(targetPrepared !== undefined) target = targetPrepared
                     else preparedCache.set(target, target = fuzzysort.prepareFast(target))
@@ -223,7 +223,7 @@ USAGE:
               if(target === undefined) continue
 
               // target = fuzzysort.ensurePrepared(target)
-                if(typeof target !== 'object') {
+                if(!isObj(target)) {
                   var targetPrepared = preparedCache.get(target)
                   if(targetPrepared !== undefined) target = targetPrepared
                   else preparedCache.set(target, target = fuzzysort.prepareFast(target))
@@ -255,7 +255,7 @@ USAGE:
           } else {
             for(; iCurrent >= 0; --iCurrent) { var target = targets[iCurrent]
               // target = fuzzysort.ensurePrepared(target)
-                if(typeof target !== 'object') {
+                if(!isObj(target)) {
                   var targetPrepared = preparedCache.get(target)
                   if(targetPrepared !== undefined) target = targetPrepared
                   else preparedCache.set(target, target = fuzzysort.prepareFast(target))
@@ -549,6 +549,8 @@ function getValue(obj, prop) {
   while (obj && (++i < len)) obj = obj[segs[i]]
   return obj
 }
+
+function isObj(x) { return typeof x === 'object' }
 
 // Hacked version of https://github.com/lemire/FastPriorityQueue.js
 var fastpriorityqueue=function(){var r=[],o=0,e={};function n(){for(var e=0,n=r[e],c=1;c<o;){var f=c+1;e=c,f<o&&r[f].score<r[c].score&&(e=f),r[e-1>>1]=r[e],c=1+(e<<1)}for(var a=e-1>>1;e>0&&n.score<r[a].score;a=(e=a)-1>>1)r[e]=r[a];r[e]=n}return e.add=function(e){var n=o;r[o++]=e;for(var c=n-1>>1;n>0&&e.score<r[c].score;c=(n=c)-1>>1)r[n]=r[c];r[n]=e},e.poll=function(){if(0!==o){var e=r[0];return r[0]=r[--o],n(),e}},e.peek=function(e){if(0!==o)return r[0]},e.replaceTop=function(o){r[0]=o,n()},e};
