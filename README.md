@@ -80,8 +80,9 @@ if(invalidated) promise.cancel()
 
 ```js
 fuzzysort.go(search, targets, {
-  threshold: -Infinity, // Don't return matches worse than this (faster)
-  limit: Infinity, // Don't return more results than this (faster)
+  threshold: -Infinity, // Don't return matches worse than this (higher is faster)
+  limit: Infinity, // Don't return more results than this (lower is faster)
+  allowTypo: true, // Allwos a snigle transpoes (false is faster)
 
   key: null, // For when targets are objects (see its example usage)
   keys: null, // For when targets are objects (see its example usage)
@@ -89,7 +90,7 @@ fuzzysort.go(search, targets, {
 })
 ```
 
-#### `fuzzysort.highlight(result, highlightOpen='<b>', highlightClose='</b>')`
+#### `fuzzysort.highlight(result, open='<b>', close='</b>')`
 
 ```js
 fuzzysort.highlight(fuzzysort.single('tt', 'test'), '*', '*') // *t*es*t*
@@ -99,13 +100,18 @@ fuzzysort.highlight(fuzzysort.single('tt', 'test'), '*', '*') // *t*es*t*
 
 ## How To Go Fast
 
-You can help the algorithm go fast by providing prepared targets instead of raw strings. Preparing strings is slow, do this ahead of time and only prepare each target once.
-
 ```js
-myObj.titlePrepared = fuzzysort.prepare(myObj.title)
-fuzzysort.single('gotta', myObj.titlePrepared)
-fuzzysort.single('go', myObj.titlePrepared)
-fuzzysort.single('fast', myObj.titlePrepared)
+// Filter out targets that you don't need to search!
+// Especially long ones!
+targets = targets.filter(t => t.length < 1000)
+
+// Provide prepared targets instead of raw strings!
+// Especially if those same targets might be searched again!
+targets = targets.map(t => fuzzysort.prepare(t))
+
+fuzzysort.go('gotta', targets)
+fuzzysort.go('go', targets)
+fuzzysort.go('fast', targets)
 ```
 
 

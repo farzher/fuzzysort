@@ -2,14 +2,15 @@
 WHAT: SublimeText-like Fuzzy Search
 
 USAGE:
-  require('fuzzysort').single('fs', 'Fuzzy Search')
-  // {score: -16}
+  fuzzysort.single('fs', 'Fuzzy Search') // {score: -16}
+  fuzzysort.single('test', 'test') // {score: 0}
+  fuzzysort.single('doesnt exist', 'target') // null
 
-  require('fuzzysort').single('test', 'test')
-  // {score: 0}
+  fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
+  // [{score: -18, target: "MeshRenderer.cpp"}, {score: -6009, target: "Monitor.cpp"}]
 
-  require('fuzzysort').single('doesnt exist', 'target')
-  // null
+  fuzzysort.highlight(fuzzysort.single('fs', 'Fuzzy Search'), '<b>', '</b>')
+  // <b>F</b>uzzy <b>S</b>earch
 */
 
 // UMD (Universal Module Definition) for fuzzysort
@@ -21,38 +22,36 @@ USAGE:
 
   var fuzzysort = {
 
-    single: function(search, target) {
-      // search = fuzzysort.ensurePreparedSearch(search)
-        if(!isObj(search)) {
-          var searchPrepared = preparedSearchCache.get(search)
-          if(searchPrepared !== undefined) search = searchPrepared
-          else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
-        }
-      if(search.length === 0) return null
+    single: function(search, target, options) {
+      if(!search) return null
+      if(!isObj(search)) search = fuzzysort.getPreparedSearch(search)
 
-      // target = fuzzysort.ensurePrepared(target)
-        if(!isObj(target)) {
-          var targetPrepared = preparedCache.get(target)
-          if(targetPrepared !== undefined) target = targetPrepared
-          else preparedCache.set(target, target = fuzzysort.prepareFast(target))
-        }
-      if(target._targetLowerCodes.length === 0) return null
+      if(!target) return null
+      if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
-      return fuzzysort.algorithm(search, target, search[0])
+      var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
+        : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
+        : true
+      var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
+      return algorithm(search, target, search[0])
+      // var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -Infinity
+      // var result = algorithm(search, target, search[0])
+      // if(result === null) return null
+      // if(result.score < threshold) return null
+      // return result
     },
 
     go: function(search, targets, options) {
-      // search = fuzzysort.ensurePreparedSearch(search)
-        if(!isObj(search)) {
-          var searchPrepared = preparedSearchCache.get(search)
-          if(searchPrepared !== undefined) search = searchPrepared
-          else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
-        }
-      if(search.length === 0) return noResults
+      if(!search) return noResults
+      search = fuzzysort.prepareSearch(search)
       var searchLowerCode = search[0]
 
       var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -Infinity
       var limit = options && options.limit || instanceOptions && instanceOptions.limit || Infinity
+      var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
+        : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
+        : true
+      var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
       var resultsLen = 0; var limitedCount = 0
       var targetsLen = targets.length
 
@@ -68,17 +67,10 @@ USAGE:
           for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
             var key = keys[keyI]
             var target = getValue(obj, key)
-            if(target === undefined) { objResults[keyI] = null; continue }
+            if(!target) { objResults[keyI] = null; continue }
+            if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
-            // target = fuzzysort.ensurePrepared(target)
-              if(!isObj(target)) {
-                var targetPrepared = preparedCache.get(target)
-                if(targetPrepared !== undefined) target = targetPrepared
-                else preparedCache.set(target, target = fuzzysort.prepareFast(target))
-              }
-            if(target._targetLowerCodes.length === 0) { objResults[keyI] = null; continue }
-
-            objResults[keyI] = fuzzysort.algorithm(search, target, searchLowerCode)
+            objResults[keyI] = algorithm(search, target, searchLowerCode)
           }
           objResults.obj = obj // before scoreFn so scoreFn can use it
           var score = scoreFn(objResults)
@@ -97,17 +89,10 @@ USAGE:
         var key = options.key
         for(var i = targetsLen - 1; i >= 0; --i) { var obj = targets[i]
           var target = getValue(obj, key)
-          if(target === undefined) continue
+          if(!target) continue
+          if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
-          // target = fuzzysort.ensurePrepared(target)
-            if(!isObj(target)) {
-              var targetPrepared = preparedCache.get(target)
-              if(targetPrepared !== undefined) target = targetPrepared
-              else preparedCache.set(target, target = fuzzysort.prepareFast(target))
-            }
-          if(target._targetLowerCodes.length === 0) continue
-
-          var result = fuzzysort.algorithm(search, target, searchLowerCode)
+          var result = algorithm(search, target, searchLowerCode)
           if(result === null) continue
           if(result.score < threshold) continue
 
@@ -124,15 +109,10 @@ USAGE:
       // no keys
       } else {
         for(var i = targetsLen - 1; i >= 0; --i) { var target = targets[i]
-          // target = fuzzysort.ensurePrepared(target)
-            if(!isObj(target)) {
-              var targetPrepared = preparedCache.get(target)
-              if(targetPrepared !== undefined) target = targetPrepared
-              else preparedCache.set(target, target = fuzzysort.prepareFast(target))
-            }
-          if(target._targetLowerCodes.length === 0) continue
+          if(!target) continue
+          if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
-          var result = fuzzysort.algorithm(search, target, searchLowerCode)
+          var result = algorithm(search, target, searchLowerCode)
           if(result === null) continue
           if(result.score < threshold) continue
           if(resultsLen < limit) { q.add(result); ++resultsLen }
@@ -153,20 +133,18 @@ USAGE:
     goAsync: function(search, targets, options) {
       var canceled = false
       var p = new Promise(function(resolve, reject) {
-        // search = fuzzysort.ensurePreparedSearch(search)
-          if(!isObj(search)) {
-            var searchPrepared = preparedSearchCache.get(search)
-            if(searchPrepared !== undefined) search = searchPrepared
-            else preparedSearchCache.set(search, search = fuzzysort.prepareSearch(search))
-          }
-        if(search.length === 0) return resolve(noResults)
+        if(!search) return resolve(noResults)
+        search = fuzzysort.prepareSearch(search)
         var searchLowerCode = search[0]
 
-        var itemsPerCheck = 1000
         var q = fastpriorityqueue()
         var iCurrent = targets.length - 1
         var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -Infinity
         var limit = options && options.limit || instanceOptions && instanceOptions.limit || Infinity
+        var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
+          : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
+          : true
+        var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
         var resultsLen = 0; var limitedCount = 0
         function step() {
           if(canceled) return reject('canceled')
@@ -185,17 +163,10 @@ USAGE:
               for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
                 var key = keys[keyI]
                 var target = getValue(obj, key)
-                if(target === undefined) { objResults[keyI] = null; continue }
+                if(!target) { objResults[keyI] = null; continue }
+                if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
-                // target = fuzzysort.ensurePrepared(target)
-                  if(!isObj(target)) {
-                    var targetPrepared = preparedCache.get(target)
-                    if(targetPrepared !== undefined) target = targetPrepared
-                    else preparedCache.set(target, target = fuzzysort.prepareFast(target))
-                  }
-                if(target._targetLowerCodes.length === 0) { objResults[keyI] = null; continue }
-
-                objResults[keyI] = fuzzysort.algorithm(search, target, searchLowerCode)
+                objResults[keyI] = algorithm(search, target, searchLowerCode)
               }
               objResults.obj = obj // before scoreFn so scoreFn can use it
               var score = scoreFn(objResults)
@@ -209,7 +180,7 @@ USAGE:
               }
 
               if(iCurrent%1000/*itemsPerCheck*/ === 0) {
-                if(Date.now() - startMs >= 32/*asyncInterval*/) {
+                if(Date.now() - startMs >= 10/*asyncInterval*/) {
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
@@ -221,17 +192,10 @@ USAGE:
             var key = options.key
             for(; iCurrent >= 0; --iCurrent) { var obj = targets[iCurrent]
               var target = getValue(obj, key)
-              if(target === undefined) continue
+              if(!target) continue
+              if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
-              // target = fuzzysort.ensurePrepared(target)
-                if(!isObj(target)) {
-                  var targetPrepared = preparedCache.get(target)
-                  if(targetPrepared !== undefined) target = targetPrepared
-                  else preparedCache.set(target, target = fuzzysort.prepareFast(target))
-                }
-              if(target._targetLowerCodes.length === 0) continue
-
-              var result = fuzzysort.algorithm(search, target, searchLowerCode)
+              var result = algorithm(search, target, searchLowerCode)
               if(result === null) continue
               if(result.score < threshold) continue
 
@@ -245,7 +209,7 @@ USAGE:
               }
 
               if(iCurrent%1000/*itemsPerCheck*/ === 0) {
-                if(Date.now() - startMs >= 32/*asyncInterval*/) {
+                if(Date.now() - startMs >= 10/*asyncInterval*/) {
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
@@ -255,15 +219,10 @@ USAGE:
           // no keys
           } else {
             for(; iCurrent >= 0; --iCurrent) { var target = targets[iCurrent]
-              // target = fuzzysort.ensurePrepared(target)
-                if(!isObj(target)) {
-                  var targetPrepared = preparedCache.get(target)
-                  if(targetPrepared !== undefined) target = targetPrepared
-                  else preparedCache.set(target, target = fuzzysort.prepareFast(target))
-                }
-              if(target._targetLowerCodes.length === 0) continue
+              if(!target) continue
+              if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
-              var result = fuzzysort.algorithm(search, target, searchLowerCode)
+              var result = algorithm(search, target, searchLowerCode)
               if(result === null) continue
               if(result.score < threshold) continue
               if(resultsLen < limit) { q.add(result); ++resultsLen }
@@ -273,7 +232,7 @@ USAGE:
               }
 
               if(iCurrent%1000/*itemsPerCheck*/ === 0) {
-                if(Date.now() - startMs >= 32/*asyncInterval*/) {
+                if(Date.now() - startMs >= 10/*asyncInterval*/) {
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
@@ -327,9 +286,15 @@ USAGE:
     },
 
     prepare: function(target) {
+      if(!target) return
+      return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:null, score:null, indexes:null, obj:null} // hidden
+    },
+    prepareSlow: function(target) {
+      if(!target) return
       return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:fuzzysort.prepareNextBeginningIndexes(target), score:null, indexes:null, obj:null} // hidden
     },
     prepareSearch: function(search) {
+      if(!search) return
       return fuzzysort.prepareLowerCodes(search)
     },
 
@@ -341,6 +306,23 @@ USAGE:
     // Below this point is only internal code
 
 
+
+    getPrepared: function(target) {
+      if(target.length > 999) return fuzzysort.prepare(target) // don't cache huge targets
+      var targetPrepared = preparedCache.get(target)
+      if(targetPrepared !== undefined) return targetPrepared
+      targetPrepared = fuzzysort.prepare(target)
+      preparedCache.set(target, targetPrepared)
+      return targetPrepared
+    },
+    getPreparedSearch: function(search) {
+      if(search.length > 999) return fuzzysort.prepareSearch(search) // don't cache huge searches
+      var searchPrepared = preparedSearchCache.get(search)
+      if(searchPrepared !== undefined) return searchPrepared
+      searchPrepared = fuzzysort.prepareSearch(search)
+      preparedSearchCache.set(search, searchPrepared)
+      return searchPrepared
+    },
 
     algorithm: function(searchLowerCodes, prepared, searchLowerCode) {
       var targetLowerCodes = prepared._targetLowerCodes
@@ -451,8 +433,76 @@ USAGE:
       }
     },
 
-    prepareFast: function(target) {
-      return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:null, score:null, indexes:null, obj:null} // hidden
+    algorithmNoTypo: function(searchLowerCodes, prepared, searchLowerCode) {
+      var targetLowerCodes = prepared._targetLowerCodes
+      var searchLen = searchLowerCodes.length
+      var targetLen = targetLowerCodes.length
+      var searchI = 0 // where we at
+      var targetI = 0 // where you at
+      var matchesSimpleLen = 0
+
+      // very basic fuzzy match; to remove non-matching targets ASAP!
+      // walk through target. find sequential matches.
+      // if all chars aren't found then exit
+      for(;;) {
+        var isMatch = searchLowerCode === targetLowerCodes[targetI]
+        if(isMatch) {
+          matchesSimple[matchesSimpleLen++] = targetI
+          ++searchI; if(searchI === searchLen) break
+          searchLowerCode = searchLowerCodes[searchI]
+        }
+        ++targetI; if(targetI >= targetLen) return null // Failed to find searchI
+      }
+
+      var searchI = 0
+      var successStrict = false
+      var matchesStrictLen = 0
+
+      var nextBeginningIndexes = prepared._nextBeginningIndexes
+      if(nextBeginningIndexes === null) nextBeginningIndexes = prepared._nextBeginningIndexes = fuzzysort.prepareNextBeginningIndexes(prepared.target)
+      var firstPossibleI = targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
+
+      // Our target string successfully matched all characters in sequence!
+      // Let's try a more advanced and strict test to improve the score
+      // only count it as a match if it's consecutive or a beginning character!
+      if(targetI !== targetLen) for(;;) {
+        if(targetI >= targetLen) {
+          // We failed to find a good spot for this search char, go back to the previous search char and force it forward
+          if(searchI <= 0) break // We failed to push chars forward for a better match
+
+          --searchI
+          var lastMatch = matchesStrict[--matchesStrictLen]
+          targetI = nextBeginningIndexes[lastMatch]
+
+        } else {
+          var isMatch = searchLowerCodes[searchI] === targetLowerCodes[targetI]
+          if(isMatch) {
+            matchesStrict[matchesStrictLen++] = targetI
+            ++searchI; if(searchI === searchLen) { successStrict = true; break }
+            ++targetI
+          } else {
+            targetI = nextBeginningIndexes[targetI]
+          }
+        }
+      }
+
+      { // tally up the score & keep track of matches for highlighting later
+        if(successStrict) { var matchesBest = matchesStrict; var matchesBestLen = matchesStrictLen }
+        else { var matchesBest = matchesSimple; var matchesBestLen = matchesSimpleLen }
+        var score = 0
+        var lastTargetI = -1
+        for(var i = 0; i < searchLen; ++i) { var targetI = matchesBest[i]
+          // score only goes down if they're not consecutive
+          if(lastTargetI !== targetI - 1) score -= targetI
+          lastTargetI = targetI
+        }
+        if(!successStrict) score *= 1000
+        score -= targetLen - searchLen
+        prepared.score = score
+        prepared.indexes = new Array(matchesBestLen); for(var i = matchesBestLen - 1; i >= 0; --i) prepared.indexes[i] = matchesBest[i]
+
+        return prepared
+      }
     },
 
     prepareLowerCodes: function(str) {
@@ -495,21 +545,6 @@ USAGE:
       return nextBeginningIndexes
     },
 
-    // ensurePrepared: function(target) {
-    //   if(typeof target === 'object') return target
-    //   var targetPrepared = preparedCache.get(target)
-    //   if(targetPrepared !== undefined) return targetPrepared
-    //   preparedCache.set(target, targetPrepared = fuzzysort.prepareFast(target))
-    //   return targetPrepared
-    // },
-    // ensurePreparedSearch: function(search) {
-    //   if(typeof search === 'object') return search
-    //   var searchPrepared = preparedSearchCache.get(search)
-    //   if(searchPrepared !== undefined) return searchPrepared
-    //   preparedSearchCache.set(search, searchPrepared = fuzzysort.prepareSearch(search))
-    //   return searchPrepared
-    // },
-
     cleanup: cleanup,
     new: fuzzysortNew,
   }
@@ -536,9 +571,9 @@ function defaultScoreFn(a) {
   return max
 }
 
-// prop = 'key'              25ms
-// prop = 'key1.key2         100ms
-// prop = ['key1', 'key'2]   270ms
+// prop = 'key'              2.5ms optimized for this case, seems to be about as fast as direct obj[prop]
+// prop = 'key1.key2'        10ms
+// prop = ['key1', 'key2']   27ms
 function getValue(obj, prop) {
   var tmp = obj[prop]; if(tmp !== undefined) return tmp
   var segs = prop
@@ -549,14 +584,16 @@ function getValue(obj, prop) {
   return obj
 }
 
-function isObj(x) { return typeof x === 'object' }
+function isObj(x) { return typeof x === 'object' } // faster as a function
 
 // Hacked version of https://github.com/lemire/FastPriorityQueue.js
 var fastpriorityqueue=function(){var r=[],o=0,e={};function n(){for(var e=0,n=r[e],c=1;c<o;){var f=c+1;e=c,f<o&&r[f].score<r[c].score&&(e=f),r[e-1>>1]=r[e],c=1+(e<<1)}for(var a=e-1>>1;e>0&&n.score<r[a].score;a=(e=a)-1>>1)r[e]=r[a];r[e]=n}return e.add=function(e){var n=o;r[o++]=e;for(var c=n-1>>1;n>0&&e.score<r[c].score;c=(n=c)-1>>1)r[n]=r[c];r[n]=e},e.poll=function(){if(0!==o){var e=r[0];return r[0]=r[--o],n(),e}},e.peek=function(e){if(0!==o)return r[0]},e.replaceTop=function(o){r[0]=o,n()},e};
-var q = fastpriorityqueue()
+var q = fastpriorityqueue() // reuse this, except for async, it needs to make its own
 
 return fuzzysortNew()
 }) // UMD
+
+// TODO: (performance) wasm version!?
 
 // TODO: (performance) layout memory in an optimal way to go fast by avoiding cache misses
 
@@ -565,5 +602,3 @@ return fuzzysortNew()
 // TODO: (like sublime) backslash === forwardslash
 
 // TODO: (performance) i have no idea how well optizmied the allowing typos algorithm is
-
-// TODO: (performance) search could assume to be lowercase?
