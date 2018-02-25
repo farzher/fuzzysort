@@ -208,8 +208,8 @@ USAGE:
                 if(score > q.peek().score) q.replaceTop(objResults)
               }
 
-              if(iCurrent%itemsPerCheck === 0) {
-                if(Date.now() - startMs >= asyncInterval) {
+              if(iCurrent%1000/*itemsPerCheck*/ === 0) {
+                if(Date.now() - startMs >= 32/*asyncInterval*/) {
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
@@ -244,8 +244,8 @@ USAGE:
                 if(result.score > q.peek().score) q.replaceTop(result)
               }
 
-              if(iCurrent%itemsPerCheck === 0) {
-                if(Date.now() - startMs >= asyncInterval) {
+              if(iCurrent%1000/*itemsPerCheck*/ === 0) {
+                if(Date.now() - startMs >= 32/*asyncInterval*/) {
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
@@ -272,8 +272,8 @@ USAGE:
                 if(result.score > q.peek().score) q.replaceTop(result)
               }
 
-              if(iCurrent%itemsPerCheck === 0) {
-                if(Date.now() - startMs >= asyncInterval) {
+              if(iCurrent%1000/*itemsPerCheck*/ === 0) {
+                if(Date.now() - startMs >= 32/*asyncInterval*/) {
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
@@ -439,9 +439,9 @@ USAGE:
         }
         if(!successStrict) {
           score *= 1000
-          if(typoSimpleI !== 0) score += typoPenalty
+          if(typoSimpleI !== 0) score += -20/*typoPenalty*/
         } else {
-          if(typoStrictI !== 0) score += typoPenalty
+          if(typoStrictI !== 0) score += -20/*typoPenalty*/
         }
         score -= targetLen - searchLen
         prepared.score = score
@@ -520,8 +520,6 @@ USAGE:
 var isNode = typeof require !== 'undefined' && typeof window === 'undefined'
 // var MAX_INT = Number.MAX_SAFE_INTEGER
 // var MIN_INT = Number.MIN_VALUE
-var typoPenalty = -20
-var asyncInterval = 32
 var preparedCache = new Map()
 var preparedSearchCache = new Map()
 var noResults = []; noResults.total = 0
