@@ -507,7 +507,7 @@ USAGE:
 
     prepareLowerCodes: function(str) {
       var strLen = str.length
-      var lowerCodes = new Array(strLen)
+      var lowerCodes = [] // new Array(strLen)    sparse array is too slow
       var lower = str.toLowerCase()
       for(var i = 0; i < strLen; ++i) lowerCodes[i] = lower.charCodeAt(i)
       return lowerCodes
@@ -531,7 +531,7 @@ USAGE:
     prepareNextBeginningIndexes: function(target) {
       var targetLen = target.length
       var beginningIndexes = fuzzysort.prepareBeginningIndexes(target)
-      var nextBeginningIndexes = new Array(targetLen)
+      var nextBeginningIndexes = [] // new Array(targetLen)     sparse array is too slow
       var lastIsBeginning = beginningIndexes[0]
       var lastIsBeginningI = 0
       for(var i = 0; i < targetLen; ++i) {
