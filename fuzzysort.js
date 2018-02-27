@@ -34,7 +34,7 @@ USAGE:
         : true
       var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
       return algorithm(search, target, search[0])
-      // var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -Infinity
+      // var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -9007199254740991
       // var result = algorithm(search, target, search[0])
       // if(result === null) return null
       // if(result.score < threshold) return null
@@ -46,8 +46,8 @@ USAGE:
       search = fuzzysort.prepareSearch(search)
       var searchLowerCode = search[0]
 
-      var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -Infinity
-      var limit = options && options.limit || instanceOptions && instanceOptions.limit || Infinity
+      var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -9007199254740991
+      var limit = options && options.limit || instanceOptions && instanceOptions.limit || 9007199254740991
       var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
         : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
         : true
@@ -139,8 +139,8 @@ USAGE:
 
         var q = fastpriorityqueue()
         var iCurrent = targets.length - 1
-        var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -Infinity
-        var limit = options && options.limit || instanceOptions && instanceOptions.limit || Infinity
+        var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -9007199254740991
+        var limit = options && options.limit || instanceOptions && instanceOptions.limit || 9007199254740991
         var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
           : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
           : true
@@ -561,13 +561,13 @@ var noResults = []; noResults.total = 0
 var matchesSimple = []; var matchesStrict = []
 function cleanup() { preparedCache.clear(); preparedSearchCache.clear(); matchesSimple = []; matchesStrict = [] }
 function defaultScoreFn(a) {
-  var max = -Infinity
+  var max = -9007199254740991
   for (var i = a.length - 1; i >= 0; --i) {
     var result = a[i]; if(result === null) continue
     var score = result.score
     if(score > max) max = score
   }
-  if(max === -Infinity) return null
+  if(max === -9007199254740991) return null
   return max
 }
 
