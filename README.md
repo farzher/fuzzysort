@@ -98,20 +98,23 @@ fuzzysort.highlight(fuzzysort.single('tt', 'test'), '*', '*') // *t*es*t*
 
 
 
-## How To Go Fast
+## How To Go Fast · Performance Tips
 
 ```js
-// Filter out targets that you don't need to search!
-// Especially long ones!
+// filter out targets that you don't need to search! especially long ones!
 targets = targets.filter(t => t.length < 1000)
 
-// Provide prepared targets instead of raw strings!
-// Especially if those same targets might be searched again!
+// if your targets don't change often, provide prepared targets instead of raw strings!
 targets = targets.map(t => fuzzysort.prepare(t))
 
-fuzzysort.go('gotta', targets)
-fuzzysort.go('go', targets)
-fuzzysort.go('fast', targets)
+const options = {
+  limit: 100, // don't return more results than you need!
+  allowTypo: false, // if you don't care about allowing typos
+  threshold: -10000, // don't return garbage results
+}
+fuzzysort.go('gotta', targets, options)
+fuzzysort.go('go', targets, options)
+fuzzysort.go('fast', targets, options)
 ```
 
 
@@ -150,6 +153,9 @@ const strictsort = fuzzysort.new({threshold: -999})
 
 
 ### Changelog
+
+#### v1.1.0
+- Added `allowTypo` as an option
 
 #### v1.0.0
 
