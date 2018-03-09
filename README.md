@@ -107,6 +107,16 @@ targets = targets.filter(t => t.length < 1000)
 // if your targets don't change often, provide prepared targets instead of raw strings!
 targets = targets.map(t => fuzzysort.prepare(t))
 
+// to prepare targets that are objects, pick a field to prepare, add the prepared
+// field to each object, and search on the prepared field
+targets = targets.map((target) => {
+  target.titlePrepared = fuzzysort.prepare(target.title);
+  return target;
+});
+const results = fuzzysort.go('search', targets, { key: 'titlePrepared' })
+console.log(results[0].obj)
+
+// use smart options!
 const options = {
   limit: 100, // don't return more results than you need!
   allowTypo: false, // if you don't care about allowing typos
