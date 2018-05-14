@@ -1,8 +1,14 @@
 {
   "name": "fuzzysort",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Fast SublimeText-like fuzzy search for JavaScript",
-  "keywords": ["fuzzy", "search", "filter", "javascript", "sublime"],
+  "keywords": [
+    "fuzzy",
+    "search",
+    "filter",
+    "javascript",
+    "sublime"
+  ],
   "author": "farzher",
   "license": "MIT",
   "main": "fuzzysort.js",
