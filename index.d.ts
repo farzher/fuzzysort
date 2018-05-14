@@ -18,15 +18,15 @@ declare namespace Fuzzysort {
     readonly total: number
   }
 
-  interface KeyResult extends Result {
+  interface KeyResult<T> extends Result {
     /** Your original object */
-    readonly obj: any
+    readonly obj: T
   }
-  interface KeyResults extends ReadonlyArray<KeyResult> {
+  interface KeyResults<T> extends ReadonlyArray<KeyResult<T>> {
     /** Total matches before limit */
     readonly total: number
   }
-  interface KeysResults extends ReadonlyArray<ReadonlyArray<KeyResult>> {
+  interface KeysResults<T> extends ReadonlyArray<ReadonlyArray<KeyResult<T>>> {
     /**
     * Higher is better
     *
@@ -64,9 +64,9 @@ declare namespace Fuzzysort {
   interface KeyOptions extends Options {
     key: string | ReadonlyArray<string>
   }
-  interface KeysOptions extends Options {
+  interface KeysOptions<T> extends Options {
     keys: ReadonlyArray<string | ReadonlyArray<string>>
-    scoreFn?: (keysResult:ReadonlyArray<KeyResult>) => number
+    scoreFn?: (keysResult:ReadonlyArray<KeyResult<T>>) => number
   }
 
   interface Fuzzysort {
@@ -80,11 +80,11 @@ declare namespace Fuzzysort {
 
     single(search: string, target: string | Prepared): Result | null
     go(search: string, targets: (string | Prepared | undefined)[], options?: Options): Results
-    go(search: string, targets: (string | Prepared | undefined)[], options: KeyOptions): KeyResults
-    go(search: string, targets: (string | Prepared | undefined)[], options: KeysOptions): KeysResults
+    go<T>(search: string, targets: (T | undefined)[], options: KeyOptions): KeyResults<T>
+    go<T>(search: string, targets: (T | undefined)[], options: KeysOptions<T>): KeysResults<T>
     goAsync(search: string, targets: (string | Prepared | undefined)[], options?: Options): CancelablePromise<Results>
-    goAsync(search: string, targets: (string | Prepared | undefined)[], options: KeyOptions): CancelablePromise<KeyResults>
-    goAsync(search: string, targets: (string | Prepared | undefined)[], options: KeysOptions): CancelablePromise<KeysResults>
+    goAsync<T>(search: string, targets: (T | undefined)[], options: KeyOptions): CancelablePromise<KeyResults<T>>
+    goAsync<T>(search: string, targets: (T | undefined)[], options: KeysOptions<T>): CancelablePromise<KeysResults<T>>
 
     /** Returns a new instance of fuzzysort, which you can give different default options to */
     'new'(options?: Options): Fuzzysort
