@@ -22,11 +22,22 @@ declare namespace Fuzzysort {
     /** Your original object */
     readonly obj: T
   }
+  interface KeysResult<T> extends ReadonlyArray<Result> {
+    /**
+    * Higher is better
+    *
+    * 0 is a perfect match; -1000 is a bad match
+    */
+   readonly score: number
+
+    /** Your original object */
+    readonly obj: T
+  }
   interface KeyResults<T> extends ReadonlyArray<KeyResult<T>> {
     /** Total matches before limit */
     readonly total: number
   }
-  interface KeysResults<T> extends ReadonlyArray<ReadonlyArray<KeyResult<T>>> {
+  interface KeysResults<T> extends ReadonlyArray<KeysResult<T>> {
     /** Total matches before limit */
     readonly total: number
   }
