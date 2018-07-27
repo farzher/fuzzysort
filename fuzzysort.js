@@ -508,6 +508,7 @@ USAGE:
     prepareLowerCodes: function(str) {
       var strLen = str.length
       var lowerCodes = [] // new Array(strLen)    sparse array is too slow
+      if (typeof str === "number") str = str.toString()
       var lower = str.toLowerCase()
       for(var i = 0; i < strLen; ++i) lowerCodes[i] = lower.charCodeAt(i)
       return lowerCodes
