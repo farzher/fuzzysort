@@ -122,7 +122,7 @@ async function tests() {
   testNomatch('', ' ')
   testNomatch(' ', '')
 
-  var tmpObjs = [{'s.s':'str', arr:[{o:'obj'}]}]
+  var tmpObjs = [{'s.s':'str', 's.i':2, arr:[{o:'obj', i:1}]}]
   // key
   var tmp = fuzzysort.go('str', tmpObjs, {key: 's.s'})[0]
   assert(tmp.score===0, 'goKey s.s')
@@ -132,6 +132,10 @@ async function tests() {
   assert(tmp===undefined, 'goKey')
   var tmp = fuzzysort.go('obj', tmpObjs, {key: ['arr', '0', 'o']})[0]
   assert(tmp.score===0, 'goKey arr.0.o')
+  var tmp = fuzzysort.go('2', tmpObjs, {key: 's.i'})[0]
+  assert(tmp.score===0, 'goKey s.i')
+  var tmp = fuzzysort.go('1', tmpObjs, {key: 'arr.0.i'})[0]
+  assert(tmp.score===0, 'goKey arr.0.i')
 
   // keys
   var tmp = fuzzysort.go('str', tmpObjs, {keys: ['s.s']})[0]
@@ -146,6 +150,10 @@ async function tests() {
   assert(tmp.score===0, 'goKeys s.s || arr.0.o')
   var tmp = fuzzysort.go('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}})[0]
   assert(tmp.score===1, 'goKeys s.s || arr.0.o score')
+  var tmp = fuzzysort.go('2', tmpObjs, {keys: ['s.s', 's.i']})[0]
+  assert(tmp.score===0, 'goKeys s.i || s.i score')
+  var tmp = fuzzysort.go('2', tmpObjs, {keys: ['s.s', 's.i'], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}})[0]
+  assert(tmp.score===1, 'goKeys s.i || s.i score')
 
   // keyAsync
   var tmp = (await fuzzysort.goAsync('str', tmpObjs, {key: 's.s'}))[0]
@@ -156,6 +164,10 @@ async function tests() {
   assert(tmp===undefined, 'goKey')
   var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {key: ['arr', '0', 'o']}))[0]
   assert(tmp.score===0, 'goKey arr.0.o')
+  var tmp = (await fuzzysort.goAsync('2', tmpObjs, {key: 's.i'}))[0]
+  assert(tmp.score===0, 'goKey s.i')
+  var tmp = (await fuzzysort.goAsync('1', tmpObjs, {key: 'arr.0.i'}))[0]
+  assert(tmp.score===0, 'goKey arr.0.i')
 
   // keysAsync
   var tmp = (await fuzzysort.goAsync('str', tmpObjs, {keys: ['s.s']}))[0]
@@ -168,6 +180,12 @@ async function tests() {
   assert(tmp.score===0, 'goKeys arr.0.o')
   var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}}))[0]
   assert(tmp.score===1, 'goKeys s.s || arr.0.o score')
+  var tmp = (await fuzzysort.goAsync('2', tmpObjs, {keys: [ 's.s', 's.i' ]}))[0]
+  assert(tmp.score===0, 'goKeys s.s || s.i score')
+  var tmp = (await fuzzysort.goAsync('2', tmpObjs, {keys: [ 's.s', 's.i' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}}))[0]
+  assert(tmp.score===1, 'goKeys s.s || s.i score')
+  var tmp = (await fuzzysort.goAsync('1', tmpObjs, {keys: [ 's.s', 'arr.0.i' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}}))[0]
+  assert(tmp.score===1, 'goKeys s.s || arr.0.i score')
 
   var targets = [
     {name: 'Typography', version: '3.1.0'},
