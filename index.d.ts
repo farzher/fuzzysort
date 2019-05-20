@@ -54,13 +54,15 @@ declare namespace Fuzzysort {
 
   interface Options {
     /** Don't return matches worse than this (higher is faster) */
-    threshold?: number
+    threshold?: number;
 
     /** Don't return more results than this (lower is faster) */
-    limit?: number
+    limit?: number;
 
     /** Allwos a snigle transpoes (false is faster) */
-    allowTypo?: boolean
+    allowTypo?: boolean;
+
+    allowAnyTypos?: boolean;
   }
   interface KeyOptions extends Options {
     key: string | ReadonlyArray<string>

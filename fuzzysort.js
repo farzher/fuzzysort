@@ -51,9 +51,22 @@ USAGE:
       var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
         : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
         : true
-      var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
+      var allowAnyTypos = options && options.allowAnyTypos!==undefined ? options.allowAnyTypos
+          : instanceOptions && instanceOptions.allowAnyTypos!==undefined ? instanceOptions.allowAnyTypos
+              : true
       var resultsLen = 0; var limitedCount = 0
       var targetsLen = targets.length
+      var algorithm;
+
+      if (allowAnyTypos) {
+        algorithm = fuzzysort.algorithmAnyTypos;
+      } else {
+        if (allowTypo) {
+          algorithm = fuzzysort.algorithm;
+        } else {
+          algorithm = fuzzysort.algorithmNoTypo;
+        }
+      }
 
       // This code is copy/pasted 3 times for performance reasons [options.keys, options.key, no keys]
 
@@ -425,6 +438,156 @@ USAGE:
         } else {
           if(typoStrictI !== 0) score += -20/*typoPenalty*/
         }
+        score -= targetLen - searchLen
+        prepared.score = score
+        prepared.indexes = new Array(matchesBestLen); for(var i = matchesBestLen - 1; i >= 0; --i) prepared.indexes[i] = matchesBest[i]
+
+        return prepared
+      }
+    },
+
+    algorithmAnyTypos: function(searchLowerCodes, prepared, searchLowerCode) {
+      var targetLowerCodes = prepared._targetLowerCodes
+      var searchLen = searchLowerCodes.length
+      var targetLen = targetLowerCodes.length
+      var searchI = 0 // where we at
+      var targetI = 0 // where you at
+      var typoSimpleI = 0
+      var matchesSimpleLen = 0
+
+      // very basic fuzzy match; to remove non-matching targets ASAP!
+      // walk through target. find sequential matches.
+      // if all chars aren't found then exit
+      for(;;) {
+        // console.log("searchLowerCode: ", searchLowerCode);
+        // console.log("targetLowerCodes[targetI]: ", targetLowerCodes[targetI]);
+        var targetLowerCode = targetLowerCodes[targetI];
+
+        var isMatch = searchLowerCode === targetLowerCode
+        if(isMatch) {
+          matchesSimple[matchesSimpleLen++] = targetI
+          ++searchI; if(searchI === searchLen) break
+          searchLowerCode = searchLowerCodes[typoSimpleI===0?searchI : (typoSimpleI===searchI?searchI+1 : (typoSimpleI===searchI-1?searchI-1 : searchI))]
+        }
+        else {
+          var nextCharI = searchI + 1;
+
+          for (;;) {
+            ++nextCharI;
+
+            if (nextCharI >= searchLen) {
+              break;
+            }
+
+            if (searchLowerCodes[nextCharI] === targetLowerCode) {
+              matchesSimple[matchesSimpleLen++] = targetI
+              searchI = ++nextCharI; if(searchI === searchLen) break
+              searchLowerCode = searchLowerCodes[typoSimpleI===0?searchI : (typoSimpleI===searchI?searchI+1 : (typoSimpleI===searchI-1?searchI-1 : searchI))]
+            }
+          }
+        }
+        // console.log('targetI: ', targetI);
+        // console.log('searchI: ', searchI);
+        // console.log('typoSimpleI: ', typoSimpleI);
+        ++targetI;
+
+        if (targetI >= targetLen) {
+          if (matchesSimple.length > 0) {
+            break;
+          } else {
+            return null;
+          }
+        }
+
+        // if(targetI >= targetLen) { // Failed to find searchI
+        //   // Check for typo or exit
+        //   // we go as far as possible before trying to transpose
+        //   // then we transpose backwards until we reach the beginning
+        //   for(;;) {
+        //     if(searchI <= 1) return null // not allowed to transpose first char
+        //     if(typoSimpleI === 0) { // we haven't tried to transpose yet
+        //       --searchI
+        //       var searchLowerCodeNew = searchLowerCodes[searchI]
+        //       if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
+        //       typoSimpleI = searchI
+        //     } else {
+        //       if(typoSimpleI === 1) return null // reached the end of the line for transposing
+        //       --typoSimpleI
+        //       searchI = typoSimpleI
+        //       searchLowerCode = searchLowerCodes[searchI + 1]
+        //
+        //       var searchLowerCodeNew = searchLowerCodes[searchI]
+        //       if(searchLowerCode === searchLowerCodeNew) continue // doesn't make sense to transpose a repeat char
+        //     }
+        //     matchesSimpleLen = searchI
+        //     targetI = matchesSimple[matchesSimpleLen - 1] + 1
+        //     break
+        //   }
+        // }
+      }
+
+      var searchI = 0
+      var typoStrictI = 0
+      var successStrict = false
+      var matchesStrictLen = 0
+
+      var nextBeginningIndexes = prepared._nextBeginningIndexes
+      if(nextBeginningIndexes === null) nextBeginningIndexes = prepared._nextBeginningIndexes = fuzzysort.prepareNextBeginningIndexes(prepared.target)
+      var firstPossibleI = targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
+
+      // Our target string successfully matched all characters in sequence!
+      // Let's try a more advanced and strict test to improve the score
+      // only count it as a match if it's consecutive or a beginning character!
+      if(targetI !== targetLen) for(;;) {
+        if(targetI >= targetLen) {
+          // We failed to find a good spot for this search char, go back to the previous search char and force it forward
+          if(searchI <= 0) { // We failed to push chars forward for a better match
+            // transpose, starting from the beginning
+            ++typoStrictI; if(typoStrictI > searchLen-2) break
+            if(searchLowerCodes[typoStrictI] === searchLowerCodes[typoStrictI+1]) continue // doesn't make sense to transpose a repeat char
+            targetI = firstPossibleI
+            continue
+          }
+
+          --searchI
+          var lastMatch = matchesStrict[--matchesStrictLen]
+          targetI = nextBeginningIndexes[lastMatch]
+
+        } else {
+          var isMatch = searchLowerCodes[typoStrictI===0?searchI : (typoStrictI===searchI?searchI+1 : (typoStrictI===searchI-1?searchI-1 : searchI))] === targetLowerCodes[targetI]
+          if(isMatch) {
+            matchesStrict[matchesStrictLen++] = targetI
+            ++searchI; if(searchI === searchLen) { successStrict = true; break }
+            ++targetI
+          } else {
+            targetI = nextBeginningIndexes[targetI]
+          }
+        }
+      }
+
+      { // tally up the score & keep track of matches for highlighting later
+        if(successStrict) { var matchesBest = matchesStrict; var matchesBestLen = matchesStrictLen }
+        else { var matchesBest = matchesSimple; var matchesBestLen = matchesSimpleLen }
+        var score = 0
+        var lastTargetI = -1
+        for(var i = 0; i < searchLen; ++i) { var targetI = matchesBest[i]
+          // score only goes down if they're not consecutive
+          console.log('targetI: ', targetI);
+          console.log('score: ', score)
+          if(lastTargetI !== targetI - 1) score -= targetI
+          lastTargetI = targetI
+        }
+        if(!successStrict) {
+          // console.log('score: ', score);
+          score *= 1000
+          if(typoSimpleI !== 0) score += -20/*typoPenalty*/
+        } else {
+          if(typoStrictI !== 0) score += -20/*typoPenalty*/
+        }
+        console.log('targetLen: ', targetLen);
+        console.log('searchLen: ', searchLen);
+        console.log('score before: ', score);
+
         score -= targetLen - searchLen
         prepared.score = score
         prepared.indexes = new Array(matchesBestLen); for(var i = matchesBestLen - 1; i >= 0; --i) prepared.indexes[i] = matchesBest[i]

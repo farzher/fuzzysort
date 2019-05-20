@@ -19,5 +19,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/farzher/fuzzysort.git"
+  },
+  "dependencies": {
+    "benchmark": "^2.1.4"
   }
 }

@@ -58,15 +58,15 @@ test('APPLES',      'app', 'l', 'E',               null,     'xxx')
                matches must not get better
 */
 
-setTimeout(async function() {
-  // for (var i = 0; i < 1000; i++) await tests()
-  await tests()
-
-  if(assert.count==0) console.log('testing disabled!')
-  else if(!assert.failed) console.log('all tests passed')
-
-  if(isNode) bench() // Only bench on node. Don't want the demo to freeze
-})
+// setTimeout(async function() {
+//   // for (var i = 0; i < 1000; i++) await tests()
+//   await tests()
+//
+//   if(assert.count==0) console.log('testing disabled!')
+//   else if(!assert.failed) console.log('all tests passed')
+//
+//   if(isNode) bench() // Only bench on node. Don't want the demo to freeze
+// })
 
 
 async function tests() {
