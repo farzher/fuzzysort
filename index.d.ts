@@ -61,8 +61,6 @@ declare namespace Fuzzysort {
 
     /** Allwos a snigle transpoes (false is faster) */
     allowTypo?: boolean;
-
-    allowAnyTypos?: boolean;
   }
   interface KeyOptions extends Options {
     key: string | ReadonlyArray<string>
