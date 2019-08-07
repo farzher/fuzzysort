@@ -253,7 +253,7 @@ USAGE:
       return p
     },
 
-    highlight: function(result, hOpen, hClose) {
+    highlight: function(result, target, hOpen, hClose) {
       if(result === null) return null
       if(hOpen === undefined) hOpen = '<b>'
       if(hClose === undefined) hClose = '</b>'
