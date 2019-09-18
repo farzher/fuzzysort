@@ -181,6 +181,7 @@ USAGE:
 
               if(iCurrent%1000/*itemsPerCheck*/ === 0) {
                 if(Date.now() - startMs >= 10/*asyncInterval*/) {
+                  iCurrent-- // if we don't decrement here, step will continue with same value
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
@@ -210,6 +211,7 @@ USAGE:
 
               if(iCurrent%1000/*itemsPerCheck*/ === 0) {
                 if(Date.now() - startMs >= 10/*asyncInterval*/) {
+                  iCurrent-- // if we don't decrement here, step will continue with same value
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
@@ -233,6 +235,7 @@ USAGE:
 
               if(iCurrent%1000/*itemsPerCheck*/ === 0) {
                 if(Date.now() - startMs >= 10/*asyncInterval*/) {
+                  iCurrent-- // if we don't decrement here, step will continue with same value
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
