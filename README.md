@@ -71,7 +71,7 @@ promise.then(results => console.log(results))
 if(invalidated) promise.cancel()
 ```
 
-##### InstanceOptions
+##### __InstanceOptions__
 
 When you declare an instance the following options are supported (defaults are shown):
 ```js
@@ -82,7 +82,7 @@ fuzzysort.new({
 })
 ```
 
-##### SearchOptions
+##### __SearchOptions__
 
 For each search, options can also be specified. These override any InstanceOptions that were set:
 ```js
