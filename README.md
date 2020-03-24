@@ -71,16 +71,27 @@ promise.then(results => console.log(results))
 if(invalidated) promise.cancel()
 ```
 
-##### Options
+##### InstanceOptions
 
+When you declare an instance the following options are supported (defaults are shown):
+```js
+fuzzysort.new({
+  threshold: -Infinity, // Don't return matches worse than this (higher is faster)
+  limit:     Infinity,  // Don't return more results than this (lower is faster)
+  allowTypo: true,      // Allwos a snigle transpoes (false is faster)
+})
+```
+
+##### SearchOptions
+
+For each search, options can also be specified. These override any InstanceOptions that were set:
 ```js
 fuzzysort.go(search, targets, {
-  threshold: -Infinity, // Don't return matches worse than this (higher is faster)
-  limit: Infinity, // Don't return more results than this (lower is faster)
-  allowTypo: true, // Allwos a snigle transpoes (false is faster)
-
-  key: null, // For when targets are objects (see its example usage)
-  keys: null, // For when targets are objects (see its example usage)
+  threshold: ...,
+  limit:     ...,
+  allowTypo: ...,
+  key:     null, // For when targets are objects (see its example usage)
+  keys:    null, // For when targets are objects (see its example usage)
   scoreFn: null, // For use with `keys` (see its example usage)
 })
 ```
