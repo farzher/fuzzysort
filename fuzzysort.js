@@ -25,9 +25,10 @@ USAGE:
 
   // Overwrite default with whatever might be in instanceOptions
   instanceOptions = Object.assign({
-    allowTypo: true,
-    threshold: -9007199254740991,
-    limit:     9007199254740991,
+    allowTypo:   true,
+    threshold:   -9007199254740991,
+    limit:       9007199254740991,
+    typoPenalty: -20, // InstanceParam only
   }, instanceOptions);
 
   var fuzzysort = {
@@ -442,9 +443,9 @@ USAGE:
         }
         if(!successStrict) {
           score *= 1000
-          if(typoSimpleI !== 0) score += -20/*typoPenalty*/
+          if(typoSimpleI !== 0) score += instanceOptions.typoPenalty
         } else {
-          if(typoStrictI !== 0) score += -20/*typoPenalty*/
+          if(typoStrictI !== 0) score += instanceOptions.typoPenalty
         }
         score -= targetLen - searchLen
         prepared.score = score
