@@ -18,7 +18,18 @@ USAGE:
   if(typeof define === 'function' && define.amd) define([], UMD)
   else if(typeof module === 'object' && module.exports) module.exports = UMD()
   else root.fuzzysort = UMD()
-})(this, function UMD() { function fuzzysortNew(instanceOptions) {
+})(this, function UMD() {
+
+ function fuzzysortNew(instanceOptions) {
+  instanceOptions = instanceOptions || {}; // If not given, make it an object
+
+  // Overwrite default with whatever might be in instanceOptions
+  instanceOptions = Object.assign({
+    allowTypo:   true,
+    threshold:   -9007199254740991,
+    limit:       9007199254740991,
+    typoPenalty: -20, // InstanceParam only
+  }, instanceOptions);
 
   var fuzzysort = {
 
@@ -29,10 +40,12 @@ USAGE:
       if(!target) return null
       if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
-      var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
-        : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
-        : true
-      var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
+      options = options || {}; // If not given, make it an object
+      options = Object.assign({
+        allowTypo: instanceOptions.allowTypo,
+      }, options);
+
+      var algorithm = options.allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
       return algorithm(search, target, search[0])
       // var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -9007199254740991
       // var result = algorithm(search, target, search[0])
@@ -43,15 +56,20 @@ USAGE:
 
     go: function(search, targets, options) {
       if(!search) return noResults
+
+      options = options || {}; // If not given, make it an object
+      options = Object.assign({
+        allowTypo: instanceOptions.allowTypo,
+        threshold: instanceOptions.threshold,
+        limit:     instanceOptions.limit,
+      }, options);
+
       search = fuzzysort.prepareSearch(search)
       var searchLowerCode = search[0]
 
-      var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -9007199254740991
-      var limit = options && options.limit || instanceOptions && instanceOptions.limit || 9007199254740991
-      var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
-        : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
-        : true
-      var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
+      var threshold = options.threshold
+      var limit = options.limit
+      var algorithm = options.allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
       var resultsLen = 0; var limitedCount = 0
       var targetsLen = targets.length
 
@@ -131,6 +149,13 @@ USAGE:
     },
 
     goAsync: function(search, targets, options) {
+      options = options || {}; // If not given, make it an object
+      options = Object.assign({
+        allowTypo: instanceOptions.allowTypo,
+        threshold: instanceOptions.threshold,
+        limit:     instanceOptions.limit,
+      }, options);
+
       var canceled = false
       var p = new Promise(function(resolve, reject) {
         if(!search) return resolve(noResults)
@@ -139,12 +164,9 @@ USAGE:
 
         var q = fastpriorityqueue()
         var iCurrent = targets.length - 1
-        var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -9007199254740991
-        var limit = options && options.limit || instanceOptions && instanceOptions.limit || 9007199254740991
-        var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
-          : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
-          : true
-        var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
+        var threshold = options.threshold
+        var limit = options.limit
+        var algorithm = options.allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
         var resultsLen = 0; var limitedCount = 0
         function step() {
           if(canceled) return reject('canceled')
@@ -411,7 +433,7 @@ USAGE:
 
       { // tally up the score & keep track of matches for highlighting later
         if(successStrict) { var matchesBest = matchesStrict; var matchesBestLen = matchesStrictLen }
-        else { var matchesBest = matchesSimple; var matchesBestLen = matchesSimpleLen }
+        else              { var matchesBest = matchesSimple; var matchesBestLen = matchesSimpleLen }
         var score = 0
         var lastTargetI = -1
         for(var i = 0; i < searchLen; ++i) { var targetI = matchesBest[i]
@@ -421,9 +443,9 @@ USAGE:
         }
         if(!successStrict) {
           score *= 1000
-          if(typoSimpleI !== 0) score += -20/*typoPenalty*/
+          if(typoSimpleI !== 0) score += instanceOptions.typoPenalty
         } else {
-          if(typoStrictI !== 0) score += -20/*typoPenalty*/
+          if(typoStrictI !== 0) score += instanceOptions.typoPenalty
         }
         score -= targetLen - searchLen
         prepared.score = score
@@ -549,7 +571,7 @@ USAGE:
     new: fuzzysortNew,
   }
   return fuzzysort
-} // fuzzysortNew
+ } // fuzzysortNew
 
 // This stuff is outside fuzzysortNew, because it's shared with instances of fuzzysort.new()
 var isNode = typeof require !== 'undefined' && typeof window === 'undefined'
