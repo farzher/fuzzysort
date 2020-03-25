@@ -76,9 +76,10 @@ if(invalidated) promise.cancel()
 When you declare an instance the following options are supported (defaults are shown):
 ```js
 fuzzysort.new({
-  threshold: -Infinity, // Don't return matches worse than this (higher is faster)
-  limit:     Infinity,  // Don't return more results than this (lower is faster)
-  allowTypo: true,      // Allwos a snigle transpoes (false is faster)
+  threshold:   -Infinity, // Don't return matches worse than this (higher is faster)
+  limit:       Infinity,  // Don't return more results than this (lower is faster)
+  allowTypo:   true,      // Allwos a snigle transpoes (false is faster)
+  typoPenalty: -20,       // Score penalty applied when a typo is detected (instance only)
 })
 ```
 
