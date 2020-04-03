@@ -191,6 +191,9 @@ async function tests() {
   var results = fuzzysort.go('typography', targets, {keys: ['name']})
   var results = (await fuzzysort.goAsync('typography', targets, {key: 'name'}))
   var results = (await fuzzysort.goAsync('typography', targets, {keys: ['name']}))
+
+  var s = Symbol(), results = fuzzysort.go('va', ['value', ''].map(v=> ({key: v, [s]: fuzzysort.prepare(v)})), {keys: [s]})
+  assert(results.length==1, 'using Symbol as key in prepared field - bug')
 }
 
 
