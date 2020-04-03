@@ -575,7 +575,7 @@ function defaultScoreFn(a) {
 // prop = 'key1.key2'        10ms
 // prop = ['key1', 'key2']   27ms
 function getValue(obj, prop) {
-  var tmp = obj[prop]; if(tmp !== undefined) return tmp
+  var tmp = obj[prop]; if(tmp !== undefined || typeof prop==='symbol') return tmp
   var segs = prop
   if(!Array.isArray(prop)) segs = prop.split('.')
   var len = segs.length

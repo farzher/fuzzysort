@@ -14,10 +14,13 @@
   "main": "fuzzysort.js",
   "scripts": {
     "test": "node test.js",
-    "build": "uglifyjs fuzzysort.js -m -c -o fuzzysort.min.js"
+    "build": "npx uglify-js fuzzysort.js -m -c -o fuzzysort.min.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/farzher/fuzzysort.git"
+  },
+  "devDependencies": {
+    "benchmark": "^2.1.4"
   }
 }
