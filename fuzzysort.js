@@ -555,8 +555,21 @@ USAGE:
 var isNode = typeof require !== 'undefined' && typeof window === 'undefined'
 // var MAX_INT = Number.MAX_SAFE_INTEGER
 // var MIN_INT = Number.MIN_VALUE
-var preparedCache = new Map()
-var preparedSearchCache = new Map()
+var StringMap = typeof Map !== 'undefined' ? Map : function StringMap() {
+  var store = Object.create(null);
+  this.get = function(key) {
+    return store[key]
+  }
+  this.set = function(key, val) {
+    store[key] = val
+    return this
+  }
+  this.clear = function() {
+    store = Object.create(null)
+  }
+}
+var preparedCache = new StringMap()
+var preparedSearchCache = new StringMap()
 var noResults = []; noResults.total = 0
 var matchesSimple = []; var matchesStrict = []
 function cleanup() { preparedCache.clear(); preparedSearchCache.clear(); matchesSimple = []; matchesStrict = [] }
