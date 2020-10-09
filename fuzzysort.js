@@ -429,7 +429,7 @@ USAGE:
         prepared.score = score
         prepared.indexes = new Array(matchesBestLen); for(var i = matchesBestLen - 1; i >= 0; --i) prepared.indexes[i] = matchesBest[i]
 
-        return prepared
+        return {...prepared}
       }
     },
 
