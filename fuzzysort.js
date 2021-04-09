@@ -460,7 +460,7 @@ USAGE:
 
       var nextBeginningIndexes = prepared._nextBeginningIndexes
       if(nextBeginningIndexes === null) nextBeginningIndexes = prepared._nextBeginningIndexes = fuzzysort.prepareNextBeginningIndexes(prepared.target)
-      var firstPossibleI = targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
+      targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
 
       // Our target string successfully matched all characters in sequence!
       // Let's try a more advanced and strict test to improve the score
