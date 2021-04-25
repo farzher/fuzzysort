@@ -80,12 +80,12 @@ declare namespace Fuzzysort {
     highlight(result?: Result, highlightOpen?: string, highlightClose?: string): string | null
 
     single(search: string, target: string | Prepared): Result | null
-    go(search: string, targets: (string | Prepared | undefined)[], options?: Options): Results
-    go<T>(search: string, targets: (T | undefined)[], options: KeyOptions): KeyResults<T>
-    go<T>(search: string, targets: (T | undefined)[], options: KeysOptions<T>): KeysResults<T>
-    goAsync(search: string, targets: (string | Prepared | undefined)[], options?: Options): CancelablePromise<Results>
-    goAsync<T>(search: string, targets: (T | undefined)[], options: KeyOptions): CancelablePromise<KeyResults<T>>
-    goAsync<T>(search: string, targets: (T | undefined)[], options: KeysOptions<T>): CancelablePromise<KeysResults<T>>
+    go(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): Results
+    go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): KeyResults<T>
+    go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): KeysResults<T>
+    goAsync(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): CancelablePromise<Results>
+    goAsync<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): CancelablePromise<KeyResults<T>>
+    goAsync<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): CancelablePromise<KeysResults<T>>
 
     /** Returns a new instance of fuzzysort, which you can give different default options to */
     'new'(options?: Options): Fuzzysort
