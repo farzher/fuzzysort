@@ -332,6 +332,8 @@ USAGE:
       var targetI = 0 // where you at
       var typoSimpleI = 0
       var matchesSimpleLen = 0
+      var weightDiacritics = true
+      var diacriticScore = 0
       const DIACRITICS = [
           'oö',
           'aä',
@@ -383,6 +385,7 @@ USAGE:
         var isMatch;
         if (Array.isArray(diacritic)) {
             isMatch = diacritic.includes(targetLowerCodes[targetI])
+            if (isMatch && weightDiacritics && searchLowerCode != targetLowerCodes[targetI]) diacriticScore--;
         } else {
             isMatch = searchLowerCode === targetLowerCodes[targetI]
         }
@@ -469,6 +472,7 @@ USAGE:
           if(typoStrictI !== 0) score += -20/*typoPenalty*/
         }
         score -= targetLen - searchLen
+        score += (diacriticScore * 10)
         prepared.score = score
         prepared.indexes = new Array(matchesBestLen); for(var i = matchesBestLen - 1; i >= 0; --i) prepared.indexes[i] = matchesBest[i]
 
