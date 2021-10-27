@@ -332,16 +332,59 @@ USAGE:
       var targetI = 0 // where you at
       var typoSimpleI = 0
       var matchesSimpleLen = 0
+      const DIACRITICS = [
+          'oö',
+          'aä',
+          'aḀḁĂăÂâǍǎȺⱥȦȧẠạÄäÀàÁáĀāÃãÅåąĄÃąĄ',
+          'b␢βΒB฿𐌁ᛒ',
+          'cĆćĈĉČčĊċC̄c̄ÇçḈḉȻȼƇƈɕᴄＣｃ',
+          'dĎďḊḋḐḑḌḍḒḓḎḏĐđD̦d̦ƉɖƊɗƋƌᵭᶁᶑȡᴅＤｄð',
+          'eÉéÈèÊêḘḙĚěĔĕẼẽḚḛẺẻĖėËëĒēȨȩĘęᶒɆɇȄȅẾếỀềỄễỂểḜḝḖḗḔḕȆȇẸẹỆệⱸᴇＥｅɘǝƏƐε',
+          'fƑƒḞḟ',
+          'gɢ₲ǤǥĜĝĞğĢģƓɠĠġ',
+          'hĤĥĦħḨḩẖẖḤḥḢḣɦʰǶƕ',
+          'iÍíÌìĬĭÎîǏǐÏïḮḯĨĩĮįĪīỈỉȈȉȊȋỊịḬḭƗɨɨ̆ᵻᶖİiIıɪＩｉ',
+          'jȷĴĵɈɉʝɟʲ',
+          'kƘƙꝀꝁḰḱǨǩḲḳḴḵκϰ₭',
+          'lŁłĽľĻļĹĺḶḷḸḹḼḽḺḻĿŀȽƚⱠⱡⱢɫɬᶅɭȴʟＬｌ',
+          'nŃńǸǹŇňÑñṄṅŅņṆṇṊṋṈṉN̈n̈ƝɲȠƞᵰᶇɳȵɴＮｎŊŋ',
+          'oØøÖöÓóÒòÔôǑǒŐőŎŏȮȯỌọƟɵƠơỎỏŌōÕõǪǫȌȍՕօ',
+          'pṔṕṖṗⱣᵽƤƥᵱ',
+          'qꝖꝗʠɊɋꝘꝙq̃',
+          'rŔŕɌɍŘřŖŗṘṙȐȑȒȓṚṛⱤɽ',
+          'sŚśṠṡṢṣꞨꞩŜŝŠšŞşȘșS̈s̈',
+          'tŤťṪṫŢţṬṭƮʈȚțṰṱṮṯƬƭ',
+          'uŬŭɄʉỤụÜüÚúÙùÛûǓǔŰűŬŭƯưỦủŪūŨũŲųȔȕ∪',
+          'vṼṽṾṿƲʋꝞꝟⱱʋ',
+          'wẂẃẀẁŴŵẄẅẆẇẈẉ',
+          'xẌẍẊẋχ',
+          'yÝýỲỳŶŷŸÿỸỹẎẏỴỵɎɏƳƴ',
+          'zŹźẐẑŽžŻżẒẓẔẕƵƶ',
+          '/\\|',
+          '….',
+          '"\'`»«',
+          ',.'
+      ]
+      const DIACRITICSLowerCode = DIACRITICS.map(s => fuzzysort.prepareLowerCodes(s))
 
       // very basic fuzzy match; to remove non-matching targets ASAP!
       // walk through target. find sequential matches.
       // if all chars aren't found then exit
       for(;;) {
-        var isMatch = searchLowerCode === targetLowerCodes[targetI]
-        if(isMatch) {
-          matchesSimple[matchesSimpleLen++] = targetI
-          ++searchI; if(searchI === searchLen) break
-          searchLowerCode = searchLowerCodes[typoSimpleI===0?searchI : (typoSimpleI===searchI?searchI+1 : (typoSimpleI===searchI-1?searchI-1 : searchI))]
+        var diacritic = false;
+        for (var i = 0; i < DIACRITICSLowerCode.length; i++) {
+            // console.log(DIACRITICSLowerCode[i]);
+            if (DIACRITICSLowerCode[i].includes(searchLowerCode)) {
+                diacritic = DIACRITICSLowerCode[i];
+                break;
+            }
+        }
+
+        var isMatch;
+        if (Array.isArray(diacritic)) {
+            isMatch = diacritic.includes(targetLowerCodes[targetI])
+        } else {
+            isMatch = searchLowerCode === targetLowerCodes[targetI]
         }
 
         ++targetI; if(targetI >= targetLen) { // Failed to find searchI
@@ -598,7 +641,5 @@ return fuzzysortNew()
 // TODO: (performance) layout memory in an optimal way to go fast by avoiding cache misses
 
 // TODO: (performance) preparedCache is a memory leak
-
-// TODO: (like sublime) backslash === forwardslash
 
 // TODO: (performance) i have no idea how well optizmied the allowing typos algorithm is
