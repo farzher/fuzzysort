@@ -335,8 +335,6 @@ USAGE:
       var weightDiacritics = true
       var diacriticScore = 0
       const DIACRITICS = [
-          'oö',
-          'aä',
           'aḀḁĂăÂâǍǎȺⱥȦȧẠạÄäÀàÁáĀāÃãÅåąĄÃąĄ',
           'b␢βΒB฿𐌁ᛒ',
           'cĆćĈĉČčĊċC̄c̄ÇçḈḉȻȼƇƈɕᴄＣｃ',
