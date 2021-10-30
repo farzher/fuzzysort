@@ -372,23 +372,16 @@ USAGE:
       // walk through target. find sequential matches.
       // if all chars aren't found then exit
       for(;;) {
-        var diacritic = false;
-        for (var i = 0; i < DIACRITICSLowerCode.length; i++) {
-            // console.log(DIACRITICSLowerCode[i]);
-            if (DIACRITICSLowerCode[i].includes(searchLowerCode)) {
-                diacritic = DIACRITICSLowerCode[i];
-                break;
+        var isMatch = searchLowerCode === targetLowerCodes[targetI];
+        if (!isMatch) {
+            for (var i = 0; i < DIACRITICSLowerCode.length; i++) {
+                if (DIACRITICSLowerCode[i].includes(searchLowerCode)) {
+                    isMatch = DIACRITICSLowerCode[i].includes(targetLowerCodes[targetI])
+                    if (isMatch && weightDiacritics && searchLowerCode != targetLowerCodes[targetI]) diacriticScore--;
+                    break;
+                }
             }
         }
-
-        var isMatch;
-        if (Array.isArray(diacritic)) {
-            isMatch = diacritic.includes(targetLowerCodes[targetI])
-            if (isMatch && weightDiacritics && searchLowerCode != targetLowerCodes[targetI]) diacriticScore--;
-        } else {
-            isMatch = searchLowerCode === targetLowerCodes[targetI]
-        }
-
         ++targetI; if(targetI >= targetLen) { // Failed to find searchI
           // Check for typo or exit
           // we go as far as possible before trying to transpose
