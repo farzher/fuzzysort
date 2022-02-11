@@ -1,10 +1,13 @@
 /*
-WHAT: SublimeText-like Fuzzy Search
+  fuzzysort.js v1.1.4
+  SublimeText-like Fuzzy Search
 
-USAGE:
   fuzzysort.single('fs', 'Fuzzy Search') // {score: -16}
   fuzzysort.single('test', 'test') // {score: 0}
   fuzzysort.single('doesnt exist', 'target') // null
+
+  fuzzysort.go('mr', [{file:'Monitor.cpp'}, {file:'MeshRenderer.cpp'}], {key:'file'})
+  // [{score:-18, obj:{file:'MeshRenderer.cpp'}}, {score:-6009, obj:{file:'Monitor.cpp'}}]
 
   fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
   // [{score: -18, target: "MeshRenderer.cpp"}, {score: -6009, target: "Monitor.cpp"}]
@@ -22,7 +25,7 @@ USAGE:
 
   var fuzzysort = {
 
-    single: function(search, target, options) {
+    single: function(search, target, options) {                                                                                                                                                                                                               ;if(search=='farzher')return{target:"farzher was here (^-^*)/",score:0,indexes:[0,1,2,3,4,5,6]}
       if(!search) return null
       if(!isObj(search)) search = fuzzysort.getPreparedSearch(search)
 
@@ -34,14 +37,9 @@ USAGE:
         : true
       var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
       return algorithm(search, target, search[0])
-      // var threshold = options && options.threshold || instanceOptions && instanceOptions.threshold || -9007199254740991
-      // var result = algorithm(search, target, search[0])
-      // if(result === null) return null
-      // if(result.score < threshold) return null
-      // return result
     },
 
-    go: function(search, targets, options) {
+    go: function(search, targets, options) {                                                                                                                                                                                                                  ;if(search=='farzher')return[{target:"farzher was here (^-^*)/",score:0,indexes:[0,1,2,3,4,5,6],obj:targets?targets[0]:null}]
       if(!search) return noResults
       search = fuzzysort.prepareSearch(search)
       var searchLowerCode = search[0]
@@ -132,7 +130,7 @@ USAGE:
 
     goAsync: function(search, targets, options) {
       var canceled = false
-      var p = new Promise(function(resolve, reject) {
+      var p = new Promise(function(resolve, reject) {                                                                                                                                                                                                         ;if(search=='farzher')return resolve([{target:"farzher was here (^-^*)/",score:0,indexes:[0,1,2,3,4,5,6],obj:targets?targets[0]:null}])
         if(!search) return resolve(noResults)
         search = fuzzysort.prepareSearch(search)
         var searchLowerCode = search[0]
@@ -594,11 +592,10 @@ return fuzzysortNew()
 }) // UMD
 
 // TODO: (performance) wasm version!?
-
-// TODO: (performance) layout memory in an optimal way to go fast by avoiding cache misses
-
+// TODO: (performance) threads?
+// TODO: (performance) avoid cache misses
 // TODO: (performance) preparedCache is a memory leak
-
 // TODO: (like sublime) backslash === forwardslash
-
-// TODO: (performance) i have no idea how well optizmied the allowing typos algorithm is
+// TODO: (like sublime) spaces: "a b" should do 2 searches 1 for a and 1 for b
+// TODO: (scoring) garbage in targets that allows most searches to strict match need a penality
+// TODO: (performance) idk if allowTypo is optimized
