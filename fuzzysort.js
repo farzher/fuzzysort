@@ -287,15 +287,15 @@
     },
 
     prepare: function(target) {
-      if(!target) return
+      if(!target) return {target: '', _targetLowerCodes: [0/*this 0 doesn't make sense. here because an empty array causes the algorithm to deoptimize and run 50% slower!*/], _nextBeginningIndexes: null, score: null, indexes: null, obj: null} // hidden
       return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:null, score:null, indexes:null, obj:null} // hidden
     },
     prepareSlow: function(target) {
-      if(!target) return
+      if(!target) return {target: '', _targetLowerCodes: [0/*this 0 doesn't make sense. here because an empty array causes the algorithm to deoptimize and run 50% slower!*/], _nextBeginningIndexes: null, score: null, indexes: null, obj: null} // hidden
       return {target:target, _targetLowerCodes:fuzzysort.prepareLowerCodes(target), _nextBeginningIndexes:fuzzysort.prepareNextBeginningIndexes(target), score:null, indexes:null, obj:null} // hidden
     },
     prepareSearch: function(search) {
-      if(!search) return
+      if(!search) search = ''
       return fuzzysort.prepareLowerCodes(search)
     },
 
