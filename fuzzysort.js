@@ -554,8 +554,7 @@
 
 // This stuff is outside fuzzysortNew, because it's shared with instances of fuzzysort.new()
 var isNode = typeof require !== 'undefined' && typeof window === 'undefined'
-// var MAX_INT = Number.MAX_SAFE_INTEGER
-// var MIN_INT = Number.MIN_VALUE
+var Map = Map||function(){var s=Object.create(null);this.get=function(k){return s[k]};this.set=function(k,val){s[k]=val;return this};this.clear=function(){s=Object.create(null)}}
 var preparedCache = new Map()
 var preparedSearchCache = new Map()
 var noResults = []; noResults.total = 0
