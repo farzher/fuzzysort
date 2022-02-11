@@ -156,7 +156,15 @@
             var scoreFn = options.scoreFn || defaultScoreFn
             var keys = options.keys
             var keysLen = keys.length
-            for(; iCurrent >= 0; --iCurrent) { var obj = targets[iCurrent]
+            for(; iCurrent >= 0; --iCurrent) {
+              if(iCurrent%1000/*itemsPerCheck*/ === 0) {
+                if(Date.now() - startMs >= 10/*asyncInterval*/) {
+                  isNode?setImmediate(step):setTimeout(step)
+                  return
+                }
+              }
+
+              var obj = targets[iCurrent]
               var objResults = new Array(keysLen)
               for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
                 var key = keys[keyI]
@@ -176,19 +184,20 @@
                 ++limitedCount
                 if(score > q.peek().score) q.replaceTop(objResults)
               }
+            }
 
+          // options.key
+          } else if(options && options.key) {
+            var key = options.key
+            for(; iCurrent >= 0; --iCurrent) {
               if(iCurrent%1000/*itemsPerCheck*/ === 0) {
                 if(Date.now() - startMs >= 10/*asyncInterval*/) {
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
               }
-            }
 
-          // options.key
-          } else if(options && options.key) {
-            var key = options.key
-            for(; iCurrent >= 0; --iCurrent) { var obj = targets[iCurrent]
+              var obj = targets[iCurrent]
               var target = getValue(obj, key)
               if(!target) continue
               if(!isObj(target)) target = fuzzysort.getPrepared(target)
@@ -205,18 +214,19 @@
                 ++limitedCount
                 if(result.score > q.peek().score) q.replaceTop(result)
               }
+            }
 
+          // no keys
+          } else {
+            for(; iCurrent >= 0; --iCurrent) {
               if(iCurrent%1000/*itemsPerCheck*/ === 0) {
                 if(Date.now() - startMs >= 10/*asyncInterval*/) {
                   isNode?setImmediate(step):setTimeout(step)
                   return
                 }
               }
-            }
 
-          // no keys
-          } else {
-            for(; iCurrent >= 0; --iCurrent) { var target = targets[iCurrent]
+              var target = targets[iCurrent]
               if(!target) continue
               if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
@@ -228,13 +238,6 @@
                 ++limitedCount
                 if(result.score > q.peek().score) q.replaceTop(result)
               }
-
-              if(iCurrent%1000/*itemsPerCheck*/ === 0) {
-                if(Date.now() - startMs >= 10/*asyncInterval*/) {
-                  isNode?setImmediate(step):setTimeout(step)
-                  return
-                }
-              }
             }
           }
 
@@ -245,7 +248,7 @@
           resolve(results)
         }
 
-        isNode?setImmediate(step):step()
+        isNode?setImmediate(step):step() //setTimeout here is too slow
       })
       p.cancel = function() { canceled = true }
       return p
