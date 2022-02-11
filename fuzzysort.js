@@ -255,6 +255,7 @@
     },
 
     highlight: function(result, hOpen, hClose) {
+      if(typeof hOpen == 'function') return fuzzysort.highlightCallback(result, hOpen)
       if(result === null) return null
       if(hOpen === undefined) hOpen = '<b>'
       if(hClose === undefined) hClose = '</b>'
@@ -284,6 +285,38 @@
       }
 
       return highlighted
+    },
+    highlightCallback: function(result, cb) {
+      if(result === null) return null
+      var target = result.target
+      var targetLen = target.length
+      var indexes = result.indexes
+      var highlighted = ''
+      var matchI = 0
+      var indexesI = 0
+      var opened = false
+      var result = []
+      for(var i = 0; i < targetLen; ++i) { var char = target[i]
+        if(indexes[indexesI] === i) {
+          ++indexesI
+          if(!opened) { opened = true
+            result.push(highlighted); highlighted = ''
+          }
+
+          if(indexesI === indexes.length) {
+            highlighted += char
+            result.push(cb(highlighted, matchI++)); highlighted = ''
+            result.push(target.substr(i+1))
+            break
+          }
+        } else {
+          if(opened) { opened = false
+            result.push(cb(highlighted, matchI++)); highlighted = ''
+          }
+        }
+        highlighted += char
+      }
+      return result
     },
 
     prepare: function(target) {
