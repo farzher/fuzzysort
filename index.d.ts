@@ -70,14 +70,17 @@ declare namespace Fuzzysort {
     scoreFn?: (keysResult:ReadonlyArray<KeyResult<T>>) => number
   }
 
+  interface HighlightCallback<T> { (match: string, index: number): T }
+
   interface Fuzzysort {
 
     /**
     * Help the algorithm go fast by providing prepared targets instead of raw strings
     */
-    prepare(target: string): Prepared | undefined
+    prepare(target: string): Prepared
 
     highlight(result?: Result, highlightOpen?: string, highlightClose?: string): string | null
+    highlight<T>(result: Result, callback: HighlightCallback<T>): (string | T)[] | null
 
     single(search: string, target: string | Prepared): Result | null
     go(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): Results
