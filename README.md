@@ -91,6 +91,11 @@ fuzzysort.go(search, targets, {
 fuzzysort.highlight(fuzzysort.single('tt', 'test'), '*', '*') // *t*es*t*
 ```
 
+#### `fuzzysort.highlight(result, callback)`
+```js
+fuzzysort.highlight(result, (m, i) => <react key={i}>{m}</react>) // [<react key=0>t</react>, 'es', <react key=1>t</react>]
+```
+
 
 ## What is a `result`
 
