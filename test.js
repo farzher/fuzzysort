@@ -1,72 +1,67 @@
-// fuzzysort = require('./fuzzysort')
-// Benchmark = require('benchmark')
-// Benchmark.options.maxTime = 2
-// const suite = new Benchmark.Suite
-// Things = [1,2323,231,3123,131,313,124,124124,1421,2]
-// function doit(x) { return x+1 }
-// var hasOwn = {}.hasOwnProperty
-// var o = {a:true}
-// o['   - - - -'] = true
-// var xxxxxx = {target:'pants', indexes:[0,1,3]}
-// fuzzysort.highlightOpen = fuzzysort.highlightClose = '*'
-// suite.add('go prepared', function() {
-//   return fuzzysort.highlight(xxxxxx)
-// })
-// suite.add('go prepared', function() {
-//   return fuzzysort.highlight2(xxxxxx, '*', '*')
-// })
-
-// suite.add('go prepared', function() {
-//   return hasOwn.call(o, 'a')
-// })
-// suite.add('go prepared', function() {
-//   return o.hasOwnProperty('a')
-// })
-// suite.add('go prepared', function() {
-//   return 'a' in o
-// })
-// suite.add('go prepared', function() {
-//   return o['a'] !== undefined
-// })
-
-
-
-// suite.on('cycle', function(e) {
-//   console.log(String(e.target))
-// })
-
-// console.log('now benching')
-// suite.run()
-// process.exit()
-
-
-
-
-
-
-
-
-
-
 /*
-WHAT: Test and then benchmark
-USAGE: Run this file in node
+WHAT: Checks for bugs, and then benchmarks to check for performance issues
+USAGE: npm test; node test.js; open test.html in the browser
 
 HOW TO WRITE TESTS:
-      target         ...matches...               after null must not match
-test('APPLES',      'app', 'l', 'E',               null,     'xxx')
-               matches must not get better
+  // matches must not get better
+  test('APPLES',      'app', 'l', 'E',               null,     'xxx')
+  //    target         ...matches...               after null must not match
+
+  testStrict('a bc', 'bc') // must be a strict match
+  testSimple('abc', 'bc') // must be a simple match
+  testNomatch('abc', 'cba') // must not match
+  assert(true, 'my err msg') // must be truthy
 */
 
+
+// require / setup
+const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
+if(isNode) var fuzzysort = require('./fuzzysort') // if we're running in the browser we already have these
+if(isNode) var Benchmark = require('benchmark') // if we're running in the browser we already have these
+if(isNode) var testdata = require('./testdata') // if we're running in the browser we already have these
+
+// config
+const config = {
+  fuzzyoptions: {limit: 100/*limit 100 for browser because our rendering code is too slow to render more..*/},
+  benchtime: 1/*2*/,
+}
+
+// apply config.fuzzyoptions, and load testdata into testdata_prepared, testdata_obj
+fuzzysort = fuzzysort.new(config.fuzzyoptions)
+let testdata_prepared = {}, testdata_obj = {}
+{
+  for(const key of Object.keys(testdata)) {
+    testdata_prepared[key] = new Array(testdata[key].length)
+    for(let i = testdata[key].length-1; i>=0; i-=1) {
+      testdata_prepared[key][i] = fuzzysort.prepare(testdata[key][i])
+    }
+  }
+  for(const key of Object.keys(testdata)) {
+    testdata_obj[key] = new Array(testdata[key].length)
+    for(let i = testdata[key].length-1; i>=0; i-=1) {
+      testdata_obj[key][i] = {str: testdata[key][i], prepared: testdata_prepared[key][i]}
+    }
+  }
+}
+
+
+
+
+// main
+// main
+// main
 setTimeout(async function() {
-  // for (var i = 0; i < 1000; i++) await tests()
   await tests()
 
-  if(assert.count==0) console.log('testing disabled!')
+  if(assert.count==0/*no asserts were run*/) console.log('testing is disabled!')
   else if(!assert.failed) console.log('all tests passed')
 
   if(isNode) bench() // Only bench on node. Don't want the demo to freeze
 })
+
+
+
+
 
 
 async function tests() {
@@ -95,9 +90,20 @@ async function tests() {
   test('noodle monster', 'nomon', null, 'qrs')
   test('noodle monster '.repeat(100), null, 'a')
 
+  // sorting
+
+  if(false) {
+    // this test is currently failing. sorting algo needs changes
+    var tmp = fuzzysort.go('zom', testdata_prepared.urls_and_titles)
+    assert(tmp[0].target == 'jQuery Zoom', 'zom', tmp[0].target)
+  }
+
+  var tmp = fuzzysort.go('cman', testdata_prepared.ue4_filenames).slice(0, 2).map(r=>r.target)
+  assert(tmp.includes('CheatManager.h') && tmp.includes('CrowdManager.h'), 'cman', tmp[0])
+
   // typoPenalty
-  assert(fuzzysort.single('acb', 'abc').score===-20, 'typoPenalty strict')
-  assert(fuzzysort.single('acb', 'axbxc').score===-6022, 'typoPenalty simple')
+  assert(fuzzysort.single('abc', 'abc').score > fuzzysort.single('acb', 'abc').score, 'typoPenalty strict')
+  assert(fuzzysort.single('abc', 'axbxc').score > fuzzysort.single('acb', 'axbxc').score, 'typoPenalty simple')
 
   var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
   assert(tmp[0].score===0, 'go sorting')
@@ -191,64 +197,35 @@ async function tests() {
   var results = fuzzysort.go('typography', targets, {keys: ['name']})
   var results = (await fuzzysort.goAsync('typography', targets, {key: 'name'}))
   var results = (await fuzzysort.goAsync('typography', targets, {keys: ['name']}))
+
+  // key/keys is a Symbol AND the target is a prepared empty string
+  var s = Symbol()
+  var results = fuzzysort.go('va', ['value', ''].map(v => ({target: v, [s]: fuzzysort.prepare(v)})), {key: s})
+  assert(results.length==1)
+  var results = fuzzysort.go('va', ['value', ''].map(v => ({target: v, [s]: fuzzysort.prepare(v)})), {keys: [s]})
+  assert(results.length==1)
+
+  // make sure we don't deoptimize when run with weird values
+  fuzzysort.single('sup', fuzzysort.prepare())
+  fuzzysort.go('', ['empty search test'])
+  fuzzysort.go('empty target test', [''])
+  fuzzysort.go('', [''])
 }
-
-
-
-
-
-
-
-const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
-if(isNode) fuzzysort = require('./fuzzysort')
-
-// Config
-  fuzzysort = fuzzysort.new({
-    limit: 100,
-    // threshold: 999,
-  })
-  const benchmark_duration = 2
-
-if(isNode) testdata = require('./testdata')
-var testdata_prepared = {}; var testdata_obj = {}
-for(var key of Object.keys(testdata)) {
-  testdata_prepared[key] = new Array(testdata[key].length)
-  for(var i = testdata[key].length-1; i>=0; i-=1) {
-    testdata_prepared[key][i] = fuzzysort.prepare(testdata[key][i])
-  }
-}
-for(var key of Object.keys(testdata)) {
-  testdata_obj[key] = new Array(testdata[key].length)
-  for(var i = testdata[key].length-1; i>=0; i-=1) {
-    // testdata_obj[key][i] = {str: fuzzysort.prepare(testdata[key][i])}
-    testdata_obj[key][i] = {str: testdata[key][i]}
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function bench() {
-  if(isNode) Benchmark = require('benchmark')
-  Benchmark.options.maxTime = benchmark_duration
+  Benchmark.options.maxTime = config.benchtime
   const suite = new Benchmark.Suite
 
   suite.add('go prepared', function() {
     fuzzysort.go('nnnne', testdata_prepared.ue4_filenames)
     fuzzysort.go('e', testdata_prepared.ue4_filenames)
     fuzzysort.go('mrender.h', testdata_prepared.ue4_filenames)
+  })
+  suite.add('go prepared key', function() {
+    fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {key: 'prepared'})
+    fuzzysort.go('e', testdata_obj.ue4_filenames, {key: 'prepared'})
+    fuzzysort.go('mrender.h', testdata_obj.ue4_filenames, {key: 'prepared'})
   })
   suite.add('go key', function() {
     fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {key: 'str'})
@@ -266,24 +243,6 @@ function bench() {
     fuzzysort.go('mrender.h', testdata.ue4_filenames)
   })
 
-  // suite.add('goKey', function() {
-  //   fuzzysort.go('e', objects, {key:'target'})
-  //   fuzzysort.go('a', objects, {key:'target'})
-  //   fuzzysort.go('mrender.h', objects, {key:'target'})
-
-  //   // objs = [{str:'naytunfwuyt', str2:'nautfn'}, {str:'pant', str2:'tunntuftf889323'}, {str:'tame', str2:'n&*(*&o'}]
-  //   // fuzzysort.go('t', objs, {keys:['str', 'str2'], scoreFn:metas=> (metas[0]&&metas[0].score||1000) + (metas[1]&&metas[1].score||1000) })
-  // })
-
-  // suite.add('goKeys', function() {
-  //   fuzzysort.go('e', objects, {key:['target']})
-  //   fuzzysort.go('a', objects, {key:['target']})
-  //   fuzzysort.go('mrender.h', objects, {key:['target']})
-
-  //   // objs = [{str:'naytunfwuyt', str2:'nautfn'}, {str:'pant', str2:'tunntuftf889323'}, {str:'tame', str2:'n&*(*&o'}]
-  //   // fuzzysort.go('t', objs, {keys:['str', 'str2'], scoreFn:metas=> (metas[0]&&metas[0].score||1000) + (metas[1]&&metas[1].score||1000) })
-  // })
-
   suite.add('goAsync', function(deferred) {
     var count = 0
     fuzzysort.goAsync('e', testdata_prepared.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
@@ -291,11 +250,11 @@ function bench() {
     fuzzysort.goAsync('mrender.h', testdata_prepared.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
   }, {defer:true})
 
-  // suite.add('goAsync.cancel()', function(deferred) {
-  //   const p = fuzzysort.goAsync('e', testdata_prepared.ue4_filenames)
-  //   p.then(()=>{deferred.resolve()}, ()=>{deferred.resolve()})
-  //   p.cancel()
-  // }, {defer:true})
+  suite.add('goAsync.cancel()', function(deferred) {
+    const p = fuzzysort.goAsync('e', testdata_prepared.ue4_filenames)
+    p.then(()=>{deferred.resolve()}, ()=>{deferred.resolve()})
+    p.cancel()
+  }, {defer:true})
 
   suite.add('huge nomatch', function() {
     fuzzysort.single('xxx', 'noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
@@ -342,12 +301,12 @@ function bench() {
 
 
 // helper function nonsense
-function assert(b, m=undefined) {
+function assert(b, ...m) {
   if(!b) {
-  console.log(assert.count, 'ASSERTION FAILED!!!!!!!', m)
-  assert.failed = true
+    console.error(/* assert.count,  */'ASSERTION FAILED!', ...m)
+    assert.failed = true
   } else {
-  // console.log(assert.count, 'test passed')
+    // console.log(assert.count, 'test passed')
   }
 
   assert.count += 1
@@ -400,6 +359,8 @@ function testNomatch(target, ...searches) {
     assert(result===null, {search, result})
   }
 }
+
+// result.indexes must be increasing
 function assertResultIntegrity(result) {
   if(result === null) return true
   var lastMatchI = null
@@ -415,21 +376,3 @@ function assertResultIntegrity(result) {
     }
   }
 }
-
-// function randomString(len, charSet) {
-//     charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,./\]["<>?:{}!@#$%^&*()_+=-';
-//     var randomString = '';
-//     for (var i = 0; i < len; i++) {
-//         var randomPoz = Math.floor(seededRand() * charSet.length);
-//         randomString += charSet.substring(randomPoz,randomPoz+1);
-//     }
-//     return randomString;
-// }
-
-// function seededRand(max=1, min=0) {
-//   if(min) [max,min]=[min,max]
-//   seededRand.seed = (seededRand.seed * 9301 + 49297) % 233280
-//   var rnd = seededRand.seed / 233280
-//   return min + rnd * (max - min)
-// }
-// seededRand.seed = 0
