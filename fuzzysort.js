@@ -1,5 +1,5 @@
 /*
-  fuzzysort.js v1.1.4
+  fuzzysort.js https://github.com/farzher/fuzzysort
   SublimeText-like Fuzzy Search
 
   fuzzysort.single('fs', 'Fuzzy Search') // {score: -16}
