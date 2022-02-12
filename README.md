@@ -164,6 +164,9 @@ const strictsort = fuzzysort.new({threshold: -999})
 
 ### Changelog
 
+#### v1.2.0
+- Added `fuzzysort.highlight(result, callback)`
+
 #### v1.1.0
 - Added `allowTypo` as an option
 
