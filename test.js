@@ -17,13 +17,12 @@ HOW TO WRITE TESTS:
 // require / setup
 const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
 if(isNode) var fuzzysort = require('./fuzzysort') // if we're running in the browser we already have these
-if(isNode) var Benchmark = require('benchmark') // if we're running in the browser we already have these
 if(isNode) var testdata = require('./testdata') // if we're running in the browser we already have these
 
 // config
 const config = {
   fuzzyoptions: {limit: 100/*limit 100 for browser because our rendering code is too slow to render more..*/},
-  benchtime: 1/*2*/,
+  benchtime: 2000,
 }
 
 // apply config.fuzzyoptions, and load testdata into testdata_prepared, testdata_obj
@@ -56,7 +55,7 @@ setTimeout(async function() {
   if(assert.count==0/*no asserts were run*/) console.log('testing is disabled!')
   else if(!assert.failed) console.log('all tests passed')
 
-  if(isNode) bench() // Only bench on node. Don't want the demo to freeze
+  if(isNode) await benchmarks() // Only bench on node. Don't want the demo to freeze
 })
 
 
@@ -210,75 +209,68 @@ async function tests() {
   fuzzysort.go('', ['empty search test'])
   fuzzysort.go('empty target test', [''])
   fuzzysort.go('', [''])
+
+  var results = fuzzysort.go('farzher', [{yes:'farzher', no:'no'}], {keys:['yes', 'no']})
+  assert(!!results[0].obj)
 }
 
 
-function bench() {
-  Benchmark.options.maxTime = config.benchtime
-  const suite = new Benchmark.Suite
+async function benchmarks() {
 
-  suite.add('go prepared', function() {
+  console.log('now benching ...')
+
+  bench('go prepared', function() {
     fuzzysort.go('nnnne', testdata_prepared.ue4_filenames)
     fuzzysort.go('e', testdata_prepared.ue4_filenames)
     fuzzysort.go('mrender.h', testdata_prepared.ue4_filenames)
-  })
-  suite.add('go prepared key', function() {
+  }, config)
+  bench('go prepared key', function() {
     fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {key: 'prepared'})
     fuzzysort.go('e', testdata_obj.ue4_filenames, {key: 'prepared'})
     fuzzysort.go('mrender.h', testdata_obj.ue4_filenames, {key: 'prepared'})
-  })
-  suite.add('go key', function() {
+  }, config)
+  bench('go key', function() {
     fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {key: 'str'})
     fuzzysort.go('e', testdata_obj.ue4_filenames, {key: 'str'})
     fuzzysort.go('mrender.h', testdata_obj.ue4_filenames, {key: 'str'})
-  })
-  suite.add('go keys', function() {
+  }, config)
+  bench('go keys', function() {
     fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {keys: ['str']})
     fuzzysort.go('e', testdata_obj.ue4_filenames, {keys: ['str']})
     fuzzysort.go('mrender.h', testdata_obj.ue4_filenames, {keys: ['str']})
-  })
-  suite.add('go str', function() {
+  }, config)
+  bench('go str', function() {
     fuzzysort.go('nnnne', testdata.ue4_filenames)
     fuzzysort.go('e', testdata.ue4_filenames)
     fuzzysort.go('mrender.h', testdata.ue4_filenames)
-  })
+  }, config)
 
-  suite.add('goAsync', function(deferred) {
-    var count = 0
-    fuzzysort.goAsync('e', testdata_prepared.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
-    fuzzysort.goAsync('a', testdata_prepared.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
-    fuzzysort.goAsync('mrender.h', testdata_prepared.ue4_filenames).then(()=>{count+=1; if(count===3)deferred.resolve()})
-  }, {defer:true})
+  await bench('goAsync', async () => {
+    await fuzzysort.goAsync('e', testdata_prepared.ue4_filenames)
+    await fuzzysort.goAsync('a', testdata_prepared.ue4_filenames)
+    await fuzzysort.goAsync('mrender.h', testdata_prepared.ue4_filenames)
+  }, config)
 
-  suite.add('goAsync.cancel()', function(deferred) {
-    const p = fuzzysort.goAsync('e', testdata_prepared.ue4_filenames)
-    p.then(()=>{deferred.resolve()}, ()=>{deferred.resolve()})
-    p.cancel()
-  }, {defer:true})
+  await bench('goAsync.cancel()', async () => {
+    return new Promise((res, rej) => {
+      const p = fuzzysort.goAsync('e', testdata_prepared.ue4_filenames)
+      p.then(results => res(), ()=>res())
+      p.cancel()
+    })
+  }, config)
 
-  suite.add('huge nomatch', function() {
+  bench('huge nomatch', function() {
     fuzzysort.single('xxx', 'noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
-  })
-
-  suite.add('tricky', function() {
+  }, config)
+  bench('tricky', function() {
     fuzzysort.single('prrun', 'C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat')
-  })
-
-  suite.add('small', function() {
+  }, config)
+  bench('small', function() {
     fuzzysort.single('al', 'alexstrasa')
-  })
-
-  suite.add('somematch', function() {
+  }, config)
+  bench('somematch', function() {
     fuzzysort.single('texxx', 'template/index')
-  })
-
-
-  suite.on('cycle', function(e) {
-    console.log(String(e.target))
-  })
-
-  console.log('now benching')
-  suite.run()
+  }, config)
 }
 
 
@@ -375,4 +367,48 @@ function assertResultIntegrity(result) {
       lastMatchI = matchI
     }
   }
+}
+
+
+
+async function bench(name, code, {benchtime=2000}={}) {
+  const async = code.constructor.name === 'AsyncFunction'
+  const startms = Date.now()
+
+  // quick estimate of how long a single call takes, so we know how many times to loop it
+  let singledurationms
+  for(let i=0;;i++) {
+
+    for(let j=0;j<10**i;j++) async?await code():code()
+
+    const durationms = Date.now()-startms
+    if(durationms > 10) {
+      singledurationms = durationms/(10**i)
+      break
+    }
+  }
+
+  const idealsamplecount = 10
+  const loopcount = Math.round(benchtime/idealsamplecount/singledurationms)
+
+
+  const loopmsarr = []
+  for(;;) {
+    if(Date.now()-startms > benchtime) break
+
+    const loopstartms = Date.now()
+    for(let i=0; i<loopcount; i++) async?await code():code()
+    loopmsarr.push(Date.now()-loopstartms)
+  }
+
+
+  const fastestloopms = Math.min(...loopmsarr)
+  const hz = 1000/(fastestloopms/loopcount)
+  console.log(
+    cmdyellow(name),
+    'x', cmdyellow(hz>1000?(+Math.round(hz)).toLocaleString() : hz.toFixed(2)), 'ops/sec',
+    '|', loopmsarr.length.toString(), 'runs sampled'
+  )
+
+  function cmdyellow(x) { return `${'\u001b[33m'}${x}${'\u001b[0m'}` }
 }
