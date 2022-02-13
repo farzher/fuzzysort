@@ -13,8 +13,7 @@
   "license": "MIT",
   "main": "fuzzysort.js",
   "scripts": {
-    "test": "node test.js",
-    "build": "uglifyjs fuzzysort.js -m -c -o fuzzysort.min.js"
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",
