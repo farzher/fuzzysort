@@ -145,7 +145,7 @@ let objects = [{title:'Favorite Color', desc:'Chrome'}, {title:'Google Chrome', 
 let results = fuzzysort.go('chr', objects, {
   keys: ['title', 'desc'],
   // Create a custom combined score to sort by. -100 to the desc score makes it a worse match
-  scoreFn(a) => Math.max(a[0]?a[0].score:-1000, a[1]?a[1].score-100:-1000)
+  scoreFn: a => Math.max(a[0]?a[0].score:-1000, a[1]?a[1].score-100:-1000)
 })
 
 var bestResult = results[0]
