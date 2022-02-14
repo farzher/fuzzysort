@@ -587,7 +587,7 @@
 
 // This stuff is outside fuzzysortNew, because it's shared with instances of fuzzysort.new()
 var isNode = typeof require !== 'undefined' && typeof window === 'undefined'
-var MyMap = Map||function(){var s=Object.create(null);this.get=function(k){return s[k]};this.set=function(k,val){s[k]=val;return this};this.clear=function(){s=Object.create(null)}}
+var MyMap = typeof Map === 'function' ? Map : function(){var s=Object.create(null);this.get=function(k){return s[k]};this.set=function(k,val){s[k]=val;return this};this.clear=function(){s=Object.create(null)}}
 var preparedCache = new MyMap()
 var preparedSearchCache = new MyMap()
 var noResults = []; noResults.total = 0
