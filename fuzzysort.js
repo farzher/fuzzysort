@@ -65,6 +65,7 @@
           for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
             var key = keys[keyI]
             var target = getValue(obj, key)
+            if(typeof target !== 'string' && target !== null && target !== undefined) target = target.toString()
             if(!target) { objResults[keyI] = null; continue }
             if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
@@ -87,6 +88,7 @@
         var key = options.key
         for(var i = targetsLen - 1; i >= 0; --i) { var obj = targets[i]
           var target = getValue(obj, key)
+          if(typeof target !== 'string' && target !== null && target !== undefined) target = target.toString()
           if(!target) continue
           if(!isObj(target)) target = fuzzysort.getPrepared(target)
 
