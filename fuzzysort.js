@@ -34,7 +34,7 @@
 
       var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
         : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
-        : true
+        : false
       var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
       return algorithm(search, target, search[0])
     },
@@ -48,7 +48,7 @@
       var limit = options && options.limit || instanceOptions && instanceOptions.limit || 9007199254740991
       var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
         : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
-        : true
+        : false
       var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
       var resultsLen = 0; var limitedCount = 0
       var targetsLen = targets.length
@@ -141,7 +141,7 @@
         var limit = options && options.limit || instanceOptions && instanceOptions.limit || 9007199254740991
         var allowTypo = options && options.allowTypo!==undefined ? options.allowTypo
           : instanceOptions && instanceOptions.allowTypo!==undefined ? instanceOptions.allowTypo
-          : true
+          : false
         var algorithm = allowTypo ? fuzzysort.algorithm : fuzzysort.algorithmNoTypo
         var resultsLen = 0; var limitedCount = 0
         function step() {
