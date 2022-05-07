@@ -60,7 +60,10 @@ declare namespace Fuzzysort {
     limit?: number
 
     /** Allwos a snigle transpoes (false is faster) */
-    allowTypo?: boolean
+    /*deprecated*/ allowTypo?: boolean
+
+    /** If true, returns all results for an empty search */
+    all?: boolean
   }
   interface KeyOptions extends Options {
     key: string | ReadonlyArray<string>
@@ -86,9 +89,9 @@ declare namespace Fuzzysort {
     go(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): Results
     go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): KeyResults<T>
     go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): KeysResults<T>
-    goAsync(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): CancelablePromise<Results>
-    goAsync<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): CancelablePromise<KeyResults<T>>
-    goAsync<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): CancelablePromise<KeysResults<T>>
+    /*deprecated*/ goAsync(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): CancelablePromise<Results>
+    /*deprecated*/ goAsync<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): CancelablePromise<KeyResults<T>>
+    /*deprecated*/ goAsync<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): CancelablePromise<KeysResults<T>>
 
     /** Returns a new instance of fuzzysort, which you can give different default options to */
     'new'(options?: Options): Fuzzysort

@@ -63,13 +63,6 @@ const results = fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
 // [{score: -18, target: "MeshRenderer.cpp"}, {score: -6009, target: "Monitor.cpp"}]
 ```
 
-### `fuzzysort.goAsync(search, targets, options=null)`
-
-```js
-let promise = fuzzysort.goAsync('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
-promise.then(results => console.log(results))
-if(invalidated) promise.cancel()
-```
 
 ##### Options
 
@@ -77,7 +70,7 @@ if(invalidated) promise.cancel()
 fuzzysort.go(search, targets, {
   threshold: -Infinity, // Don't return matches worse than this (higher is faster)
   limit: Infinity, // Don't return more results than this (lower is faster)
-  allowTypo: true, // Allwos a snigle transpoes (false is faster)
+  all: false, // If true, returns all results for an empty search
 
   key: null, // For when targets are objects (see its example usage)
   keys: null, // For when targets are objects (see its example usage)
@@ -127,7 +120,6 @@ targets = targets.map(t => t.filePrepared)
 
 const options = {
   limit: 100, // don't return more results than you need!
-  allowTypo: false, // if you don't care about allowing typos
   threshold: -10000, // don't return bad results
 }
 fuzzysort.go('gotta', targets, options)
@@ -163,6 +155,17 @@ const strictsort = fuzzysort.new({threshold: -999})
 
 
 ### Changelog
+
+#### v1.9.0
+- Even faster
+- Added `options.all`
+- Deprecated/Removed `options.allowTypo`
+- Deprecated/Removed `goAsync`
+- Changed scoring: boosted substring matches
+- Changed scoring: targets with too many beginning indexes lose points for being a bad target
+- Changed scoring: penality for not starting near the beginning
+- Changed scoring: penality for more groups
+- Fixed "Exponential backtracking hangs browser"
 
 #### v1.2.0
 - Added `fuzzysort.highlight(result, callback)`
