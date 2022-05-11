@@ -400,10 +400,11 @@
       var beginningIndexes = []; var beginningIndexesLen = 0
       var wasUpper = false
       var wasAlphanum = false
+      var regexpUnicodeLetter = new RegExp(/^\p{L}/, 'u')
       for(var i = 0; i < targetLen; ++i) {
-        var targetCode = target.charCodeAt(i)
-        var isUpper = targetCode>=65&&targetCode<=90
-        var isAlphanum = isUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
+        var targetChar = target.charAt(i)
+        var isUpper = (targetChar === targetChar.toUpperCase()) && (targetChar !== targetChar.toLowerCase())
+        var isAlphanum = regexpUnicodeLetter.test(targetChar)
         var isBeginning = isUpper && !wasUpper || !wasAlphanum || !isAlphanum
         wasUpper = isUpper
         wasAlphanum = isAlphanum
