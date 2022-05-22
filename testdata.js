@@ -47312,7 +47312,7 @@ var testdata = {
 "Ball 2D",
 "Cornflower Corbin Demo",
     ],
-    "english_wordlist_58k" : [
+    "english_58k" : [
         "aardvark",
         "aardwolf",
         "aaron",
@@ -105424,7 +105424,7 @@ var testdata = {
         "zulu",
         "zulus"
     ],
-    "hearthstone_cardlist" : [
+    "hearthstone" : [
         "Abomination",
         "Abusive Sergeant",
         "Acidic Swamp Ooze",
@@ -106169,7 +106169,7 @@ var testdata = {
         "Ysera",
         "Zombie Chow"
     ],
-    "magicthegathering_cardlist" : [
+    "mtg" : [
         "Air Elemental",
         "Ancestral Recall",
         "Animate Artifact",
@@ -122064,7 +122064,7 @@ var testdata = {
         "Human",
         "Zombie"
     ],
-    "ue4_filenames" : [
+    "ue4_files" : [
         "UE4Client.Target.cs",
         "UE4Editor.Target.cs",
         "UE4Game.Target.cs",

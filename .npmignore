@@ -3,7 +3,9 @@ package.json
 package-lock.json
 README.md
 node_modules/
-tmp/
+
+ignore/
+ignore*
 
 testdata.js
 test.html

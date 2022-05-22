@@ -1,6 +1,6 @@
 /*
 WHAT: Checks for bugs, and then benchmarks to check for performance issues
-USAGE: npm test / node test.js / open test.html in the browser
+USAGE: npm test / node test.js / test.bat / open test.html in the browser
 
 HOW TO WRITE TESTS:
   // matches must not get better
@@ -22,11 +22,21 @@ if(isNode) var testdata = require('./testdata') // if we're running in the brows
 // config
 const config = {
   fuzzyoptions: {limit: 100/*limit 100 for browser because our rendering code is too slow to render more..*/},
-  benchtime: 2000,
+  benchtime: 250,
 }
 
-// apply config.fuzzyoptions, and load testdata into testdata_prepared, testdata_obj
+// fuzzysort.new
+const _fuzzysort = fuzzysort
+fuzzysort.new = function (instanceOptions) {
+  return {..._fuzzysort,
+    go: (s, t, o) => _fuzzysort.go(s, t, {...instanceOptions, ...o}),
+  }
+}
+
+// apply config.fuzzyoptions
 fuzzysort = fuzzysort.new(config.fuzzyoptions)
+
+// load testdata into testdata_prepared, testdata_obj
 let testdata_prepared = {}, testdata_obj = {}
 {
   for(const key of Object.keys(testdata)) {
@@ -127,7 +137,7 @@ async function tests() {
 
 
   { // random junks tests, idk
-    var tmp = fuzzysort.go('cman', testdata_prepared.ue4_filenames).slice(0, 2).map(r=>r.target)
+    var tmp = fuzzysort.go('cman', testdata_prepared.ue4_files).slice(0, 2).map(r=>r.target)
     assert(tmp.includes('CheatManager.h') && tmp.includes('CrowdManager.h'), 'cman', tmp[0])
 
     var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
@@ -135,15 +145,10 @@ async function tests() {
     assert(tmp.length===5, 'go sorting length')
     assert(tmp.total===5, 'go sorting total')
 
-    var tmp = await fuzzysort.goAsync('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
-    assert(tmp[0].score===0, 'goAsync sorting')
-    assert(tmp.length===5, 'goAsync sorting length')
-    assert(tmp.total===5, 'goAsync sorting total')
-
     fuzzysort.cleanup()
 
     assert(fuzzysort.go('a', ['a', 'a']).length===2, 'length')
-    var tmpfuzz = fuzzysort.new({limit:1})
+    var tmpfuzz = fuzzysort.new({limit: 1})
     assert(tmpfuzz.go('a', ['a', 'a']).length===1, 'length')
 
 
@@ -184,28 +189,6 @@ async function tests() {
     var tmp = fuzzysort.go('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}})[0]
     assert(tmp.score===1, 'goKeys s.s || arr.0.o score')
 
-    // keyAsync
-    var tmp = (await fuzzysort.goAsync('str', tmpObjs, {key: 's.s'}))[0]
-    assert(tmp.score===0, 'goKey s.s')
-    var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {key: 'arr.0.o'}))[0]
-    assert(tmp.score===0, 'goKey arr.0.o')
-    var tmp = (await fuzzysort.goAsync('str', tmpObjs, {key: 'arr.0.o'}))[0]
-    assert(tmp===undefined, 'goKey')
-    var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {key: ['arr', '0', 'o']}))[0]
-    assert(tmp.score===0, 'goKey arr.0.o')
-
-    // keysAsync
-    var tmp = (await fuzzysort.goAsync('str', tmpObjs, {keys: ['s.s']}))[0]
-    assert(tmp.score===0, 'goKeys s.s')
-    var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {keys: ['arr.0.o']}))[0]
-    assert(tmp.score===0, 'goKeys arr.0.o')
-    var tmp = (await fuzzysort.goAsync('str', tmpObjs, {keys: ['arr.0.o']}))[0]
-    assert(tmp===undefined, 'goKeys')
-    var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {keys: [ ['arr', '0', 'o'] ]}))[0]
-    assert(tmp.score===0, 'goKeys arr.0.o')
-    var tmp = (await fuzzysort.goAsync('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}}))[0]
-    assert(tmp.score===1, 'goKeys s.s || arr.0.o score')
-
     var targets = [
       {name: 'Typography', version: '3.1.0'},
       {name: 'Typography', version: '2.1.0'},
@@ -214,10 +197,6 @@ async function tests() {
     assert(results[0].obj.version != results[1].obj.version, 'key same object bug')
     var results = fuzzysort.go('typography', targets, {keys: ['name']})
     assert(results[0].obj.version != results[1].obj.version, 'keys same object bug')
-    var results = (await fuzzysort.goAsync('typography', targets, {key: 'name'}))
-    assert(results[0].obj.version != results[1].obj.version, 'key same object bug async')
-    var results = (await fuzzysort.goAsync('typography', targets, {keys: ['name']}))
-    assert(results[0].obj.version != results[1].obj.version, 'keys same object bug async')
 
     // missing key
     var targets = [
@@ -226,8 +205,6 @@ async function tests() {
     ]
     var results = fuzzysort.go('typography', targets, {key: 'name'})
     var results = fuzzysort.go('typography', targets, {keys: ['name']})
-    var results = (await fuzzysort.goAsync('typography', targets, {key: 'name'}))
-    var results = (await fuzzysort.goAsync('typography', targets, {keys: ['name']}))
 
     // key/keys is a Symbol AND the target is a prepared empty string
     var s = Symbol()
@@ -333,7 +310,8 @@ function testNomatch(target, ...searches) {
 function assertResultIntegrity(result) {
   if(result === null) return true
   var lastMatchI = null
-  for(const matchI of result.indexes) {
+  for(let i=0; i<result.indexes.len; i++) { const matchI = result.indexes[i]
+  // for(const matchI of result.indexes) {
     if(lastMatchI === null) {
       lastMatchI = matchI
     } else {
@@ -366,44 +344,58 @@ async function benchmarks() {
 
   console.log('now benching ...')
 
+  bench('highlight', function() {
+    const results = fuzzysort.go('e', testdata_prepared.ue4_files)
+    for(const result of results) {
+      fuzzysort.highlight(result)
+    }
+  }, config)
+
+  bench('tricky', function() {
+    fuzzysort.single('prrun', 'C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat')
+  }, config)
+  bench('tricky space', function() {
+    fuzzysort.single('pr run', 'C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat')
+  }, config)
+  bench('tricky lot of space', function() {
+    fuzzysort.single('pr run      e     e e e        e      e e ee         e     e', 'C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat')
+  }, config)
+
+  bench('go prepared spaces', function() {
+    fuzzysort.go('n n  n    n     e', testdata_prepared.ue4_files)
+    fuzzysort.go(' e ',               testdata_prepared.ue4_files)
+    fuzzysort.go('m render .h',       testdata_prepared.ue4_files)
+  }, config)
+  bench('go key spaces', function() {
+    fuzzysort.go('n n  n    n     e', testdata_obj.ue4_files, {key: 'str'})
+    fuzzysort.go(' e ',               testdata_obj.ue4_files, {key: 'str'})
+    fuzzysort.go('m render .h',       testdata_obj.ue4_files, {key: 'str'})
+  }, config)
+
   bench('go prepared', function() {
-    fuzzysort.go('nnnne', testdata_prepared.ue4_filenames)
-    fuzzysort.go('e', testdata_prepared.ue4_filenames)
-    fuzzysort.go('mrender.h', testdata_prepared.ue4_filenames)
+    fuzzysort.go('nnnne', testdata_prepared.ue4_files)
+    fuzzysort.go('e', testdata_prepared.ue4_files)
+    fuzzysort.go('mrender.h', testdata_prepared.ue4_files)
   }, config)
   bench('go prepared key', function() {
-    fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {key: 'prepared'})
-    fuzzysort.go('e', testdata_obj.ue4_filenames, {key: 'prepared'})
-    fuzzysort.go('mrender.h', testdata_obj.ue4_filenames, {key: 'prepared'})
+    fuzzysort.go('nnnne', testdata_obj.ue4_files, {key: 'prepared'})
+    fuzzysort.go('e', testdata_obj.ue4_files, {key: 'prepared'})
+    fuzzysort.go('mrender.h', testdata_obj.ue4_files, {key: 'prepared'})
   }, config)
   bench('go key', function() {
-    fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {key: 'str'})
-    fuzzysort.go('e', testdata_obj.ue4_filenames, {key: 'str'})
-    fuzzysort.go('mrender.h', testdata_obj.ue4_filenames, {key: 'str'})
+    fuzzysort.go('nnnne', testdata_obj.ue4_files, {key: 'str'})
+    fuzzysort.go('e', testdata_obj.ue4_files, {key: 'str'})
+    fuzzysort.go('mrender.h', testdata_obj.ue4_files, {key: 'str'})
   }, config)
   bench('go keys', function() {
-    fuzzysort.go('nnnne', testdata_obj.ue4_filenames, {keys: ['str']})
-    fuzzysort.go('e', testdata_obj.ue4_filenames, {keys: ['str']})
-    fuzzysort.go('mrender.h', testdata_obj.ue4_filenames, {keys: ['str']})
+    fuzzysort.go('nnnne', testdata_obj.ue4_files, {keys: ['str']})
+    fuzzysort.go('e', testdata_obj.ue4_files, {keys: ['str']})
+    fuzzysort.go('mrender.h', testdata_obj.ue4_files, {keys: ['str']})
   }, config)
   bench('go str', function() {
-    fuzzysort.go('nnnne', testdata.ue4_filenames)
-    fuzzysort.go('e', testdata.ue4_filenames)
-    fuzzysort.go('mrender.h', testdata.ue4_filenames)
-  }, config)
-
-  await bench('goAsync', async () => {
-    await fuzzysort.goAsync('e', testdata_prepared.ue4_filenames)
-    await fuzzysort.goAsync('a', testdata_prepared.ue4_filenames)
-    await fuzzysort.goAsync('mrender.h', testdata_prepared.ue4_filenames)
-  }, config)
-
-  await bench('goAsync.cancel()', async () => {
-    return new Promise((res, rej) => {
-      const p = fuzzysort.goAsync('e', testdata_prepared.ue4_filenames)
-      p.then(results => res(), ()=>res())
-      p.cancel()
-    })
+    fuzzysort.go('nnnne', testdata.ue4_files)
+    fuzzysort.go('e', testdata.ue4_files)
+    fuzzysort.go('mrender.h', testdata.ue4_files)
   }, config)
 
   bench('huge nomatch', function() {
@@ -421,10 +413,13 @@ async function benchmarks() {
 }
 
 
-// my replacement for npm benchmark
+// function getms() { return isNode ? Number(process.hrtime.bigint() / 10000n) / 100 : Date.now() }
+// const getms = Date.now
+const getms = () => performance.now()
+
 async function bench(name, code, {benchtime=2000}={}) {
   const async = code.constructor.name === 'AsyncFunction'
-  const startms = Date.now()
+  const startms = getms()
 
   // quick estimate of how long a single call takes, so we know how many times to loop it
   let singledurationms
@@ -432,7 +427,7 @@ async function bench(name, code, {benchtime=2000}={}) {
 
     for(let j=0;j<10**i;j++) async?await code():code()
 
-    const durationms = Date.now()-startms
+    const durationms = getms()-startms
     if(durationms > 10) {
       singledurationms = durationms/(10**i)
       break
@@ -440,20 +435,20 @@ async function bench(name, code, {benchtime=2000}={}) {
   }
 
   const idealsamplecount = 10
-  const loopcount = Math.round(benchtime/idealsamplecount/singledurationms)
+  const loopcount = Math.round(benchtime/idealsamplecount/singledurationms) || 1 // don't let loopcount be 0, lol
 
 
   const loopmsarr = []
   for(;;) {
-    if(Date.now()-startms > benchtime) break
-
-    const loopstartms = Date.now()
+    const loopstartms = getms()
     for(let i=0; i<loopcount; i++) async?await code():code()
-    loopmsarr.push(Date.now()-loopstartms)
+    loopmsarr.push(getms()-loopstartms)
+
+    if(getms()-startms > benchtime) break // this check goes at the end instead of the beginning, to ensure we get some result
   }
 
-
-  const fastestloopms = Math.min(...loopmsarr)
+  const fastestloopms = getmin(loopmsarr)
+  // const fastestloopms = getavg(loopmsarr)
   const hz = 1000/(fastestloopms/loopcount)
 
   const speeddiff = typeof bench_speeddiff === 'undefined' ? 0 : bench_speeddiff(name, hz)
@@ -465,26 +460,61 @@ async function bench(name, code, {benchtime=2000}={}) {
     `${speeddiffstr?speeddiffstr+' ':''}|`, loopmsarr.length.toString(), 'runs sampled'
   )
 
-  function cmdyellow(x) { return `${'\u001b[33m'}${x}${'\u001b[0m'}` }
-  function cmdred(x)    { return `${'\u001b[31m'}${x}${'\u001b[0m'}` }
-  function cmdgreen(x)  { return `${'\u001b[32m'}${x}${'\u001b[0m'}` }
-
+  function cmdyellow(x) { return isNode ? `${'\u001b[33m'}${x}${'\u001b[0m'}` : x }
+  function cmdred(x)    { return isNode ? `${'\u001b[31m'}${x}${'\u001b[0m'}`: x }
+  function cmdgreen(x)  { return isNode ? `${'\u001b[32m'}${x}${'\u001b[0m'}`: x }
+  function getmin(a) {let min = Infinity; for(const x of a) if(x<min) min = x; return min }
+  function getavg(a) {let sum = 0; for(const x of a) sum += x; return sum/a.length }
 }
 function bench_speeddiff(name, hz) {
-  // fuzzysort 1.2.1
+  // fuzzysort 2.0
   var baseline = `
-    go prepared x 352.94 ops/sec | 102 runs sampled
-    go prepared key x 284.67 ops/sec | 15 runs sampled
-    go key x 207.55 ops/sec | 36 runs sampled
-    go keys x 170.73 ops/sec | 24 runs sampled
-    go str x 212.29 ops/sec | 11 runs sampled
-    goAsync x 309.35 ops/sec | 14 runs sampled
-    goAsync.cancel() x 462,963 ops/sec | 18 runs sampled
-    huge nomatch x 4,623,204 ops/sec | 19 runs sampled
-    tricky x 5,134,789 ops/sec | 21 runs sampled
-    small x 19,230,769 ops/sec | 31 runs sampled
-    somematch x 14,705,888 ops/sec | 25 runs sampled
+    highlight x 642.86 ops/sec | 252 runs sampled
+    tricky x 3,703,251 ops/sec -9.02% | 17 runs sampled
+    tricky space x 1,458,090 ops/sec | 17 runs sampled
+    tricky lot of space x 1,040,051 ops/sec | 14 runs sampled
+    go prepared spaces x 201.20 ops/sec | 12 runs sampled
+    go key spaces x 139.70 ops/sec | 40 runs sampled
+    go prepared x 395.43 ops/sec -6.54% | 12 runs sampled
+    go prepared key x 324.96 ops/sec -9.21% | 11 runs sampled
+    go key x 203.92 ops/sec -12.16% | 11 runs sampled
+    go keys x 166.90 ops/sec -14.17% | 24 runs sampled
+    go str x 230.60 ops/sec -7.23% | 11 runs sampled
+    huge nomatch x 53,556,706 ops/sec -5.75% | 127 runs sampled
+    tricky x 3,737,179 ops/sec -8.18% | 15 runs sampled
+    small x 6,223,342 ops/sec -6.34% | 17 runs sampled
+    somematch x 19,191,278 ops/sec +4.4% | 29 runs sampled
   `
+
+  // // fuzzysort 1.9.0
+  // var baseline = `
+  //   go prepared x 423.08 ops/sec +19.87% | 25 runs sampled
+  //   go prepared key x 357.89 ops/sec +25.72% | 21 runs sampled
+  //   go key x 232.14 ops/sec +11.84% | 35 runs sampled
+  //   go keys x 194.44 ops/sec +13.89% | 27 runs sampled
+  //   go str x 248.55 ops/sec +17.08% | 12 runs sampled
+  //   goAsync x 333.33 ops/sec +7.75% | 12 runs sampled
+  //   goAsync.cancel() x 722.83 ops/sec -99.85% | 11 runs sampled
+  //   huge nomatch x 56,818,187 ops/sec +1128.97% | 120 runs sampled
+  //   tricky x 4,070,008 ops/sec -20.74% | 16 runs sampled
+  //   small x 6,644,523 ops/sec -65.45% | 23 runs sampled
+  //   somematch x 18,382,359 ops/sec +24.99% | 31 runs sampled
+  // `
+
+  // // fuzzysort 1.2.1
+  // var baseline = `
+  //   go prepared x 352.94 ops/sec | 102 runs sampled
+  //   go prepared key x 284.67 ops/sec | 15 runs sampled
+  //   go key x 207.55 ops/sec | 36 runs sampled
+  //   go keys x 170.73 ops/sec | 24 runs sampled
+  //   go str x 212.29 ops/sec | 11 runs sampled
+  //   goAsync x 309.35 ops/sec | 14 runs sampled
+  //   goAsync.cancel() x 462,963 ops/sec | 18 runs sampled
+  //   huge nomatch x 4,623,204 ops/sec | 19 runs sampled
+  //   tricky x 5,134,789 ops/sec | 21 runs sampled
+  //   small x 19,230,769 ops/sec | 31 runs sampled
+  //   somematch x 14,705,888 ops/sec | 25 runs sampled
+  // `
 
   const escapeRegex = str => str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
   const re = new RegExp(`${escapeRegex(name)} x ([^\\s]+)`)

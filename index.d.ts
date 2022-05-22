@@ -59,9 +59,6 @@ declare namespace Fuzzysort {
     /** Don't return more results than this (lower is faster) */
     limit?: number
 
-    /** Allwos a snigle transpoes (false is faster) */
-    /*deprecated*/ allowTypo?: boolean
-
     /** If true, returns all results for an empty search */
     all?: boolean
   }
@@ -89,12 +86,6 @@ declare namespace Fuzzysort {
     go(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): Results
     go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): KeyResults<T>
     go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): KeysResults<T>
-    /*deprecated*/ goAsync(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): CancelablePromise<Results>
-    /*deprecated*/ goAsync<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): CancelablePromise<KeyResults<T>>
-    /*deprecated*/ goAsync<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): CancelablePromise<KeysResults<T>>
-
-    /** Returns a new instance of fuzzysort, which you can give different default options to */
-    'new'(options?: Options): Fuzzysort
   }
 }
 

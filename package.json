@@ -3,10 +3,13 @@
   "version": "1.9.0",
   "description": "Fast SublimeText-like fuzzy search for JavaScript",
   "keywords": [
+    "fuzzy search",
     "fuzzy",
     "search",
     "filter",
     "javascript",
+    "node",
+    "fast",
     "sublime"
   ],
   "author": "farzher",

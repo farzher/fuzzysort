@@ -1,165 +1,87 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="UTF-8">
-</head>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">
+<!DOCTYPE html> <head> <meta charset="UTF-8"> </head>
+
+
+<link rel="stylesheet" href="https://farzher.com/assets/bootstrap4.css">
+<link rel="stylesheet" href="https://farzher.com/assets/farzher.css">
 <style>
-  b {color: #dc3545!important}
-  html {overflow-y: scroll;}
+  b { color: #dc3545; }
+  html { overflow-y: scroll; }
 </style>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.4/platform.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+
+
 <script src="./fuzzysort.js"></script>
 <script src="./testdata.js"></script>
 <script src="./test.js"></script>
+<script src="https://unpkg.com/vue@3.2.35/dist/vue.global.prod.js"></script>
 
-<div class="jumbotron" style="background:none">
+
+
+<div id="vue" class="jumbotron" style="background:none">
   <div class="container">
-    <div id="async-buttons"></div><br>
-    <div id="buttons"></div><br>
-    <input id="input" autofocus style="width:300px" placeholder="ue4_filenames" />
-    <div id="results"></div>
+
+    <!-- testdatakeys -->
+    <div class="btn-group">
+      <label v-for="key of testdatakeys" class="btn btn-outline-secondary" :class="{active: key===testdatakey}">
+        <input type="radio" @change="search" style="display:none" v-model="testdatakey" :value="key"> {{key}}
+      </label>
+    </div>
+    <br> <br>
+
+    <!-- input -->
+    <div class="my-input-div" style="width:100%">
+      <input id="input" class="my-input" autofocus style="width:100%" v-model="input" :placeholder="testdatakey" :data-empty="!input" @input="search" />
+      <hr class="my-input-hr">
+    </div>
+
+    <!-- results -->
+    <div id="results">
+      <p v-if="results.length">{{results.total}} matches in {{duration}}ms</p>
+      <ul style="list-style:none">
+        <li v-for="result of results" v-html="renderResult(result)"></li>
+      </ul>
+    </div>
   </div>
 </div>
 
-<script>
-  ;(function() {
-    const $input = $('#input')
-    const $results = $('#results')
-    const testdatakeys = Object.keys(testdata_prepared)
-    var testdatakey = 'ue4_filenames'
-    var searchMode = 'Ludicrous Mode'
-    var cache = {}
-    const cacheChars = 'abcdefghijklmnopqrstuvwxyz'
-    var promise, cachePromise, cacheCanceled, startms
 
-    cacheNextLevel()
 
-    function getSearchLower() { return $input.val().toLowerCase() }
+<script>;(function() {
+  var vue = window.vue = Vue.createApp({
 
-    function search() {
-      $input.focus()
-      const inputValue = getSearchLower()
+    data() {
+      return {
+        testdatakeys : Object.keys(testdata_prepared),
+        testdatakey  : 'ue4_files',
 
-      if(cachePromise) { cachePromise.cancel() }; cacheCanceled = true
-
-      if(searchMode==='Ludicrous Mode') {
-        startms = Date.now()
-        if(cache[testdatakey]&&cache[testdatakey][inputValue]) {
-          renderCache(cache[testdatakey][inputValue])
-          cacheNextLevel()
-        } else {
-          renderResults(fuzzysort.go(inputValue, testdata_prepared[testdatakey]))
-          cacheNextLevel()
-        }
-
-      } else if(searchMode === 'Async') {
-        if(promise) promise.cancel()
-
-        startms = Date.now()
-        promise = fuzzysort.goAsync(inputValue, testdata_prepared[testdatakey])
-        promise.then(renderResults, err=>console.log(err))
-
-      } else { // Sync
-        startms = Date.now()
-        renderResults(fuzzysort.go(inputValue, testdata_prepared[testdatakey]))
+        input        : '',
+        results      : [],
+        duration     : 0,
       }
-    }
+    },
 
-    function cacheNextLevel(nextIndex=0) {
-      setTimeout(function() {
-        if(nextIndex >= cacheChars.length+testdatakeys.length) return
+    methods: {
+      renderResult: result => `${formatnumber(Math.abs(result.score))} - ${fuzzysort.highlight(result)}`,
+      search() {
+        document.getElementById('input').focus()
 
-        const inputValue = getSearchLower()
-        var nextInputValue
-        var nextdatakey
-        if(nextIndex >= cacheChars.length) {
-          nextInputValue = inputValue
-          nextdatakey = testdatakeys[nextIndex - cacheChars.length]
-        } else {
-          nextInputValue = inputValue+cacheChars[nextIndex]
-          nextdatakey = testdatakey
-        }
+        const search = vue.input.toLowerCase()
 
-        const isCached = cache[nextdatakey]&&cache[nextdatakey][nextInputValue]
-        if(isCached) return cacheNextLevel(nextIndex + 1)
+        const startms = getms()
+        vue.results = fuzzysort.go(search, testdata_prepared[vue.testdatakey])
+        vue.duration = formatnumber(getms()-startms)
+      },
+    },
 
-        if(nextIndex===0) cacheCanceled = false
-        cachePromise = fuzzysort.goAsync(nextInputValue, testdata_prepared[nextdatakey])
-        cachePromise.then(results => {
-          if(cache[nextdatakey]===undefined) cache[nextdatakey] = {}
-          cache[nextdatakey][nextInputValue] = {total:results.total, html:resultsToHtml(results)}
-          if(!cacheCanceled) cacheNextLevel(nextIndex + 1)
-        })
-      })
-    }
+  }).mount('#vue')
 
-    function resultsToHtml(results) {
-      var html = '<ul>'
-      for (var i = 0; i < results.length; i++) {
-        const result = results[i]
-        html += `<li>${result.score} - ${fuzzysort.highlight(result)}</li>`
-      }
-      html += '</ul>'
-      return html
-    }
-    function renderResults(results) {
-      const duration = Date.now() - startms
-      const header = `<p>${results.total} matches in ${duration}ms</p>`
-      const html = resultsToHtml(results)
+  function formatnumber(n) { return Math.floor(n*100)/100 }
+  function getms() { return performance.now() }
 
-      if(cache[testdatakey]===undefined) cache[testdatakey] = {}
-      cache[testdatakey][getSearchLower()] = {total:results.total, html}
+  document.body.onload = () => {
+    const $input = document.getElementById('input')
+    document.onkeyup   = e => { if(e.key == 'Escape') $input.select() }
+    document.onkeydown = e => $input.focus()
+    vue.search()
+  }
 
-      $results.html(header+html)
-    }
-    function renderCache(cached) {
-      const duration = Date.now() - startms
-      const header = `<p>${cached.total} matches in ${duration}ms <small class="text-muted"><i>cached</i></small></p>`
-      $results.html(header+cached.html)
-    }
-
-    // Run a search on input change
-      $input.on('input', search)
-    // Select input when escape pressed
-      document.onkeyup = (e) => {
-        if(e.keyCode === 27) $input.select()
-      }
-    // Focus input when any key pressed
-      document.onkeydown = (e) => {
-        $input.focus()
-      }
-
-    $('#async-buttons').html(`
-      <div class="btn-group" data-toggle="buttons">
-        ${['Async', 'Sync', 'Ludicrous Mode'].map(name => `
-          <label class="btn btn-secondary ${name===searchMode?'active':''}">
-            <input type="radio" name="searchMode" value="${name}"> ${name}
-          </label>
-        `).join('')}
-      </div>
-    `)
-    $(document).on('change', '[name="searchMode"]', function() {
-      searchMode = $(this).val()
-      setTimeout(search)
-    })
-
-    $('#buttons').html(`
-      <div class="btn-group" data-toggle="buttons">
-        ${testdatakeys.map(name => `
-          <label class="btn btn-secondary ${name===testdatakey?'active':''}">
-            <input type="radio" name="testdatakeys" value="${name}"> ${name}
-          </label>
-        `).join('')}
-      </div>
-    `)
-    $(document).on('change', '[name="testdatakeys"]', function() {
-      testdatakey = $(this).val()
-      $input.attr('placeholder', testdatakey)
-      setTimeout(search)
-    })
-  })()
-</script>
+})()</script>
