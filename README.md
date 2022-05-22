@@ -1,6 +1,6 @@
 # [fuzzysort](https://raw.github.com/farzher/fuzzysort/master/fuzzysort.js)
 
-Fast SublimeText-like fuzzy search for JavaScript.
+Fast, Tiny, & Good SublimeText-like fuzzy search for JavaScript.
 
 Sublime's fuzzy search is... sublime. I wish everything used it. So here's an open source js version.
 
@@ -8,18 +8,17 @@ Sublime's fuzzy search is... sublime. I wish everything used it. So here's an op
 
 ## [Demo](https://rawgit.com/farzher/fuzzysort/master/test.html)
 
+- **Fast** - **1ms** to search **13,000** files.
+- **Tiny** - 1 file, **3kb**. 0 dependencies.
+- **Good** - clean api + sorts results well (unlike others who shall not be named).
+
 https://rawgit.com/farzher/fuzzysort/master/test.html
 
-![](http://i.imgur.com/1M6ZrgS.gif)
+![](https://i.imgur.com/THbQ08n.gif)
 
+![](https://i.imgur.com/X1rzMGZ.png)
 
-![](http://i.imgur.com/kdZxnJ0.png)
-
-![](https://i.imgur.com/KOsl1HO.png)
-
-![](http://i.imgur.com/K8KMgcn.png)
-
-![](http://i.imgur.com/PFIp7WR.png)
+![](https://i.imgur.com/ha0YfNq.png)
 
 
 
@@ -31,12 +30,15 @@ npm install fuzzysort
 ```js
 const fuzzysort = require('fuzzysort')
 ```
+```js
+import fuzzysort from 'fuzzysort'
+```
 
 
 ## Installation Browser
 
 ```html
-<script src="https://rawgit.com/farzher/fuzzysort/master/fuzzysort.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuzzysort@1.9.0/fuzzysort.js"></script>
 ```
 
 
@@ -96,7 +98,6 @@ fuzzysort.highlight(result, (m, i) => <react key={i}>{m}</react>) // [<react key
 const result = fuzzysort.single('query', 'some string that contains my query.')
 // exact match returns a score of 0. lower is worse
 result.score // -59
-result.indexes // [29, 30, 31, 32, 33]
 result.target // some string that contains my query.
 result.obj // reference to your original obj when using options.key
 fuzzysort.highlight(result, '<b>', '</b>') // some string that contains my <b>query</b>.
@@ -147,20 +148,24 @@ fuzzysort.highlight(bestResult[1]) // 'Launch <b>Chr</b>ome'
 bestResult.obj.title // 'Google Chrome'
 ```
 
-Multiple instances, each with different default options.
-
-```js
-const strictsort = fuzzysort.new({threshold: -999})
-```
-
 
 ### Changelog
+
+#### v2.0.0
+- Added new behavior when your search contains spaces!
+- Added fuzzysort.min.js
+- Changed how indexes work to improve GC performance
+- Removed result.indexes & Added fuzzysort.indexes
+- Completely Removed `options.allowTypo`
+- Completely Removed `fuzzysort.goAsync`
+- Completely Removed `fuzzysort.new`
+- Rewrote the demo
 
 #### v1.9.0
 - Even faster
 - Added `options.all`
 - Deprecated/Removed `options.allowTypo`
-- Deprecated/Removed `goAsync`
+- Deprecated/Removed `fuzzysort.goAsync`
 - Changed scoring: boosted substring matches
 - Changed scoring: targets with too many beginning indexes lose points for being a bad target
 - Changed scoring: penality for not starting near the beginning

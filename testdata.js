@@ -47312,7 +47312,7 @@ var testdata = {
 "Ball 2D",
 "Cornflower Corbin Demo",
     ],
-    "english_58k" : [
+    "wordlist_58k" : [
         "aardvark",
         "aardwolf",
         "aaron",

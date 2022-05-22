@@ -9,9 +9,6 @@ declare namespace Fuzzysort {
 
     /** Your original target string */
     readonly target: string
-
-    /** Indexes of the matching target characters */
-    readonly indexes: number[]
   }
   interface Results extends ReadonlyArray<Result> {
     /** Total matches before limit */
@@ -48,10 +45,6 @@ declare namespace Fuzzysort {
     readonly target: string
   }
 
-  interface CancelablePromise<T> extends Promise<T> {
-    cancel(): void
-  }
-
   interface Options {
     /** Don't return matches worse than this (higher is faster) */
     threshold?: number
@@ -74,18 +67,23 @@ declare namespace Fuzzysort {
 
   interface Fuzzysort {
 
+    single(search: string, target: string | Prepared): Result | null
+
+    go(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): Results
+    go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): KeyResults<T>
+    go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): KeysResults<T>
+
+    highlight(result?: Result, highlightOpen?: string, highlightClose?: string): string | null
+    highlight<T>(result: Result, callback: HighlightCallback<T>): (string | T)[] | null
+
+    indexes(result: Result): ReadonlyArray<Number>
+    cleanup(): void
+
     /**
     * Help the algorithm go fast by providing prepared targets instead of raw strings
     */
     prepare(target: string): Prepared
 
-    highlight(result?: Result, highlightOpen?: string, highlightClose?: string): string | null
-    highlight<T>(result: Result, callback: HighlightCallback<T>): (string | T)[] | null
-
-    single(search: string, target: string | Prepared): Result | null
-    go(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): Results
-    go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): KeyResults<T>
-    go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): KeysResults<T>
   }
 }
 

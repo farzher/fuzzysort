@@ -23,6 +23,7 @@ if(isNode) var testdata = require('./testdata') // if we're running in the brows
 const config = {
   fuzzyoptions: {limit: 100/*limit 100 for browser because our rendering code is too slow to render more..*/},
   benchtime: 250,
+  // benchtime: 1000,
 }
 
 // fuzzysort.new
@@ -310,7 +311,9 @@ function testNomatch(target, ...searches) {
 function assertResultIntegrity(result) {
   if(result === null) return true
   var lastMatchI = null
-  for(let i=0; i<result.indexes.len; i++) { const matchI = result.indexes[i]
+  var indexes = fuzzysort.indexes(result)
+  for(let i=0; i<indexes.length; i++) { const matchI = indexes[i]
+  // for(let i=0; i<result.indexes.len; i++) { const matchI = result.indexes[i]
   // for(const matchI of result.indexes) {
     if(lastMatchI === null) {
       lastMatchI = matchI

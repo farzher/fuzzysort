@@ -16,7 +16,8 @@
   "license": "MIT",
   "main": "fuzzysort.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "min" : "uglifyjs fuzzysort.js -o fuzzysort.min.js -m -c --mangle-props keep_quoted --comments /farzher/"
   },
   "repository": {
     "type": "git",
