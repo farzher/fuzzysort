@@ -10,7 +10,7 @@ Sublime's fuzzy search is... sublime. I wish everything used it. So here's an op
 
 - **Fast** - **1ms** to search **13,000** files.
 - **Tiny** - 1 file, **3kb**. 0 dependencies.
-- **Good** - clean api + sorts results well (unlike others who shall not be named).
+- **Good** - clean api + sorts results well.
 
 https://rawgit.com/farzher/fuzzysort/master/test.html
 
@@ -38,7 +38,7 @@ import fuzzysort from 'fuzzysort'
 ## Installation Browser
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/fuzzysort@1.9.0/fuzzysort.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuzzysort@1.9.0/fuzzysort.min.js"></script>
 ```
 
 
@@ -155,8 +155,7 @@ bestResult.obj.title // 'Google Chrome'
 - Added new behavior when your search contains spaces!
 - Added fuzzysort.min.js
 - Now depends on ES6 features
-- Changed how indexes work to improve GC performance
-- Removed result.indexes & Added fuzzysort.indexes
+- Removed `result.indexes` & Added `fuzzysort.indexes` (improved GC performance)
 - Completely Removed `options.allowTypo`
 - Completely Removed `fuzzysort.goAsync`
 - Completely Removed `fuzzysort.new`

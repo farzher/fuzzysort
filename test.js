@@ -13,10 +13,10 @@ HOW TO WRITE TESTS:
   assert(true, 'my err msg') // must be truthy
 */
 
-
 // require / setup
 const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
-if(isNode) var fuzzysort = require('./fuzzysort') // if we're running in the browser we already have these
+const minjs = isNode ? !!process.argv[2] : false // test minified fuzzysort (if node and you pass any cmd argument)
+if(isNode) var fuzzysort = minjs ? require('./fuzzysort.min.js') : require('./fuzzysort') // if we're running in the browser we already have these
 if(isNode) var testdata = require('./testdata') // if we're running in the browser we already have these
 
 // config
