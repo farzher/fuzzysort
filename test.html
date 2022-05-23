@@ -64,10 +64,8 @@
       search() {
         document.getElementById('input').focus()
 
-        const search = vue.input.toLowerCase()
-
         const startms = getms()
-        vue.results = fuzzysort.go(search, testdata_prepared[vue.testdatakey])
+        vue.results = fuzzysort.go(vue.input.toLowerCase(), testdata_prepared[vue.testdatakey])
         vue.duration = formatnumber(getms()-startms)
       },
     },
