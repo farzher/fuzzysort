@@ -9,7 +9,7 @@ Sublime's fuzzy search is... sublime. I wish everything used it. So here's an op
 ## [Demo](https://rawgit.com/farzher/fuzzysort/master/test.html)
 
 - **Fast** - **1ms** to search **13,000** files.
-- **Tiny** - 1 file, **3kb**. 0 dependencies.
+- **Tiny** - 1 file, **5kb**. 0 dependencies.
 - **Good** - clean api + sorts results well.
 
 https://rawgit.com/farzher/fuzzysort/master/test.html
