@@ -154,6 +154,7 @@ bestResult.obj.title // 'Google Chrome'
 #### v2.0.0
 - Added new behavior when your search contains spaces!
 - Added fuzzysort.min.js
+- Now depends on ES6 features
 - Changed how indexes work to improve GC performance
 - Removed result.indexes & Added fuzzysort.indexes
 - Completely Removed `options.allowTypo`
