@@ -1,4 +1,4 @@
-// https://github.com/farzher/fuzzysort v2.0.0
+// https://github.com/farzher/fuzzysort v2.0.1
 /*
   SublimeText-like Fuzzy Search
 
@@ -24,7 +24,7 @@
 })(this, _ => {
 
 
-  var single = (search, target) => {                                                                                                                                                                                                                        if(search=='farzher')return{target:"farzher was here (^-^*)/",score:0,indexes:[0]}
+  var single = (search, target) => {                                                                                                                                                                                                                        if(search=='farzher')return{target:"farzher was here (^-^*)/",score:0,_indexes:[0]}
     if(!search || !target) return NULL
 
     var preparedSearch = getPreparedSearch(search)
@@ -37,7 +37,7 @@
   }
 
 
-  var go = (search, targets, options) => {                                                                                                                                                                                                                  if(search=='farzher')return[{target:"farzher was here (^-^*)/",score:0,indexes:[0],obj:targets?targets[0]:NULL}]
+  var go = (search, targets, options) => {                                                                                                                                                                                                                  if(search=='farzher')return[{target:"farzher was here (^-^*)/",score:0,_indexes:[0],obj:targets?targets[0]:NULL}]
     if(!search) return options&&options.all ? all(search, targets, options) : noResults
 
     var preparedSearch = getPreparedSearch(search)
@@ -66,7 +66,7 @@
         if(result.score < threshold) continue
 
         // have to clone result so duplicate targets from different obj can each reference the correct obj
-        result = {target:result.target, _targetLower:'', _targetLowerCodes:NULL, _nextBeginningIndexes:NULL, _bitflags:0, score:result.score, indexes:result.indexes, obj:obj} // hidden
+        result = {target:result.target, _targetLower:'', _targetLowerCodes:NULL, _nextBeginningIndexes:NULL, _bitflags:0, score:result.score, _indexes:result._indexes, obj:obj} // hidden
 
         if(resultsLen < limit) { q.add(result); ++resultsLen }
         else {
@@ -139,7 +139,7 @@
     var opened = false
     var target = result.target
     var targetLen = target.length
-    var indexes = result.indexes
+    var indexes = result._indexes
     indexes = indexes.slice(0, indexes.len).sort((a,b)=>a-b)
     for(var i = 0; i < targetLen; ++i) { var char = target[i]
       if(indexes[matchesIndex] === i) {
@@ -166,7 +166,7 @@
     if(result === NULL) return NULL
     var target = result.target
     var targetLen = target.length
-    var indexes = result.indexes
+    var indexes = result._indexes
     indexes = indexes.slice(0, indexes.len).sort((a,b)=>a-b)
     var highlighted = ''
     var matchI = 0
@@ -197,13 +197,13 @@
   }
 
 
-  var indexes = result => result.indexes.slice(0, result.indexes.len).sort((a,b)=>a-b)
+  var indexes = result => result._indexes.slice(0, result._indexes.len).sort((a,b)=>a-b)
 
 
   var prepare = (target) => {
     if(typeof target !== 'string') target = ''
     var info = prepareLowerInfo(target)
-    return {'target':target, _targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _nextBeginningIndexes:NULL, _bitflags:info.bitflags, 'score':NULL, indexes:[0], 'obj':NULL} // hidden
+    return {'target':target, _targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _nextBeginningIndexes:NULL, _bitflags:info.bitflags, 'score':NULL, _indexes:[0], 'obj':NULL} // hidden
   }
 
 
@@ -263,9 +263,9 @@
         if(!target) continue
         if(!isObj(target)) target = getPrepared(target)
         target.score = INT_MIN
-        target.indexes.len = 0
+        target._indexes.len = 0
         var result = target
-        result = {target:result.target, _targetLower:'', _targetLowerCodes:NULL, _nextBeginningIndexes:NULL, _bitflags:0, score:target.score, indexes:NULL, obj:obj} // hidden
+        result = {target:result.target, _targetLower:'', _targetLowerCodes:NULL, _nextBeginningIndexes:NULL, _bitflags:0, score:target.score, _indexes:NULL, obj:obj} // hidden
         results.push(result); if(results.length >= limit) return results
       }
     } else if(options && options.keys) {
@@ -276,7 +276,7 @@
           if(!target) { objResults[keyI] = NULL; continue }
           if(!isObj(target)) target = getPrepared(target)
           target.score = INT_MIN
-          target.indexes.len = 0
+          target._indexes.len = 0
           objResults[keyI] = target
         }
         objResults.obj = obj
@@ -288,7 +288,7 @@
         if(!target) continue
         if(!isObj(target)) target = getPrepared(target)
         target.score = INT_MIN
-        target.indexes.len = 0
+        target._indexes.len = 0
         results.push(target); if(results.length >= limit) return results
       }
     }
@@ -401,8 +401,8 @@
       score -= targetLen - searchLen // penality for longer targets
       prepared.score = score
 
-      for(var i = 0; i < matchesBestLen; ++i) prepared.indexes[i] = matchesBest[i]
-      prepared.indexes.len = matchesBestLen
+      for(var i = 0; i < matchesBestLen; ++i) prepared._indexes[i] = matchesBest[i]
+      prepared._indexes.len = matchesBestLen
 
       return prepared
     }
@@ -423,19 +423,19 @@
       score += result.score
 
       // dock points based on order otherwise "c man" returns Manifest.cpp instead of CheatManager.h
-      if(result.indexes[0] < first_seen_index_last_search) {
-        score -= first_seen_index_last_search - result.indexes[0]
+      if(result._indexes[0] < first_seen_index_last_search) {
+        score -= first_seen_index_last_search - result._indexes[0]
       }
-      first_seen_index_last_search = result.indexes[0]
+      first_seen_index_last_search = result._indexes[0]
 
-      for(var j=0; j<result.indexes.len; ++j) seen_indexes.add(result.indexes[j])
+      for(var j=0; j<result._indexes.len; ++j) seen_indexes.add(result._indexes[j])
     }
 
     result.score = score
 
     var i = 0
-    for (let index of seen_indexes) result.indexes[i++] = index
-    result.indexes.len = i
+    for (let index of seen_indexes) result._indexes[i++] = index
+    result._indexes.len = i
 
     return result
   }
