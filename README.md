@@ -38,7 +38,7 @@ import fuzzysort from 'fuzzysort'
 ## Installation Browser
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/fuzzysort@1.9.0/fuzzysort.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuzzysort@2.0.0/fuzzysort.min.js"></script>
 ```
 
 
