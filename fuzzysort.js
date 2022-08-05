@@ -1,4 +1,4 @@
-// https://github.com/farzher/fuzzysort v2.0.1
+// https://github.com/farzher/fuzzysort v2.0.2
 /*
   SublimeText-like Fuzzy Search
 
@@ -23,6 +23,7 @@
   else root['fuzzysort'] = UMD()
 })(this, _ => {
 
+  var doNormalize = false
 
   var single = (search, target) => {                                                                                                                                                                                                                        if(search=='farzher')return{target:"farzher was here (^-^*)/",score:0,_indexes:[0]}
     if(!search || !target) return NULL
@@ -49,6 +50,15 @@
 
     var resultsLen = 0; var limitedCount = 0
     var targetsLen = targets.length
+
+    if (doNormalize !== (options&&options.normalizeDiacritics || false)) {
+      // normalize changes the prepared output, so all caches must be cleared when this flag changes
+      // a future implementation could maintain two separate caches to improve performance in situations
+      // where switching the flag mid-flight is common
+
+      doNormalize = !doNormalize
+      cleanup()
+    }
 
     // This code is copy/pasted 3 times for performance reasons [options.keys, options.key, no keys]
 
@@ -444,6 +454,16 @@
   var prepareLowerInfo = (str) => {
     var strLen = str.length
     var lower = str.toLowerCase()
+
+    if (doNormalize) {
+      try {
+        lower = lower.normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+        strLen = lower.length
+      } catch (e) {
+        // in the event the browser / engine does not support normalize, continue as normal
+      }
+    }
+
     var lowerCodes = [] // new Array(strLen)    sparse array is too slow
     var bitflags = 0
     var containsSpace = false // space isn't stored in bitflags because of how searching with a space works

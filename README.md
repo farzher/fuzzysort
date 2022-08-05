@@ -77,6 +77,8 @@ fuzzysort.go(search, targets, {
   key: null, // For when targets are objects (see its example usage)
   keys: null, // For when targets are objects (see its example usage)
   scoreFn: null, // For use with `keys` (see its example usage)
+
+  normalizeDiacritics: false, // Allows unaccented characters to match accented characters (Ä should match A)
 })
 ```
 
@@ -150,6 +152,9 @@ bestResult.obj.title // 'Google Chrome'
 
 
 ### Changelog
+
+#### v2.0.2
+- Added normalizeDiacritics option to normalize accents, diacritics and ligatures for improved matching
 
 #### v2.0.0
 - Added new behavior when your search contains spaces!
