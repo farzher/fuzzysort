@@ -222,6 +222,31 @@ async function tests() {
 
     var results = fuzzysort.go('farzher', [{yes:'farzher', no:'no'}], {keys:['yes', 'no']})
     assert(!!results[0].obj)
+
+    // test normalization of diacritics
+    let normalizeStrings = [{"value": "Über"},{"value": "naïveté"},{"value": "ﬁnance"},{"value": "ÄKTA"}];
+    var normalizeTests = [
+      ['uber',true,1],
+      ['uber',false,0],
+      ['naive',true,1],
+      ['naivete',true,1],
+      ['naive',false,0],
+      ['finance',true,1],
+      ['finance',false,0],
+      ['über',false,1],
+      ['akta',false,0],
+      ['akta',true,1],
+    ]
+
+    for (let i = 0; i < normalizeTests.length; i++) {
+      let [term, normalizeDiacritics, resultCount] = normalizeTests[i]
+
+      let results = fuzzysort.go(term, normalizeStrings, {
+        key: 'value',
+        normalizeDiacritics
+      })
+      assert(results.length==resultCount, "Normalize failed for " + term + " / " + ((normalizeDiacritics) ? 'true' : 'false') + " / " + resultCount)
+    }
   }
 }
 

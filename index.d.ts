@@ -54,6 +54,9 @@ declare namespace Fuzzysort {
 
     /** If true, returns all results for an empty search */
     all?: boolean
+
+    /** If true, normalizes accents, diacritics, and ligatures in search text */
+    normalizeDiacritics?: boolean
   }
   interface KeyOptions extends Options {
     key: string | ReadonlyArray<string>
