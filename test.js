@@ -98,6 +98,19 @@ async function tests() {
     testSorting1('er.life360', 'device-tracker.life360_iphone_6', 'sendor.battery_life360_iphone_6')
   }
 
+  { // spaces destroy the score even when it's an exact substring https://github.com/farzher/fuzzysort/issues/99
+    assert(fuzzysort.single('this is exactly the same search and target', 'this is exactly the same search and target').score == 0)
+    test('The Amazing Spider-Man', 'The Amazing Spider-Man', 'The Amazing Spider', 'The Amazing', 'The')
+  }
+
+  { // order should matter when using spaces
+    testSorting1('c man', 'CheatManager.h', 'ManageCheats.h');
+    testSorting1('man c', 'ManageCheats.h', 'CheatManager.h');
+
+    testSorting1('man c', 'ThisManagesStuff.c', 'ThisCheatsStuff.m');
+    testSorting1('c man', 'ThisCheatsStuff.man', 'ThisManagesStuff.c');
+  }
+
 
   { // typos
     testNomatch('abc', 'acb')
@@ -156,7 +169,7 @@ async function tests() {
     test('noodle monster', 'nomon', null, 'qrs')
     test('noodle monster '.repeat(100), null, 'a')
     test('APPLES', 'app', 'l', 'E')
-    test('C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat', 'po', 'p', 'po ru', 'pr', 'prrun', 'ocket umble')
+    test('C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat', 'po', 'po ru', 'pr', 'prrun', 'ocket umble')
     test('123abc', '12', '1', 'a', null, 'cc')
     test('Thoug ht', 'ht', 'hh')
     test('az bx cyy y', 'az', 'ab', 'ay', 'ax', 'ayy')
@@ -470,24 +483,43 @@ async function bench(name, code, {benchtime=2000}={}) {
   function getavg(a) {let sum = 0; for(const x of a) sum += x; return sum/a.length }
 }
 function bench_speeddiff(name, hz) {
-  // fuzzysort 2.0
+  // fuzzysort 2.0.2
   var baseline = `
-    highlight x 642.86 ops/sec | 252 runs sampled
-    tricky x 3,703,251 ops/sec -9.02% | 17 runs sampled
-    tricky space x 1,458,090 ops/sec | 17 runs sampled
-    tricky lot of space x 1,040,051 ops/sec | 14 runs sampled
-    go prepared spaces x 201.20 ops/sec | 12 runs sampled
-    go key spaces x 139.70 ops/sec | 40 runs sampled
-    go prepared x 395.43 ops/sec -6.54% | 12 runs sampled
-    go prepared key x 324.96 ops/sec -9.21% | 11 runs sampled
-    go key x 203.92 ops/sec -12.16% | 11 runs sampled
-    go keys x 166.90 ops/sec -14.17% | 24 runs sampled
-    go str x 230.60 ops/sec -7.23% | 11 runs sampled
-    huge nomatch x 53,556,706 ops/sec -5.75% | 127 runs sampled
-    tricky x 3,737,179 ops/sec -8.18% | 15 runs sampled
-    small x 6,223,342 ops/sec -6.34% | 17 runs sampled
-    somematch x 19,191,278 ops/sec +4.4% | 29 runs sampled
+    highlight x 635.22 ops/sec -1.19% | 62 runs sampled
+    tricky x 3,032,593 ops/sec -18.11% | 13 runs sampled
+    tricky space x 942,114 ops/sec -35.39% | 14 runs sampled
+    tricky lot of space x 847,304 ops/sec -18.54% | 13 runs sampled
+    go prepared spaces x 193.00 ops/sec -4.08% | 9 runs sampled
+    go key spaces x 136.29 ops/sec -2.45% | 28 runs sampled
+    go prepared x 404.49 ops/sec +2.29% | 10 runs sampled
+    go prepared key x 335.53 ops/sec +3.25% | 10 runs sampled
+    go key x 219.76 ops/sec +7.76% | 9 runs sampled
+    go keys x 182.24 ops/sec +9.19% | 20 runs sampled
+    go str x 250.21 ops/sec +8.5% | 8 runs sampled
+    huge nomatch x 53,612,811 ops/sec +0.1% | 125 runs sampled
+    tricky x 3,208,152 ops/sec -13.37% | 12 runs sampled
+    small x 6,237,592 ops/sec +0.22% | 16 runs sampled
+    somematch x 17,516,025 ops/sec -8.73% | 26 runs sampled
   `
+
+  // // fuzzysort 2.0
+  // var baseline = `
+  //   highlight x 642.86 ops/sec | 252 runs sampled
+  //   tricky x 3,703,251 ops/sec -9.02% | 17 runs sampled
+  //   tricky space x 1,458,090 ops/sec | 17 runs sampled
+  //   tricky lot of space x 1,040,051 ops/sec | 14 runs sampled
+  //   go prepared spaces x 201.20 ops/sec | 12 runs sampled
+  //   go key spaces x 139.70 ops/sec | 40 runs sampled
+  //   go prepared x 395.43 ops/sec -6.54% | 12 runs sampled
+  //   go prepared key x 324.96 ops/sec -9.21% | 11 runs sampled
+  //   go key x 203.92 ops/sec -12.16% | 11 runs sampled
+  //   go keys x 166.90 ops/sec -14.17% | 24 runs sampled
+  //   go str x 230.60 ops/sec -7.23% | 11 runs sampled
+  //   huge nomatch x 53,556,706 ops/sec -5.75% | 127 runs sampled
+  //   tricky x 3,737,179 ops/sec -8.18% | 15 runs sampled
+  //   small x 6,223,342 ops/sec -6.34% | 17 runs sampled
+  //   somematch x 19,191,278 ops/sec +4.4% | 29 runs sampled
+  // `
 
   // // fuzzysort 1.9.0
   // var baseline = `

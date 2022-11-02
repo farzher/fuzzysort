@@ -1,6 +1,6 @@
 {
   "name": "fuzzysort",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Fast SublimeText-like fuzzy search for JavaScript",
   "keywords": [
     "fuzzy search",

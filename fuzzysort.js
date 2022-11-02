@@ -1,4 +1,4 @@
-// https://github.com/farzher/fuzzysort v2.0.1
+// https://github.com/farzher/fuzzysort v2.0.2
 /*
   SublimeText-like Fuzzy Search
 
@@ -297,8 +297,8 @@
   }
 
 
-  var algorithm = (preparedSearch, prepared) => {
-    if(preparedSearch.containsSpace) return algorithmSpaces(preparedSearch, prepared)
+  var algorithm = (preparedSearch, prepared, allowSpaces=false) => {
+    if(allowSpaces===false && preparedSearch.containsSpace) return algorithmSpaces(preparedSearch, prepared)
 
     var searchLower = preparedSearch._lower
     var searchLowerCodes = preparedSearch.lowerCodes
@@ -383,7 +383,7 @@
 
       score -= (12+unmatchedDistance) * extraMatchGroupCount // penality for more groups
 
-      if(matchesBest[0] !== 0) score -= matchesBest[0]*10 // penality for not starting near the beginning
+      if(matchesBest[0] !== 0) score -= matchesBest[0]*matchesBest[0]*.2 // penality for not starting near the beginning
 
       if(!successStrict) {
         score *= 1000
@@ -395,8 +395,8 @@
         if(uniqueBeginningIndexes > 24) score *= (uniqueBeginningIndexes-24)*10 // quite arbitrary numbers here ...
       }
 
-      if(isSubstring)          score /= 10 // bonus for being a full substring
-      if(isSubstringBeginning) score /= 10 // bonus for substring starting on a beginningIndex
+      if(isSubstring)          score /= 1+searchLen*searchLen*1 // bonus for being a full substring
+      if(isSubstringBeginning) score /= 1+searchLen*searchLen*1 // bonus for substring starting on a beginningIndex
 
       score -= targetLen - searchLen // penality for longer targets
       prepared.score = score
@@ -429,6 +429,12 @@
       first_seen_index_last_search = result._indexes[0]
 
       for(var j=0; j<result._indexes.len; ++j) seen_indexes.add(result._indexes[j])
+    }
+
+    // allows a search with spaces that's an exact substring to score well
+    var allowSpacesResult = algorithm(preparedSearch, target, allowSpaces=true)
+    if(allowSpacesResult !== NULL && allowSpacesResult.score > score) {
+      return allowSpacesResult
     }
 
     result.score = score
