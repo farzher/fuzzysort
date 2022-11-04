@@ -1,4 +1,4 @@
-// https://github.com/farzher/fuzzysort v2.0.2
+// https://github.com/farzher/fuzzysort v2.0.3
 /*
   SublimeText-like Fuzzy Search
 
@@ -432,7 +432,7 @@
     }
 
     // allows a search with spaces that's an exact substring to score well
-    var allowSpacesResult = algorithm(preparedSearch, target, allowSpaces=true)
+    var allowSpacesResult = algorithm(preparedSearch, target, /*allowSpaces=*/true)
     if(allowSpacesResult !== NULL && allowSpacesResult.score > score) {
       return allowSpacesResult
     }
