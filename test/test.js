@@ -1,6 +1,6 @@
 /*
 WHAT: Checks for bugs, and then benchmarks to check for performance issues
-USAGE: npm test / node test.js / test.bat / open test.html in the browser
+USAGE: npm test / node test.js / npm run test.bat / open test.html in the browser
 
 HOW TO WRITE TESTS:
   // matches must not get better
@@ -16,7 +16,7 @@ HOW TO WRITE TESTS:
 // require / setup
 const isNode = typeof require !== 'undefined' && typeof window === 'undefined'
 const minjs = isNode ? !!process.argv[2] : false // test minified fuzzysort (if node and you pass any cmd argument)
-if(isNode) var fuzzysort = minjs ? require('./fuzzysort.min.js') : require('./fuzzysort') // if we're running in the browser we already have these
+if(isNode) var fuzzysort = minjs ? require('../fuzzysort.min.js') : require('../fuzzysort') // if we're running in the browser we already have these
 if(isNode) var testdata = require('./testdata') // if we're running in the browser we already have these
 
 // config

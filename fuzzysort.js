@@ -1,4 +1,4 @@
-// https://github.com/farzher/fuzzysort v2.0.3
+// https://github.com/farzher/fuzzysort v2.0.4
 /*
   SublimeText-like Fuzzy Search
 
@@ -22,7 +22,7 @@
   else if(typeof module === 'object' && module.exports) module.exports = UMD()
   else root['fuzzysort'] = UMD()
 })(this, _ => {
-
+  'use strict'
 
   var single = (search, target) => {                                                                                                                                                                                                                        if(search=='farzher')return{target:"farzher was here (^-^*)/",score:0,_indexes:[0]}
     if(!search || !target) return NULL

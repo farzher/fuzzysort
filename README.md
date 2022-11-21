@@ -6,13 +6,13 @@ Sublime's fuzzy search is... sublime. I wish everything used it. So here's an op
 
 
 
-## [Demo](https://rawgit.com/farzher/fuzzysort/master/test.html)
+## [Demo](https://rawgit.com/farzher/fuzzysort/master/test/test.html)
 
 - **Fast** - **1ms** to search **13,000** files.
 - **Tiny** - 1 file, **5kb**. 0 dependencies.
 - **Good** - clean api + sorts results well.
 
-https://rawgit.com/farzher/fuzzysort/master/test.html
+https://rawgit.com/farzher/fuzzysort/master/test/test.html
 
 ![](https://i.imgur.com/THbQ08n.gif)
 
@@ -38,7 +38,7 @@ import fuzzysort from 'fuzzysort'
 ## Installation Browser
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/fuzzysort@2.0.1/fuzzysort.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuzzysort@2.0.4/fuzzysort.min.js"></script>
 ```
 
 
