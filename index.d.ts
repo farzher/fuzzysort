@@ -60,7 +60,7 @@ declare namespace Fuzzysort {
   }
   interface KeysOptions<T> extends Options {
     keys: ReadonlyArray<string | ReadonlyArray<string>>
-    scoreFn?: (keysResult:ReadonlyArray<KeyResult<T>>) => number
+    scoreFn?: (keysResult:ReadonlyArray<KeyResult<T>>) => number | null
   }
 
   interface HighlightCallback<T> { (match: string, index: number): T }
