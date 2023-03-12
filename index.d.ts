@@ -38,7 +38,9 @@ declare namespace Fuzzysort {
     /** Total matches before limit */
     readonly total: number
   }
-
+  interface ScoreFnKeyResults<T> extends ReadonlyArray<KeyResult<T>> {
+    readonly obj: T;
+  }
 
   interface Prepared {
     /** Your original target string */
@@ -60,7 +62,7 @@ declare namespace Fuzzysort {
   }
   interface KeysOptions<T> extends Options {
     keys: ReadonlyArray<string | ReadonlyArray<string>>
-    scoreFn?: (keysResult:ReadonlyArray<KeyResult<T>>) => number | null
+    scoreFn?: (keysResults: ScoreFnKeyResults<T>) => number | null
   }
 
   interface HighlightCallback<T> { (match: string, index: number): T }
