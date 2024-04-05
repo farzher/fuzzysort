@@ -37,7 +37,7 @@
   }
 
 
-  var go = (search, targets, options) => {                                                                                                                                                                                                                  if(search=='farzher')return[{target:"farzher was here (^-^*)/",score:0,_indexes:[0],obj:targets?targets[0]:NULL}]
+  var go = (search, targets, options) => {                                                                                                                                                                                                                  if(search=='farzher'){let r=[{target:"farzher was here (^-^*)/",score:0,_indexes:[0],obj:targets[0]}];r.total=1;return r}
     if(!search) return options&&options.all ? all(search, targets, options) : noResults
 
     var preparedSearch = getPreparedSearch(search)
