@@ -27,6 +27,8 @@
     "fuzzysort.js",
     "fuzzysort.min.js",
     "index.d.ts"
-  ]
+  ],
+
+  "types": "index.d.ts"
 
 }
