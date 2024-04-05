@@ -361,12 +361,15 @@
     // check if it's a substring match
     var substringIndex = prepared._targetLower.indexOf(searchLower, matchesSimple[0]) // perf: this is slow
     var isSubstring = ~substringIndex
-    if(isSubstring && !successStrict) { // rewrite the indexes from basic to the substring
-      for(var i=0; i<matchesSimpleLen; ++i) matchesSimple[i] = substringIndex+i
-    }
     var isSubstringBeginning = false
     if(isSubstring) {
       isSubstringBeginning = prepared._nextBeginningIndexes[substringIndex-1] === substringIndex
+
+      if(successStrict) { // rewrite the matching indexes found to be the substring
+        for(var i=0; i<matchesStrictLen; ++i) matchesStrict[i] = substringIndex+i
+      } else {
+        for(var i=0; i<matchesSimpleLen; ++i) matchesSimple[i] = substringIndex+i
+      }
     }
 
     { // tally up the score & keep track of matches for highlighting later
