@@ -260,7 +260,7 @@
     if(options && options.key) {
       for(var i=0;i<targets.length;i++) { var obj = targets[i]
         var target = getValue(obj, options.key)
-        if(!target) continue
+        if(target == NULL) continue
         if(!isObj(target)) target = getPrepared(target)
         target.score = INT_MIN
         target._indexes.len = 0
@@ -273,7 +273,7 @@
         var objResults = new Array(options.keys.length)
         for (var keyI = options.keys.length - 1; keyI >= 0; --keyI) {
           var target = getValue(obj, options.keys[keyI])
-          if(!target) { objResults[keyI] = NULL; continue }
+          if(target == NULL) { objResults[keyI] = NULL; continue }
           if(!isObj(target)) target = getPrepared(target)
           target.score = INT_MIN
           target._indexes.len = 0
@@ -285,7 +285,7 @@
       }
     } else {
       for(var i=0;i<targets.length;i++) { var target = targets[i]
-        if(!target) continue
+        if(target == NULL) continue
         if(!isObj(target)) target = getPrepared(target)
         target.score = INT_MIN
         target._indexes.len = 0
