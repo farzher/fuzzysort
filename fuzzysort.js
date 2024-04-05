@@ -81,6 +81,7 @@
       var keys = options.keys
       var keysLen = keys.length
       for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
+        var hasAtLeast1Match = false
         var objResults = new Array(keysLen)
         for (var keyI = 0; keyI < keysLen; ++keyI) {
           var key = keys[keyI]
@@ -90,10 +91,14 @@
 
           if((searchBitflags & target._bitflags) !== searchBitflags) objResults[keyI] = NULL
           else objResults[keyI] = algorithm(preparedSearch, target)
+
+          if(objResults[keyI] !== NULL) hasAtLeast1Match = true
         }
+        if(!hasAtLeast1Match) continue // no matches found in any of the keys. don't call scoreFn
         objResults.obj = obj // before scoreFn so scoreFn can use it
         var score = scoreFn(objResults)
-        if(score === NULL) continue
+        // we have == here, instaed of ===. since scoreFn can be user defined, if they return undefined it should count as null
+        if(score == NULL) continue
         if(score < threshold) continue
         objResults.score = score
         if(resultsLen < limit) { q.add(objResults); ++resultsLen }
