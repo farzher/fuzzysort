@@ -324,7 +324,7 @@ function testNomatch(target, ...searches) {
 function assertResultIntegrity(result) {
   if(result === null) return true
   var lastMatchI = null
-  var indexes = fuzzysort.indexes(result)
+  var indexes = result.indexes
   for(let i=0; i<indexes.length; i++) { const matchI = indexes[i]
   // for(let i=0; i<result.indexes.len; i++) { const matchI = result.indexes[i]
   // for(const matchI of result.indexes) {

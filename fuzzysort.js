@@ -66,7 +66,7 @@
         if(result.score < threshold) continue
 
         // have to clone result so duplicate targets from different obj can each reference the correct obj
-        result = {target:result.target, _targetLower:'', _targetLowerCodes:NULL, _nextBeginningIndexes:NULL, _bitflags:0, score:result.score, _indexes:result._indexes, obj:obj} // hidden
+        result = new_result(result.target, {score:result.score, _indexes:result._indexes, obj})
 
         if(resultsLen < limit) { q.add(result); ++resultsLen }
         else {
@@ -202,13 +202,12 @@
   }
 
 
-  var indexes = result => result._indexes.slice(0, result._indexes.len).sort((a,b)=>a-b)
 
 
   var prepare = (target) => {
     if(typeof target !== 'string') target = ''
     var info = prepareLowerInfo(target)
-    return {'target':target, _targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _nextBeginningIndexes:NULL, _bitflags:info.bitflags, 'score':NULL, _indexes:[0], 'obj':NULL} // hidden
+    return new_result(target, {_targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _bitflags:info.bitflags})
   }
 
 
@@ -216,6 +215,24 @@
   // Below this point is only internal code
   // Below this point is only internal code
   // Below this point is only internal code
+
+  var ResultPrototype = {
+    get indexes() { return this._indexes.slice(0, this._indexes.len).sort((a,b)=>a-b) },
+    set indexes(indexes) { return this._indexes = indexes },
+  }
+
+  var new_result = (target, options) => {
+    const result = Object.create(ResultPrototype)
+    result['target']             = target
+    result['score']              = options.score ?? NULL
+    result['obj']                = options.obj ?? NULL
+    result._indexes              = options._indexes ?? []
+    result._targetLower          = options._targetLower ?? ''
+    result._targetLowerCodes     = options._targetLowerCodes ?? NULL
+    result._nextBeginningIndexes = options._nextBeginningIndexes ?? NULL
+    result._bitflags             = options._bitflags ?? 0
+    return result
+  }
 
 
   var prepareSearch = (search) => {
@@ -270,7 +287,7 @@
         target.score = INT_MIN
         target._indexes.len = 0
         var result = target
-        result = {target:result.target, _targetLower:'', _targetLowerCodes:NULL, _nextBeginningIndexes:NULL, _bitflags:0, score:target.score, _indexes:NULL, obj:obj} // hidden
+        result = new_result(result.target, {score:target.score, obj})
         results.push(result); if(results.length >= limit) return results
       }
     } else if(options && options.keys) {
@@ -581,7 +598,7 @@
 
 
   // fuzzysort is written this way for minification. all names are mangeled unless quoted
-  return {'single':single, 'go':go, 'highlight':highlight, 'prepare':prepare, 'indexes':indexes, 'cleanup':cleanup}
+  return {'single':single, 'go':go, 'highlight':highlight, 'prepare':prepare, 'cleanup':cleanup}
 }) // UMD
 
 // TODO: (feature) frecency
