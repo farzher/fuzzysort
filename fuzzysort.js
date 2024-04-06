@@ -305,14 +305,14 @@
   var algorithm = (preparedSearch, prepared, allowSpaces=false) => {
     if(allowSpaces===false && preparedSearch.containsSpace) return algorithmSpaces(preparedSearch, prepared)
 
-    var searchLower = preparedSearch._lower
+    var searchLower      = preparedSearch._lower
     var searchLowerCodes = preparedSearch.lowerCodes
-    var searchLowerCode = searchLowerCodes[0]
+    var searchLowerCode  = searchLowerCodes[0]
     var targetLowerCodes = prepared._targetLowerCodes
-    var searchLen = searchLowerCodes.length
-    var targetLen = targetLowerCodes.length
-    var searchI = 0 // where we at
-    var targetI = 0 // where you at
+    var searchLen        = searchLowerCodes.length
+    var targetLen        = targetLowerCodes.length
+    var searchI          = 0 // where we at
+    var targetI          = 0 // where you at
     var matchesSimpleLen = 0
 
     // very basic fuzzy match; to remove non-matching targets ASAP!
