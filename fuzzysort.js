@@ -28,7 +28,7 @@
     if(!search || !target) return NULL
 
     var preparedSearch = getPreparedSearch(search)
-    if(!isObj(target)) target = getPrepared(target)
+    if(!isPrepared(target)) target = getPrepared(target)
 
     var searchBitflags = preparedSearch.bitflags
     if((searchBitflags & target._bitflags) !== searchBitflags) return NULL
@@ -58,7 +58,7 @@
       for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
         var target = getValue(obj, key)
         if(!target) continue
-        if(!isObj(target)) target = getPrepared(target)
+        if(!isPrepared(target)) target = getPrepared(target)
 
         if((searchBitflags & target._bitflags) !== searchBitflags) continue
         var result = algorithm(preparedSearch, target)
@@ -87,7 +87,7 @@
           var key = keys[keyI]
           var target = getValue(obj, key)
           if(!target) { objResults[keyI] = NULL; continue }
-          if(!isObj(target)) target = getPrepared(target)
+          if(!isPrepared(target)) target = getPrepared(target)
 
           if((searchBitflags & target._bitflags) !== searchBitflags) objResults[keyI] = NULL
           else objResults[keyI] = algorithm(preparedSearch, target)
@@ -112,7 +112,7 @@
     } else {
       for(var i = 0; i < targetsLen; ++i) { var target = targets[i]
         if(!target) continue
-        if(!isObj(target)) target = getPrepared(target)
+        if(!isPrepared(target)) target = getPrepared(target)
 
         if((searchBitflags & target._bitflags) !== searchBitflags) continue
         var result = algorithm(preparedSearch, target)
@@ -275,7 +275,7 @@
 
 
   var all = (search, targets, options) => {
-    var results = []; results.total = targets.length
+    var results = []; results.total = targets.length // this total can be wrong if some targets are skipped
 
     var limit = options && options.limit || INT_MAX
 
@@ -283,11 +283,8 @@
       for(var i=0;i<targets.length;i++) { var obj = targets[i]
         var target = getValue(obj, options.key)
         if(target == NULL) continue
-        if(!isObj(target)) target = getPrepared(target)
-        target.score = INT_MIN
-        target._indexes.len = 0
-        var result = target
-        result = new_result(result.target, {score:target.score, obj})
+        if(!isPrepared(target)) target = getPrepared(target)
+        var result = new_result(target.target, {score: target.score, obj: target.obj})
         results.push(result); if(results.length >= limit) return results
       }
     } else if(options && options.keys) {
@@ -296,7 +293,7 @@
         for (var keyI = options.keys.length - 1; keyI >= 0; --keyI) {
           var target = getValue(obj, options.keys[keyI])
           if(target == NULL) { objResults[keyI] = NULL; continue }
-          if(!isObj(target)) target = getPrepared(target)
+          if(!isPrepared(target)) target = getPrepared(target)
           target.score = INT_MIN
           target._indexes.len = 0
           objResults[keyI] = target
@@ -308,7 +305,7 @@
     } else {
       for(var i=0;i<targets.length;i++) { var target = targets[i]
         if(target == NULL) continue
-        if(!isObj(target)) target = getPrepared(target)
+        if(!isPrepared(target)) target = getPrepared(target)
         target.score = INT_MIN
         target._indexes.len = 0
         results.push(target); if(results.length >= limit) return results
@@ -585,7 +582,7 @@
     return obj
   }
 
-  var isObj = (x) => { return typeof x === 'object' } // faster as a function
+  var isPrepared = (x) => { return typeof x === 'object' && typeof x._bitflags === 'number' }
   // var INT_MAX = 9007199254740991; var INT_MIN = -INT_MAX
   var INT_MAX = Infinity; var INT_MIN = -INT_MAX
   var noResults = []; noResults.total = 0
