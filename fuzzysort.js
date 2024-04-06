@@ -364,16 +364,17 @@
     }
 
     // check if it's a substring match
-    var substringIndex = prepared._targetLower.indexOf(searchLower, matchesSimple[0]) // perf: this is slow
-    var isSubstring = ~substringIndex
-    var isSubstringBeginning = false
-    if(isSubstring) {
-      isSubstringBeginning = prepared._nextBeginningIndexes[substringIndex-1] === substringIndex
+    var substringIndex = searchLen <= 1 ? -1 : prepared._targetLower.indexOf(searchLower, matchesSimple[0]) // perf: this is slow
+    var isSubstring = !!~substringIndex
+    var isSubstringBeginning = !isSubstring ? false : isSubstringBeginning = prepared._nextBeginningIndexes[substringIndex-1] === substringIndex
 
-      if(successStrict) { // rewrite the matching indexes found to be the substring
-        for(var i=0; i<matchesStrictLen; ++i) matchesStrict[i] = substringIndex+i
-      } else {
-        for(var i=0; i<matchesSimpleLen; ++i) matchesSimple[i] = substringIndex+i
+    // if it's a substring match but not at a beginning index, let's try to find a substring starting at a beginning index for a better score
+    if(isSubstring && !isSubstringBeginning) {
+      for(var i=0; i<nextBeginningIndexes.length; i=nextBeginningIndexes[i]) {
+        if(i <= substringIndex) continue
+
+        for(var s=0; s<searchLen; s++) if(searchLowerCodes[s] !== prepared._targetLowerCodes[i+s]) break
+        if(s === searchLen) { substringIndex = i; break }
       }
     }
 
