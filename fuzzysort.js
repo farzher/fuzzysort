@@ -453,7 +453,7 @@
 
       // dock points based on order otherwise "c man" returns Manifest.cpp instead of CheatManager.h
       if(result._indexes[0] < first_seen_index_last_search) {
-        score -= first_seen_index_last_search - result._indexes[0]
+        score -= (first_seen_index_last_search - result._indexes[0]) * 2
       }
       first_seen_index_last_search = result._indexes[0]
 
