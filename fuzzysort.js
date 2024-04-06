@@ -50,7 +50,7 @@
     var resultsLen = 0; var limitedCount = 0
     var targetsLen = targets.length
 
-    // This code is copy/pasted 3 times for performance reasons [options.keys, options.key, no keys]
+    // This code is copy/pasted 3 times for performance reasons [options.key, options.keys, no keys]
 
     // options.key
     if(options && options.key) {
