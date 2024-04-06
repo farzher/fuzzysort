@@ -378,21 +378,38 @@
       }
     }
 
-    { // tally up the score & keep track of matches for highlighting later
-      if(successStrict) { var matchesBest = matchesStrict; var matchesBestLen = matchesStrictLen }
-      else { var matchesBest = matchesSimple; var matchesBestLen = matchesSimpleLen }
+    // tally up the score & keep track of matches for highlighting later
+    // if it's a simple match, we'll switch to a substring match if a substring exists
+    // if it's a strict match, we'll switch to a substring match only if that's a better score
+    if(!successStrict) {
+      if(isSubstring) for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
+      var matchesBest = matchesSimple
+      var score = calculateScore(matchesBest)
+    } else {
+      var matchesBest = matchesStrict
+      var score = calculateScore(matchesStrict)
+      if(isSubstring) {
+        for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
+        var scoreSubstr = calculateScore(matchesSimple)
+        if(scoreSubstr >= score) {
+          var matchesBest = matchesSimple
+          var score = scoreSubstr
+        }
+      }
+    }
 
+    function calculateScore(matches) {
       var score = 0
 
       var extraMatchGroupCount = 0
       for(var i = 1; i < searchLen; ++i) {
-        if(matchesBest[i] - matchesBest[i-1] !== 1) {score -= matchesBest[i]; ++extraMatchGroupCount}
+        if(matches[i] - matches[i-1] !== 1) {score -= matches[i]; ++extraMatchGroupCount}
       }
-      var unmatchedDistance = matchesBest[searchLen-1] - matchesBest[0] - (searchLen-1)
+      var unmatchedDistance = matches[searchLen-1] - matches[0] - (searchLen-1)
 
       score -= (12+unmatchedDistance) * extraMatchGroupCount // penality for more groups
 
-      if(matchesBest[0] !== 0) score -= matchesBest[0]*matchesBest[0]*.2 // penality for not starting near the beginning
+      if(matches[0] !== 0) score -= matches[0]*matches[0]*.2 // penality for not starting near the beginning
 
       if(!successStrict) {
         score *= 1000
@@ -408,13 +425,16 @@
       if(isSubstringBeginning) score /= 1+searchLen*searchLen*1 // bonus for substring starting on a beginningIndex
 
       score -= targetLen - searchLen // penality for longer targets
-      prepared.score = score
 
-      for(var i = 0; i < matchesBestLen; ++i) prepared._indexes[i] = matchesBest[i]
-      prepared._indexes.len = matchesBestLen
-
-      return prepared
+      return score
     }
+
+    prepared.score = score
+
+    for(var i = 0; i < searchLen; ++i) prepared._indexes[i] = matchesBest[i]
+    prepared._indexes.len = searchLen
+
+    return prepared
   }
   var algorithmSpaces = (preparedSearch, target) => {
     var seen_indexes = new Set()
