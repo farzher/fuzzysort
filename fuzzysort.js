@@ -573,6 +573,7 @@
   // prop = 'key1.key2'        10ms
   // prop = ['key1', 'key2']   27ms
   var getValue = (obj, prop) => {
+    if(typeof prop === 'function') return prop(obj)
     var tmp = obj[prop]; if(tmp !== undefined) return tmp
     var segs = prop
     if(!Array.isArray(prop)) segs = prop.split('.')
