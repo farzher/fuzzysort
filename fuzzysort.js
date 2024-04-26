@@ -457,11 +457,43 @@
 
     var first_seen_index_last_search = 0
     var searches = preparedSearch.spaceSearches
+    var changeslen = 0
+
+    // return _nextBeginningIndexes back to its normal state
+    function resetNextBeginningIndexes() {
+      for(let i=changeslen-1; i>=0; i--) target._nextBeginningIndexes[nextBeginningIndexesChanges[i*2 + 0]] = nextBeginningIndexesChanges[i*2 + 1]
+    }
+
     for(var i=0; i<searches.length; ++i) {
       var search = searches[i]
 
       result = algorithm(search, target)
-      if(result === NULL) return NULL
+      if(result === NULL) {resetNextBeginningIndexes(); return NULL}
+
+      // if not the last search, we need to mutate _nextBeginningIndexes for the next search
+      var isTheLastSearch = i === searches.length - 1
+      if(!isTheLastSearch) {
+        var indexes = result._indexes
+
+        var indexesIsConsecutiveSubstring = true
+        for(let i=0; i<indexes.len-1; i++) {
+          if(indexes[i+1] - indexes[i] !== 1) {
+            indexesIsConsecutiveSubstring = false; break;
+          }
+        }
+
+        if(indexesIsConsecutiveSubstring) {
+          var newBeginningIndex = indexes[indexes.len-1] + 1
+          var toReplace = target._nextBeginningIndexes[newBeginningIndex-1]
+          for(let i=newBeginningIndex-1; i>=0; i--) {
+            if(toReplace !== target._nextBeginningIndexes[i]) break
+            target._nextBeginningIndexes[i] = newBeginningIndex
+            nextBeginningIndexesChanges[changeslen*2 + 0] = i
+            nextBeginningIndexesChanges[changeslen*2 + 1] = toReplace
+            changeslen++
+          }
+        }
+      }
 
       score += result.score
 
@@ -473,6 +505,8 @@
 
       for(var j=0; j<result._indexes.len; ++j) seen_indexes.add(result._indexes[j])
     }
+
+    resetNextBeginningIndexes()
 
     // allows a search with spaces that's an exact substring to score well
     var allowSpacesResult = algorithm(preparedSearch, target, /*allowSpaces=*/true)
@@ -568,6 +602,7 @@
     if(max === INT_MIN) return NULL
     return max
   }
+  var nextBeginningIndexesChanges = [] // allows straw berry to match strawberry well, by modifying the end of a substring to be considered a beginning index for the rest of the search
 
   // prop = 'key'              2.5ms optimized for this case, seems to be about as fast as direct obj[prop]
   // prop = 'key1.key2'        10ms
