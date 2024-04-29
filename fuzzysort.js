@@ -80,23 +80,54 @@
       var scoreFn = options['scoreFn'] || defaultScoreFn
       var keys = options.keys
       var keysLen = keys.length
-      for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
-        var hasAtLeast1Match = false
-        var objResults = new Array(keysLen)
+      outer: for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
+
+        { // early out based on bitflags
+          var keysBitflags = 0
+          for (var keyI = 0; keyI < keysLen; ++keyI) {
+            var key = keys[keyI]
+            var target = getValue(obj, key)
+            if(!target) continue
+            if(!isPrepared(target)) target = getPrepared(target)
+
+            keysBitflags |= target._bitflags
+          }
+          if((searchBitflags & keysBitflags) !== searchBitflags) continue
+        }
+
+        if(containsSpace) for(let i=0; i<preparedSearch.spaceSearches.length; i++) keysSpacesBestScores[i] = -Infinity
+
         for (var keyI = 0; keyI < keysLen; ++keyI) {
           var key = keys[keyI]
           var target = getValue(obj, key)
-          if(!target) { objResults[keyI] = NULL; continue }
+          if(!target) { tmpResults[keyI] = NULL; continue }
           if(!isPrepared(target)) target = getPrepared(target)
 
-          if((searchBitflags & target._bitflags) !== searchBitflags) objResults[keyI] = NULL
-          else objResults[keyI] = algorithm(preparedSearch, target)
+          tmpResults[keyI] = algorithm(preparedSearch, target, /*allowSpaces=*/false, /*allowPartialMatch=*/containsSpace)
 
-          if(objResults[keyI] !== NULL) hasAtLeast1Match = true
+          if(containsSpace && tmpResults[keyI]) for(let i=0; i<preparedSearch.spaceSearches.length; i++) {
+            if(allowPartialMatchScores[i] > keysSpacesBestScores[i]) keysSpacesBestScores[i] = allowPartialMatchScores[i]
+          }
         }
-        if(!hasAtLeast1Match) continue // no matches found in any of the keys. don't call scoreFn
+
+        if(containsSpace) {
+          for(let i=0; i<preparedSearch.spaceSearches.length; i++) { if(keysSpacesBestScores[i] === -Infinity) continue outer }
+        } else {
+          var hasAtLeast1Match = false
+          for(let i=0; i < keysLen; i++) { if(tmpResults[keyI] !== NULL) { hasAtLeast1Match = true; break } }
+          if(!hasAtLeast1Match) continue
+        }
+
+        var objResults = new Array(keysLen)
+        for(let i=0; i < keysLen; i++) { objResults[i] = tmpResults[i] }
+
         objResults.obj = obj // before scoreFn so scoreFn can use it
-        var score = scoreFn(objResults)
+        if(containsSpace) {
+          var score = 0
+          for(let i=0; i<preparedSearch.spaceSearches.length; i++) score += keysSpacesBestScores[i]
+        } else {
+          var score = scoreFn(objResults)
+        }
         // we have == here, instaed of ===. since scoreFn can be user defined, if they return undefined it should count as null
         if(score == NULL) continue
         if(score < threshold) continue
@@ -224,13 +255,13 @@
   var new_result = (target, options) => {
     const result = Object.create(ResultPrototype)
     result['target']             = target
-    result['score']              = options.score ?? NULL
-    result['obj']                = options.obj ?? NULL
-    result._indexes              = options._indexes ?? []
-    result._targetLower          = options._targetLower ?? ''
-    result._targetLowerCodes     = options._targetLowerCodes ?? NULL
+    result['score']              = options.score                 ?? NULL
+    result['obj']                = options.obj                   ?? NULL
+    result._indexes              = options._indexes              ?? []
+    result._targetLower          = options._targetLower          ?? ''
+    result._targetLowerCodes     = options._targetLowerCodes     ?? NULL
     result._nextBeginningIndexes = options._nextBeginningIndexes ?? NULL
-    result._bitflags             = options._bitflags ?? 0
+    result._bitflags             = options._bitflags             ?? 0
     return result
   }
 
@@ -251,7 +282,7 @@
       }
     }
 
-    return {lowerCodes: info.lowerCodes, bitflags: info.bitflags, containsSpace: info.containsSpace, _lower: info._lower, spaceSearches: spaceSearches}
+    return {lowerCodes: info.lowerCodes, _lower: info._lower, containsSpace: info.containsSpace, bitflags: info.bitflags, spaceSearches: spaceSearches}
   }
 
 
@@ -316,8 +347,8 @@
   }
 
 
-  var algorithm = (preparedSearch, prepared, allowSpaces=false) => {
-    if(allowSpaces===false && preparedSearch.containsSpace) return algorithmSpaces(preparedSearch, prepared)
+  var algorithm = (preparedSearch, prepared, allowSpaces=false, allowPartialMatch=false) => {
+    if(allowSpaces===false && preparedSearch.containsSpace) return algorithmSpaces(preparedSearch, prepared, allowPartialMatch)
 
     var searchLower      = preparedSearch._lower
     var searchLowerCodes = preparedSearch.lowerCodes
@@ -450,7 +481,7 @@
 
     return prepared
   }
-  var algorithmSpaces = (preparedSearch, target) => {
+  var algorithmSpaces = (preparedSearch, target, allowPartialMatch) => {
     var seen_indexes = new Set()
     var score = 0
     var result = NULL
@@ -464,11 +495,18 @@
       for(let i=changeslen-1; i>=0; i--) target._nextBeginningIndexes[nextBeginningIndexesChanges[i*2 + 0]] = nextBeginningIndexesChanges[i*2 + 1]
     }
 
+    var hasAtLeast1Match = false
     for(var i=0; i<searches.length; ++i) {
+      allowPartialMatchScores[i] = -Infinity
       var search = searches[i]
 
       result = algorithm(search, target)
-      if(result === NULL) {resetNextBeginningIndexes(); return NULL}
+      if(allowPartialMatch) {
+        if(result === NULL) continue
+        hasAtLeast1Match = true
+      } else {
+        if(result === NULL) {resetNextBeginningIndexes(); return NULL}
+      }
 
       // if not the last search, we need to mutate _nextBeginningIndexes for the next search
       var isTheLastSearch = i === searches.length - 1
@@ -496,6 +534,7 @@
       }
 
       score += result.score
+      allowPartialMatchScores[i] = result.score
 
       // dock points based on order otherwise "c man" returns Manifest.cpp instead of CheatManager.h
       if(result._indexes[0] < first_seen_index_last_search) {
@@ -506,6 +545,8 @@
       for(var j=0; j<result._indexes.len; ++j) seen_indexes.add(result._indexes[j])
     }
 
+    if(allowPartialMatch && !hasAtLeast1Match) return NULL
+
     resetNextBeginningIndexes()
 
     // allows a search with spaces that's an exact substring to score well
@@ -514,6 +555,7 @@
       return allowSpacesResult
     }
 
+    if(allowPartialMatch) result = target
     result.score = score
 
     var i = 0
@@ -603,6 +645,9 @@
     return max
   }
   var nextBeginningIndexesChanges = [] // allows straw berry to match strawberry well, by modifying the end of a substring to be considered a beginning index for the rest of the search
+  var keysSpacesBestScores = []
+  var allowPartialMatchScores = []
+  var tmpResults = []
 
   // prop = 'key'              2.5ms optimized for this case, seems to be about as fast as direct obj[prop]
   // prop = 'key1.key2'        10ms
