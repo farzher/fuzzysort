@@ -230,8 +230,9 @@
   // Below this point is only internal code
 
   var ResultPrototype = {
-    get indexes() { return this._indexes.slice(0, this._indexes.len).sort((a,b)=>a-b) },
-    set indexes(indexes) { return this._indexes = indexes },
+    get ['indexes']() { return this._indexes.slice(0, this._indexes.len).sort((a,b)=>a-b) },
+    set ['indexes'](indexes) { return this._indexes = indexes },
+    ['highlight'](open, close) { return highlight(this, open, close) }
   }
 
   var new_result = (target, options) => {
@@ -658,7 +659,7 @@
 
 
   // fuzzysort is written this way for minification. all names are mangeled unless quoted
-  return {'single':single, 'go':go, 'highlight':highlight, 'prepare':prepare, 'cleanup':cleanup}
+  return {'single':single, 'go':go, 'prepare':prepare, 'cleanup':cleanup}
 }) // UMD
 
 // TODO: (feature) frecency
