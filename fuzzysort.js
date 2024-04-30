@@ -44,8 +44,8 @@
     var searchBitflags = preparedSearch.bitflags
     var containsSpace  = preparedSearch.containsSpace
 
-    var threshold = options&&options.threshold || INT_MIN
-    var limit     = options&&options['limit']  || INT_MAX // for some reason only limit breaks when minified
+    var threshold = -Math.abs(options&&options.threshold || INT_MIN)
+    var limit     = options&&options.limit || INT_MAX
 
     var resultsLen = 0; var limitedCount = 0
     var targetsLen = targets.length
