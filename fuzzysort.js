@@ -632,12 +632,13 @@
   var allowPartialMatchScores = []
   var tmpResults = []
 
-  // prop = 'key'              2.5ms optimized for this case, seems to be about as fast as direct obj[prop]
-  // prop = 'key1.key2'        10ms
-  // prop = ['key1', 'key2']   27ms
+  // prop = 'key'                  2.5ms optimized for this case, seems to be about as fast as direct obj[prop]
+  // prop = 'key1.key2'            10ms
+  // prop = ['key1', 'key2']       27ms
+  // prop = obj => obj.tags.join() ??ms
   var getValue = (obj, prop) => {
-    if(typeof prop === 'function') return prop(obj)
     var tmp = obj[prop]; if(tmp !== undefined) return tmp
+    if(typeof prop === 'function') return prop(obj) // this should run first. but that makes string props slower
     var segs = prop
     if(!Array.isArray(prop)) segs = prop.split('.')
     var len = segs.length
