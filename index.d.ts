@@ -1,4 +1,5 @@
 declare namespace Fuzzysort {
+
   interface Result {
     /**
     * Higher is better
@@ -9,6 +10,11 @@ declare namespace Fuzzysort {
 
     /** Your original target string */
     readonly target: string
+
+    highlight(highlightOpen?: string, highlightClose?: string): string
+    highlight<T>(callback: HighlightCallback<T>): (string | T)[]
+
+    indexes: ReadonlyArray<number>
   }
   interface Results extends ReadonlyArray<Result> {
     /** Total matches before limit */
@@ -19,20 +25,21 @@ declare namespace Fuzzysort {
     /** Your original object */
     readonly obj: T
   }
+  interface KeyResults<T> extends ReadonlyArray<KeyResult<T>> {
+    /** Total matches before limit */
+    readonly total: number
+  }
+
   interface KeysResult<T> extends ReadonlyArray<Result> {
     /**
     * Higher is better
     *
     * 0 is a perfect match; -1000 is a bad match
     */
-   readonly score: number
+    readonly score: number
 
     /** Your original object */
     readonly obj: T
-  }
-  interface KeyResults<T> extends ReadonlyArray<KeyResult<T>> {
-    /** Total matches before limit */
-    readonly total: number
   }
   interface KeysResults<T> extends ReadonlyArray<KeysResult<T>> {
     /** Total matches before limit */
@@ -55,12 +62,11 @@ declare namespace Fuzzysort {
     /** If true, returns all results for an empty search */
     all?: boolean
   }
-  interface KeyOptions extends Options {
-    key: string | ReadonlyArray<string>
+  interface KeyOptions<T> extends Options {
+    key: string | ((obj: T) => string) | ReadonlyArray<string>
   }
   interface KeysOptions<T> extends Options {
-    keys: ReadonlyArray<string | ReadonlyArray<string>>
-    scoreFn?: (keysResult:ReadonlyArray<KeyResult<T>>) => number | null
+    keys: ReadonlyArray<string | ((obj: T) => string) | ReadonlyArray<string>>
   }
 
   interface HighlightCallback<T> { (match: string, index: number): T }
@@ -69,21 +75,19 @@ declare namespace Fuzzysort {
 
     single(search: string, target: string | Prepared): Result | null
 
-    go(search: string, targets: ReadonlyArray<string | Prepared | undefined>, options?: Options): Results
-    go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeyOptions): KeyResults<T>
-    go<T>(search: string, targets: ReadonlyArray<T | undefined>, options: KeysOptions<T>): KeysResults<T>
-
-    highlight(result?: Result, highlightOpen?: string, highlightClose?: string): string | null
-    highlight<T>(result: Result, callback: HighlightCallback<T>): (string | T)[] | null
-
-    indexes(result: Result): ReadonlyArray<Number>
-    cleanup(): void
+    go(search: string, targets: ReadonlyArray<string | Prepared>, options?: Options): Results
+    go<T>(search: string, targets: ReadonlyArray<T>, options: KeyOptions<T>): KeyResults<T>
+    go<T>(search: string, targets: ReadonlyArray<T>, options: KeysOptions<T>): KeysResults<T>
 
     /**
     * Help the algorithm go fast by providing prepared targets instead of raw strings
     */
     prepare(target: string): Prepared
 
+    /**
+    * Free memory caches if you're done using fuzzysort for now
+    */
+    cleanup(): void
   }
 }
 
