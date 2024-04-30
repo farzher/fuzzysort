@@ -165,71 +165,53 @@
   }
 
 
-  var highlight = (result, hOpen, hClose) => {
-    if(typeof hOpen === 'function') return highlightCallback(result, hOpen)
-    if(result === NULL) return NULL
-    if(hOpen === undefined) hOpen = '<b>'
-    if(hClose === undefined) hClose = '</b>'
-    var highlighted = ''
-    var matchesIndex = 0
-    var opened = false
-    var target = result.target
-    var targetLen = target.length
-    var indexes = result._indexes
-    indexes = indexes.slice(0, indexes.len).sort((a,b)=>a-b)
-    for(var i = 0; i < targetLen; ++i) { var char = target[i]
-      if(indexes[matchesIndex] === i) {
-        ++matchesIndex
-        if(!opened) { opened = true
-          highlighted += hOpen
-        }
+  // this is written as 1 function instead of 2 for minification. perf seems fine
+  var highlight = (result, open='<b>', close='</b>') => {
+    var callback = typeof open === 'function' ? open : undefined
 
-        if(matchesIndex === indexes.length) {
-          highlighted += char + hClose + target.substr(i+1)
-          break
-        }
-      } else {
-        if(opened) { opened = false
-          highlighted += hClose
-        }
-      }
-      highlighted += char
-    }
-
-    return highlighted
-  }
-  var highlightCallback = (result, cb) => {
-    if(result === NULL) return NULL
-    var target = result.target
-    var targetLen = target.length
-    var indexes = result._indexes
-    indexes = indexes.slice(0, indexes.len).sort((a,b)=>a-b)
+    var target      = result.target
+    var targetLen   = target.length
+    var indexes     = result.indexes
     var highlighted = ''
-    var matchI = 0
-    var indexesI = 0
-    var opened = false
-    var result = []
+    var matchI      = 0
+    var indexesI    = 0
+    var opened      = false
+    var parts       = []
+
     for(var i = 0; i < targetLen; ++i) { var char = target[i]
       if(indexes[indexesI] === i) {
         ++indexesI
         if(!opened) { opened = true
-          result.push(highlighted); highlighted = ''
+          if(callback) {
+            parts.push(highlighted); highlighted = ''
+          } else {
+            highlighted += open
+          }
         }
 
         if(indexesI === indexes.length) {
-          highlighted += char
-          result.push(cb(highlighted, matchI++)); highlighted = ''
-          result.push(target.substr(i+1))
+          if(callback) {
+            highlighted += char
+            parts.push(callback(highlighted, matchI++)); highlighted = ''
+            parts.push(target.substr(i+1))
+          } else {
+            highlighted += char + close + target.substr(i+1)
+          }
           break
         }
       } else {
         if(opened) { opened = false
-          result.push(cb(highlighted, matchI++)); highlighted = ''
+          if(callback) {
+            parts.push(callback(highlighted, matchI++)); highlighted = ''
+          } else {
+            highlighted += close
+          }
         }
       }
       highlighted += char
     }
-    return result
+
+    return callback ? parts : highlighted
   }
 
 
