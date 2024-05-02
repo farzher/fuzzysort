@@ -77,7 +77,8 @@ setTimeout(async function() {
 async function tests() {
 
   { // urls with garbage ids in them match everything too well
-    var tmp = fuzzysort.go('zom', testdata_prepared.urls_and_titles)
+    var targets = ['jQuery Zoom', 'aBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYz']
+    var tmp = fuzzysort.go('zom', targets)
     assert(tmp[0].target == 'jQuery Zoom', 'zom', tmp[0].target)
   }
 
@@ -133,20 +134,40 @@ async function tests() {
   { // options.all
     var fuzzyALL = fuzzysort.new({all: true})
 
-    var tmp = fuzzyALL.go('', ['pants', 's'], {all:true})
-    assert(tmp.length==2, 'all 1')
+    var tmp = fuzzyALL.go('', ['pants', 's', ''])
+    assert(tmp.length==3, 'all 1')
 
-    var tmp = fuzzyALL.go('pants', ['pants', 's'])
+    var tmp = fuzzyALL.go('pants', ['pants', 's', ''])
     assert(tmp.length==1, 'all 2')
 
     var tmp = fuzzysort.go('', ['pants'])
     assert(tmp.length==0, 'all 3')
 
-    var tmp = fuzzyALL.go('', [{str:'pants'}], {key:'str'})
-    assert(tmp[0].target === 'pants', 'all 4')
-
     var tmp = fuzzyALL.go('', [{a:'pants', b:'noodles'}, {a:'suit', b:'tie'}], {keys:['a', 'b']})
     assert(tmp[1][1].target === 'tie', 'all 5')
+  }
+
+
+  { // weird characters require strict match to turn into substring
+    // https://github.com/farzher/fuzzysort/issues/122 (When searching for a name containing special character, no match is found)
+    var targets = ["Änni ÄÄsma", "Anni Aasma"]
+    var results = fuzzysort.go('Ääsma', targets)
+    assert(results[0].highlight('*', '*') === "Änni *ÄÄsma*", "Änni *ÄÄsma*")
+  }
+
+  { // find good substrings, don't just use theh first one
+    var result = fuzzysort.single('cat', 'basecategory cat')
+    assert(result.highlight('*', '*') === 'basecategory *cat*', 'basecategory cat')
+  }
+
+  { // make sure indexes are correct for search with spaces
+    var tmp = fuzzysort.single('pants on the ground', 'electron-uwp-background: Sample explaining how to use')
+    assert(tmp.highlight('*', '*') == 'elec*t*r*on*-uw*p*-b*a*ck*ground*: Sample explaining *h*ow *t*o u*se*')
+  }
+
+  { // straw berry should match against strawberry well
+    var tmp = fuzzysort.single('straw berry', 'strawberry')
+    assert(tmp.score > -50, 'straw berry')
   }
 
 
@@ -200,8 +221,6 @@ async function tests() {
     assert(tmp.score===0, 'goKeys arr.0.o')
     var tmp = fuzzysort.go('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ]})[0]
     assert(tmp.score===0, 'goKeys s.s || arr.0.o')
-    var tmp = fuzzysort.go('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ], scoreFn(a){return (a[0]?a[0].score:1) + (a[1]?a[1].score:1)}})[0]
-    assert(tmp.score===1, 'goKeys s.s || arr.0.o score')
 
     var targets = [
       {name: 'Typography', version: '3.1.0'},
@@ -212,9 +231,10 @@ async function tests() {
     var results = fuzzysort.go('typography', targets, {keys: ['name']})
     assert(results[0].obj.version != results[1].obj.version, 'keys same object bug')
 
-    // missing key
+    // missing key / weird key
     var targets = [
       {},
+      {name: {}},
       {name: 'Typography'},
     ]
     var results = fuzzysort.go('typography', targets, {key: 'name'})
@@ -235,8 +255,64 @@ async function tests() {
 
     var results = fuzzysort.go('farzher', [{yes:'farzher', no:'no'}], {keys:['yes', 'no']})
     assert(!!results[0].obj)
+
+    var results = fuzzysort.go('doesnotexist', [])
+    assert(results.length === 0 && results.total === 0, 'no results')
+
+    var results = fuzzysort.go('ryan berry', [
+      {title: 'ryan berry',   desc:'berry',     },
+      {title: 'ryan',         desc:'berry',     },
+      {title: 'ryan berry',   desc:'ryan berrys'},
+      {title: 'ryan berry',   desc:'',          },
+    ], {keys: ['title', 'desc']})
+    for(let i=0; i<results.length; i++) assert(results[i].score === 0, 'ryan berry keys spaces scoring')
+
+    fuzzysort.go('xxxxxxx', [{a:'nomatch x'}], {key: 'a'}) // running key when there's no match but bitflags matches to make sure no error
+
+    var results = fuzzysort.go('a', [{a:'a 2222'}, {a:'a 1'}], {key: 'a', limit:1})
+    assert(results.length === 1 && results.total === 2, 'limit & total key')
+    assert(results[0].obj.a === 'a 1', 'limit sorting key')
+
+    var results = fuzzysort.go('a', ['a 2222', 'a 1'], {limit:1})
+    assert(results.length === 1 && results.total === 2, 'limit & total nokey')
+    assert(results[0].target === 'a 1', 'limit sorting nokey')
+
+    var results = fuzzysort.go('sup', [{a:'the wordsup is in here but not well'}], {key:'a', threshold:1})
+    assert(results[0] === undefined, 'threshold low')
+    var results = fuzzysort.go('sup', [{a:'the wordsup is in here but not well'}], {key:'a', threshold:1000000})
+    assert(results[0] !== undefined, 'threshold high')
+
+    assert(fuzzysort.single('soup time ifs', 'time for soup').highlight((m, i) => `*${m}(${i})*`).join('') === '*time(0)* *f(1)*or *soup(2)*', 'highlight callback')
+
+    // indexes getter and setter
+    fuzzysort.single('pants ground', 'pants on the ground')
+    var result = fuzzysort.single('p', 'pants on the ground')
+    assert(result.indexes.length === 1 && result.indexes[0] === 0, 'indexes')
+    result.indexes = [0, 1, 2, 3, 4]
+    assert(result.highlight() === '<b>pants</b> on the ground', 'indexes setter')
+    var result = fuzzysort.single('t o g p', 'pants on the ground')
+    assert(result.indexes.length === 4 && result.indexes[0] === 0 && result.indexes[1] === 6 && result.indexes[2] === 9 && result.indexes[3] === 13, 'indexes')
+
+    assert(fuzzysort.single('ui', 'build ui').score === fuzzysort.single('ui', 'b__ld ui').score, 'we should find the better substring and scores here should be the same')
+
+    var results = fuzzysort.go('zzzzzzzzzzzzz', [{a:'no thanksz'}], {keys:['a', 'a']})
+    assert(results.length === 0, 'no match on keys')
+
+    fuzzysort.go('pants', [['pants on the ground']], {key: obj => obj[0]})
+    fuzzysort.go('pants', [['pants on the ground']], {keys: [obj => obj[0], obj => obj[0]]})
   }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -360,11 +436,18 @@ async function benchmarks() {
 
   console.log('now benching ...')
 
+  bench('spaces & keys', function() {
+    fuzzysort.go('github react',      testdata_obj.urls_and_titles, {keys: ['title', 'url']})
+    fuzzysort.go('zom query',         testdata_obj.urls_and_titles, {keys: ['title', 'url']})
+    fuzzysort.go('image video gif',   testdata_obj.urls_and_titles, {keys: ['title', 'url']})
+  }, config)
+
+  const results = fuzzysort.go('e', testdata_prepared.ue4_files)
   bench('highlight', function() {
-    const results = fuzzysort.go('e', testdata_prepared.ue4_files)
-    for(const result of results) {
-      fuzzysort.highlight(result)
-    }
+    for(const result of results) result.highlight()
+  }, config)
+  bench('highlight callback', function() {
+    for(const result of results) result.highlight(m => `<sup>${m}</sup>`)
   }, config)
 
   bench('tricky', function() {
@@ -483,24 +566,45 @@ async function bench(name, code, {benchtime=2000}={}) {
   function getavg(a) {let sum = 0; for(const x of a) sum += x; return sum/a.length }
 }
 function bench_speeddiff(name, hz) {
-  // fuzzysort 2.0.2
+  // fuzzysort 3.0
   var baseline = `
-    highlight x 635.22 ops/sec -1.19% | 62 runs sampled
-    tricky x 3,032,593 ops/sec -18.11% | 13 runs sampled
-    tricky space x 942,114 ops/sec -35.39% | 14 runs sampled
-    tricky lot of space x 847,304 ops/sec -18.54% | 13 runs sampled
-    go prepared spaces x 193.00 ops/sec -4.08% | 9 runs sampled
-    go key spaces x 136.29 ops/sec -2.45% | 28 runs sampled
-    go prepared x 404.49 ops/sec +2.29% | 10 runs sampled
-    go prepared key x 335.53 ops/sec +3.25% | 10 runs sampled
-    go key x 219.76 ops/sec +7.76% | 9 runs sampled
-    go keys x 182.24 ops/sec +9.19% | 20 runs sampled
-    go str x 250.21 ops/sec +8.5% | 8 runs sampled
-    huge nomatch x 53,612,811 ops/sec +0.1% | 125 runs sampled
-    tricky x 3,208,152 ops/sec -13.37% | 12 runs sampled
-    small x 6,237,592 ops/sec +0.22% | 16 runs sampled
-    somematch x 17,516,025 ops/sec -8.73% | 26 runs sampled
+    spaces & keys x 6,661 ops/sec +3581.13% | 17 runs sampled
+    highlight x 339,079 ops/sec +27923.02% | 37 runs sampled
+    highlight callback x 182,122 ops/sec | 19 runs sampled
+    tricky x 6,413,130 ops/sec +2.91% | 15 runs sampled
+    tricky space x 1,693,572 ops/sec +5.64% | 18 runs sampled
+    tricky lot of space x 1,423,071 ops/sec +8.15% | 8 runs sampled
+    go prepared spaces x 306.94 ops/sec +8.73% | 11 runs sampled
+    go key spaces x 212.81 ops/sec +16.84% | 46 runs sampled
+    go prepared x 684.62 ops/sec +10.95% | 11 runs sampled
+    go prepared key x 548.37 ops/sec +13.38% | 11 runs sampled
+    go key x 347.06 ops/sec +9.56% | 10 runs sampled
+    go keys x 329.01 ops/sec +11.15% | 12 runs sampled
+    go str x 418.67 ops/sec +8.81% | 13 runs sampled
+    huge nomatch x 103,495,504 ops/sec +3.76% | 44 runs sampled
+    tricky x 6,484,067 ops/sec +4.05% | 15 runs sampled
+    small x 10,053,582 ops/sec +3.2% | 17 runs sampled
+    somematch x 36,459,010 ops/sec -0.48% | 37 runs sampled
   `
+
+  // // fuzzysort 2.0.2
+  // var baseline = `
+  //   highlight x 635.22 ops/sec -1.19% | 62 runs sampled
+  //   tricky x 3,032,593 ops/sec -18.11% | 13 runs sampled
+  //   tricky space x 942,114 ops/sec -35.39% | 14 runs sampled
+  //   tricky lot of space x 847,304 ops/sec -18.54% | 13 runs sampled
+  //   go prepared spaces x 193.00 ops/sec -4.08% | 9 runs sampled
+  //   go key spaces x 136.29 ops/sec -2.45% | 28 runs sampled
+  //   go prepared x 404.49 ops/sec +2.29% | 10 runs sampled
+  //   go prepared key x 335.53 ops/sec +3.25% | 10 runs sampled
+  //   go key x 219.76 ops/sec +7.76% | 9 runs sampled
+  //   go keys x 182.24 ops/sec +9.19% | 20 runs sampled
+  //   go str x 250.21 ops/sec +8.5% | 8 runs sampled
+  //   huge nomatch x 53,612,811 ops/sec +0.1% | 125 runs sampled
+  //   tricky x 3,208,152 ops/sec -13.37% | 12 runs sampled
+  //   small x 6,237,592 ops/sec +0.22% | 16 runs sampled
+  //   somematch x 17,516,025 ops/sec -8.73% | 26 runs sampled
+  // `
 
   // // fuzzysort 2.0
   // var baseline = `
