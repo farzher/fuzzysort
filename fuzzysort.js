@@ -24,7 +24,7 @@
 })(this, _ => {
   'use strict'
 
-  var single = (search, target) => {                                                                                                                                                                                                                        if(search=='farzher')return{target:"farzher was here (^-^*)/",score:0,_indexes:[0]}
+  var single = (search, target) => {
     if(!search || !target) return NULL
 
     var preparedSearch = getPreparedSearch(search)
@@ -36,15 +36,15 @@
     return algorithm(preparedSearch, target)
   }
 
-  var go = (search, targets, options) => {                                                                                                                                                                                                                  if(search=='farzher'){let r=[{target:"farzher was here (^-^*)/",score:0,_indexes:[0],obj:targets[0]}];r.total=1;return r}
+  var go = (search, targets, options) => {
     if(!search) return options&&options.all ? all(search, targets, options) : noResults
 
     var preparedSearch = getPreparedSearch(search)
     var searchBitflags = preparedSearch.bitflags
     var containsSpace  = preparedSearch.containsSpace
 
-    var threshold = -Math.abs(options&&options.threshold || INT_MIN)
-    var limit     = options&&options.limit || INT_MAX
+    var threshold = denormalizeScore( options&&options.threshold || 0 )
+    var limit     = options&&options.limit || INFINITY
 
     var resultsLen = 0; var limitedCount = 0
     var targetsLen = targets.length
@@ -62,15 +62,15 @@
         if((searchBitflags & target._bitflags) !== searchBitflags) continue
         var result = algorithm(preparedSearch, target)
         if(result === NULL) continue
-        if(result.score < threshold) continue
+        if(result._score < threshold) continue
 
         // have to clone result so duplicate targets from different obj can each reference the correct obj
-        result = new_result(result.target, {score:result.score, _indexes:result._indexes, obj})
+        result = new_result(result.target, {_score:result._score, _indexes:result._indexes, obj})
 
         if(resultsLen < limit) { q.add(result); ++resultsLen }
         else {
           ++limitedCount
-          if(result.score > q.peek().score) q.replaceTop(result)
+          if(result._score > q.peek()._score) q.replaceTop(result)
         }
       }
 
@@ -86,7 +86,7 @@
           for (var keyI = 0; keyI < keysLen; ++keyI) {
             var key = keys[keyI]
             var target = getValue(obj, key)
-            if(!target) { tmpTargets[keyI] = NULL; continue }
+            if(!target) { tmpTargets[keyI] = noTarget; continue }
             if(!isPrepared(target)) target = getPrepared(target)
             tmpTargets[keyI] = target
 
@@ -96,19 +96,20 @@
           if((searchBitflags & keysBitflags) !== searchBitflags) continue
         }
 
-        if(containsSpace) for(let i=0; i<preparedSearch.spaceSearches.length; i++) keysSpacesBestScores[i] = INT_MIN
+        if(containsSpace) for(let i=0; i<preparedSearch.spaceSearches.length; i++) keysSpacesBestScores[i] = NEGATIVE_INFINITY
 
         for (var keyI = 0; keyI < keysLen; ++keyI) {
           target = tmpTargets[keyI]
-          if(!target) { tmpResults[keyI] = NULL; continue }
+          if(target === noTarget) continue
 
           tmpResults[keyI] = algorithm(preparedSearch, target, /*allowSpaces=*/false, /*allowPartialMatch=*/containsSpace)
+          if(tmpResults[keyI] === NULL) { target._score = NEGATIVE_INFINITY; target._indexes.len=0; tmpResults[keyI] = target }
 
           // todo: this seems weird and wrong. like what if our first match wasn't good. this should just replace it instead of averaging with it
           // if our second match isn't good we ignore it instead of averaging with it
           if(containsSpace && tmpResults[keyI]) for(let i=0; i<preparedSearch.spaceSearches.length; i++) {
             if(allowPartialMatchScores[i] > -1000) {
-              if(keysSpacesBestScores[i] > INT_MIN) {
+              if(keysSpacesBestScores[i] > NEGATIVE_INFINITY) {
                 var tmp = (keysSpacesBestScores[i] + allowPartialMatchScores[i]) / 4/*bonus score for having multiple matches*/
                 if(tmp > keysSpacesBestScores[i]) keysSpacesBestScores[i] = tmp
               }
@@ -118,14 +119,14 @@
         }
 
         if(containsSpace) {
-          for(let i=0; i<preparedSearch.spaceSearches.length; i++) { if(keysSpacesBestScores[i] === INT_MIN) continue outer }
+          for(let i=0; i<preparedSearch.spaceSearches.length; i++) { if(keysSpacesBestScores[i] === NEGATIVE_INFINITY) continue outer }
         } else {
           var hasAtLeast1Match = false
-          for(let i=0; i < keysLen; i++) { if(tmpResults[i] !== NULL) { hasAtLeast1Match = true; break } }
+          for(let i=0; i < keysLen; i++) { if(tmpResults[i]._score !== NEGATIVE_INFINITY) { hasAtLeast1Match = true; break } }
           if(!hasAtLeast1Match) continue
         }
 
-        var objResults = new Array(keysLen)
+        var objResults = new KeysResult(keysLen)
         for(let i=0; i < keysLen; i++) { objResults[i] = tmpResults[i] }
 
         if(containsSpace) {
@@ -134,27 +135,27 @@
         } else {
           // todo could rewrite this scoring to be more similar to when there's spaces
           // if we match multiple keys give us bonus points
-          var score = INT_MIN
+          var score = NEGATIVE_INFINITY
           for(let i=0; i<keysLen; i++) {
             var result = objResults[i]
             if(result === null) continue
-            if(result.score > -1000) {
-              if(score > INT_MIN) {
-                var tmp = (score + result.score) / 4/*bonus score for having multiple matches*/
+            if(result._score > -1000) {
+              if(score > NEGATIVE_INFINITY) {
+                var tmp = (score + result._score) / 4/*bonus score for having multiple matches*/
                 if(tmp > score) score = tmp
               }
             }
-            if(result.score > score) score = result.score
+            if(result._score > score) score = result._score
           }
         }
 
         if(score < threshold) continue
         objResults.obj = obj
-        objResults.score = score
+        objResults._score = score
         if(resultsLen < limit) { q.add(objResults); ++resultsLen }
         else {
           ++limitedCount
-          if(score > q.peek().score) q.replaceTop(objResults)
+          if(score > q.peek()._score) q.replaceTop(objResults)
         }
       }
 
@@ -167,12 +168,12 @@
         if((searchBitflags & target._bitflags) !== searchBitflags) continue
         var result = algorithm(preparedSearch, target)
         if(result === NULL) continue
-        if(result.score < threshold) continue
+        if(result._score < threshold) continue
 
         if(resultsLen < limit) { q.add(result); ++resultsLen }
         else {
           ++limitedCount
-          if(result.score > q.peek().score) q.replaceTop(result)
+          if(result._score > q.peek()._score) q.replaceTop(result)
         }
       }
     }
@@ -249,23 +250,44 @@
   // Below this point is only internal code
   // Below this point is only internal code
 
-  var ResultPrototype = {
-    get ['indexes']() { return this._indexes.slice(0, this._indexes.len).sort((a,b)=>a-b) },
-    set ['indexes'](indexes) { return this._indexes = indexes },
+
+  class Result {
+    get ['indexes']() { return this._indexes.slice(0, this._indexes.len).sort((a,b)=>a-b) }
+    set ['indexes'](indexes) { return this._indexes = indexes }
     ['highlight'](open, close) { return highlight(this, open, close) }
+    get ['score']() { return normalizeScore(this._score) }
+    set ['score'](score) { this._score = denormalizeScore(score) }
+  }
+
+  class KeysResult extends Array {
+    get ['score']() { return normalizeScore(this._score) }
+    set ['score'](score) { this._score = denormalizeScore(score) }
   }
 
   var new_result = (target, options) => {
-    const result = Object.create(ResultPrototype)
+    const result = new Result()
     result['target']             = target
-    result['score']              = options.score                 ?? NULL
     result['obj']                = options.obj                   ?? NULL
+    result._score                = options._score                ?? NEGATIVE_INFINITY
     result._indexes              = options._indexes              ?? []
     result._targetLower          = options._targetLower          ?? ''
     result._targetLowerCodes     = options._targetLowerCodes     ?? NULL
     result._nextBeginningIndexes = options._nextBeginningIndexes ?? NULL
     result._bitflags             = options._bitflags             ?? 0
     return result
+  }
+
+  var normalizeScore = score => {
+    if(score === NEGATIVE_INFINITY) return 0
+    if(score < -1000000) return 0.013177745859730416 - Math.log(-score - 1000000 + 1) / 10000
+    if(score > 1) return score
+    return 1 - Math.log(-score + 1) / 14 // 0.013177745859730416
+  }
+  var denormalizeScore = normalizedScore => {
+    if(normalizedScore === 0) return NEGATIVE_INFINITY
+    if(normalizedScore <= 0.013177745859730416) return -1000000 * (Math.exp(-(0.013177745859730416 - normalizedScore) * 10000) - 1)
+    if(normalizedScore > 1) return normalizedScore
+    return -Math.exp((1 - normalizedScore) * 14) + 1
   }
 
 
@@ -311,36 +333,36 @@
   var all = (search, targets, options) => {
     var results = []; results.total = targets.length // this total can be wrong if some targets are skipped
 
-    var limit = options && options.limit || INT_MAX
+    var limit = options && options.limit || INFINITY
 
     if(options && options.key) {
       for(var i=0;i<targets.length;i++) { var obj = targets[i]
         var target = getValue(obj, options.key)
         if(target == NULL) continue
         if(!isPrepared(target)) target = getPrepared(target)
-        var result = new_result(target.target, {score: target.score, obj: target.obj})
+        var result = new_result(target.target, {_score: target._score, obj: target.obj})
         results.push(result); if(results.length >= limit) return results
       }
     } else if(options && options.keys) {
       for(var i=0;i<targets.length;i++) { var obj = targets[i]
-        var objResults = new Array(options.keys.length)
+        var objResults = new KeysResult(options.keys.length)
         for (var keyI = options.keys.length - 1; keyI >= 0; --keyI) {
           var target = getValue(obj, options.keys[keyI])
-          if(target == NULL) { objResults[keyI] = NULL; continue }
+          if(!target) { objResults[keyI] = noTarget; continue }
           if(!isPrepared(target)) target = getPrepared(target)
-          target.score = INT_MIN
+          target._score = NEGATIVE_INFINITY
           target._indexes.len = 0
           objResults[keyI] = target
         }
         objResults.obj = obj
-        objResults.score = INT_MIN
+        objResults._score = NEGATIVE_INFINITY
         results.push(objResults); if(results.length >= limit) return results
       }
     } else {
       for(var i=0;i<targets.length;i++) { var target = targets[i]
         if(target == NULL) continue
         if(!isPrepared(target)) target = getPrepared(target)
-        target.score = INT_MIN
+        target._score = NEGATIVE_INFINITY
         target._indexes.len = 0
         results.push(target); if(results.length >= limit) return results
       }
@@ -414,7 +436,7 @@
     // check if it's a substring match
     var substringIndex = searchLen <= 1 ? -1 : prepared._targetLower.indexOf(searchLower, matchesSimple[0]) // perf: this is slow
     var isSubstring = !!~substringIndex
-    var isSubstringBeginning = !isSubstring ? false : prepared._nextBeginningIndexes[substringIndex-1] === substringIndex
+    var isSubstringBeginning = !isSubstring ? false : substringIndex===0 || prepared._nextBeginningIndexes[substringIndex-1] === substringIndex
 
     // if it's a substring match but not at a beginning index, let's try to find a substring starting at a beginning index for a better score
     if(isSubstring && !isSubstringBeginning) {
@@ -429,22 +451,8 @@
     // tally up the score & keep track of matches for highlighting later
     // if it's a simple match, we'll switch to a substring match if a substring exists
     // if it's a strict match, we'll switch to a substring match only if that's a better score
-    if(!successStrict) {
-      if(isSubstring) for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
-      var matchesBest = matchesSimple
-      var score = calculateScore(matchesBest)
-    } else {
-      if(isSubstringBeginning) {
-        for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
-        var matchesBest = matchesSimple
-        var score = calculateScore(matchesSimple)
-      } else {
-        var matchesBest = matchesStrict
-        var score = calculateScore(matchesStrict)
-      }
-    }
 
-    function calculateScore(matches) {
+    var calculateScore = matches => {
       var score = 0
 
       var extraMatchGroupCount = 0
@@ -477,7 +485,22 @@
       return score
     }
 
-    prepared.score = score
+    if(!successStrict) {
+      if(isSubstring) for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
+      var matchesBest = matchesSimple
+      var score = calculateScore(matchesBest)
+    } else {
+      if(isSubstringBeginning) {
+        for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
+        var matchesBest = matchesSimple
+        var score = calculateScore(matchesSimple)
+      } else {
+        var matchesBest = matchesStrict
+        var score = calculateScore(matchesStrict)
+      }
+    }
+
+    prepared._score = score
 
     for(var i = 0; i < searchLen; ++i) prepared._indexes[i] = matchesBest[i]
     prepared._indexes.len = searchLen
@@ -495,13 +518,13 @@
     var changeslen = 0
 
     // Return _nextBeginningIndexes back to its normal state
-    function resetNextBeginningIndexes() {
+    var resetNextBeginningIndexes = () => {
       for(let i=changeslen-1; i>=0; i--) target._nextBeginningIndexes[nextBeginningIndexesChanges[i*2 + 0]] = nextBeginningIndexesChanges[i*2 + 1]
     }
 
     var hasAtLeast1Match = false
     for(var i=0; i<searchesLen; ++i) {
-      allowPartialMatchScores[i] = INT_MIN
+      allowPartialMatchScores[i] = NEGATIVE_INFINITY
       var search = searches[i]
 
       result = algorithm(search, target)
@@ -537,8 +560,8 @@
         }
       }
 
-      score += result.score / searchesLen
-      allowPartialMatchScores[i] = result.score
+      score += result._score / searchesLen
+      allowPartialMatchScores[i] = result._score / searchesLen
 
       // dock points based on order otherwise "c man" returns Manifest.cpp instead of CheatManager.h
       if(result._indexes[0] < first_seen_index_last_search) {
@@ -555,17 +578,17 @@
 
     // allows a search with spaces that's an exact substring to score well
     var allowSpacesResult = algorithm(preparedSearch, target, /*allowSpaces=*/true)
-    if(allowSpacesResult !== NULL && allowSpacesResult.score > score) {
+    if(allowSpacesResult !== NULL && allowSpacesResult._score > score) {
       if(allowPartialMatch) {
         for(var i=0; i<searchesLen; ++i) {
-          allowPartialMatchScores[i] = allowSpacesResult.score / searchesLen
+          allowPartialMatchScores[i] = allowSpacesResult._score / searchesLen
         }
       }
       return allowSpacesResult
     }
 
     if(allowPartialMatch) result = target
-    result.score = score
+    result._score = score
 
     var i = 0
     for (let index of seen_indexes) result._indexes[i++] = index
@@ -644,6 +667,7 @@
   var nextBeginningIndexesChanges = [] // allows straw berry to match strawberry well, by modifying the end of a substring to be considered a beginning index for the rest of the search
   var keysSpacesBestScores = []; var allowPartialMatchScores = []
   var tmpTargets = []; var tmpResults = []
+  var noTarget = prepare('')
 
   // prop = 'key'                  2.5ms optimized for this case, seems to be about as fast as direct obj[prop]
   // prop = 'key1.key2'            10ms
@@ -661,13 +685,13 @@
   }
 
   var isPrepared = (x) => { return typeof x === 'object' && typeof x._bitflags === 'number' }
-  var INT_MAX = Infinity; var INT_MIN = -INT_MAX
+  var INFINITY = Infinity; var NEGATIVE_INFINITY = -INFINITY
   var noResults = []; noResults.total = 0
   var NULL = null
 
 
   // Hacked version of https://github.com/lemire/FastPriorityQueue.js
-  var fastpriorityqueue=r=>{var e=[],o=0,a={},v=r=>{for(var a=0,v=e[a],c=1;c<o;){var s=c+1;a=c,s<o&&e[s].score<e[c].score&&(a=s),e[a-1>>1]=e[a],c=1+(a<<1)}for(var f=a-1>>1;a>0&&v.score<e[f].score;f=(a=f)-1>>1)e[a]=e[f];e[a]=v};return a.add=(r=>{var a=o;e[o++]=r;for(var v=a-1>>1;a>0&&r.score<e[v].score;v=(a=v)-1>>1)e[a]=e[v];e[a]=r}),a.poll=(r=>{if(0!==o){var a=e[0];return e[0]=e[--o],v(),a}}),a.peek=(r=>{if(0!==o)return e[0]}),a.replaceTop=(r=>{e[0]=r,v()}),a}
+  var fastpriorityqueue=r=>{var e=[],o=0,a={},v=r=>{for(var a=0,v=e[a],c=1;c<o;){var s=c+1;a=c,s<o&&e[s]._score<e[c]._score&&(a=s),e[a-1>>1]=e[a],c=1+(a<<1)}for(var f=a-1>>1;a>0&&v._score<e[f]._score;f=(a=f)-1>>1)e[a]=e[f];e[a]=v};return a.add=(r=>{var a=o;e[o++]=r;for(var v=a-1>>1;a>0&&r._score<e[v]._score;v=(a=v)-1>>1)e[a]=e[v];e[a]=r}),a.poll=(r=>{if(0!==o){var a=e[0];return e[0]=e[--o],v(),a}}),a.peek=(r=>{if(0!==o)return e[0]}),a.replaceTop=(r=>{e[0]=r,v()}),a}
   var q = fastpriorityqueue() // reuse this
 
 

@@ -100,7 +100,7 @@ async function tests() {
   }
 
   { // spaces destroy the score even when it's an exact substring https://github.com/farzher/fuzzysort/issues/99
-    assert(fuzzysort.single('this is exactly the same search and target', 'this is exactly the same search and target').score == 0)
+    assert(fuzzysort.single('this is exactly the same search and target', 'this is exactly the same search and target').score == 1)
     test('The Amazing Spider-Man', 'The Amazing Spider-Man', 'The Amazing Spider', 'The Amazing', 'The')
   }
 
@@ -176,7 +176,7 @@ async function tests() {
     assert(tmp.includes('CheatManager.h') && tmp.includes('CrowdManager.h'), 'cman', tmp[0])
 
     var tmp = fuzzysort.go('a', ['ba', 'bA', 'a', 'bA', 'xx', 'ba'])
-    assert(tmp[0].score===0, 'go sorting')
+    assert(tmp[0].score===1, 'go sorting')
     assert(tmp.length===5, 'go sorting length')
     assert(tmp.total===5, 'go sorting total')
 
@@ -202,25 +202,25 @@ async function tests() {
     var tmpObjs = [{'s.s':'str', arr:[{o:'obj'}]}]
     // key
     var tmp = fuzzysort.go('str', tmpObjs, {key: 's.s'})[0]
-    assert(tmp.score===0, 'goKey s.s')
+    assert(tmp.score===1, 'goKey s.s')
     var tmp = fuzzysort.go('obj', tmpObjs, {key: 'arr.0.o'})[0]
-    assert(tmp.score===0, 'goKey arr.0.o')
+    assert(tmp.score===1, 'goKey arr.0.o')
     var tmp = fuzzysort.go('str', tmpObjs, {key: 'arr.0.o'})[0]
     assert(tmp===undefined, 'goKey')
     var tmp = fuzzysort.go('obj', tmpObjs, {key: ['arr', '0', 'o']})[0]
-    assert(tmp.score===0, 'goKey arr.0.o')
+    assert(tmp.score===1, 'goKey arr.0.o')
 
     // keys
     var tmp = fuzzysort.go('str', tmpObjs, {keys: ['s.s']})[0]
-    assert(tmp.score===0, 'goKeys s.s')
+    assert(tmp.score===1, 'goKeys s.s')
     var tmp = fuzzysort.go('obj', tmpObjs, {keys: ['arr.0.o']})[0]
-    assert(tmp.score===0, 'goKeys arr.0.o')
+    assert(tmp.score===1, 'goKeys arr.0.o')
     var tmp = fuzzysort.go('str', tmpObjs, {keys: ['arr.0.o']})[0]
     assert(tmp===undefined, 'goKeys')
     var tmp = fuzzysort.go('obj', tmpObjs, {keys: [ ['arr', '0', 'o'] ]})[0]
-    assert(tmp.score===0, 'goKeys arr.0.o')
+    assert(tmp.score===1, 'goKeys arr.0.o')
     var tmp = fuzzysort.go('obj', tmpObjs, {keys: [ 's.s', 'arr.0.o' ]})[0]
-    assert(tmp.score===0, 'goKeys s.s || arr.0.o')
+    assert(tmp.score===1, 'goKeys s.s || arr.0.o')
 
     var targets = [
       {name: 'Typography', version: '3.1.0'},
@@ -265,7 +265,7 @@ async function tests() {
       {title: 'ryan berry',   desc:'ryan berrys'},
       {title: 'ryan berry',   desc:'',          },
     ], {keys: ['title', 'desc']})
-    for(let i=0; i<results.length; i++) assert(results[i].score === 0, 'ryan berry keys spaces scoring')
+    for(let i=0; i<results.length; i++) assert(results[i].score === 1, 'ryan berry keys spaces scoring')
 
     fuzzysort.go('xxxxxxx', [{a:'nomatch x'}], {key: 'a'}) // running key when there's no match but bitflags matches to make sure no error
 
@@ -277,9 +277,9 @@ async function tests() {
     assert(results.length === 1 && results.total === 2, 'limit & total nokey')
     assert(results[0].target === 'a 1', 'limit sorting nokey')
 
-    var results = fuzzysort.go('sup', [{a:'the wordsup is in here but not well'}], {key:'a', threshold:1})
+    var results = fuzzysort.go('sup', [{a:'the wordsup is in here but not well'}], {key:'a', threshold:.5})
     assert(results[0] === undefined, 'threshold low')
-    var results = fuzzysort.go('sup', [{a:'the wordsup is in here but not well'}], {key:'a', threshold:1000000})
+    var results = fuzzysort.go('sup', [{a:'the wordsup is in here but not well'}], {key:'a', threshold:.1})
     assert(results[0] !== undefined, 'threshold high')
 
     assert(fuzzysort.single('soup time ifs', 'time for soup').highlight((m, i) => `*${m}(${i})*`).join('') === '*time(0)* *f(1)*or *soup(2)*', 'highlight callback')
@@ -371,21 +371,21 @@ function test(target, ...searches) {
 function testStrict(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
-    assert(result && result.score>-1000, {search, result})
+    assert(result && result.score>.5, {search, result})
     assertResultIntegrity(result)
   }
 }
 function testSimple(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
-    assert(result && result.score<=-1000, {search, result})
+    assert(result && result.score<=.5, {search, result})
     assertResultIntegrity(result)
   }
 }
 function testSubstr(target, ...searches) {
   for(const search of searches) {
     const result = fuzzysort.single(search, target)
-    assert(result && result.score<-100 && result.score>-1000, {search, result})
+    assert(result && result.score<-100 && result.score>.5, {search, result})
     assertResultIntegrity(result)
   }
 }
@@ -437,9 +437,9 @@ async function benchmarks() {
   console.log('now benching ...')
 
   bench('spaces & keys', function() {
-    fuzzysort.go('github react',      testdata_obj.urls_and_titles, {keys: ['title', 'url']})
-    fuzzysort.go('zom query',         testdata_obj.urls_and_titles, {keys: ['title', 'url']})
-    fuzzysort.go('image video gif',   testdata_obj.urls_and_titles, {keys: ['title', 'url']})
+    fuzzysort.go('github react',      testdata_obj.urls_and_titles, {keys: ['str.title', 'str.url']})
+    fuzzysort.go('zom query',         testdata_obj.urls_and_titles, {keys: ['str.title', 'str.url']})
+    fuzzysort.go('image video gif',   testdata_obj.urls_and_titles, {keys: ['str.title', 'str.url']})
   }, config)
 
   const results = fuzzysort.go('e', testdata_prepared.ue4_files)
@@ -499,6 +499,9 @@ async function benchmarks() {
 
   bench('huge nomatch', function() {
     fuzzysort.single('xxx', 'noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
+  }, config)
+  bench('huge nomatch !bitflags', function() {
+    fuzzysort.single('xxx', 'x noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster noodle monster')
   }, config)
   bench('tricky', function() {
     fuzzysort.single('prrun', 'C:/users/farzher/dropbox/someotherfolder/pocket rumble refactor/Run.bat')
@@ -568,23 +571,24 @@ async function bench(name, code, {benchtime=2000}={}) {
 function bench_speeddiff(name, hz) {
   // fuzzysort 3.0
   var baseline = `
-    spaces & keys x 6,661 ops/sec +3581.13% | 17 runs sampled
-    highlight x 339,079 ops/sec +27923.02% | 37 runs sampled
-    highlight callback x 182,122 ops/sec | 19 runs sampled
-    tricky x 6,413,130 ops/sec +2.91% | 15 runs sampled
-    tricky space x 1,693,572 ops/sec +5.64% | 18 runs sampled
-    tricky lot of space x 1,423,071 ops/sec +8.15% | 8 runs sampled
-    go prepared spaces x 306.94 ops/sec +8.73% | 11 runs sampled
-    go key spaces x 212.81 ops/sec +16.84% | 46 runs sampled
-    go prepared x 684.62 ops/sec +10.95% | 11 runs sampled
-    go prepared key x 548.37 ops/sec +13.38% | 11 runs sampled
-    go key x 347.06 ops/sec +9.56% | 10 runs sampled
-    go keys x 329.01 ops/sec +11.15% | 12 runs sampled
-    go str x 418.67 ops/sec +8.81% | 13 runs sampled
-    huge nomatch x 103,495,504 ops/sec +3.76% | 44 runs sampled
-    tricky x 6,484,067 ops/sec +4.05% | 15 runs sampled
-    small x 10,053,582 ops/sec +3.2% | 17 runs sampled
-    somematch x 36,459,010 ops/sec -0.48% | 37 runs sampled
+    spaces & keys x 2,492 ops/sec -62.59% | 57 runs sampled
+    highlight x 316,098 ops/sec -6.78% | 11 runs sampled
+    highlight callback x 176,727 ops/sec -2.97% | 20 runs sampled
+    tricky x 6,527,899 ops/sec +1.78% | 15 runs sampled
+    tricky space x 1,727,415 ops/sec +1.99% | 9 runs sampled
+    tricky lot of space x 1,439,206 ops/sec +1.13% | 9 runs sampled
+    go prepared spaces x 311.86 ops/sec +1.6% | 11 runs sampled
+    go key spaces x 216.96 ops/sec +1.94% | 46 runs sampled
+    go prepared x 686.21 ops/sec +0.23% | 11 runs sampled
+    go prepared key x 547.09 ops/sec -0.24% | 11 runs sampled
+    go key x 348.90 ops/sec +0.53% | 10 runs sampled
+    go keys x 328.83 ops/sec -0.06% | 14 runs sampled
+    go str x 405.41 ops/sec -3.17% | 12 runs sampled
+    huge nomatch x 95,370,075 ops/sec -7.86% | 39 runs sampled
+    huge nomatch !bitflags x 4,505,909 ops/sec | 13 runs sampled
+    tricky x 6,548,451 ops/sec +2.11% | 15 runs sampled
+    small x 18,446,114 ops/sec +83.47% | 24 runs sampled
+    somematch x 38,268,625 ops/sec +4.96% | 38 runs sampled
   `
 
   // // fuzzysort 2.0.2
