@@ -2,9 +2,7 @@ declare namespace Fuzzysort {
 
   interface Result {
     /**
-    * Higher is better
-    *
-    * 0 is a perfect match; -1000 is a bad match
+    * 1 is a perfect match. 0.5 is a good match. 0 is no match. 
     */
     readonly score: number
 
@@ -32,9 +30,7 @@ declare namespace Fuzzysort {
 
   interface KeysResult<T> extends ReadonlyArray<Result> {
     /**
-    * Higher is better
-    *
-    * 0 is a perfect match; -1000 is a bad match
+    * 1 is a perfect match. 0.5 is a good match. 0 is no match. 
     */
     readonly score: number
 
@@ -67,6 +63,7 @@ declare namespace Fuzzysort {
   }
   interface KeysOptions<T> extends Options {
     keys: ReadonlyArray<string | ((obj: T) => string) | ReadonlyArray<string>>
+    scoreFn?: (keysResult:ReadonlyArray<KeyResult<T>>) => number
   }
 
   interface HighlightCallback<T> { (match: string, index: number): T }
