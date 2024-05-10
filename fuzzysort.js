@@ -1,26 +1,7 @@
 // https://github.com/farzher/fuzzysort v3.0.0
-/*
-  SublimeText-like Fuzzy Search
-
-  fuzzysort.single('fs', 'Fuzzy Search') // {score: -16}
-  fuzzysort.single('test', 'test') // {score: 0}
-  fuzzysort.single('doesnt exist', 'target') // null
-
-  fuzzysort.go('mr', [{file:'Monitor.cpp'}, {file:'MeshRenderer.cpp'}], {key:'file'})
-  // [{score:-18, obj:{file:'MeshRenderer.cpp'}}, {score:-6009, obj:{file:'Monitor.cpp'}}]
-
-  fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
-  // [{score: -18, target: "MeshRenderer.cpp"}, {score: -6009, target: "Monitor.cpp"}]
-
-  fuzzysort.highlight(fuzzysort.single('fs', 'Fuzzy Search'), '<b>', '</b>')
-  // <b>F</b>uzzy <b>S</b>earch
-*/
-
-// UMD (Universal Module Definition) for fuzzysort
 ;((root, UMD) => {
-  if(typeof define === 'function' && define.amd) define([], UMD)
-  else if(typeof module === 'object' && module.exports) module.exports = UMD()
-  else root['fuzzysort'] = UMD()
+  if(typeof module === 'object' && module.exports) module.exports = UMD() // require
+  else root['fuzzysort'] = UMD() // browser
 })(this, _ => {
   'use strict'
 
@@ -37,22 +18,30 @@
   }
 
   var go = (search, targets, options) => {
-    if(!search) return options&&options.all ? all(search, targets, options) : noResults
+    if(!search) return options?.all ? all(search, targets, options) : noResults
 
     var preparedSearch = getPreparedSearch(search)
     var searchBitflags = preparedSearch.bitflags
     var containsSpace  = preparedSearch.containsSpace
 
-    var threshold = denormalizeScore( options&&options.threshold || 0 )
-    var limit     = options&&options.limit || INFINITY
+    var threshold = denormalizeScore( options?.threshold || 0 )
+    var limit     = options?.limit || INFINITY
 
     var resultsLen = 0; var limitedCount = 0
     var targetsLen = targets.length
 
+    function push_result(result) {
+      if(resultsLen < limit) { q.add(result); ++resultsLen }
+      else {
+        ++limitedCount
+        if(result._score > q.peek()._score) q.replaceTop(result)
+      }
+    }
+
     // This code is copy/pasted 3 times for performance reasons [options.key, options.keys, no keys]
 
     // options.key
-    if(options && options.key) {
+    if(options?.key) {
       var key = options.key
       for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
         var target = getValue(obj, key)
@@ -65,17 +54,11 @@
         if(result._score < threshold) continue
 
         // have to clone result so duplicate targets from different obj can each reference the correct obj
-        result = new_result(result.target, {_score:result._score, _indexes:result._indexes, obj})
-
-        if(resultsLen < limit) { q.add(result); ++resultsLen }
-        else {
-          ++limitedCount
-          if(result._score > q.peek()._score) q.replaceTop(result)
-        }
+        push_result(new_result(result.target, {_score:result._score, _indexes:result._indexes, obj}))
       }
 
     // options.keys
-    } else if(options && options.keys) {
+    } else if(options?.keys) {
       var keys = options.keys
       var keysLen = keys.length
 
@@ -149,14 +132,17 @@
           }
         }
 
-        if(score < threshold) continue
         objResults.obj = obj
         objResults._score = score
-        if(resultsLen < limit) { q.add(objResults); ++resultsLen }
-        else {
-          ++limitedCount
-          if(score > q.peek()._score) q.replaceTop(objResults)
+        if(options?.scoreFn) {
+          score = options.scoreFn(objResults)
+          if(!score) continue
+          score = denormalizeScore(score)
+          objResults._score = score
         }
+
+        if(score < threshold) continue
+        push_result(objResults)
       }
 
     // no keys
@@ -170,11 +156,7 @@
         if(result === NULL) continue
         if(result._score < threshold) continue
 
-        if(resultsLen < limit) { q.add(result); ++resultsLen }
-        else {
-          ++limitedCount
-          if(result._score > q.peek()._score) q.replaceTop(result)
-        }
+        push_result(result)
       }
     }
 
@@ -236,13 +218,13 @@
   }
 
 
-
-
   var prepare = (target) => {
     if(typeof target !== 'string') target = ''
     var info = prepareLowerInfo(target)
     return new_result(target, {_targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _bitflags:info.bitflags})
   }
+
+  var cleanup = () => { preparedCache.clear(); preparedSearchCache.clear() }
 
 
   // Below this point is only internal code
@@ -277,17 +259,16 @@
     return result
   }
 
+
   var normalizeScore = score => {
     if(score === NEGATIVE_INFINITY) return 0
-    if(score < -1000000) return 0.013177745859730416 - Math.log(-score - 1000000 + 1) / 10000
     if(score > 1) return score
-    return 1 - Math.log(-score + 1) / 14 // 0.013177745859730416
+    return Math.E ** ( ((-score + 1)**.04307 - 1) * -2)
   }
   var denormalizeScore = normalizedScore => {
     if(normalizedScore === 0) return NEGATIVE_INFINITY
-    if(normalizedScore <= 0.013177745859730416) return -1000000 * (Math.exp(-(0.013177745859730416 - normalizedScore) * 10000) - 1)
     if(normalizedScore > 1) return normalizedScore
-    return -Math.exp((1 - normalizedScore) * 14) + 1
+    return 1 - Math.pow((Math.log(normalizedScore) / -2 + 1), 1 / 0.04307)
   }
 
 
@@ -333,9 +314,9 @@
   var all = (search, targets, options) => {
     var results = []; results.total = targets.length // this total can be wrong if some targets are skipped
 
-    var limit = options && options.limit || INFINITY
+    var limit = options?.limit || INFINITY
 
-    if(options && options.key) {
+    if(options?.key) {
       for(var i=0;i<targets.length;i++) { var obj = targets[i]
         var target = getValue(obj, options.key)
         if(target == NULL) continue
@@ -343,7 +324,7 @@
         var result = new_result(target.target, {_score: target._score, obj: target.obj})
         results.push(result); if(results.length >= limit) return results
       }
-    } else if(options && options.keys) {
+    } else if(options?.keys) {
       for(var i=0;i<targets.length;i++) { var obj = targets[i]
         var objResults = new KeysResult(options.keys.length)
         for (var keyI = options.keys.length - 1; keyI >= 0; --keyI) {
@@ -656,9 +637,6 @@
     return nextBeginningIndexes
   }
 
-
-  var cleanup = () => { preparedCache.clear(); preparedSearchCache.clear(); matchesSimple = []; matchesStrict = [] }
-
   var preparedCache       = new Map()
   var preparedSearchCache = new Map()
 
@@ -694,13 +672,6 @@
   var fastpriorityqueue=r=>{var e=[],o=0,a={},v=r=>{for(var a=0,v=e[a],c=1;c<o;){var s=c+1;a=c,s<o&&e[s]._score<e[c]._score&&(a=s),e[a-1>>1]=e[a],c=1+(a<<1)}for(var f=a-1>>1;a>0&&v._score<e[f]._score;f=(a=f)-1>>1)e[a]=e[f];e[a]=v};return a.add=(r=>{var a=o;e[o++]=r;for(var v=a-1>>1;a>0&&r._score<e[v]._score;v=(a=v)-1>>1)e[a]=e[v];e[a]=r}),a.poll=(r=>{if(0!==o){var a=e[0];return e[0]=e[--o],v(),a}}),a.peek=(r=>{if(0!==o)return e[0]}),a.replaceTop=(r=>{e[0]=r,v()}),a}
   var q = fastpriorityqueue() // reuse this
 
-
   // fuzzysort is written this way for minification. all names are mangeled unless quoted
   return {'single':single, 'go':go, 'prepare':prepare, 'cleanup':cleanup}
 }) // UMD
-
-// TODO: (feature) frecency
-// TODO: (perf) use different sorting algo depending on the # of results?
-// TODO: (perf) preparedCache is a memory leak
-// TODO: (like sublime) backslash === forwardslash
-// TODO: (perf) prepareSearch seems slow
