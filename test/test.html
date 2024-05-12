@@ -51,29 +51,58 @@
     data() {
       return {
         testdatakeys : Object.keys(testdata_prepared),
-        testdatakey  : 'ue4_files',
+        testdatakey  : 'urls_and_titles',
 
         input        : '',
         results      : [],
         duration     : 0,
+        keys         : [],
       }
     },
 
     methods: {
-      renderResult: result => `${formatnumber(Math.abs(result.score))} - ${fuzzysort.highlight(result)}`,
+      renderResult: result => {
+        let x = mapnumber(result.score, 0, 1, 66, 200, {ex:2})
+        if(result.score > .5) x += 30
+        return `<span style="color: rgb(${x},${x},${x})">${doit()}</span>`
+
+        function doit() {
+          if(!vue.keys.length) return `${formatscore(result.score)} - ${result.highlight()}`
+
+          let str = `${formatscore(result.score)} - `
+          for(let i=0; i<vue.keys.length; i++) {
+            if(i === 0) str += '<strong>'
+            str += result[i].highlight()
+            if(i === 0) str += '</strong>'
+            str += `<br>&nbsp;&nbsp;&nbsp;${'&nbsp;'.repeat(formatscore(result.score).toString().length)}`
+          }
+          str += '<br>'
+          return str
+        }
+      },
       search() {
         document.getElementById('input').focus()
 
         const startms = getms()
-        vue.results = fuzzysort.go(vue.input.toLowerCase(), testdata_prepared[vue.testdatakey])
-        vue.duration = formatnumber(getms()-startms)
+
+        const targets_are_strings = typeof testdata[vue.testdatakey][0] === 'string'
+        if(targets_are_strings) {
+          vue.keys = []
+          vue.results = fuzzysort.go(vue.input, testdata_prepared[vue.testdatakey], {limit: 100})
+        } else {
+          vue.keys = Object.keys(testdata[vue.testdatakey][0])
+          vue.results = fuzzysort.go(vue.input, testdata[vue.testdatakey], {keys: vue.keys, all:true, limit: 100})
+        }
+
+        vue.duration = formatscore(getms()-startms)
       },
     },
 
   }).mount('#vue')
 
-  function formatnumber(n) { return Math.floor(n*100)/100 }
+  function formatscore(score) { return Math.floor(Math.abs(score)*1000)/1000 }
   function getms() { return performance.now() }
+  function mapnumber(e,n,r,a,t,u){var b,m,o,p;b=r-n,m=t-a,o=(e-n)/b,u?.ex&&(p=o<0,o=Math.pow(Math.abs(o),u.ex),p&&(o=-o));let x=m*o+a;return x}
 
   document.body.onload = () => {
     const $input = document.getElementById('input')

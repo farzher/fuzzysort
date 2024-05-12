@@ -1,77 +1,64 @@
-# [fuzzysort](https://raw.github.com/farzher/fuzzysort/master/fuzzysort.js)
+<p align="center"><a href="https://raw.github.com/farzher/fuzzysort/master/fuzzysort.js">
+  <img src="https://i.imgur.com/axkOMVs.png" alt="fuzzysort" />
+</a></p>
 
-Fast, Tiny, & Good SublimeText-like fuzzy search for JavaScript.
-
-Sublime's fuzzy search is... sublime. I wish everything used it. So here's an open source js version.
+<p align="center">
+  Fast, Tiny, & Good fuzzy search for JavaScript.
+</p>
 
 
 
 ## [Demo](https://rawgit.com/farzher/fuzzysort/master/test/test.html)
 
 - **Fast** - **1ms** to search **13,000** files.
-- **Tiny** - 1 file, **5kb**. 0 dependencies.
+- **Tiny** - 1 file, 0 dependencies, **5kb**.
 - **Good** - clean api + sorts results well.
 
 https://rawgit.com/farzher/fuzzysort/master/test/test.html
 
-![](https://i.imgur.com/THbQ08n.gif)
+![](https://i.imgur.com/YrlpL1o.gif)
 
-![](https://i.imgur.com/X1rzMGZ.png)
+![](https://i.imgur.com/SXC9A3q.png)
 
-![](https://i.imgur.com/ha0YfNq.png)
+![](https://i.imgur.com/CnVXRbf.png)
 
 
 
 ## Installation Node
 
 ```sh
-npm install fuzzysort
-```
-```js
-const fuzzysort = require('fuzzysort')
+npm i fuzzysort
 ```
 ```js
 import fuzzysort from 'fuzzysort'
 ```
 
 
+
 ## Installation Browser
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/fuzzysort@2.0.4/fuzzysort.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuzzysort@3.0.0/fuzzysort.min.js"></script>
 ```
-
-
-## Most Common Usage
-
-
-### `fuzzysort.go(search, targets, options=null)`
-
-```js
-const mystuff = [{file:'Monitor.cpp'}, {file:'MeshRenderer.cpp'}]
-const results = fuzzysort.go('mr', mystuff, {key:'file'})
-// [{score:-18, obj:{file:'MeshRenderer.cpp'}}, {score:-6009, obj:{file:'Monitor.cpp'}}]
-```
-
 
 
 ## Usage
 
-
 ### `fuzzysort.go(search, targets, options=null)`
 
 ```js
-const results = fuzzysort.go('mr', ['Monitor.cpp', 'MeshRenderer.cpp'])
-// [{score: -18, target: "MeshRenderer.cpp"}, {score: -6009, target: "Monitor.cpp"}]
+const mystuff = [{file: 'Monitor.cpp'}, {file: 'MeshRenderer.cpp'}]
+const results = fuzzysort.go('mr', mystuff, {key: 'file'})
+
+// [{score: 0.74, obj: {file: 'MeshRenderer.cpp'}}, {score: 0.28, obj: {file: 'Monitor.cpp'}}]
 ```
 
-
-##### Options
+### Options
 
 ```js
 fuzzysort.go(search, targets, {
-  threshold: -Infinity, // Don't return matches worse than this (higher is faster)
-  limit: Infinity, // Don't return more results than this (lower is faster)
+  threshold: 0, // Don't return matches worse than this
+  limit: 0, // Don't return more results than this
   all: false, // If true, returns all results for an empty search
 
   key: null, // For when targets are objects (see its example usage)
@@ -80,27 +67,58 @@ fuzzysort.go(search, targets, {
 })
 ```
 
-#### `fuzzysort.highlight(result, open='<b>', close='</b>')`
-
-```js
-fuzzysort.highlight(fuzzysort.single('tt', 'test'), '*', '*') // *t*es*t*
-```
-
-#### `fuzzysort.highlight(result, callback)`
-```js
-fuzzysort.highlight(result, (m, i) => <react key={i}>{m}</react>) // [<react key=0>t</react>, 'es', <react key=1>t</react>]
-```
 
 
-## What is a `result`
+
+## What's a `result`
 
 ```js
 const result = fuzzysort.single('query', 'some string that contains my query.')
-// exact match returns a score of 0. lower is worse
-result.score // -59
-result.target // some string that contains my query.
-result.obj // reference to your original obj when using options.key
-fuzzysort.highlight(result, '<b>', '</b>') // some string that contains my <b>query</b>.
+result.score       // .80 (1 is a perfect match. 0.5 is a good match. 0 is no match.)
+result.target      // 'some string that contains my query.'
+result.obj         // reference to your original obj when using options.key
+result.indexes     // [29, 30, 31, 32, 33]
+result.highlight() // 'some string that contains my <b>query</b>.'
+```
+
+#### `result.highlight(open='<b>', close='</b>')`
+
+```js
+fuzzysort.single('tt', 'test').highlight('*', '*') // *t*es*t*
+```
+
+#### `result.highlight(callback)`
+```js
+result.highlight((m, i) => <react key={i}>{m}</react>) // [<react key=0>t</react>, 'es', <react key=1>t</react>]
+```
+
+
+
+### Advanced Usage
+
+Search a list of objects, by multiple complex keys, with custom weights.
+
+```js
+let objects = [{
+  title: 'Liechi Berry',
+  meta: {desc: 'Raises Attack when HP is low.'},
+  tags: ['berries', 'items'],
+  bookmarked: true,
+}, {
+  title: 'Petaya Berry',
+  meta: {desc: 'Raises Special Attack when HP is low.'},
+}]
+let results = fuzzysort.go('attack berry', objects, {
+  keys: ['title', 'meta.desc', obj => obj.tags?.join()],
+  scoreFn: r => r.score * r.obj.bookmarked ? 2 : 1, // if the item is bookmarked, boost its score
+})
+
+var keysResult = results[0]
+// When using multiple `keys`, results are different. They're indexable to get each normal result
+keysResult[0].highlight() // 'Liechi <b>Berry</b>'
+keysResult[1].highlight() // 'Raises <b>Attack</b> when HP is low.'
+keysResult.score           // .84
+keysResult.obj.title       // 'Liechi Berry'
 ```
 
 
@@ -108,7 +126,7 @@ fuzzysort.highlight(result, '<b>', '</b>') // some string that contains my <b>qu
 ## How To Go Fast · Performance Tips
 
 ```js
-let targets = [{file:'Monitor.cpp'}, {file:'MeshRenderer.cpp'}]
+let targets = [{file: 'Monitor.cpp'}, {file: 'MeshRenderer.cpp'}]
 
 // filter out targets that you don't need to search! especially long ones!
 targets = targets.filter(t => t.file.length < 1000)
@@ -121,35 +139,34 @@ targets = targets.map(t => t.filePrepared)
 
 const options = {
   limit: 100, // don't return more results than you need!
-  threshold: -10000, // don't return bad results
+  threshold: .5, // don't return bad results
 }
 fuzzysort.go('gotta', targets, options)
-fuzzysort.go('go', targets, options)
-fuzzysort.go('fast', targets, options)
+fuzzysort.go('go',    targets, options)
+fuzzysort.go('fast',  targets, options)
 ```
 
 
-### Advanced Usage
 
-Search a list of objects, by multiple fields, with custom weights.
 
-```js
-let objects = [{title:'Favorite Color', desc:'Chrome'}, {title:'Google Chrome', desc:'Launch Chrome'}]
-let results = fuzzysort.go('chr', objects, {
-  keys: ['title', 'desc'],
-  // Create a custom combined score to sort by. -100 to the desc score makes it a worse match
-  scoreFn: a => Math.max(a[0]?a[0].score:-1000, a[1]?a[1].score-100:-1000)
-})
+## Star History
 
-var bestResult = results[0]
-// When using multiple `keys`, results are different. They're indexable to get each normal result
-fuzzysort.highlight(bestResult[0]) // 'Google <b>Chr</b>ome'
-fuzzysort.highlight(bestResult[1]) // 'Launch <b>Chr</b>ome'
-bestResult.obj.title // 'Google Chrome'
-```
+[![Star History Chart](https://api.star-history.com/svg?repos=farzher/fuzzysort)](https://star-history.com/#farzher/fuzzysort)
+
 
 
 ### Changelog
+
+#### v3.0.0
+- Added new behavior when using `keys` and your search contains spaces!
+- Added `options.key` can now be a function `{key: obj => obj.tags.join()}`
+- Removed `fuzzysort.indexes` & Added `result.indexes` (as a getter/setter for GC perf)
+- Removed `fuzzysort.highlight()` & Added `result.highlight()`
+- Changed scoring: score is now a number from 0 to 1 instead of from -Infinity to 0
+- Changed scoring: substring matches are even more relevant
+- Changed scoring: tweaked the scoring quite a bit
+- `result.score` and `result.indexes` are behind a getter/setter for performance reasons
+- Fixed minor issues
 
 #### v2.0.0
 - Added new behavior when your search contains spaces!

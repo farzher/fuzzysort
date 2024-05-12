@@ -19,9 +19,7 @@
     "test"     : "node test/test.js",
     "test-min" : "node test/test.js min",
 
-    "//"       : "depends on uglify-js v3.17.4 being installed globally",
-    "minify"   : "uglifyjs fuzzysort.js -o fuzzysort.min.js -m -c --mangle-props keep_quoted --comments /farzher/",
-    "build"    : "npx babel --plugins @babel/plugin-transform-modules-umd fuzzysort.mjs > fuzzysort.js && npm run minify"
+    "minify"     : "uglifyjs fuzzysort.js -o fuzzysort.min.js -m -c --mangle-props keep_quoted --comments /farzher/"
   },
 
   "files": [

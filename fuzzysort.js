@@ -1,7 +1,10 @@
 // https://github.com/farzher/fuzzysort v3.0.0
+
+// UMD (Universal Module Definition) for fuzzysort
 ;((root, UMD) => {
-  if(typeof module === 'object' && module.exports) module.exports = UMD() // require
-  else root['fuzzysort'] = UMD() // browser
+  if(typeof define === 'function' && define.amd) define([], UMD)
+  else if(typeof module === 'object' && module.exports) module.exports = UMD()
+  else root['fuzzysort'] = UMD()
 })(this, _ => {
   'use strict'
 
