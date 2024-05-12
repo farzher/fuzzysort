@@ -10,13 +10,13 @@
 
 ## [Demo](https://rawgit.com/farzher/fuzzysort/master/test/test.html)
 
-- **Fast** - **1ms** to search **13,000** files.
-- **Tiny** - 1 file, 0 dependencies, **5kb**.
+- **Fast** - **<1ms** to search **13,000** files.
+- **Tiny** - **1 file**, **0 dependencies**, **5kb**.
 - **Good** - clean api + sorts results well.
 
 https://rawgit.com/farzher/fuzzysort/master/test/test.html
 
-![](https://i.imgur.com/YrlpL1o.gif)
+![](https://i.imgur.com/muaw363.gif)
 
 ![](https://i.imgur.com/SXC9A3q.png)
 
@@ -147,6 +147,12 @@ fuzzysort.go('fast',  targets, options)
 ```
 
 
+### Gotcha
+`result.score` is implemented as a getter/setter and stored different internally
+`r.score = .3; // r.score == 0.30000000000000004`
+
+
+
 
 
 ## Star History
@@ -165,7 +171,7 @@ fuzzysort.go('fast',  targets, options)
 - Changed scoring: score is now a number from 0 to 1 instead of from -Infinity to 0
 - Changed scoring: substring matches are even more relevant
 - Changed scoring: tweaked the scoring quite a bit
-- `result.score` and `result.indexes` are behind a getter/setter for performance reasons
+- `result.score` is behind a getter/setter for performance reasons
 - Fixed minor issues
 
 #### v2.0.0
