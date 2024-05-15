@@ -21,7 +21,7 @@
   }
 
   var go = (search, targets, options) => {
-    if(!search) return options?.all ? all(search, targets, options) : noResults
+    if(!search) return options?.all ? all(targets, options) : noResults
 
     var preparedSearch = getPreparedSearch(search)
     var searchBitflags = preparedSearch.bitflags
@@ -314,7 +314,7 @@
   }
 
 
-  var all = (search, targets, options) => {
+  var all = (targets, options) => {
     var results = []; results.total = targets.length // this total can be wrong if some targets are skipped
 
     var limit = options?.limit || INFINITY
@@ -388,7 +388,7 @@
 
     var nextBeginningIndexes = prepared._nextBeginningIndexes
     if(nextBeginningIndexes === NULL) nextBeginningIndexes = prepared._nextBeginningIndexes = prepareNextBeginningIndexes(prepared.target)
-    var firstPossibleI = targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
+    targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
 
     // Our target string successfully matched all characters in sequence!
     // Let's try a more advanced and strict test to improve the score
