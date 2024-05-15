@@ -20,7 +20,11 @@ https://rawgit.com/farzher/fuzzysort/master/test/test.html
 
 ![](https://i.imgur.com/SXC9A3q.png)
 
+![](https://i.imgur.com/fUkJ7G3.png)
+
 ![](https://i.imgur.com/CnVXRbf.png)
+
+
 
 
 
@@ -31,6 +35,9 @@ npm i fuzzysort
 ```
 ```js
 import fuzzysort from 'fuzzysort'
+```
+```js
+const fuzzysort = require('fuzzysort')
 ```
 
 
@@ -170,6 +177,7 @@ fuzzysort.go('fast',  targets, options)
 - Removed `fuzzysort.highlight()` & Added `result.highlight()`
 - Changed scoring: score is now a number from 0 to 1 instead of from -Infinity to 0
 - Changed scoring: substring matches are even more relevant
+- Changed scoring: `straw berry` now matches great against `strawberry`
 - Changed scoring: tweaked the scoring quite a bit
 - `result.score` is behind a getter/setter for performance reasons
 - Fixed minor issues
