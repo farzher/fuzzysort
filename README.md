@@ -6,13 +6,16 @@
   Fast, Tiny, & Good fuzzy search for JavaScript.
 </p>
 
+<p align="center">
+  <b>Fast:</b> <b>&lt;1ms</b> to search <b>13,000</b> files.
+  <br>
+  <b>Tiny:</b> <b>1 file</b>, <b>0 dependencies</b>, <b>5kb</b>.
+  <br>
+  <b>Good:</b> clean api + sorts results well.
+</p>
 
 
 ## [Demo](https://rawgit.com/farzher/fuzzysort/master/test/test.html)
-
-- **Fast** - **<1ms** to search **13,000** files.
-- **Tiny** - **1 file**, **0 dependencies**, **5kb**.
-- **Good** - clean api + sorts results well.
 
 https://rawgit.com/farzher/fuzzysort/master/test/test.html
 
