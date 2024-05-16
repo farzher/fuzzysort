@@ -56,8 +56,11 @@
         if(result === NULL) continue
         if(result._score < threshold) continue
 
-        // have to clone result so duplicate targets from different obj can each reference the correct obj
-        push_result(new_result(result.target, {_score:result._score, _indexes:result._indexes, obj}))
+        // // have to clone result so duplicate targets from different obj can each reference the correct obj
+        // push_result(new_result(result.target, {_score:result._score, _indexes:result._indexes, obj}))
+
+        result.obj = obj
+        push_result(result)
       }
 
     // options.keys
@@ -222,7 +225,8 @@
 
 
   var prepare = (target) => {
-    if(typeof target !== 'string') target = ''
+    if(typeof target === 'number') target = ''+target
+    else if(typeof target !== 'string') target = ''
     var info = prepareLowerInfo(target)
     return new_result(target, {_targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _bitflags:info.bitflags})
   }
@@ -276,7 +280,8 @@
 
 
   var prepareSearch = (search) => {
-    if(typeof search !== 'string') search = ''
+    if(typeof search === 'number') search = ''+search
+    else if(typeof search !== 'string') search = ''
     search = search.trim()
     var info = prepareLowerInfo(search)
 
@@ -489,7 +494,8 @@
     for(var i = 0; i < searchLen; ++i) prepared._indexes[i] = matchesBest[i]
     prepared._indexes.len = searchLen
 
-    return prepared
+    // return prepared
+    return new_result(prepared.target, {_score:prepared._score, _indexes:prepared._indexes})
   }
   var algorithmSpaces = (preparedSearch, target, allowPartialMatch) => {
     var seen_indexes = new Set()
