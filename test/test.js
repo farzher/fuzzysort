@@ -107,6 +107,39 @@ async function tests() {
     testSorting1('c man', 'ThisCheatsStuff.man', 'ThisManagesStuff.c');
   }
 
+  { // object cache overwriting your results
+    var result1 = fuzzysort.single('a', 'pants')
+    var result2 = fuzzysort.single('s', 'pants')
+    assert(result1.score != result2.score, 'different scores single')
+
+    var result1 = fuzzysort.go('a', ['pants'])[0]
+    var result2 = fuzzysort.go('s', ['pants'])[0]
+    assert(result1.score != result2.score, 'different scores go')
+
+    var result1 = fuzzysort.go('a', [{title: 'pants'}], {key: 'title'})[0]
+    var result2 = fuzzysort.go('s', [{title: 'pants'}], {key: 'title'})[0]
+    assert(result1.score != result2.score, 'different scores key')
+
+    var result1 = fuzzysort.go('a', [{title: 'pants'}], {keys: ['title']})[0]
+    var result2 = fuzzysort.go('s', [{title: 'pants'}], {keys: ['title']})[0]
+    assert(result1.score != result2.score, 'different scores keys')
+
+    var result1 = fuzzysort.go('a', [{title: 'pants'}], {keys: ['title']})[0][0]
+    var result2 = fuzzysort.go('s', [{title: 'pants'}], {keys: ['title']})[0][0]
+    assert(result1.score != result2.score, 'different scores keys result')
+  }
+
+  { // numbers should work
+    var result = fuzzysort.single(5, 256)
+    assert(!!result, 'numbers should work')
+  }
+
+  { // Cannot read properties of undefined (reading '_score') https://github.com/farzher/fuzzysort/issues/130
+    // when using keys, and some don't exist on the target, but others match
+    var result = fuzzysort.go('a'  , [{pants:'what'}, {apple:'what'}, {x:'a', '1':'idk'}], {keys:['pants', 'x', 'y', 'z', '']})
+    var result = fuzzysort.go('a a', [{pants:'what'}, {apple:'what'}, {x:'a', '1':'idk'}], {keys:['pants', 'x', 'y', 'z', '']})
+  }
+
 
   { // typos
     testNomatch('abc', 'acb')

@@ -89,14 +89,14 @@
 
         for (var keyI = 0; keyI < keysLen; ++keyI) {
           target = tmpTargets[keyI]
-          if(target === noTarget) continue
+          if(target === noTarget) { tmpResults[keyI] = noTarget; continue }
 
           tmpResults[keyI] = algorithm(preparedSearch, target, /*allowSpaces=*/false, /*allowPartialMatch=*/containsSpace)
-          if(tmpResults[keyI] === NULL) { target._score = NEGATIVE_INFINITY; target._indexes.len=0; tmpResults[keyI] = target }
+          if(tmpResults[keyI] === NULL) { tmpResults[keyI] = noTarget; continue }
 
           // todo: this seems weird and wrong. like what if our first match wasn't good. this should just replace it instead of averaging with it
           // if our second match isn't good we ignore it instead of averaging with it
-          if(containsSpace && tmpResults[keyI]) for(let i=0; i<preparedSearch.spaceSearches.length; i++) {
+          if(containsSpace) for(let i=0; i<preparedSearch.spaceSearches.length; i++) {
             if(allowPartialMatchScores[i] > -1000) {
               if(keysSpacesBestScores[i] > NEGATIVE_INFINITY) {
                 var tmp = (keysSpacesBestScores[i] + allowPartialMatchScores[i]) / 4/*bonus score for having multiple matches*/
@@ -127,7 +127,6 @@
           var score = NEGATIVE_INFINITY
           for(let i=0; i<keysLen; i++) {
             var result = objResults[i]
-            if(result === null) continue
             if(result._score > -1000) {
               if(score > NEGATIVE_INFINITY) {
                 var tmp = (score + result._score) / 4/*bonus score for having multiple matches*/
@@ -654,7 +653,6 @@
   var nextBeginningIndexesChanges = [] // allows straw berry to match strawberry well, by modifying the end of a substring to be considered a beginning index for the rest of the search
   var keysSpacesBestScores = []; var allowPartialMatchScores = []
   var tmpTargets = []; var tmpResults = []
-  var noTarget = prepare('')
 
   // prop = 'key'                  2.5ms optimized for this case, seems to be about as fast as direct obj[prop]
   // prop = 'key1.key2'            10ms
@@ -676,6 +674,7 @@
   var noResults = []; noResults.total = 0
   var NULL = null
 
+  var noTarget = prepare('')
 
   // Hacked version of https://github.com/lemire/FastPriorityQueue.js
   var fastpriorityqueue=r=>{var e=[],o=0,a={},v=r=>{for(var a=0,v=e[a],c=1;c<o;){var s=c+1;a=c,s<o&&e[s]._score<e[c]._score&&(a=s),e[a-1>>1]=e[a],c=1+(a<<1)}for(var f=a-1>>1;a>0&&v._score<e[f]._score;f=(a=f)-1>>1)e[a]=e[f];e[a]=v};return a.add=(r=>{var a=o;e[o++]=r;for(var v=a-1>>1;a>0&&r._score<e[v]._score;v=(a=v)-1>>1)e[a]=e[v];e[a]=r}),a.poll=(r=>{if(0!==o){var a=e[0];return e[0]=e[--o],v(),a}}),a.peek=(r=>{if(0!==o)return e[0]}),a.replaceTop=(r=>{e[0]=r,v()}),a}
