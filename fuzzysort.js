@@ -124,7 +124,7 @@
           var score = NEGATIVE_INFINITY
           for(let i=0; i<keysLen; i++) {
             var result = objResults[i]
-            if(result === null) continue
+            if(result == null) continue
             if(result._score > -1000) {
               if(score > NEGATIVE_INFINITY) {
                 var tmp = (score + result._score) / 4/*bonus score for having multiple matches*/
