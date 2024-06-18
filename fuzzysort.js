@@ -1,4 +1,4 @@
-// https://github.com/farzher/fuzzysort v3.0.1
+// https://github.com/farzher/fuzzysort v3.0.2
 
 // UMD (Universal Module Definition) for fuzzysort
 ;((root, UMD) => {
