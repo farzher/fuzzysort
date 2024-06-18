@@ -171,6 +171,13 @@ async function tests() {
 
     var tmp = fuzzysort.go('', [{a:'pants', b:'noodles'}, {a:'suit', b:'tie'}], {keys:['a', 'b'], all: true})
     assert(tmp[1][1].target === 'tie', 'all 5')
+
+    var targets = [{a:1}, {a:2}]
+    var tmp = fuzzysort.go('', targets, {key:'a', all: true})
+    assert(tmp[0].obj === targets[0], 'options.all with key https://github.com/farzher/fuzzysort/issues/134')
+
+    var tmp = fuzzysort.go('', targets, {keys:['a'], all: true})
+    assert(tmp[0].obj === targets[0], 'options.all with keys')
   }
 
 

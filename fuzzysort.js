@@ -328,7 +328,7 @@
         var target = getValue(obj, options.key)
         if(target == NULL) continue
         if(!isPrepared(target)) target = getPrepared(target)
-        var result = new_result(target.target, {_score: target._score, obj: target.obj})
+        var result = new_result(target.target, {_score: target._score, obj: obj})
         results.push(result); if(results.length >= limit) return results
       }
     } else if(options?.keys) {
