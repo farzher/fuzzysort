@@ -56,9 +56,6 @@
         if(result === NULL) continue
         if(result._score < threshold) continue
 
-        // // have to clone result so duplicate targets from different obj can each reference the correct obj
-        // push_result(new_result(result.target, {_score:result._score, _indexes:result._indexes, obj}))
-
         result.obj = obj
         push_result(result)
       }
@@ -173,7 +170,8 @@
   }
 
 
-  // this is written as 1 function instead of 2 for minification. perf seems fine
+  // this is written as 1 function instead of 2 for minification. perf seems fine ...
+  // except when minified. the perf is very slow
   var highlight = (result, open='<b>', close='</b>') => {
     var callback = typeof open === 'function' ? open : undefined
 
@@ -493,8 +491,11 @@
     for(var i = 0; i < searchLen; ++i) prepared._indexes[i] = matchesBest[i]
     prepared._indexes.len = searchLen
 
-    // return prepared
-    return new_result(prepared.target, {_score:prepared._score, _indexes:prepared._indexes})
+    const result    = new Result()
+    result.target   = prepared.target
+    result._score   = prepared._score
+    result._indexes = prepared._indexes
+    return result
   }
   var algorithmSpaces = (preparedSearch, target, allowPartialMatch) => {
     var seen_indexes = new Set()
