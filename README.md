@@ -165,6 +165,9 @@ fuzzysort.go('fast',  targets, options)
 
 ### Changelog
 
+#### v3.0.3
+- Added normalizeDiacritics option to normalize accents, diacritics and ligatures for improved matching
+
 #### v3.0.0
 - Added new behavior when using `keys` and your search contains spaces!
 - Added `options.key` can now be a function `{key: obj => obj.tags.join()}`
