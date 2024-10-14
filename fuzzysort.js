@@ -587,8 +587,11 @@
     return result
   }
 
+  // we use this instead of just .normalize('NFD').replace(/[\u0300-\u036f]/g, '') because that screws with japanese characters
+  var remove_accents = (str) => str.replace(/\p{Script=Latin}+/gu, match => match.normalize('NFD')).replace(/[\u0300-\u036f]/g, '')
 
   var prepareLowerInfo = (str) => {
+    str = remove_accents(str)
     var strLen = str.length
     var lower = str.toLowerCase()
     var lowerCodes = [] // new Array(strLen)    sparse array is too slow
@@ -630,6 +633,7 @@
     return beginningIndexes
   }
   var prepareNextBeginningIndexes = (target) => {
+    target = remove_accents(target)
     var targetLen = target.length
     var beginningIndexes = prepareBeginningIndexes(target)
     var nextBeginningIndexes = [] // new Array(targetLen)     sparse array is too slow

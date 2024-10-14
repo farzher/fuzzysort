@@ -1,7 +1,7 @@
 {
 
   "name"        : "fuzzysort",
-  "version"     : "3.0.2",
+  "version"     : "3.1.0",
   "author"      : "farzher",
   "license"     : "MIT",
   "description" : "Fast SublimeText-like fuzzy search for JavaScript",

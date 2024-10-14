@@ -183,9 +183,23 @@ async function tests() {
 
   { // weird characters require strict match to turn into substring
     // https://github.com/farzher/fuzzysort/issues/122 (When searching for a name containing special character, no match is found)
-    var targets = ["Änni ÄÄsma", "Anni Aasma"]
+    var targets = ["Änni ÄÄsma"]
     var results = fuzzysort.go('Ääsma', targets)
-    assert(results[0].highlight('*', '*') === "Änni *ÄÄsma*", "Änni *ÄÄsma*")
+    assert(results[0] && results[0].highlight('*', '*') === "Änni *ÄÄsma*", "Änni *ÄÄsma*")
+    var results = fuzzysort.go('aasma', targets)
+    assert(results[0] && results[0].highlight('*', '*') === "Änni *ÄÄsma*", "Änni *ÄÄsma*")
+  }
+
+  { // normalize diacritics / accents / ligatures
+    var targets = ['Café Society']
+    var results = fuzzysort.go('cafe', targets)
+    assert(results[0].target == 'Café Society')
+
+    // make sure ジ highlights correctly
+    assert(fuzzysort.go('ジ', ['ファイナルファンタジーXIV スターターパック'])[0].highlight() == 'ファイナルファンタ<b>ジ</b>ーXIV スターターパック', 'ジ')
+
+    // make sure this doesn't infinite loop
+    assert(fuzzysort.go('w', ['Rich JavaScript Applications – the Seven Frameworks (Throne of JS, 2012) - Steve Sanderson’s blog - As seen on YouTube™']).length != 0)
   }
 
   { // find good substrings, don't just use theh first one

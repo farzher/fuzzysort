@@ -71,6 +71,7 @@
 
           let str = `${formatscore(result.score)} - `
           for(let i=0; i<vue.keys.length; i++) {
+            if(result[i].target === '') str += result.obj[vue.keys[i]]
             if(i === 0) str += '<strong>'
             str += result[i].highlight()
             if(i === 0) str += '</strong>'
