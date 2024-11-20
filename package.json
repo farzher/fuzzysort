@@ -1,5 +1,4 @@
 {
-
   "name"        : "fuzzysort",
   "version"     : "3.1.0",
   "author"      : "farzher",
@@ -10,24 +9,33 @@
 
   "repository": {
     "type" : "git",
-    "url"  : "https://github.com/farzher/fuzzysort.git"
+    "url"  : "git+https://github.com/farzher/fuzzysort.git"
   },
 
+  "type": "commonjs",
   "main": "fuzzysort.js",
+  "module": "fuzzysort.mjs",
+  "browser": "fuzzysort.min.js",
 
   "scripts": {
-    "test"     : "node test/test.js",
-    "test-min" : "node test/test.js min",
-
-    "minify"   : "uglifyjs fuzzysort.js -o fuzzysort.min.js -m -c --mangle-props keep_quoted --comments /farzher/"
+    "test": "node test/test.js",
+    "test-min": "node test/test.js min",
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "pretest": "npm run build"
   },
 
   "files": [
     "fuzzysort.js",
+    "fuzzysort.mjs",
     "fuzzysort.min.js",
-    "index.d.ts"
+    "index.d.ts",
+    "*.map"
   ],
 
-  "types": "index.d.ts"
-
+  "types": "index.d.ts",
+  "devDependencies": {
+    "rollup": "^4.27.3",
+    "@rollup/plugin-terser": "^0.4.4"
+  }
 }
