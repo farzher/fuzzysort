@@ -119,8 +119,8 @@ var keysResult = results[0]
 // When using multiple `keys`, results are different. They're indexable to get each normal result
 keysResult[0].highlight() // 'Liechi <b>Berry</b>'
 keysResult[1].highlight() // 'Raises <b>Attack</b> when HP is low.'
-keysResult.score          // .84
-keysResult.obj.title      // 'Liechi Berry'
+keysResult[0].score       // .84
+keysResult[0].obj.title   // 'Liechi Berry'
 ```
 
 
