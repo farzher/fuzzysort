@@ -1,8 +1,4 @@
 // https://github.com/farzher/fuzzysort v3.1.0
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
 const single = (search, target) => {
   if(!search || !target) return NULL
 
@@ -682,9 +678,5 @@ const q = fastpriorityqueue(); // reuse this
 
 var fuzzysort = {single, go, prepare, cleanup};
 
-exports.cleanup = cleanup;
-exports.default = fuzzysort;
-exports.go = go;
-exports.prepare = prepare;
-exports.single = single;
-//# sourceMappingURL=fuzzysort.js.map
+export { cleanup, fuzzysort as default, go, prepare, single };
+//# sourceMappingURL=fuzzysort.mjs.map
