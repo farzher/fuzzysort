@@ -30,6 +30,9 @@
     var threshold = denormalizeScore( options?.threshold || 0 )
     var limit     = options?.limit || INFINITY
 
+    var allowSpaces     = options?.allowSpaces || false
+    var allowPartialMatch     = options?.allowPartialMatch || false
+
     var resultsLen = 0; var limitedCount = 0
     var targetsLen = targets.length
 
@@ -52,7 +55,7 @@
         if(!isPrepared(target)) target = getPrepared(target)
 
         if((searchBitflags & target._bitflags) !== searchBitflags) continue
-        var result = algorithm(preparedSearch, target)
+        var result = algorithm(preparedSearch, target, allowSpaces, allowPartialMatch)
         if(result === NULL) continue
         if(result._score < threshold) continue
 
@@ -88,7 +91,7 @@
           target = tmpTargets[keyI]
           if(target === noTarget) { tmpResults[keyI] = noTarget; continue }
 
-          tmpResults[keyI] = algorithm(preparedSearch, target, /*allowSpaces=*/false, /*allowPartialMatch=*/containsSpace)
+          tmpResults[keyI] = algorithm(preparedSearch, target, allowSpaces, /*allowPartialMatch=*/containsSpace)
           if(tmpResults[keyI] === NULL) { tmpResults[keyI] = noTarget; continue }
 
           // todo: this seems weird and wrong. like what if our first match wasn't good. this should just replace it instead of averaging with it
@@ -154,7 +157,7 @@
         if(!isPrepared(target)) target = getPrepared(target)
 
         if((searchBitflags & target._bitflags) !== searchBitflags) continue
-        var result = algorithm(preparedSearch, target)
+        var result = algorithm(preparedSearch, target, allowSpaces, allowPartialMatch)
         if(result === NULL) continue
         if(result._score < threshold) continue
 
