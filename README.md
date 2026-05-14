@@ -112,7 +112,7 @@ let objects = [{
 
 let results = fuzzysort.go('attack berry', objects, {
   keys: ['title', 'meta.desc', obj => obj.tags?.join()],
-  scoreFn: r => r.score * r.obj.bookmarked ? 2 : 1, // if the item is bookmarked, boost its score
+  scoreFn: r => r.score * (r.obj.bookmarked ? 2 : 1), // if the item is bookmarked, boost its score
 })
 
 var keysResult = results[0]
