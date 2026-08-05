@@ -1,4 +1,4 @@
-/*! https://github.com/farzher/fuzzysort v3.0.2 */
+/*! https://github.com/farzher/fuzzysort v3.1.1 */
 
 // UMD (Universal Module Definition) for fuzzysort
 ;((root, UMD) => {
@@ -404,10 +404,7 @@
   }
 
 
-  // Below this point is only internal code
-  // Below this point is only internal code
-  // Below this point is only internal code
-  // Below this point is only internal code
+  // Below this point is internal code.
 
 
   class Result {
@@ -436,12 +433,12 @@
     const result = new Result()
     result['target']             = target
     result['obj']                = options.obj                   ?? NULL
-    result._score                = options._score                ?? NEGATIVE_INFINITY
-    result._indexes              = options._indexes              ?? []
-    result._targetLower          = options._targetLower          ?? ''
-    result._targetLowerCodes     = options._targetLowerCodes     ?? NULL
-    result._nextBeginningIndexes = options._nextBeginningIndexes ?? NULL
-    result._beginningIndexesLen  = options._beginningIndexesLen  ?? 0
+    result._score                = options._score            ?? NEGATIVE_INFINITY
+    result._indexes              = []
+    result._targetLower          = options._targetLower       ?? ''
+    result._targetLowerCodes     = options._targetLowerCodes  ?? NULL
+    result._nextBeginningIndexes = NULL
+    result._beginningIndexesLen  = 0
     result._singleMatchCode      = -1
     result._singleMatchIndex     = -1
     result._singleMatchStrict    = false
@@ -473,9 +470,8 @@
       var searches = search.split(/\s+/)
       searches = [...new Set(searches)] // distinct
       for(var i=0; i<searches.length; i++) {
-        if(searches[i] === '') continue
         var _info = prepareLowerInfo(searches[i])
-        spaceSearches.push({lowerCodes:_info.lowerCodes, _lower:searches[i].toLowerCase(), containsSpace:false})
+        spaceSearches.push({lowerCodes:_info.lowerCodes, _lower:_info._lower, containsSpace:false})
       }
     }
 
@@ -926,10 +922,6 @@
   var keysSpacesBestScores = []; var allowPartialMatchScores = []
   var tmpTargets = []; var tmpResults = []
 
-  // prop = 'key'                  2.5ms optimized for this case, seems to be about as fast as direct obj[prop]
-  // prop = 'key1.key2'            10ms
-  // prop = ['key1', 'key2']       27ms
-  // prop = obj => obj.tags.join() ??ms
   // Resolve complex key shapes once per go(), rather than coercing and
   // inspecting them for every target.
   var makeGetter = prop => {
@@ -962,6 +954,6 @@
   var fastpriorityqueue=r=>{var e=[],o=0,a={},v=r=>{for(var a=0,v=e[a],c=1;c<o;){var s=c+1;a=c,s<o&&e[s]._score<e[c]._score&&(a=s),e[a-1>>1]=e[a],c=1+(a<<1)}for(var f=a-1>>1;a>0&&v._score<e[f]._score;f=(a=f)-1>>1)e[a]=e[f];e[a]=v};return a.add=(r=>{var a=o;e[o++]=r;for(var v=a-1>>1;a>0&&r._score<e[v]._score;v=(a=v)-1>>1)e[a]=e[v];e[a]=r}),a.poll=(r=>{if(0!==o){var a=e[0];return e[0]=e[--o],v(),a}}),a.peek=(r=>{if(0!==o)return e[0]}),a.replaceTop=(r=>{e[0]=r,v()}),a}
   var q = fastpriorityqueue() // reuse this
 
-  // fuzzysort is written this way for minification. all names are mangeled unless quoted
+  // Quote public names so property mangling only affects internals.
   return {'single':single, 'go':go, 'prepare':prepare, 'highlight':highlight, 'score':getScore, 'cleanup':cleanup}
 }) // UMD

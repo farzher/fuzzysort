@@ -4,7 +4,7 @@
   },
   "mangle": {
     "properties": {
-      "regex": "^_"
+      "regex": "^_|^(lowerCodes|bitflags|containsSpace|spaceSearches|add|poll|peek|replaceTop)$"
     }
   },
   "format": {
