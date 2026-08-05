@@ -289,6 +289,7 @@
     result._targetLower          = options._targetLower          ?? ''
     result._targetLowerCodes     = options._targetLowerCodes     ?? NULL
     result._nextBeginningIndexes = options._nextBeginningIndexes ?? NULL
+    result._beginningIndexesLen  = options._beginningIndexesLen  ?? 0
     result._bitflags             = options._bitflags             ?? 0
     return result
   }
@@ -388,7 +389,7 @@
   }
 
 
-  var algorithm = (preparedSearch, prepared, allowSpaces=false, allowPartialMatch=false) => {
+  var algorithm = (preparedSearch, prepared, allowSpaces=false, allowPartialMatch=false, nextBeginningIndexesChanged=false) => {
     if(allowSpaces===false && preparedSearch.containsSpace) return algorithmSpaces(preparedSearch, prepared, allowPartialMatch)
 
     var searchLower      = preparedSearch._lower
@@ -420,26 +421,48 @@
 
     var nextBeginningIndexes = prepared._nextBeginningIndexes
     if(nextBeginningIndexes === NULL) nextBeginningIndexes = prepared._nextBeginningIndexes = prepareNextBeginningIndexes(prepared.target)
-    targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
+    var beginningIndexesLen = nextBeginningIndexesChanged ? 0 : prepared._beginningIndexesLen
+    if(!beginningIndexesLen) {
+      beginningIndexesLen = 1
+      for(var i = nextBeginningIndexes[0]; i < targetLen; i=nextBeginningIndexes[i]) ++beginningIndexesLen
+      if(!nextBeginningIndexesChanged) prepared._beginningIndexesLen = beginningIndexesLen
+    }
 
-    // Our target string successfully matched all characters in sequence!
-    // Let's try a more advanced and strict test to improve the score
-    // only count it as a match if it's consecutive or a beginning character!
-    var backtrackCount = 0
-    if(targetI !== targetLen) for(;;) {
-      if(targetI >= targetLen) {
-        // We failed to find a good spot for this search char, go back to the previous search char and force it forward
-        if(searchI <= 0) break // We failed to push chars forward for a better match
+    // Single-character searches need neither backtracking nor substring work.
+    if(searchLen === 1 && !nextBeginningIndexesChanged) {
+      targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
+      while(targetI < targetLen && searchLowerCode !== targetLowerCodes[targetI]) targetI = nextBeginningIndexes[targetI]
+      var successStrict = targetI < targetLen
+      var matchIndex = successStrict ? targetI : matchesSimple[0]
+      var score = matchIndex === 0 ? 0 : -matchIndex*matchIndex*.2
+      if(!successStrict) score *= 1000
+      else if(beginningIndexesLen > 24) score *= (beginningIndexesLen-24)*10
+      prepared._score = score - (targetLen-1)
+      prepared._indexes[0] = matchIndex
+      prepared._indexes.len = 1
+      return prepared
+    }
 
-        ++backtrackCount; if(backtrackCount > 200) break // exponential backtracking is taking too long, just give up and return a bad match
+    // A substring beginning at the first simple match is necessarily a strict
+    // match. This common case can skip the strict backtracking pass entirely.
+    var substringIndex = searchLen <= 1 ? -1 : prepared._targetLower.indexOf(searchLower, matchesSimple[0])
+    var isSubstring = substringIndex !== -1
+    var isSubstringBeginning = isSubstring && (substringIndex===0 || nextBeginningIndexes[substringIndex-1] === substringIndex)
+    if(isSubstringBeginning && substringIndex === matchesSimple[0]) {
+      successStrict = true
+    } else {
+      targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
 
-        --searchI
-        var lastMatch = matchesStrict[--matchesStrictLen]
-        targetI = nextBeginningIndexes[lastMatch]
-
-      } else {
-        var isMatch = searchLowerCodes[searchI] === targetLowerCodes[targetI]
-        if(isMatch) {
+      // Try a strict match: every character must be consecutive or at a word beginning.
+      var backtrackCount = 0
+      if(targetI !== targetLen) for(;;) {
+        if(targetI >= targetLen) {
+          if(searchI <= 0) break
+          ++backtrackCount; if(backtrackCount > 200) break
+          --searchI
+          var lastMatch = matchesStrict[--matchesStrictLen]
+          targetI = nextBeginningIndexes[lastMatch]
+        } else if(searchLowerCodes[searchI] === targetLowerCodes[targetI]) {
           matchesStrict[matchesStrictLen++] = targetI
           ++searchI; if(searchI === searchLen) { successStrict = true; break }
           ++targetI
@@ -448,11 +471,6 @@
         }
       }
     }
-
-    // check if it's a substring match
-    var substringIndex = searchLen <= 1 ? -1 : prepared._targetLower.indexOf(searchLower, matchesSimple[0]) // perf: this is slow
-    var isSubstring = !!~substringIndex
-    var isSubstringBeginning = !isSubstring ? false : substringIndex===0 || prepared._nextBeginningIndexes[substringIndex-1] === substringIndex
 
     // if it's a substring match but not at a beginning index, let's try to find a substring starting at a beginning index for a better score
     if(isSubstring && !isSubstringBeginning) {
@@ -479,7 +497,7 @@
         var matchesBest = matchesStrict
       }
     }
-    var score = calculateScore(matchesBest, searchLen, targetLen, successStrict, nextBeginningIndexes, isSubstring, isSubstringBeginning)
+    var score = calculateScore(matchesBest, searchLen, targetLen, successStrict, beginningIndexesLen, isSubstring, isSubstringBeginning)
 
     prepared._score = score
 
@@ -488,7 +506,7 @@
 
     return prepared
   }
-  var calculateScore = (matches, searchLen, targetLen, successStrict, nextBeginningIndexes, isSubstring, isSubstringBeginning) => {
+  var calculateScore = (matches, searchLen, targetLen, successStrict, beginningIndexesLen, isSubstring, isSubstringBeginning) => {
     var score = 0
     var extraMatchGroupCount = 0
     for(var i = 1; i < searchLen; ++i) {
@@ -499,11 +517,7 @@
     if(matches[0] !== 0) score -= matches[0]*matches[0]*.2
 
     if(!successStrict) score *= 1000
-    else {
-      var uniqueBeginningIndexes = 1
-      for(var i = nextBeginningIndexes[0]; i < targetLen; i=nextBeginningIndexes[i]) ++uniqueBeginningIndexes
-      if(uniqueBeginningIndexes > 24) score *= (uniqueBeginningIndexes-24)*10
-    }
+    else if(beginningIndexesLen > 24) score *= (beginningIndexesLen-24)*10
 
     var lengthPenalty = (targetLen - searchLen)/2
     score -= lengthPenalty
@@ -513,7 +527,8 @@
     return score - lengthPenalty
   }
   var algorithmSpaces = (preparedSearch, target, allowPartialMatch) => {
-    var seen_indexes = new Set()
+    var seenIndexesLen = 0
+    var seenIndexesGeneration = ++seenIndexesGenerationCounter
     var score = 0
     var result = NULL
 
@@ -522,22 +537,17 @@
     var searchesLen = searches.length
     var changeslen = 0
 
-    // Return _nextBeginningIndexes back to its normal state
-    var resetNextBeginningIndexes = () => {
-      for(let i=changeslen-1; i>=0; i--) target._nextBeginningIndexes[nextBeginningIndexesChanges[i*2 + 0]] = nextBeginningIndexesChanges[i*2 + 1]
-    }
-
     var hasAtLeast1Match = false
     for(var i=0; i<searchesLen; ++i) {
       allowPartialMatchScores[i] = NEGATIVE_INFINITY
       var search = searches[i]
 
-      result = algorithm(search, target)
+      result = algorithm(search, target, false, false, changeslen !== 0)
       if(allowPartialMatch) {
         if(result === NULL) continue
         hasAtLeast1Match = true
       } else {
-        if(result === NULL) {resetNextBeginningIndexes(); return NULL}
+        if(result === NULL) { resetNextBeginningIndexes(target, changeslen); return NULL }
       }
 
       // if not the last search, we need to mutate _nextBeginningIndexes for the next search
@@ -574,12 +584,18 @@
       }
       first_seen_index_last_search = result._indexes[0]
 
-      for(var j=0; j<result._indexes.len; ++j) seen_indexes.add(result._indexes[j])
+      for(var j=0; j<result._indexes.len; ++j) {
+        var index = result._indexes[j]
+        if(seenIndexesFlags[index] !== seenIndexesGeneration) {
+          seenIndexesFlags[index] = seenIndexesGeneration
+          seenIndexes[seenIndexesLen++] = index
+        }
+      }
     }
 
     if(allowPartialMatch && !hasAtLeast1Match) return NULL
 
-    resetNextBeginningIndexes()
+    resetNextBeginningIndexes(target, changeslen)
 
     // allows a search with spaces that's an exact substring to score well
     var allowSpacesResult = algorithm(preparedSearch, target, /*allowSpaces=*/true)
@@ -595,11 +611,13 @@
     if(allowPartialMatch) result = target
     result._score = score
 
-    var i = 0
-    for (let index of seen_indexes) result._indexes[i++] = index
-    result._indexes.len = i
+    for(var i = 0; i < seenIndexesLen; ++i) result._indexes[i] = seenIndexes[i]
+    result._indexes.len = seenIndexesLen
 
     return result
+  }
+  var resetNextBeginningIndexes = (target, changeslen) => {
+    for(var i=changeslen-1; i>=0; --i) target._nextBeginningIndexes[nextBeginningIndexesChanges[i*2]] = nextBeginningIndexesChanges[i*2+1]
   }
 
   // the extra normalize('NFC') is to fix japanese characters like ジ
@@ -670,6 +688,7 @@
 
   // the theory behind these being globals is to reduce garbage collection by not making new arrays
   var matchesSimple = []; var matchesStrict = []
+  var seenIndexes = []; var seenIndexesFlags = []; var seenIndexesGenerationCounter = 0
   var nextBeginningIndexesChanges = [] // allows straw berry to match strawberry well, by modifying the end of a substring to be considered a beginning index for the rest of the search
   var keysSpacesBestScores = []; var allowPartialMatchScores = []
   var tmpTargets = []; var tmpResults = []
