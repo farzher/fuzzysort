@@ -807,12 +807,44 @@
     for(var i=changeslen-1; i>=0; --i) target._nextBeginningIndexes[nextBeginningIndexesChanges[i*2]] = nextBeginningIndexesChanges[i*2+1]
   }
 
-  // the extra normalize('NFC') is to fix japanese characters like ジ
-  // normalize() is relatively expensive and cannot change an ASCII string.
-  var remove_accents = (str) => /[^\x00-\x7F]/.test(str) ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC') : str
+  var characterFolds = {
+    '\\':'/', '"':"'", '`':"'",
+    '‘':"'", '’':"'", '“':"'", '”':"'",
+    '‐':'-', '–':'-', '—':'-', '−':'-',
+    '⁄':'/', '∕':'/', '…':'.',
+    'ø':'o', 'Ø':'O', 'æ':'a', 'Æ':'A',
+    'œ':'o', 'Œ':'O', 'ß':'s', 'ẞ':'S',
+    'ł':'l', 'Ł':'L',
+  }
+
+  var customAsciiFolds = false
+
+  var remap = mappings => {
+    Object.assign(characterFolds, mappings)
+    for(var char in mappings) {
+      if(char.charCodeAt(0) < 128) customAsciiFolds = true
+    }
+  }
+
+  var foldCharacter = char => {
+    var folded = characterFolds[char]
+    if(folded !== undefined) return folded
+    if(char.charCodeAt(0) < 128) return char
+
+    folded = char.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    return folded.length === 1 ? folded : char
+  }
+
+  var normalizeCharacters = str => {
+    if(customAsciiFolds) return str.replace(/[\s\S]/g, foldCharacter)
+
+    return /[^\x00-\x7F]|[\\"`]/.test(str)
+      ? str.replace(/[^\x00-\x7F]|[\\"`]/g, foldCharacter)
+      : str
+  }
 
   var prepareLowerInfo = (str, firstBeginnings=NULL, beginningCounts=NULL, preparedRow=-1) => {
-    str = remove_accents(str)
+    str = normalizeCharacters(str)
     var strLen = str.length
     var lower = str.toLowerCase()
     var lowerCodes = [] // new Array(strLen)    sparse array is too slow
@@ -860,7 +892,7 @@
     return {lowerCodes:lowerCodes, bitflags:bitflags, containsSpace:containsSpace, _lower:lower}
   }
   var prepareSingleMatch = (prepared, searchLowerCode, fallbackIndex) => {
-    var target = remove_accents(prepared.target)
+    var target = normalizeCharacters(prepared.target)
     var targetLowerCodes = prepared._targetLowerCodes
     var matchIndex = fallbackIndex
     var successStrict = false
@@ -888,7 +920,7 @@
     prepared._singleMatchStrict = successStrict
   }
   var prepareNextBeginningIndexes = (prepared) => {
-    var target = remove_accents(prepared.target)
+    var target = normalizeCharacters(prepared.target)
     var targetLen = target.length
     var nextBeginningIndexes = [] // new Array(targetLen)     sparse array is too slow
     var fillFrom = 0
@@ -955,5 +987,5 @@
   var q = fastpriorityqueue() // reuse this
 
   // Quote public names so property mangling only affects internals.
-  return {'single':single, 'go':go, 'prepare':prepare, 'highlight':highlight, 'score':getScore, 'cleanup':cleanup}
+  return {'single':single, 'go':go, 'prepare':prepare, 'highlight':highlight, 'score':getScore, 'remap':remap, 'cleanup':cleanup}
 }) // UMD

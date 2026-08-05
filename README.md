@@ -179,6 +179,13 @@ fuzzysort.go('fast',  preparedTargets, options)
 ```
 
 
+### Character normalization
+
+Searches automatically fold accents, Unicode compatibility forms, and common visual
+variants (`ø`/`o`, `ｅ`/`e`, `ℯ`/`e`, and smart/straight quotes). Forward and backward
+slashes are equivalent, as are an ellipsis and a period. Context-dependent symbols
+such as `+`/`&` and decimal `,`/`.` remain distinct.
+
 ### Gotcha
 `result.score` is implemented as a getter/setter and stored different internally
 `r.score = .3; // r.score == 0.30000000000000004`

@@ -188,6 +188,29 @@ async function tests() {
     var results = fuzzysort.go('cafe', targets)
     assert(results[0].target == 'Café Society')
 
+    // visually equivalent and Unicode compatibility characters
+    for(const [search, target] of [
+      ['o', 'ø'],
+    ]) {
+      var result = fuzzysort.single(search, target)
+      assert(result && result.indexes[0] === 0, `${search} matches ${target}`)
+      assert(fuzzysort.single(target, search), `${target} matches ${search}`)
+    }
+
+    // common punctuation variants
+    for(const quote of ['"', '`', '‘', '’', '“']) {
+      assert(fuzzysort.single("'", quote), `' matches ${quote}`)
+      assert(fuzzysort.single(quote, "'"), `${quote} matches '`)
+    }
+    assert(fuzzysort.single('/', '\\'), '/ matches \\')
+    assert(fuzzysort.single('\\', '/'), '\\ matches /')
+    assert(fuzzysort.single('.', '…'), '. matches …')
+    assert(fuzzysort.single('…', '.'), '… matches .')
+
+    // semantic, context-dependent symbols remain distinct
+    assert(!fuzzysort.single('+', '&'), '+ does not match &')
+    assert(!fuzzysort.single('.', ','), '. does not match ,')
+
     // make sure ジ highlights correctly
     assert(fuzzysort.go('ジ', ['ファイナルファンタジーXIV スターターパック'])[0].highlight() == 'ファイナルファンタ<b>ジ</b>ーXIV スターターパック', 'ジ')
 
