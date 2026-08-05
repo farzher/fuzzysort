@@ -1,0 +1,13 @@
+{
+  "compress": {
+    "passes": 3
+  },
+  "mangle": {
+    "properties": {
+      "regex": "^_"
+    }
+  },
+  "format": {
+    "comments": "some"
+  }
+}

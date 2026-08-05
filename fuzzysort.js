@@ -1,4 +1,4 @@
-// https://github.com/farzher/fuzzysort v3.0.2
+/*! https://github.com/farzher/fuzzysort v3.0.2 */
 
 // UMD (Universal Module Definition) for fuzzysort
 ;((root, UMD) => {
@@ -59,7 +59,7 @@
       var key = options.key
       var keyGetter = makeGetter(key)
       for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
-        var target = keyGetter === NULL ? getValue(obj, key) : keyGetter(obj)
+        var target = keyGetter === NULL ? obj[key] : keyGetter(obj)
         if(!target) continue
         if(!isPrepared(target)) target = getPrepared(target)
 
@@ -84,7 +84,7 @@
           var keysBitflags = 0
           for (var keyI = 0; keyI < keysLen; ++keyI) {
             var keyGetter = keyGetters[keyI]
-            var target = keyGetter === NULL ? getValue(obj, keys[keyI]) : keyGetter(obj)
+            var target = keyGetter === NULL ? obj[keys[keyI]] : keyGetter(obj)
             if(!target) { tmpTargets[keyI] = noTarget; continue }
             if(!isPrepared(target)) target = getPrepared(target)
             tmpTargets[keyI] = target
@@ -272,7 +272,7 @@
         this._objects = targets.slice()
         for(var i=0; i<targets.length; ++i) {
           var obj = targets[i]
-          var value = getter === NULL ? getValue(obj, key) : getter(obj)
+          var value = getter === NULL ? obj[key] : getter(obj)
           this._targets[i] = value ? prepareTarget(value, firstBeginnings, beginningCounts, i) : noTarget
         }
       } else {
@@ -288,7 +288,7 @@
           var values = new Array(keysLen)
           for(var keyI=0; keyI<keysLen; ++keyI) {
             var getter = getters[keyI]
-            var value = getter === NULL ? getValue(obj, keys[keyI]) : getter(obj)
+            var value = getter === NULL ? obj[keys[keyI]] : getter(obj)
             var preparedRow = i * keysLen + keyI
             values[keyI] = value ? prepareTarget(value, firstBeginnings, beginningCounts, preparedRow) : noTarget
           }
@@ -511,7 +511,7 @@
       var key = options.key
       var keyGetter = makeGetter(key)
       for(var i=0;i<targets.length;i++) { var obj = targets[i]
-        var target = keyGetter === NULL ? getValue(obj, key) : keyGetter(obj)
+        var target = keyGetter === NULL ? obj[key] : keyGetter(obj)
         if(target == NULL) continue
         if(!isPrepared(target)) target = getPrepared(target)
         var result = new_result(target.target, {_score: target._score, obj: obj})
@@ -526,7 +526,7 @@
         var objResults = new KeysResult(keysLen)
         for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
           var keyGetter = keyGetters[keyI]
-          var target = keyGetter === NULL ? getValue(obj, keys[keyI]) : keyGetter(obj)
+          var target = keyGetter === NULL ? obj[keys[keyI]] : keyGetter(obj)
           if(!target) { objResults[keyI] = noTarget; continue }
           if(!isPrepared(target)) target = getPrepared(target)
           target._score = NEGATIVE_INFINITY
@@ -930,16 +930,6 @@
   // prop = 'key1.key2'            10ms
   // prop = ['key1', 'key2']       27ms
   // prop = obj => obj.tags.join() ??ms
-  var getValue = (obj, prop) => {
-    var tmp = obj[prop]; if(tmp !== undefined) return tmp
-    if(typeof prop === 'function') return prop(obj) // this should run first. but that makes string props slower
-    var segs = prop
-    if(!Array.isArray(prop)) segs = prop.split('.')
-    var len = segs.length
-    var i = -1
-    while (obj && (++i < len)) obj = obj[segs[i]]
-    return obj
-  }
   // Resolve complex key shapes once per go(), rather than coercing and
   // inspecting them for every target.
   var makeGetter = prop => {
