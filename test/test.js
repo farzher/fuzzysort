@@ -575,6 +575,34 @@ async function benchmarks() {
   const focusedObjects = testdata_obj.ue4_files
   const focusedNestedObjects = focusedRaw.map(str => ({nested:{str}}))
 
+  // Data-cold latency is hidden by the throughput benchmarks because their first
+  // call prepares and warms the targets for every subsequent loop iteration.
+  benchCold('prepare all raw targets', function() {
+    return focusedRaw
+  }, function(targets) {
+    targets.map(fuzzysort.prepare)
+  })
+  benchCold('first go raw targets', function() {
+    fuzzysort.cleanup()
+    return focusedRaw
+  }, function(targets) {
+    fuzzysort.go('render', targets, {limit:10})
+  })
+  benchCold('first go freshly prepared targets', function() {
+    fuzzysort.cleanup()
+    return focusedRaw.map(fuzzysort.prepare)
+  }, function(targets) {
+    fuzzysort.go('render', targets, {limit:10})
+  })
+  benchCold('second go freshly prepared targets', function() {
+    fuzzysort.cleanup()
+    var targets = focusedRaw.map(fuzzysort.prepare)
+    fuzzysort.go('render', targets, {limit:10})
+    return targets
+  }, function(targets) {
+    fuzzysort.go('render', targets, {limit:10})
+  })
+
   bench('go prepared limit 1', function() {
     fuzzysort.go('render', focusedPrepared, {limit:1})
   }, config)
@@ -716,6 +744,25 @@ async function benchmarks() {
 // function getms() { return isNode ? Number(process.hrtime.bigint() / 10000n) / 100 : Date.now() }
 // const getms = Date.now
 const getms = () => performance.now()
+
+function benchCold(name, setup, code, {samplecount=25}={}) {
+  const samples = new Array(samplecount)
+  for(let i=0; i<samplecount; ++i) {
+    const state = setup() // Deliberately outside the timed region.
+    const startms = getms()
+    code(state)
+    samples[i] = getms() - startms
+  }
+  samples.sort((a,b) => a-b)
+  const medianms = samples[samplecount >> 1]
+  const hz = 1000 / medianms
+  console.log(
+    `\u001b[36m${name}\u001b[0m`,
+    '|', `\u001b[36m${medianms.toFixed(2)} ms\u001b[0m`,
+    '|', `${Math.round(hz).toLocaleString()} ops/sec`,
+    '|', samplecount, 'cold samples'
+  )
+}
 
 async function bench(name, code, {benchtime=2000}={}) {
   const async = code.constructor.name === 'AsyncFunction'
