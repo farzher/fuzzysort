@@ -80,7 +80,9 @@ fuzzysort.go('render', files, {limit: 10})
 
 Treat prepared targets and their searchable values as a snapshot. Prepare them again
 when they change. This moves preparation work out of latency-sensitive searches and
-allows fuzzysort to cache additional search metadata safely.
+allows fuzzysort to cache additional search metadata safely. Preparation also builds
+a compact first-letter lookup table (about 54 bytes per searchable value) so the first
+keystroke does not need a separate warmup pass.
 
 ### Options
 

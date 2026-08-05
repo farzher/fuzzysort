@@ -238,11 +238,19 @@
   }
 
 
-  var prepareTarget = (target) => {
+  var prepareTarget = (target, firstBeginnings=NULL, beginningCounts=NULL, preparedRow=-1) => {
     if(typeof target === 'number') target = ''+target
     else if(typeof target !== 'string') target = ''
-    var info = prepareLowerInfo(target)
-    return new_result(target, {_targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _bitflags:info.bitflags})
+    if(target.length >= 65535) preparedRow = -1
+    var info = prepareLowerInfo(target, firstBeginnings, beginningCounts, preparedRow)
+    var result = new_result(target, {_targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _bitflags:info.bitflags})
+    if(preparedRow >= 0) {
+      result._preparedFirstBeginnings = firstBeginnings
+      result._preparedBeginningCounts = beginningCounts
+      result._preparedRow = preparedRow
+      result._beginningIndexesLen = beginningCounts[preparedRow]
+    }
+    return result
   }
 
   var preparedEntryMarker = {}
@@ -251,20 +259,23 @@
       this._mode = options?.keys ? 2 : options?.key ? 1 : 0
       this._targets = new Array(targets.length)
       this._keys = NULL
+      var keysLen = this._mode === 2 ? options.keys.length : 1
+      var preparedLen = targets.length * keysLen
+      var firstBeginnings = new Uint16Array(preparedLen * 26)
+      var beginningCounts = new Uint16Array(preparedLen)
 
       if(this._mode === 0) {
-        for(var i=0; i<targets.length; ++i) this._targets[i] = prepareTarget(targets[i])
+        for(var i=0; i<targets.length; ++i) this._targets[i] = prepareTarget(targets[i], firstBeginnings, beginningCounts, i)
       } else if(this._mode === 1) {
         var key = options.key
         var getter = makeGetter(key)
         for(var i=0; i<targets.length; ++i) {
           var obj = targets[i]
           var value = getter === NULL ? getValue(obj, key) : getter(obj)
-          this._targets[i] = {_prepared:preparedEntryMarker, _obj:obj, '_target':value ? prepareTarget(value) : noTarget}
+          this._targets[i] = {_prepared:preparedEntryMarker, _obj:obj, '_target':value ? prepareTarget(value, firstBeginnings, beginningCounts, i) : noTarget}
         }
       } else {
         var keys = options.keys
-        var keysLen = keys.length
         var getters = new Array(keysLen)
         this._keys = new Array(keysLen)
         for(var keyI=0; keyI<keysLen; ++keyI) {
@@ -277,7 +288,8 @@
           for(var keyI=0; keyI<keysLen; ++keyI) {
             var getter = getters[keyI]
             var value = getter === NULL ? getValue(obj, keys[keyI]) : getter(obj)
-            values[keyI] = value ? prepareTarget(value) : noTarget
+            var preparedRow = i * keysLen + keyI
+            values[keyI] = value ? prepareTarget(value, firstBeginnings, beginningCounts, preparedRow) : noTarget
           }
           this._targets[i] = {_prepared:preparedEntryMarker, _obj:obj, _targets:values}
         }
@@ -480,6 +492,24 @@
     var targetI          = 0 // where you at
     var matchesSimpleLen = 0
 
+    // Prepared collections can answer ASCII letter searches directly from their
+    // shared table, skipping both the target scan and lazy beginning preparation.
+    if(searchLen === 1 && !nextBeginningIndexesChanged && allowSingleCharacter && prepared._preparedRow >= 0 && searchLowerCode>=97 && searchLowerCode<=122) {
+      var preparedSlot = prepared._preparedRow*26 + searchLowerCode-97
+      var simpleMatchIndex = prepared._targetLower.indexOf(searchLower)
+      if(simpleMatchIndex === -1) return NULL
+      var encodedBeginning = prepared._preparedFirstBeginnings[preparedSlot]
+      var successStrict = encodedBeginning !== 0
+      var matchIndex = successStrict ? encodedBeginning-1 : simpleMatchIndex
+      var score = matchIndex === 0 ? 0 : -matchIndex*matchIndex*.2
+      if(!successStrict) score *= 1000
+      else if(prepared._beginningIndexesLen > 24) score *= (prepared._beginningIndexesLen-24)*10
+      prepared._score = score - (targetLen-1)
+      prepared._indexes[0] = matchIndex
+      prepared._indexes.len = 1
+      return prepared
+    }
+
     // very basic fuzzy match; to remove non-matching targets ASAP!
     // walk through target. find sequential matches.
     // if all chars aren't found then exit
@@ -493,18 +523,20 @@
       ++targetI; if(targetI >= targetLen) return NULL // Failed to find searchI
     }
 
-    // Single-character searches only need one beginning match and the beginning
-    // count, not a target-length next-index table. Cache this tiny result because
-    // repeated renders commonly issue the same one-character query.
+    // Prepared collections keep first word-beginning matches for every letter in
+    // compact shared typed arrays. Other targets cache the first character used.
     if(searchLen === 1 && !nextBeginningIndexesChanged && allowSingleCharacter) {
-      if(prepared._nextBeginningIndexes !== NULL) {
+      if(prepared._singleMatchCode === searchLowerCode) {
+        var matchIndex = prepared._singleMatchIndex
+        var successStrict = prepared._singleMatchStrict
+      } else if(prepared._nextBeginningIndexes !== NULL) {
         var nextBeginningIndexes = prepared._nextBeginningIndexes
         targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
         while(targetI < targetLen && searchLowerCode !== targetLowerCodes[targetI]) targetI = nextBeginningIndexes[targetI]
         var successStrict = targetI < targetLen
         var matchIndex = successStrict ? targetI : matchesSimple[0]
       } else {
-        if(prepared._singleMatchCode !== searchLowerCode) prepareSingleMatch(prepared, searchLowerCode, matchesSimple[0])
+        prepareSingleMatch(prepared, searchLowerCode, matchesSimple[0])
         var matchIndex = prepared._singleMatchIndex
         var successStrict = prepared._singleMatchStrict
       }
@@ -711,16 +743,37 @@
   // normalize() is relatively expensive and cannot change an ASCII string.
   var remove_accents = (str) => /[^\x00-\x7F]/.test(str) ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC') : str
 
-  var prepareLowerInfo = (str) => {
+  var prepareLowerInfo = (str, firstBeginnings=NULL, beginningCounts=NULL, preparedRow=-1) => {
     str = remove_accents(str)
     var strLen = str.length
     var lower = str.toLowerCase()
     var lowerCodes = [] // new Array(strLen)    sparse array is too slow
     var bitflags = 0
     var containsSpace = false // space isn't stored in bitflags because of how searching with a space works
+    var collectBeginnings = preparedRow >= 0
+    var beginningIndexesLen = 0
+    var wasUpper = false
+    var wasAlphanum = false
+    var beginningOffset = preparedRow * 26
 
     for(var i = 0; i < strLen; ++i) {
       var lowerCode = lowerCodes[i] = lower.charCodeAt(i)
+
+      if(collectBeginnings) {
+        var targetCode = str.charCodeAt(i)
+        var isUpper = targetCode>=65&&targetCode<=90
+        var isAlphanum = isUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
+        var isBeginning = isUpper && !wasUpper || !wasAlphanum || !isAlphanum
+        wasUpper = isUpper
+        wasAlphanum = isAlphanum
+        if(isBeginning) {
+          ++beginningIndexesLen
+          if(lowerCode>=97 && lowerCode<=122) {
+            var beginningSlot = beginningOffset + lowerCode-97
+            if(firstBeginnings[beginningSlot] === 0) firstBeginnings[beginningSlot] = i+1
+          }
+        }
+      }
 
       if(lowerCode === 32) {
         containsSpace = true
@@ -735,6 +788,7 @@
       bitflags |= 1<<bit
     }
 
+    if(collectBeginnings) beginningCounts[preparedRow] = beginningIndexesLen
     return {lowerCodes:lowerCodes, bitflags:bitflags, containsSpace:containsSpace, _lower:lower}
   }
   var prepareSingleMatch = (prepared, searchLowerCode, fallbackIndex) => {

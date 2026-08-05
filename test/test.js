@@ -368,9 +368,13 @@ async function tests() {
     assert(raw[0]._score === prepared[0]._score, 'raw/prepared score equality')
     assert(JSON.stringify(raw[0].indexes) === JSON.stringify(prepared[0].indexes), 'raw/prepared indexes equality')
 
-    // Prefer a later word beginning over an earlier mid-word character.
-    var result = fuzzysort.go('b', fuzzysort.prepare(['foobar baz']))[0]
+    // Prefer a later word beginning over an earlier mid-word character. Every
+    // letter in a prepared collection has an independent precomputed entry.
+    var singleCharacters = fuzzysort.prepare(['foobar baz'])
+    var result = fuzzysort.go('b', singleCharacters)[0]
     assert(result.indexes[0] === 7, 'single-character beginning match')
+    assert(fuzzysort.go('f', singleCharacters)[0].indexes[0] === 0, 'prepared single-character switch')
+    assert(fuzzysort.go('b', singleCharacters)[0].indexes[0] === 7, 'prepared single-character switch back')
 
     // Duplicate whitespace-separated terms are intentionally deduplicated.
     var oneTerm = fuzzysort.single('foo', 'foo bar')
