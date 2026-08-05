@@ -477,7 +477,7 @@
       for(var i=0; i<nextBeginningIndexes.length; i=nextBeginningIndexes[i]) {
         if(i <= substringIndex) continue
 
-        for(var s=0; s<searchLen; s++) if(searchLowerCodes[s] !== prepared._targetLowerCodes[i+s]) break
+        for(var s=0; s<searchLen; s++) if(searchLowerCodes[s] !== targetLowerCodes[i+s]) break
         if(s === searchLen) { substringIndex = i; isSubstringBeginning = true; break }
       }
     }
