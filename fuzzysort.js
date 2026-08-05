@@ -33,7 +33,6 @@
 
     var resultsLen = 0; var limitedCount = 0
     var targetsLen = targets.length
-
     function push_result(result) {
       if(resultsLen < limit) { q.add(result); ++resultsLen }
       else {
@@ -57,8 +56,9 @@
     // options.key
     if(options?.key) {
       var key = options.key
+      var keyGetter = makeGetter(key)
       for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
-        var target = getValue(obj, key)
+        var target = keyGetter === NULL ? getValue(obj, key) : keyGetter(obj)
         if(!target) continue
         if(!isPrepared(target)) target = getPrepared(target)
 
@@ -74,14 +74,16 @@
     } else if(options?.keys) {
       var keys = options.keys
       var keysLen = keys.length
+      var keyGetters = new Array(keysLen)
+      for(var keyI = 0; keyI < keysLen; ++keyI) keyGetters[keyI] = makeGetter(keys[keyI])
 
       outer: for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
 
         { // early out based on bitflags
           var keysBitflags = 0
           for (var keyI = 0; keyI < keysLen; ++keyI) {
-            var key = keys[keyI]
-            var target = getValue(obj, key)
+            var keyGetter = keyGetters[keyI]
+            var target = keyGetter === NULL ? getValue(obj, keys[keyI]) : keyGetter(obj)
             if(!target) { tmpTargets[keyI] = noTarget; continue }
             if(!isPrepared(target)) target = getPrepared(target)
             tmpTargets[keyI] = target
@@ -621,7 +623,8 @@
   }
 
   // the extra normalize('NFC') is to fix japanese characters like ジ
-  var remove_accents = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC')
+  // normalize() is relatively expensive and cannot change an ASCII string.
+  var remove_accents = (str) => /[^\x00-\x7F]/.test(str) ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC') : str
 
   var prepareLowerInfo = (str) => {
     str = remove_accents(str)
@@ -706,6 +709,26 @@
     var i = -1
     while (obj && (++i < len)) obj = obj[segs[i]]
     return obj
+  }
+  // Resolve complex key shapes once per go(), rather than coercing and
+  // inspecting them for every target.
+  var makeGetter = prop => {
+    if(typeof prop === 'function') return prop
+    if(Array.isArray(prop)) {
+      return obj => {
+        for(var i=0; obj && i<prop.length; ++i) obj = obj[prop[i]]
+        return obj
+      }
+    }
+    if(typeof prop === 'string' && prop.indexOf('.') !== -1) {
+      var segs = prop.split('.')
+      return obj => {
+        var direct = obj[prop]; if(direct !== undefined) return direct
+        for(var i=0; obj && i<segs.length; ++i) obj = obj[segs[i]]
+        return obj
+      }
+    }
+    return NULL
   }
 
   var isPrepared = (x) => { return typeof x === 'object' && typeof x._bitflags === 'number' }
