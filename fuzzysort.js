@@ -311,7 +311,7 @@ export default (() => {
 
   // Result accessors and methods live on the prototype, which structuredClone
   // does not preserve. These helpers also work on results sent from a Worker.
-  var getScore = result => {
+  var score = result => {
     var score = result['score']
     return score === undefined ? normalizeScore(result['_score']) : score
   }
@@ -873,5 +873,5 @@ export default (() => {
 
   // Quote public names so property mangling only affects internals.
 
-  return {single, go, prepare, highlight, score:getScore, remap, cleanup}
+  return {single, go, prepare, highlight, score, remap, cleanup}
 })()
