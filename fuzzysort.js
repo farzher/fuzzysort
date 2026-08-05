@@ -292,6 +292,9 @@
     result._targetLowerCodes     = options._targetLowerCodes     ?? NULL
     result._nextBeginningIndexes = options._nextBeginningIndexes ?? NULL
     result._beginningIndexesLen  = options._beginningIndexesLen  ?? 0
+    result._singleMatchCode      = -1
+    result._singleMatchIndex     = -1
+    result._singleMatchStrict    = false
     result._bitflags             = options._bitflags             ?? 0
     return result
   }
@@ -398,7 +401,7 @@
   }
 
 
-  var algorithm = (preparedSearch, prepared, allowSpaces=false, allowPartialMatch=false, nextBeginningIndexesChanged=false) => {
+  var algorithm = (preparedSearch, prepared, allowSpaces=false, allowPartialMatch=false, nextBeginningIndexesChanged=false, allowSingleCharacter=true) => {
     if(allowSpaces===false && preparedSearch.containsSpace) return algorithmSpaces(preparedSearch, prepared, allowPartialMatch)
 
     var searchLower      = preparedSearch._lower
@@ -424,6 +427,22 @@
       ++targetI; if(targetI >= targetLen) return NULL // Failed to find searchI
     }
 
+    // Single-character searches only need one beginning match and the beginning
+    // count, not a target-length next-index table. Cache this tiny result because
+    // repeated renders commonly issue the same one-character query.
+    if(searchLen === 1 && !nextBeginningIndexesChanged && allowSingleCharacter) {
+      if(prepared._singleMatchCode !== searchLowerCode) prepareSingleMatch(prepared, searchLowerCode, matchesSimple[0])
+      var matchIndex = prepared._singleMatchIndex
+      var successStrict = prepared._singleMatchStrict
+      var score = matchIndex === 0 ? 0 : -matchIndex*matchIndex*.2
+      if(!successStrict) score *= 1000
+      else if(prepared._beginningIndexesLen > 24) score *= (prepared._beginningIndexesLen-24)*10
+      prepared._score = score - (targetLen-1)
+      prepared._indexes[0] = matchIndex
+      prepared._indexes.len = 1
+      return prepared
+    }
+
     var searchI = 0
     var successStrict = false
     var matchesStrictLen = 0
@@ -435,21 +454,6 @@
       beginningIndexesLen = 1
       for(var i = nextBeginningIndexes[0]; i < targetLen; i=nextBeginningIndexes[i]) ++beginningIndexesLen
       if(!nextBeginningIndexesChanged) prepared._beginningIndexesLen = beginningIndexesLen
-    }
-
-    // Single-character searches need neither backtracking nor substring work.
-    if(searchLen === 1 && !nextBeginningIndexesChanged) {
-      targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
-      while(targetI < targetLen && searchLowerCode !== targetLowerCodes[targetI]) targetI = nextBeginningIndexes[targetI]
-      var successStrict = targetI < targetLen
-      var matchIndex = successStrict ? targetI : matchesSimple[0]
-      var score = matchIndex === 0 ? 0 : -matchIndex*matchIndex*.2
-      if(!successStrict) score *= 1000
-      else if(beginningIndexesLen > 24) score *= (beginningIndexesLen-24)*10
-      prepared._score = score - (targetLen-1)
-      prepared._indexes[0] = matchIndex
-      prepared._indexes.len = 1
-      return prepared
     }
 
     // A substring beginning at the first simple match is necessarily a strict
@@ -551,7 +555,7 @@
       allowPartialMatchScores[i] = NEGATIVE_INFINITY
       var search = searches[i]
 
-      result = algorithm(search, target, false, false, changeslen !== 0)
+      result = algorithm(search, target, false, false, changeslen !== 0, false)
       if(allowPartialMatch) {
         if(result === NULL) continue
         hasAtLeast1Match = true
@@ -659,6 +663,34 @@
 
     return {lowerCodes:lowerCodes, bitflags:bitflags, containsSpace:containsSpace, _lower:lower}
   }
+  var prepareSingleMatch = (prepared, searchLowerCode, fallbackIndex) => {
+    var target = remove_accents(prepared.target)
+    var targetLowerCodes = prepared._targetLowerCodes
+    var matchIndex = fallbackIndex
+    var successStrict = false
+    var beginningIndexesLen = 0
+    var wasUpper = false
+    var wasAlphanum = false
+    for(var i = 0; i < target.length; ++i) {
+      var targetCode = target.charCodeAt(i)
+      var isUpper = targetCode>=65&&targetCode<=90
+      var isAlphanum = isUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
+      var isBeginning = isUpper && !wasUpper || !wasAlphanum || !isAlphanum
+      wasUpper = isUpper
+      wasAlphanum = isAlphanum
+      if(isBeginning) {
+        ++beginningIndexesLen
+        if(!successStrict && searchLowerCode === targetLowerCodes[i]) {
+          matchIndex = i
+          successStrict = true
+        }
+      }
+    }
+    prepared._beginningIndexesLen = beginningIndexesLen
+    prepared._singleMatchCode = searchLowerCode
+    prepared._singleMatchIndex = matchIndex
+    prepared._singleMatchStrict = successStrict
+  }
   var prepareNextBeginningIndexes = (prepared) => {
     var target = remove_accents(prepared.target)
     var targetLen = target.length
@@ -667,9 +699,6 @@
     var beginningIndexesLen = 0
     var wasUpper = false
     var wasAlphanum = false
-
-    // Fill each range as soon as its next beginning is discovered. This avoids
-    // allocating a temporary beginnings array while keeping this result packed.
     for(var i = 0; i < targetLen; ++i) {
       var targetCode = target.charCodeAt(i)
       var isUpper = targetCode>=65&&targetCode<=90

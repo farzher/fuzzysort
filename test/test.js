@@ -371,9 +371,13 @@ async function tests() {
     assert(raw._score === prepared._score, 'raw/prepared score equality')
     assert(JSON.stringify(raw.indexes) === JSON.stringify(prepared.indexes), 'raw/prepared indexes equality')
 
-    // Prefer a later word beginning over an earlier mid-word character.
-    var result = fuzzysort.single('b', 'foobar baz')
+    // Prefer a later word beginning over an earlier mid-word character. Switching
+    // queries must also invalidate the cached single-character match.
+    var singleTarget = fuzzysort.prepare('foobar baz')
+    var result = fuzzysort.single('b', singleTarget)
     assert(result.indexes[0] === 7, 'single-character beginning match')
+    assert(fuzzysort.single('f', singleTarget).indexes[0] === 0, 'single-character cache switch')
+    assert(fuzzysort.single('b', singleTarget).indexes[0] === 7, 'single-character cache switch back')
 
     // Duplicate whitespace-separated terms are intentionally deduplicated.
     var oneTerm = fuzzysort.single('foo', 'foo bar')
@@ -574,27 +578,29 @@ async function benchmarks() {
   const focusedRaw = testdata.ue4_files
   const focusedObjects = testdata_obj.ue4_files
   const focusedNestedObjects = focusedRaw.map(str => ({nested:{str}}))
+  const steamPrepared = testdata_prepared.steam_games
+  const steamRaw = testdata.steam_games
 
   // Data-cold latency is hidden by the throughput benchmarks because their first
   // call prepares and warms the targets for every subsequent loop iteration.
-  benchCold('prepare all raw targets', function() {
+  benchCold('prepare all UE4 targets', function() {
     return focusedRaw
   }, function(targets) {
     targets.map(fuzzysort.prepare)
   })
-  benchCold('first go raw targets', function() {
+  benchCold('first go raw UE4 targets', function() {
     fuzzysort.cleanup()
     return focusedRaw
   }, function(targets) {
     fuzzysort.go('render', targets, {limit:10})
   })
-  benchCold('first go freshly prepared targets', function() {
+  benchCold('first go freshly prepared UE4 targets', function() {
     fuzzysort.cleanup()
     return focusedRaw.map(fuzzysort.prepare)
   }, function(targets) {
     fuzzysort.go('render', targets, {limit:10})
   })
-  benchCold('second go freshly prepared targets', function() {
+  benchCold('second go freshly prepared UE4 targets', function() {
     fuzzysort.cleanup()
     var targets = focusedRaw.map(fuzzysort.prepare)
     fuzzysort.go('render', targets, {limit:10})
@@ -602,6 +608,34 @@ async function benchmarks() {
   }, function(targets) {
     fuzzysort.go('render', targets, {limit:10})
   })
+
+  // Steam is large enough to expose first-keystroke costs which are difficult to
+  // see in the smaller UE4 set. Setup remains outside the measured interval.
+  benchCold('prepare all Steam targets', function() {
+    return steamRaw
+  }, function(targets) {
+    targets.map(fuzzysort.prepare)
+  }, {samplecount:15})
+  benchCold('first "e" raw Steam targets', function() {
+    fuzzysort.cleanup()
+    return steamRaw
+  }, function(targets) {
+    fuzzysort.go('e', targets, {limit:10})
+  }, {samplecount:15})
+  benchCold('first "e" freshly prepared Steam targets', function() {
+    fuzzysort.cleanup()
+    return steamRaw.map(fuzzysort.prepare)
+  }, function(targets) {
+    fuzzysort.go('e', targets, {limit:10})
+  }, {samplecount:15})
+  benchCold('second "e" freshly prepared Steam targets', function() {
+    fuzzysort.cleanup()
+    var targets = steamRaw.map(fuzzysort.prepare)
+    fuzzysort.go('e', targets, {limit:10})
+    return targets
+  }, function(targets) {
+    fuzzysort.go('e', targets, {limit:10})
+  }, {samplecount:15})
 
   bench('go prepared limit 1', function() {
     fuzzysort.go('render', focusedPrepared, {limit:1})
@@ -618,6 +652,28 @@ async function benchmarks() {
   bench('go prepared threshold', function() {
     fuzzysort.go('render', focusedPrepared, {limit:10, threshold:.5})
   }, config)
+
+  // A user typing "elder" necessarily performs each of these searches. Keep the
+  // first character separate because it matches most of this 46k-item dataset.
+  bench('go Steam "e" limit 10', function() {
+    fuzzysort.go('e', steamPrepared, {limit:10})
+  }, config)
+  bench('go Steam "e" limit 100', function() {
+    fuzzysort.go('e', steamPrepared, {limit:100})
+  }, config)
+  bench('go Steam "e" unlimited', function() {
+    fuzzysort.go('e', steamPrepared)
+  }, config)
+  bench('go Steam "el" limit 10', function() {
+    fuzzysort.go('el', steamPrepared, {limit:10})
+  }, config)
+  bench('go Steam "eld" limit 10', function() {
+    fuzzysort.go('eld', steamPrepared, {limit:10})
+  }, config)
+  bench('go Steam "elder" limit 10', function() {
+    fuzzysort.go('elder', steamPrepared, {limit:10})
+  }, config)
+
   bench('go raw cached limit 10', function() {
     fuzzysort.go('render', focusedRaw, {limit:10})
   }, config)
