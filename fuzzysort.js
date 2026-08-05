@@ -269,10 +269,11 @@
       } else if(this._mode === 1) {
         var key = options.key
         var getter = makeGetter(key)
+        this._objects = targets.slice()
         for(var i=0; i<targets.length; ++i) {
           var obj = targets[i]
           var value = getter === NULL ? getValue(obj, key) : getter(obj)
-          this._targets[i] = {_prepared:preparedEntryMarker, _obj:obj, '_target':value ? prepareTarget(value, firstBeginnings, beginningCounts, i) : noTarget}
+          this._targets[i] = value ? prepareTarget(value, firstBeginnings, beginningCounts, i) : noTarget
         }
       } else {
         var keys = options.keys
@@ -298,21 +299,92 @@
   }
   var makePreparedKeyGetter = i => entry => entry._targets[i]
   var prepare = (targets, options) => new PreparedTargets(targets, options)
+  // Finite prepared searches can heap the internal targets directly and only
+  // allocate the public results that survive the limit.
+  var goPreparedTargets = (search, targets, options) => {
+    var preparedSearch = getPreparedSearch(search)
+    var searchBitflags = preparedSearch.bitflags
+    var threshold = denormalizeScore( options?.threshold || 0 )
+    var limit = options?.limit || INFINITY
+    var resultsLen = 0; var limitedCount = 0
+
+    for(var i=0; i<targets.length; ++i) {
+      var prepared = targets[i]
+      if((searchBitflags & prepared._bitflags) !== searchBitflags) continue
+      var result = algorithm(preparedSearch, prepared)
+      if(result === NULL || result._score < threshold) continue
+
+      // Prepared targets already have the score shape needed by the heap. Keep
+      // them there directly and allocate only the public results that survive.
+      if(resultsLen < limit) {
+        q.add(result); ++resultsLen
+      } else {
+        ++limitedCount
+        if(result._score > q.peek()._score) q.replaceTop(result)
+      }
+    }
+
+    if(resultsLen === 0) return noResults
+    var results = new Array(resultsLen)
+    for(var i=resultsLen-1; i>=0; --i) results[i] = materialize(q.poll())
+    results.total = resultsLen + limitedCount
+    return results
+  }
+  var goPreparedKey = (search, targets, objects, options) => {
+    if(!search) {
+      if(!options?.all) return noResults
+      var results = []; results.total = targets.length
+      var limit = options?.limit || INFINITY
+      for(var i=0; i<targets.length && i<limit; ++i) {
+        var target = targets[i]
+        results.push(new_result(target.target, {_score:target._score, obj:objects[i]}))
+      }
+      return results
+    }
+
+    var preparedSearch = getPreparedSearch(search)
+    var searchBitflags = preparedSearch.bitflags
+    var threshold = denormalizeScore( options?.threshold || 0 )
+    var limit = options?.limit || INFINITY
+    var resultsLen = 0; var limitedCount = 0
+
+    for(var i=0; i<targets.length; ++i) {
+      var prepared = targets[i]
+      if((searchBitflags & prepared._bitflags) !== searchBitflags) continue
+      var result = algorithm(preparedSearch, prepared)
+      if(result === NULL || result._score < threshold) continue
+
+      if(resultsLen < limit) {
+        q.add(materialize(result, objects[i])); ++resultsLen
+      } else {
+        ++limitedCount
+        if(result._score > q.peek()._score) q.replaceTop(materialize(result, objects[i]))
+      }
+    }
+
+    if(resultsLen === 0) return noResults
+    var results = new Array(resultsLen)
+    for(var i=resultsLen-1; i>=0; --i) results[i] = q.poll()
+    results.total = resultsLen + limitedCount
+    return results
+  }
   var goPrepared = (search, prepared, options) => {
     if(options?.key || options?.keys) throw new Error('fuzzysort: key/keys must be provided to prepare(), not go()')
-    if(prepared._mode === 0) return go(search, prepared._targets, options)
+    if(prepared._mode === 0) {
+      // With no finite heap, every match must be materialized anyway and the
+      // established generic path is faster at collecting large result sets.
+      if(!search || !options?.limit) return go(search, prepared._targets, options)
+      return goPreparedTargets(search, prepared._targets, options)
+    }
+    if(prepared._mode === 1) return goPreparedKey(search, prepared._targets, prepared._objects, options)
 
     var preparedOptions = Object.assign({}, options)
-    if(prepared._mode === 1) {
-      preparedOptions.key = '_target'
-    } else {
-      preparedOptions.keys = prepared._keys
-      if(options?.['scoreFn']) {
-        var scoreFn = options['scoreFn']
-        preparedOptions['scoreFn'] = result => {
-          result.obj = result.obj._obj
-          return scoreFn(result)
-        }
+    preparedOptions.keys = prepared._keys
+    if(options?.['scoreFn']) {
+      var scoreFn = options['scoreFn']
+      preparedOptions['scoreFn'] = result => {
+        result.obj = result.obj._obj
+        return scoreFn(result)
       }
     }
     var results = go(search, prepared._targets, preparedOptions)
