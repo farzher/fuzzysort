@@ -587,8 +587,8 @@
     return result
   }
 
-  // we use this instead of just .normalize('NFD').replace(/[\u0300-\u036f]/g, '') because that screws with japanese characters
-  var remove_accents = (str) => str.replace(/\p{Script=Latin}+/gu, match => match.normalize('NFD')).replace(/[\u0300-\u036f]/g, '')
+  // the extra normalize('NFC') is to fix japanese characters like ジ
+  var remove_accents = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC')
 
   var prepareLowerInfo = (str) => {
     str = remove_accents(str)

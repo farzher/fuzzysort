@@ -1,7 +1,7 @@
 {
 
   "name"        : "fuzzysort",
-  "version"     : "3.1.0",
+  "version"     : "3.1.1",
   "author"      : "farzher",
   "license"     : "MIT",
   "description" : "Fast SublimeText-like fuzzy search for JavaScript",
@@ -19,7 +19,8 @@
     "test"     : "node test/test.js",
     "test-min" : "node test/test.js min",
 
-    "minify"   : "uglifyjs fuzzysort.js -o fuzzysort.min.js -m -c --mangle-props keep_quoted --comments /farzher/"
+    "minify"   : "uglifyjs fuzzysort.js -o fuzzysort.min.js -m -c --mangle-props keep_quoted --comments /farzher/",
+    "build"    : "npm run minify && node test/build.js"
   },
 
   "files": [
