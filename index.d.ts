@@ -106,6 +106,9 @@ declare namespace Fuzzysort {
     /** Read the normalized score of a result received through structuredClone or postMessage */
     score(result: Result | KeysResult<unknown>): number
 
+    /** Add or override character normalization mappings. */
+    remap(mappings: Readonly<Record<string, string>>): void
+
     /**
     * Free memory caches if you're done using fuzzysort for now
     */
