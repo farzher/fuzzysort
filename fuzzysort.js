@@ -22,6 +22,7 @@
   }
 
   var go = (search, targets, options) => {
+    if(targets instanceof PreparedTargets) return goPrepared(search, targets, options)
     if(!search) return options?.all ? all(targets, options) : noResults
 
     var preparedSearch = getPreparedSearch(search)
@@ -149,8 +150,8 @@
 
         objResults.obj = obj
         objResults._score = score
-        if(options?.scoreFn) {
-          score = options.scoreFn(objResults)
+        if(options?.['scoreFn']) {
+          score = options['scoreFn'](objResults)
           if(!score) continue
           score = denormalizeScore(score)
           objResults._score = score
@@ -237,11 +238,76 @@
   }
 
 
-  var prepare = (target) => {
+  var prepareTarget = (target) => {
     if(typeof target === 'number') target = ''+target
     else if(typeof target !== 'string') target = ''
     var info = prepareLowerInfo(target)
     return new_result(target, {_targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _bitflags:info.bitflags})
+  }
+
+  var preparedEntryMarker = {}
+  class PreparedTargets {
+    constructor(targets, options) {
+      this._mode = options?.keys ? 2 : options?.key ? 1 : 0
+      this._targets = new Array(targets.length)
+      this._keys = NULL
+
+      if(this._mode === 0) {
+        for(var i=0; i<targets.length; ++i) this._targets[i] = prepareTarget(targets[i])
+      } else if(this._mode === 1) {
+        var key = options.key
+        var getter = makeGetter(key)
+        for(var i=0; i<targets.length; ++i) {
+          var obj = targets[i]
+          var value = getter === NULL ? getValue(obj, key) : getter(obj)
+          this._targets[i] = {_prepared:preparedEntryMarker, _obj:obj, '_target':value ? prepareTarget(value) : noTarget}
+        }
+      } else {
+        var keys = options.keys
+        var keysLen = keys.length
+        var getters = new Array(keysLen)
+        this._keys = new Array(keysLen)
+        for(var keyI=0; keyI<keysLen; ++keyI) {
+          getters[keyI] = makeGetter(keys[keyI])
+          this._keys[keyI] = makePreparedKeyGetter(keyI)
+        }
+        for(var i=0; i<targets.length; ++i) {
+          var obj = targets[i]
+          var values = new Array(keysLen)
+          for(var keyI=0; keyI<keysLen; ++keyI) {
+            var getter = getters[keyI]
+            var value = getter === NULL ? getValue(obj, keys[keyI]) : getter(obj)
+            values[keyI] = value ? prepareTarget(value) : noTarget
+          }
+          this._targets[i] = {_prepared:preparedEntryMarker, _obj:obj, _targets:values}
+        }
+      }
+    }
+  }
+  var makePreparedKeyGetter = i => entry => entry._targets[i]
+  var prepare = (targets, options) => new PreparedTargets(targets, options)
+  var goPrepared = (search, prepared, options) => {
+    if(options?.key || options?.keys) throw new Error('fuzzysort: key/keys must be provided to prepare(), not go()')
+    if(prepared._mode === 0) return go(search, prepared._targets, options)
+
+    var preparedOptions = Object.assign({}, options)
+    if(prepared._mode === 1) {
+      preparedOptions.key = '_target'
+    } else {
+      preparedOptions.keys = prepared._keys
+      if(options?.['scoreFn']) {
+        var scoreFn = options['scoreFn']
+        preparedOptions['scoreFn'] = result => {
+          result.obj = result.obj._obj
+          return scoreFn(result)
+        }
+      }
+    }
+    var results = go(search, prepared._targets, preparedOptions)
+    for(var i=0; i<results.length; ++i) {
+      if(results[i].obj && results[i].obj._prepared === preparedEntryMarker) results[i].obj = results[i].obj._obj
+    }
+    return results
   }
 
   var cleanup = () => { preparedCache.clear(); preparedSearchCache.clear() }
@@ -335,10 +401,10 @@
 
 
   var getPrepared = (target) => {
-    if(target.length > 999) return prepare(target) // don't cache huge targets
+    if(target.length > 999) return prepareTarget(target) // don't cache huge targets
     var targetPrepared = preparedCache.get(target)
     if(targetPrepared !== undefined) return targetPrepared
-    targetPrepared = prepare(target)
+    targetPrepared = prepareTarget(target)
     preparedCache.set(target, targetPrepared)
     return targetPrepared
   }
@@ -431,9 +497,17 @@
     // count, not a target-length next-index table. Cache this tiny result because
     // repeated renders commonly issue the same one-character query.
     if(searchLen === 1 && !nextBeginningIndexesChanged && allowSingleCharacter) {
-      if(prepared._singleMatchCode !== searchLowerCode) prepareSingleMatch(prepared, searchLowerCode, matchesSimple[0])
-      var matchIndex = prepared._singleMatchIndex
-      var successStrict = prepared._singleMatchStrict
+      if(prepared._nextBeginningIndexes !== NULL) {
+        var nextBeginningIndexes = prepared._nextBeginningIndexes
+        targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
+        while(targetI < targetLen && searchLowerCode !== targetLowerCodes[targetI]) targetI = nextBeginningIndexes[targetI]
+        var successStrict = targetI < targetLen
+        var matchIndex = successStrict ? targetI : matchesSimple[0]
+      } else {
+        if(prepared._singleMatchCode !== searchLowerCode) prepareSingleMatch(prepared, searchLowerCode, matchesSimple[0])
+        var matchIndex = prepared._singleMatchIndex
+        var successStrict = prepared._singleMatchStrict
+      }
       var score = matchIndex === 0 ? 0 : -matchIndex*matchIndex*.2
       if(!successStrict) score *= 1000
       else if(prepared._beginningIndexesLen > 24) score *= (prepared._beginningIndexesLen-24)*10
@@ -766,12 +840,12 @@
   var noResults = []; noResults.total = 0
   var NULL = null
 
-  var noTarget = prepare('')
+  var noTarget = prepareTarget('')
 
   // Hacked version of https://github.com/lemire/FastPriorityQueue.js
   var fastpriorityqueue=r=>{var e=[],o=0,a={},v=r=>{for(var a=0,v=e[a],c=1;c<o;){var s=c+1;a=c,s<o&&e[s]._score<e[c]._score&&(a=s),e[a-1>>1]=e[a],c=1+(a<<1)}for(var f=a-1>>1;a>0&&v._score<e[f]._score;f=(a=f)-1>>1)e[a]=e[f];e[a]=v};return a.add=(r=>{var a=o;e[o++]=r;for(var v=a-1>>1;a>0&&r._score<e[v]._score;v=(a=v)-1>>1)e[a]=e[v];e[a]=r}),a.poll=(r=>{if(0!==o){var a=e[0];return e[0]=e[--o],v(),a}}),a.peek=(r=>{if(0!==o)return e[0]}),a.replaceTop=(r=>{e[0]=r,v()}),a}
   var q = fastpriorityqueue() // reuse this
 
   // fuzzysort is written this way for minification. all names are mangeled unless quoted
-  return {'single':single, 'go':go, 'highlight':highlight, 'score':getScore, 'prepare':prepare, 'cleanup':cleanup}
+  return {'single':single, 'go':go, 'prepare':prepare, 'highlight':highlight, 'score':getScore, 'cleanup':cleanup}
 }) // UMD

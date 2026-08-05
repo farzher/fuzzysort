@@ -32,20 +32,13 @@ const config = {
   // benchtime: 1000,
 }
 
-// load testdata into testdata_prepared, testdata_obj
+// load testdata into prepared collections and objects
 let testdata_prepared = {}; let testdata_obj = {}
 {
-  for(const key of Object.keys(testdata)) {
-    testdata_prepared[key] = new Array(testdata[key].length)
-    for(let i = testdata[key].length-1; i>=0; i-=1) {
-      testdata_prepared[key][i] = fuzzysort.prepare(testdata[key][i])
-    }
-  }
+  for(const key of Object.keys(testdata)) testdata_prepared[key] = fuzzysort.prepare(testdata[key])
   for(const key of Object.keys(testdata)) {
     testdata_obj[key] = new Array(testdata[key].length)
-    for(let i = testdata[key].length-1; i>=0; i-=1) {
-      testdata_obj[key][i] = {str: testdata[key][i], prepared: testdata_prepared[key][i]}
-    }
+    for(let i = testdata[key].length-1; i>=0; i-=1) testdata_obj[key][i] = {str: testdata[key][i], alt: testdata[key][i]}
   }
 }
 
@@ -286,15 +279,16 @@ async function tests() {
     var results = fuzzysort.go('typography', targets, {key: 'name'})
     var results = fuzzysort.go('typography', targets, {keys: ['name']})
 
-    // key/keys is a Symbol AND the target is a prepared empty string
+    // key/keys can be a Symbol and targets can contain empty strings
     var s = Symbol()
-    var results = fuzzysort.go('va', ['value', ''].map(v => ({target: v, [s]: fuzzysort.prepare(v)})), {key: s})
+    var symbolTargets = ['value', ''].map(v => ({target: v, [s]: v}))
+    var results = fuzzysort.go('va', fuzzysort.prepare(symbolTargets, {key:s}))
     assert(results.length==1)
-    var results = fuzzysort.go('va', ['value', ''].map(v => ({target: v, [s]: fuzzysort.prepare(v)})), {keys: [s]})
+    var results = fuzzysort.go('va', fuzzysort.prepare(symbolTargets, {keys:[s]}))
     assert(results.length==1)
 
     // make sure we don't deoptimize when run with weird values
-    fuzzysort.single('sup', fuzzysort.prepare())
+    fuzzysort.single('sup', undefined)
     fuzzysort.go('', ['empty search test'])
     fuzzysort.go('empty target test', [''])
     fuzzysort.go('', [''])
@@ -366,18 +360,17 @@ async function tests() {
   }
 
   { // common API paths and option combinations
-    var raw = fuzzysort.single('render', 'PreRender/render target')
-    var prepared = fuzzysort.single('render', fuzzysort.prepare('PreRender/render target'))
-    assert(raw._score === prepared._score, 'raw/prepared score equality')
-    assert(JSON.stringify(raw.indexes) === JSON.stringify(prepared.indexes), 'raw/prepared indexes equality')
+    assert(typeof fuzzysort.prepare === 'function', 'prepare is public')
+    assert(fuzzysort.index === undefined, 'index is not public')
 
-    // Prefer a later word beginning over an earlier mid-word character. Switching
-    // queries must also invalidate the cached single-character match.
-    var singleTarget = fuzzysort.prepare('foobar baz')
-    var result = fuzzysort.single('b', singleTarget)
+    var raw = fuzzysort.go('render', ['PreRender/render target'])
+    var prepared = fuzzysort.go('render', fuzzysort.prepare(['PreRender/render target']))
+    assert(raw[0]._score === prepared[0]._score, 'raw/prepared score equality')
+    assert(JSON.stringify(raw[0].indexes) === JSON.stringify(prepared[0].indexes), 'raw/prepared indexes equality')
+
+    // Prefer a later word beginning over an earlier mid-word character.
+    var result = fuzzysort.go('b', fuzzysort.prepare(['foobar baz']))[0]
     assert(result.indexes[0] === 7, 'single-character beginning match')
-    assert(fuzzysort.single('f', singleTarget).indexes[0] === 0, 'single-character cache switch')
-    assert(fuzzysort.single('b', singleTarget).indexes[0] === 7, 'single-character cache switch back')
 
     // Duplicate whitespace-separated terms are intentionally deduplicated.
     var oneTerm = fuzzysort.single('foo', 'foo bar')
@@ -396,6 +389,12 @@ async function tests() {
     assert(fuzzysort.go('gamma', keyPaths, {key:['array', 0]}).length === 1, 'array key path')
     assert(fuzzysort.go('beta', keyPaths, {key:obj=>obj.nested.value}).length === 1, 'function key path')
 
+    var preparedKey = fuzzysort.prepare(keyPaths, {key:'nested.value'})
+    assert(fuzzysort.go('beta', preparedKey)[0].obj === keyPaths[0], 'prepared key preserves object')
+    var preparedKeys = fuzzysort.prepare(keyPaths, {keys:['direct', 'nested.value']})
+    assert(fuzzysort.go('alpha beta', preparedKeys)[0].obj === keyPaths[0], 'prepared keys preserve object')
+    assert(fuzzysort.go('', preparedKey, {all:true})[0].obj === keyPaths[0], 'prepared key all')
+
     var scoreFnCalls = 0
     var scored = fuzzysort.go('a', [{name:'a', rank:2}, {name:'a', rank:3}, {name:'a', rank:0}], {
       keys: ['name'],
@@ -403,6 +402,13 @@ async function tests() {
     })
     assert(scoreFnCalls === 3, 'scoreFn called for every matching object')
     assert(scored.length === 2 && scored[0].obj.rank === 3 && scored[1].obj.rank === 2, 'scoreFn ordering and zero filtering')
+
+    scoreFnCalls = 0
+    var preparedScored = fuzzysort.prepare([{name:'a', rank:2}, {name:'a', rank:3}], {keys:['name']})
+    var preparedScoreResults = fuzzysort.go('a', preparedScored, {
+      scoreFn: result => { ++scoreFnCalls; return result.obj.rank },
+    })
+    assert(scoreFnCalls === 2 && preparedScoreResults[0].obj.rank === 3, 'prepared keys scoreFn')
 
     var unread = fuzzysort.go('render', ['PreRender/render target'], {limit:1})[0]
     var rawScore = unread._score
@@ -548,12 +554,8 @@ async function benchmarks() {
   // Focused common paths. Keep these separate so a regression in one workload
   // is not hidden by faster operations bundled into the same benchmark.
   const focusedSingleTarget = 'C:/Project/Renderer/RenderTarget.cpp'
-  const focusedSinglePrepared = fuzzysort.prepare(focusedSingleTarget)
   bench('single raw cached target', function() {
     fuzzysort.single('render', focusedSingleTarget)
-  }, config)
-  bench('single prepared target', function() {
-    fuzzysort.single('render', focusedSinglePrepared)
   }, config)
   bench('single successful non-substring', function() {
     fuzzysort.single('rtrgt', 'C:/Project/Renderer/RenderTarget.cpp')
@@ -568,10 +570,10 @@ async function benchmarks() {
     fuzzysort.single('r', 'C:/Project/Renderer/RenderTarget.cpp')
   }, config)
   bench('prepare ascii target', function() {
-    fuzzysort.prepare('C:/Project/Renderer/RenderTarget.cpp')
+    fuzzysort.prepare(['C:/Project/Renderer/RenderTarget.cpp'])
   }, config)
   bench('prepare unicode target', function() {
-    fuzzysort.prepare('Café/レンダラー/RenderTarget.cpp')
+    fuzzysort.prepare(['Café/レンダラー/RenderTarget.cpp'])
   }, config)
 
   const focusedPrepared = testdata_prepared.ue4_files
@@ -586,7 +588,7 @@ async function benchmarks() {
   benchCold('prepare all UE4 targets', function() {
     return focusedRaw
   }, function(targets) {
-    targets.map(fuzzysort.prepare)
+    fuzzysort.prepare(targets)
   })
   benchCold('first go raw UE4 targets', function() {
     fuzzysort.cleanup()
@@ -594,15 +596,15 @@ async function benchmarks() {
   }, function(targets) {
     fuzzysort.go('render', targets, {limit:10})
   })
-  benchCold('first go freshly prepared UE4 targets', function() {
+  benchCold('first go prepared UE4 targets', function() {
     fuzzysort.cleanup()
-    return focusedRaw.map(fuzzysort.prepare)
+    return fuzzysort.prepare(focusedRaw)
   }, function(targets) {
     fuzzysort.go('render', targets, {limit:10})
   })
-  benchCold('second go freshly prepared UE4 targets', function() {
+  benchCold('second go prepared UE4 targets', function() {
     fuzzysort.cleanup()
-    var targets = focusedRaw.map(fuzzysort.prepare)
+    var targets = fuzzysort.prepare(focusedRaw)
     fuzzysort.go('render', targets, {limit:10})
     return targets
   }, function(targets) {
@@ -614,7 +616,7 @@ async function benchmarks() {
   benchCold('prepare all Steam targets', function() {
     return steamRaw
   }, function(targets) {
-    targets.map(fuzzysort.prepare)
+    fuzzysort.prepare(targets)
   }, {samplecount:15})
   benchCold('first "e" raw Steam targets', function() {
     fuzzysort.cleanup()
@@ -622,15 +624,15 @@ async function benchmarks() {
   }, function(targets) {
     fuzzysort.go('e', targets, {limit:10})
   }, {samplecount:15})
-  benchCold('first "e" freshly prepared Steam targets', function() {
+  benchCold('first "e" prepared Steam targets', function() {
     fuzzysort.cleanup()
-    return steamRaw.map(fuzzysort.prepare)
+    return fuzzysort.prepare(steamRaw)
   }, function(targets) {
     fuzzysort.go('e', targets, {limit:10})
   }, {samplecount:15})
-  benchCold('second "e" freshly prepared Steam targets', function() {
+  benchCold('second "e" prepared Steam targets', function() {
     fuzzysort.cleanup()
-    var targets = steamRaw.map(fuzzysort.prepare)
+    var targets = fuzzysort.prepare(steamRaw)
     fuzzysort.go('e', targets, {limit:10})
     return targets
   }, function(targets) {
@@ -695,10 +697,10 @@ async function benchmarks() {
     fuzzysort.go('render', focusedObjects, {key:obj=>obj.str, limit:10})
   }, config)
   bench('go keys focused', function() {
-    fuzzysort.go('render', focusedObjects, {keys:['str', 'prepared'], limit:10})
+    fuzzysort.go('render', focusedObjects, {keys:['str', 'alt'], limit:10})
   }, config)
   bench('go keys scoreFn', function() {
-    fuzzysort.go('render', focusedObjects, {keys:['str', 'prepared'], limit:10, scoreFn:results=>results.score})
+    fuzzysort.go('render', focusedObjects, {keys:['str', 'alt'], limit:10, scoreFn:results=>results.score})
   }, config)
 
   bench('go results unread', function() {
@@ -758,10 +760,11 @@ async function benchmarks() {
     fuzzysort.go('e', testdata_prepared.ue4_files)
     fuzzysort.go('mrender.h', testdata_prepared.ue4_files)
   }, config)
+  const preparedObjects = fuzzysort.prepare(testdata_obj.ue4_files, {key:'str'})
   bench('go prepared key', function() {
-    fuzzysort.go('nnnne', testdata_obj.ue4_files, {key: 'prepared', limit:100})
-    fuzzysort.go('e', testdata_obj.ue4_files, {key: 'prepared', limit:100})
-    fuzzysort.go('mrender.h', testdata_obj.ue4_files, {key: 'prepared', limit:100})
+    fuzzysort.go('nnnne', preparedObjects, {limit:100})
+    fuzzysort.go('e', preparedObjects, {limit:100})
+    fuzzysort.go('mrender.h', preparedObjects, {limit:100})
   }, config)
   bench('go key', function() {
     fuzzysort.go('nnnne', testdata_obj.ue4_files, {key: 'str', limit:100})

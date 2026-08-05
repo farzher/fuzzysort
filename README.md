@@ -62,6 +62,26 @@ const results = fuzzysort.go('a', mystuff, {key: 'file'})
 // [{score: 0.81, obj: {file: 'Apple.cpp'}}, {score: 0.59, obj: {file: 'Banana.cpp'}}]
 ```
 
+### `fuzzysort.prepare(targets, options=null)`
+
+Build an optimized reusable snapshot when the same targets will be searched more than once.
+Keys for object targets are provided while preparing, not while searching.
+
+```js
+const games = fuzzysort.prepare(['Half-Life', 'Portal', 'Team Fortress 2'])
+fuzzysort.go('port', games, {limit: 10})
+
+const files = fuzzysort.prepare(
+  [{name: 'App.js'}, {name: 'Renderer.js'}],
+  {key: 'name'},
+)
+fuzzysort.go('render', files, {limit: 10})
+```
+
+Treat prepared targets and their searchable values as a snapshot. Prepare them again
+when they change. This moves preparation work out of latency-sensitive searches and
+allows fuzzysort to cache additional search metadata safely.
+
 ### Options
 
 ```js
@@ -143,19 +163,17 @@ let targets = [{file: 'Monitor.cpp'}, {file: 'MeshRenderer.cpp'}]
 // filter out targets that you don't need to search! especially long ones!
 targets = targets.filter(t => t.file.length < 1000)
 
-// if your targets don't change often, provide prepared targets instead of raw strings!
-targets.forEach(t => t.filePrepared = fuzzysort.prepare(t.file))
-
-// don't use options.key if you don't need a reference to your original obj
-targets = targets.map(t => t.filePrepared)
+// Prepare targets before the user starts searching. For object targets, key/keys
+// belong here so their values are extracted only once.
+const preparedTargets = fuzzysort.prepare(targets, {key: 'file'})
 
 const options = {
   limit: 100,    // don't return more results than you need!
   threshold: .5, // don't return bad results
 }
-fuzzysort.go('gotta', targets, options)
-fuzzysort.go('go',    targets, options)
-fuzzysort.go('fast',  targets, options)
+fuzzysort.go('gotta', preparedTargets, options)
+fuzzysort.go('go',    preparedTargets, options)
+fuzzysort.go('fast',  preparedTargets, options)
 ```
 
 
