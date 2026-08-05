@@ -39,16 +39,15 @@ npm i fuzzysort
 ```js
 import fuzzysort from 'fuzzysort'
 ```
-```js
-const fuzzysort = require('fuzzysort')
-```
 
 
 
 ## Installation Browser
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/fuzzysort@3.1.1/fuzzysort.min.js"></script>
+<script type="module">
+  import fuzzysort from 'https://cdn.jsdelivr.net/npm/fuzzysort@4.0.0/fuzzysort.min.js'
+</script>
 ```
 
 

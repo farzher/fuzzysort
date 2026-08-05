@@ -13,17 +13,12 @@ HOW TO WRITE TESTS:
   assert(true, 'my err msg') // must be truthy
 */
 
-// require / setup
+// import / setup
+import testdata from './testdata.js'
+
 const isNode = typeof window === 'undefined'
-if(isNode) {
-  var testdata = require('./testdata.js')
-  var arg = process.argv[2]
-  if(arg == 'min') {
-    var fuzzysort = require('../fuzzysort.min.js')
-  } else {
-    var fuzzysort = require('../fuzzysort.js')
-  }
-}
+const useMinified = isNode && process.argv[2] === 'min'
+const {default: fuzzysort} = await import(useMinified ? '../fuzzysort.min.js' : '../fuzzysort.js')
 
 // config
 const config = {
@@ -41,6 +36,8 @@ let testdata_prepared = {}; let testdata_obj = {}
     for(let i = testdata[key].length-1; i>=0; i-=1) testdata_obj[key][i] = {str: testdata[key][i], alt: testdata[key][i]}
   }
 }
+
+if(!isNode) Object.assign(globalThis, {fuzzysort, testdata, testdata_prepared})
 
 
 

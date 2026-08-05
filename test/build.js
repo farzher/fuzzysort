@@ -1,43 +1,28 @@
-const fs = require('fs')
+import fs from 'node:fs'
+import {fileURLToPath} from 'node:url'
 
-const new_version = process.argv[2]
-if(!new_version) return console.error('1st cmd arg must be fuzzysort\'s new version number')
+const newVersion = process.argv[2]
+if(!newVersion) throw new Error('1st cmd arg must be fuzzysort\'s new version number')
+if(!/^\d+\.\d+\.\d+$/.test(newVersion)) throw new Error(`invalid version: ${newVersion}`)
 
-{
-  const file_path = `${__dirname}/../fuzzysort.min.js`
-  const text = fs.readFileSync(file_path, 'utf8')
-  const matches = text.match(/v\d+\.\d+\.\d+/)
+const rootUrl = new URL('../', import.meta.url)
+const packagePath = fileURLToPath(new URL('package.json', rootUrl))
+const oldVersion = JSON.parse(fs.readFileSync(packagePath, 'utf8')).version
+const escapedOldVersion = oldVersion.replace(/\./g, '\\.')
 
-  if(!matches || matches.length !== 1) return console.error('expected 1 version match, found', matches ? matches.length : 0)
+function update(relativePath, pattern, replacement, expectedCount = 1) {
+  const filePath = fileURLToPath(new URL(relativePath, rootUrl))
+  const text = fs.readFileSync(filePath, 'utf8')
+  const matches = text.match(pattern)
+  const count = matches?.length ?? 0
+  if(count !== expectedCount) throw new Error(`${relativePath}: expected ${expectedCount} version matches, found ${count}`)
 
-  const version = matches[0]
-  console.log('found version:', version)
-
-  fs.writeFileSync(file_path, text.replace(version, `v${new_version}`))
+  console.log(`${relativePath}: ${matches[0]} -> ${replacement}`)
+  fs.writeFileSync(filePath, text.replace(pattern, replacement))
 }
 
-{
-  const file_path = `${__dirname}/../README.md`
-  const text = fs.readFileSync(file_path, 'utf8')
-  const matches = text.match(/@\d+\.\d+\.\d+/)
-
-  if(!matches || matches.length !== 1) return console.error('expected 1 version match, found', matches ? matches.length : 0)
-
-  const version = matches[0]
-  console.log('found version:', version)
-
-  fs.writeFileSync(file_path, text.replace(version, `@${new_version}`))
-}
-
-{
-  const file_path = `${__dirname}/../package.json`
-  const text = fs.readFileSync(file_path, 'utf8')
-  const matches = text.match(/"\d+\.\d+\.\d+"/)
-
-  if(!matches || matches.length !== 1) return console.error('expected 1 version match, found', matches ? matches.length : 0)
-
-  const version = matches[0]
-  console.log('found version:', version)
-
-  fs.writeFileSync(file_path, text.replace(version, `"${new_version}"`))
-}
+update('fuzzysort.js', new RegExp(`v${escapedOldVersion}`, 'g'), `v${newVersion}`)
+update('fuzzysort.min.js', new RegExp(`v${escapedOldVersion}`, 'g'), `v${newVersion}`)
+update('README.md', new RegExp(`@${escapedOldVersion}`, 'g'), `@${newVersion}`)
+update('package.json', new RegExp(`"${escapedOldVersion}"`, 'g'), `"${newVersion}"`)
+update('package-lock.json', new RegExp(`"version": "${escapedOldVersion}"`, 'g'), `"version": "${newVersion}"`, 2)

@@ -1,13 +1,6 @@
-/*! https://github.com/farzher/fuzzysort v3.1.1 */
+/*! https://github.com/farzher/fuzzysort v4.0.0 */
 
-// UMD (Universal Module Definition) for fuzzysort
-;((root, UMD) => {
-  if(typeof define === 'function' && define.amd) define([], UMD)
-  else if(typeof module === 'object' && module.exports) module.exports = UMD()
-  else root['fuzzysort'] = UMD()
-})(this, _ => {
-  'use strict'
-
+export default (() => {
   var single = (search, target) => {
     if(!search || !target) return NULL
 
@@ -27,122 +20,93 @@
 
     var preparedSearch = getPreparedSearch(search)
     var searchBitflags = preparedSearch.bitflags
-    var containsSpace  = preparedSearch.containsSpace
-
-    var threshold = denormalizeScore( options?.threshold || 0 )
-    var limit     = options?.limit || INFINITY
-
+    var containsSpace = preparedSearch.containsSpace
+    var threshold = denormalizeScore(options?.threshold || 0)
+    var limit = options?.limit || INFINITY
     var resultsLen = 0; var limitedCount = 0
-    var targetsLen = targets.length
-    function push_result(result) {
+
+    function push(result) {
       if(resultsLen < limit) { q.add(result); ++resultsLen }
       else {
         ++limitedCount
         if(result._score > q.peek()._score) q.replaceTop(result)
       }
     }
-    // Most searches match far more targets than their limit. Delay allocating the
-    // public Result until a candidate actually enters the result heap.
-    function push_prepared(prepared, obj) {
-      if(resultsLen < limit) {
-        q.add(materialize(prepared, obj)); ++resultsLen
-      } else {
+    function pushPrepared(prepared, obj) {
+      if(resultsLen < limit) { q.add(materialize(prepared, obj)); ++resultsLen }
+      else {
         ++limitedCount
         if(prepared._score > q.peek()._score) q.replaceTop(materialize(prepared, obj))
       }
     }
 
-    // This code is copy/pasted 3 times for performance reasons [options.key, options.keys, no keys]
-
-    // options.key
-    if(options?.key) {
-      var key = options.key
-      var keyGetter = makeGetter(key)
-      for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
-        var target = keyGetter === NULL ? obj[key] : keyGetter(obj)
-        if(!target) continue
-        if(!isPrepared(target)) target = getPrepared(target)
-
-        if((searchBitflags & target._bitflags) !== searchBitflags) continue
-        var result = algorithm(preparedSearch, target)
-        if(result === NULL) continue
-        if(result._score < threshold) continue
-
-        push_prepared(result, obj)
-      }
-
-    // options.keys
-    } else if(options?.keys) {
-      var keys = options.keys
+    var key = options?.key
+    var keys = !key && options?.keys
+    if(keys) {
       var keysLen = keys.length
-      var keyGetters = new Array(keysLen)
-      for(var keyI = 0; keyI < keysLen; ++keyI) keyGetters[keyI] = makeGetter(keys[keyI])
+      var getters = new Array(keysLen)
+      var spacesLen = preparedSearch.spaceSearches.length
+      for(var keyI=0; keyI<keysLen; ++keyI) getters[keyI] = makeGetter(keys[keyI])
 
-      outer: for(var i = 0; i < targetsLen; ++i) { var obj = targets[i]
-
-        { // early out based on bitflags
-          var keysBitflags = 0
-          for (var keyI = 0; keyI < keysLen; ++keyI) {
-            var keyGetter = keyGetters[keyI]
-            var target = keyGetter === NULL ? obj[keys[keyI]] : keyGetter(obj)
-            if(!target) { tmpTargets[keyI] = noTarget; continue }
-            if(!isPrepared(target)) target = getPrepared(target)
-            tmpTargets[keyI] = target
-
-            keysBitflags |= target._bitflags
-          }
-
-          if((searchBitflags & keysBitflags) !== searchBitflags) continue
+      outer: for(var i=0; i<targets.length; ++i) {
+        var obj = targets[i]
+        var keysBitflags = 0
+        for(var keyI=0; keyI<keysLen; ++keyI) {
+          var getter = getters[keyI]
+          var target = getter === NULL ? obj[keys[keyI]] : getter(obj)
+          if(!target) { tmpTargets[keyI] = noTarget; continue }
+          if(!isPrepared(target)) target = getPrepared(target)
+          tmpTargets[keyI] = target
+          keysBitflags |= target._bitflags
         }
+        if((searchBitflags & keysBitflags) !== searchBitflags) continue
 
-        if(containsSpace) for(let i=0; i<preparedSearch.spaceSearches.length; i++) keysSpacesBestScores[i] = NEGATIVE_INFINITY
+        if(containsSpace) for(var spaceI=0; spaceI<spacesLen; ++spaceI) keysSpacesBestScores[spaceI] = NEGATIVE_INFINITY
 
-        for (var keyI = 0; keyI < keysLen; ++keyI) {
+        for(var keyI=0; keyI<keysLen; ++keyI) {
           target = tmpTargets[keyI]
           if(target === noTarget) { tmpResults[keyI] = noTarget; continue }
+          var result = algorithm(preparedSearch, target, false, containsSpace)
+          if(result === NULL) { tmpResults[keyI] = noTarget; continue }
+          tmpResults[keyI] = materialize(result)
 
-          var keyResult = algorithm(preparedSearch, target, /*allowSpaces=*/false, /*allowPartialMatch=*/containsSpace)
-          if(keyResult === NULL) { tmpResults[keyI] = noTarget; continue }
-          tmpResults[keyI] = materialize(keyResult)
-
-          // todo: this seems weird and wrong. like what if our first match wasn't good. this should just replace it instead of averaging with it
-          // if our second match isn't good we ignore it instead of averaging with it
-          if(containsSpace) for(let i=0; i<preparedSearch.spaceSearches.length; i++) {
-            if(allowPartialMatchScores[i] > -1000) {
-              if(keysSpacesBestScores[i] > NEGATIVE_INFINITY) {
-                var tmp = (keysSpacesBestScores[i] + allowPartialMatchScores[i]) / 4/*bonus score for having multiple matches*/
-                if(tmp > keysSpacesBestScores[i]) keysSpacesBestScores[i] = tmp
-              }
+          if(containsSpace) for(var spaceI=0; spaceI<spacesLen; ++spaceI) {
+            var partialScore = allowPartialMatchScores[spaceI]
+            var bestScore = keysSpacesBestScores[spaceI]
+            if(partialScore > -1000 && bestScore > NEGATIVE_INFINITY) {
+              var combinedScore = (bestScore + partialScore) / 4
+              if(combinedScore > bestScore) bestScore = combinedScore
             }
-            if(allowPartialMatchScores[i] > keysSpacesBestScores[i]) keysSpacesBestScores[i] = allowPartialMatchScores[i]
+            if(partialScore > bestScore) bestScore = partialScore
+            keysSpacesBestScores[spaceI] = bestScore
           }
         }
 
         if(containsSpace) {
-          for(let i=0; i<preparedSearch.spaceSearches.length; i++) { if(keysSpacesBestScores[i] === NEGATIVE_INFINITY) continue outer }
+          for(var spaceI=0; spaceI<spacesLen; ++spaceI) {
+            if(keysSpacesBestScores[spaceI] === NEGATIVE_INFINITY) continue outer
+          }
         } else {
-          var hasAtLeast1Match = false
-          for(let i=0; i < keysLen; i++) { if(tmpResults[i]._score !== NEGATIVE_INFINITY) { hasAtLeast1Match = true; break } }
-          if(!hasAtLeast1Match) continue
+          var hasMatch = false
+          for(var keyI=0; keyI<keysLen; ++keyI) {
+            if(tmpResults[keyI]._score !== NEGATIVE_INFINITY) { hasMatch = true; break }
+          }
+          if(!hasMatch) continue
         }
 
         var objResults = new KeysResult(keysLen)
-        for(let i=0; i < keysLen; i++) { objResults[i] = tmpResults[i] }
+        for(var keyI=0; keyI<keysLen; ++keyI) objResults[keyI] = tmpResults[keyI]
 
         if(containsSpace) {
           var score = 0
-          for(let i=0; i<preparedSearch.spaceSearches.length; i++) score += keysSpacesBestScores[i]
+          for(var spaceI=0; spaceI<spacesLen; ++spaceI) score += keysSpacesBestScores[spaceI]
         } else {
-          // todo could rewrite this scoring to be more similar to when there's spaces
-          // if we match multiple keys give us bonus points
           var score = NEGATIVE_INFINITY
-          for(let i=0; i<keysLen; i++) {
-            var result = objResults[i]
-            if(result._score > -1000) {
-              if(score > NEGATIVE_INFINITY) {
-                var tmp = (score + result._score) / 4/*bonus score for having multiple matches*/
-                if(tmp > score) score = tmp
-              }
+          for(var keyI=0; keyI<keysLen; ++keyI) {
+            var result = objResults[keyI]
+            if(result._score > -1000 && score > NEGATIVE_INFINITY) {
+              var combinedScore = (score + result._score) / 4
+              if(combinedScore > score) score = combinedScore
             }
             if(result._score > score) score = result._score
           }
@@ -153,233 +117,182 @@
         if(options?.['scoreFn']) {
           score = options['scoreFn'](objResults)
           if(!score) continue
-          score = denormalizeScore(score)
-          objResults._score = score
+          objResults._score = score = denormalizeScore(score)
         }
-
-        if(score < threshold) continue
-        push_result(objResults)
+        if(score >= threshold) push(objResults)
       }
-
-    // no keys
     } else {
-      for(var i = 0; i < targetsLen; ++i) { var target = targets[i]
+      var getter = key && makeGetter(key)
+      for(var i=0; i<targets.length; ++i) {
+        var obj = targets[i]
+        var target = key ? getter === NULL ? obj[key] : getter(obj) : obj
         if(!target) continue
         if(!isPrepared(target)) target = getPrepared(target)
-
         if((searchBitflags & target._bitflags) !== searchBitflags) continue
         var result = algorithm(preparedSearch, target)
-        if(result === NULL) continue
-        if(result._score < threshold) continue
-
-        push_prepared(result)
+        if(result !== NULL && result._score >= threshold) pushPrepared(result, key ? obj : undefined)
       }
     }
 
-    if(resultsLen === 0) return noResults
-    var results = new Array(resultsLen)
-    for(var i = resultsLen - 1; i >= 0; --i) results[i] = q.poll()
-    results.total = resultsLen + limitedCount
-    return results
-  }
-
-
-  // this is written as 1 function instead of 2 for minification. perf seems fine ...
-  // except when minified. the perf is very slow
-  var highlight = (result, open='<b>', close='</b>') => {
-    var callback = typeof open === 'function' ? open : undefined
-
-    var target      = result.target
-    var targetLen   = target.length
-    var rawIndexes  = result['_indexes']
-    var indexes     = rawIndexes === undefined
-      ? result.indexes
-      : rawIndexes.slice(0, rawIndexes['len'] ?? rawIndexes.length).sort((a,b)=>a-b)
-    var highlighted = ''
-    var matchI      = 0
-    var indexesI    = 0
-    var opened      = false
-    var parts       = []
-
-    for(var i = 0; i < targetLen; ++i) { var char = target[i]
-      if(indexes[indexesI] === i) {
-        ++indexesI
-        if(!opened) { opened = true
-          if(callback) {
-            parts.push(highlighted); highlighted = ''
-          } else {
-            highlighted += open
-          }
-        }
-
-        if(indexesI === indexes.length) {
-          if(callback) {
-            highlighted += char
-            parts.push(callback(highlighted, matchI++)); highlighted = ''
-            parts.push(target.substr(i+1))
-          } else {
-            highlighted += char + close + target.substr(i+1)
-          }
-          break
-        }
-      } else {
-        if(opened) { opened = false
-          if(callback) {
-            parts.push(callback(highlighted, matchI++)); highlighted = ''
-          } else {
-            highlighted += close
-          }
-        }
-      }
-      highlighted += char
-    }
-
-    return callback ? parts : highlighted
-  }
-
-
-  var prepareTarget = (target, firstBeginnings=NULL, beginningCounts=NULL, preparedRow=-1) => {
-    if(typeof target === 'number') target = ''+target
-    else if(typeof target !== 'string') target = ''
-    if(target.length >= 65535) preparedRow = -1
-    var info = prepareLowerInfo(target, firstBeginnings, beginningCounts, preparedRow)
-    var result = new_result(target, {_targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _bitflags:info.bitflags})
-    if(preparedRow >= 0) {
-      result._preparedFirstBeginnings = firstBeginnings
-      result._preparedBeginningCounts = beginningCounts
-      result._preparedRow = preparedRow
-      result._beginningIndexesLen = beginningCounts[preparedRow]
-    }
-    return result
-  }
-
-  var preparedEntryMarker = {}
-  class PreparedTargets {
-    constructor(targets, options) {
-      this._mode = options?.keys ? 2 : options?.key ? 1 : 0
-      this._targets = new Array(targets.length)
-      this._keys = NULL
-      var keysLen = this._mode === 2 ? options.keys.length : 1
-      var preparedLen = targets.length * keysLen
-      var firstBeginnings = new Uint16Array(preparedLen * 26)
-      var beginningCounts = new Uint16Array(preparedLen)
-
-      if(this._mode === 0) {
-        for(var i=0; i<targets.length; ++i) this._targets[i] = prepareTarget(targets[i], firstBeginnings, beginningCounts, i)
-      } else if(this._mode === 1) {
-        var key = options.key
-        var getter = makeGetter(key)
-        this._objects = targets.slice()
-        for(var i=0; i<targets.length; ++i) {
-          var obj = targets[i]
-          var value = getter === NULL ? obj[key] : getter(obj)
-          this._targets[i] = value ? prepareTarget(value, firstBeginnings, beginningCounts, i) : noTarget
-        }
-      } else {
-        var keys = options.keys
-        var getters = new Array(keysLen)
-        this._keys = new Array(keysLen)
-        for(var keyI=0; keyI<keysLen; ++keyI) {
-          getters[keyI] = makeGetter(keys[keyI])
-          this._keys[keyI] = makePreparedKeyGetter(keyI)
-        }
-        for(var i=0; i<targets.length; ++i) {
-          var obj = targets[i]
-          var values = new Array(keysLen)
-          for(var keyI=0; keyI<keysLen; ++keyI) {
-            var getter = getters[keyI]
-            var value = getter === NULL ? obj[keys[keyI]] : getter(obj)
-            var preparedRow = i * keysLen + keyI
-            values[keyI] = value ? prepareTarget(value, firstBeginnings, beginningCounts, preparedRow) : noTarget
-          }
-          this._targets[i] = {_prepared:preparedEntryMarker, _obj:obj, _targets:values}
-        }
-      }
-    }
-  }
-  var makePreparedKeyGetter = i => entry => entry._targets[i]
-  var prepare = (targets, options) => new PreparedTargets(targets, options)
-  // Finite prepared searches can heap the internal targets directly and only
-  // allocate the public results that survive the limit.
-  var goPreparedTargets = (search, targets, options) => {
-    var preparedSearch = getPreparedSearch(search)
-    var searchBitflags = preparedSearch.bitflags
-    var threshold = denormalizeScore( options?.threshold || 0 )
-    var limit = options?.limit || INFINITY
-    var resultsLen = 0; var limitedCount = 0
-
-    for(var i=0; i<targets.length; ++i) {
-      var prepared = targets[i]
-      if((searchBitflags & prepared._bitflags) !== searchBitflags) continue
-      var result = algorithm(preparedSearch, prepared)
-      if(result === NULL || result._score < threshold) continue
-
-      // Prepared targets already have the score shape needed by the heap. Keep
-      // them there directly and allocate only the public results that survive.
-      if(resultsLen < limit) {
-        q.add(result); ++resultsLen
-      } else {
-        ++limitedCount
-        if(result._score > q.peek()._score) q.replaceTop(result)
-      }
-    }
-
-    if(resultsLen === 0) return noResults
-    var results = new Array(resultsLen)
-    for(var i=resultsLen-1; i>=0; --i) results[i] = materialize(q.poll())
-    results.total = resultsLen + limitedCount
-    return results
-  }
-  var goPreparedKey = (search, targets, objects, options) => {
-    if(!search) {
-      if(!options?.all) return noResults
-      var results = []; results.total = targets.length
-      var limit = options?.limit || INFINITY
-      for(var i=0; i<targets.length && i<limit; ++i) {
-        var target = targets[i]
-        results.push(new_result(target.target, {_score:target._score, obj:objects[i]}))
-      }
-      return results
-    }
-
-    var preparedSearch = getPreparedSearch(search)
-    var searchBitflags = preparedSearch.bitflags
-    var threshold = denormalizeScore( options?.threshold || 0 )
-    var limit = options?.limit || INFINITY
-    var resultsLen = 0; var limitedCount = 0
-
-    for(var i=0; i<targets.length; ++i) {
-      var prepared = targets[i]
-      if((searchBitflags & prepared._bitflags) !== searchBitflags) continue
-      var result = algorithm(preparedSearch, prepared)
-      if(result === NULL || result._score < threshold) continue
-
-      if(resultsLen < limit) {
-        q.add(materialize(result, objects[i])); ++resultsLen
-      } else {
-        ++limitedCount
-        if(result._score > q.peek()._score) q.replaceTop(materialize(result, objects[i]))
-      }
-    }
-
-    if(resultsLen === 0) return noResults
+    if(!resultsLen) return noResults
     var results = new Array(resultsLen)
     for(var i=resultsLen-1; i>=0; --i) results[i] = q.poll()
     results.total = resultsLen + limitedCount
     return results
   }
+
+
+  var highlight = (result, open='<b>', close='</b>') => {
+    var callback = typeof open === 'function' ? open : NULL
+    var rawIndexes = result['_indexes']
+    var indexes = rawIndexes === undefined
+      ? result.indexes
+      : rawIndexes.slice(0, rawIndexes['len'] ?? rawIndexes.length).sort((a,b)=>a-b)
+    var target = result.target
+    if(!indexes.length) return callback ? [] : target
+    var output = callback ? [] : ''
+    var lastIndex = 0
+    var matchI = 0
+
+    for(var i=0; i<indexes.length;) {
+      var start = indexes[i++]
+      var end = start + 1
+      while(indexes[i] === end) { ++i; ++end }
+      var before = target.slice(lastIndex, start)
+      var match = target.slice(start, end)
+      if(callback) output.push(before, callback(match, matchI++))
+      else output += before + open + match + close
+      lastIndex = end
+    }
+
+    if(callback) output.push(target.slice(lastIndex))
+    else output += target.slice(lastIndex)
+    return output
+  }
+
+
+  var prepareTarget = target => {
+    if(typeof target === 'number') target = ''+target
+    else if(typeof target !== 'string') target = ''
+    var info = prepareLowerInfo(target)
+    return new_result(target, {_targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _bitflags:info.bitflags})
+  }
+
+  var preparedEntryMarker = {}
+  var makePreparedKeyGetter = i => entry => entry._targets[i]
+
+  class PreparedTargets {
+    constructor(targets, options) {
+      var mode = this._mode = options?.keys ? 2 : options?.key ? 1 : 0
+      var keys = mode === 2 ? options.keys : [options?.key]
+      var keysLen = keys.length
+      var firstBeginnings = mode < 2 && new Uint16Array(targets.length * 26)
+      this._targets = new Array(targets.length)
+
+      if(mode < 2) {
+        this._firstBeginnings = firstBeginnings
+        var key = keys[0]
+        var getter = mode && makeGetter(key)
+        if(mode) this._objects = targets.slice()
+        for(var i=0; i<targets.length; ++i) {
+          var value = mode ? getter === NULL ? targets[i][key] : getter(targets[i]) : targets[i]
+          this._targets[i] = value ? indexFirstCharacters(prepareTarget(value), firstBeginnings, i) : noTarget
+        }
+        return
+      }
+
+      var getters = new Array(keysLen)
+      this._keys = new Array(keysLen)
+      for(var keyI=0; keyI<keysLen; ++keyI) {
+        getters[keyI] = makeGetter(keys[keyI])
+        this._keys[keyI] = makePreparedKeyGetter(keyI)
+      }
+      for(var i=0; i<targets.length; ++i) {
+        var obj = targets[i]
+        var values = new Array(keysLen)
+        for(var keyI=0; keyI<keysLen; ++keyI) {
+          var getter = getters[keyI]
+          var value = getter === NULL ? obj[keys[keyI]] : getter(obj)
+          values[keyI] = value ? prepareTarget(value) : noTarget
+        }
+        this._targets[i] = {_prepared:preparedEntryMarker, _obj:obj, _targets:values}
+      }
+    }
+  }
+
+  var prepare = (targets, options) => new PreparedTargets(targets, options)
+
+  var preparedSingleResult = (search, target, firstBeginnings, row) => {
+    var matchIndex = target._targetLower.indexOf(search._lower)
+    if(matchIndex === -1) return NULL
+    var beginning = firstBeginnings[row * 26 + search.lowerCodes[0] - 97]
+    var successStrict = beginning !== 0
+    if(successStrict) matchIndex = beginning - 1
+    var score = matchIndex === 0 ? 0 : -matchIndex * matchIndex * .2
+    if(!successStrict) score *= 1000
+    else if(target._beginningIndexesLen > 24) score *= (target._beginningIndexesLen - 24) * 10
+    target._score = score - target._targetLowerCodes.length + 1
+    target._indexes[0] = matchIndex
+    target._indexes.len = 1
+    return target
+  }
+
+  var goPreparedValues = (search, prepared, options, single) => {
+    var targets = prepared._targets
+    var objects = prepared._objects
+    var firstBeginnings = prepared._firstBeginnings
+    if(!search) {
+      if(!options?.all) return noResults
+      var results = []; results.total = targets.length
+      var limit = options?.limit || INFINITY
+      for(var i=0; i<targets.length && i<limit; ++i) {
+        results.push(new_result(targets[i].target, {_score:targets[i]._score, obj:objects[i]}))
+      }
+      return results
+    }
+
+    if(!single) search = getPreparedSearch(search)
+    var searchBitflags = search.bitflags
+    var threshold = denormalizeScore(options?.threshold || 0)
+    var limit = options?.limit || INFINITY
+    var resultsLen = 0; var limitedCount = 0
+
+    for(var i=0; i<targets.length; ++i) {
+      var target = targets[i]
+      if(target === noTarget || (searchBitflags & target._bitflags) !== searchBitflags) continue
+      var result = single && target.target.length < 65535
+        ? preparedSingleResult(search, target, firstBeginnings, i)
+        : algorithm(search, target)
+      if(result === NULL || result._score < threshold) continue
+      if(objects) result = materialize(result, objects[i])
+      if(resultsLen < limit) { q.add(result); ++resultsLen }
+      else {
+        ++limitedCount
+        if(result._score > q.peek()._score) q.replaceTop(result)
+      }
+    }
+
+    if(!resultsLen) return noResults
+    var results = new Array(resultsLen)
+    for(var i=resultsLen-1; i>=0; --i) {
+      var result = q.poll()
+      results[i] = objects ? result : materialize(result)
+    }
+    results.total = resultsLen + limitedCount
+    return results
+  }
+
   var goPrepared = (search, prepared, options) => {
     if(options?.key || options?.keys) throw new Error('fuzzysort: key/keys must be provided to prepare(), not go()')
-    if(prepared._mode === 0) {
-      // With no finite heap, every match must be materialized anyway and the
-      // established generic path is faster at collecting large result sets.
-      if(!search || !options?.limit) return go(search, prepared._targets, options)
-      return goPreparedTargets(search, prepared._targets, options)
+    if(prepared._mode < 2) {
+      if(prepared._mode === 0 && (!search || !options?.limit)) return go(search, prepared._targets, options)
+      var preparedSearch = search && getPreparedSearch(search)
+      var code = preparedSearch?.lowerCodes?.[0]
+      var single = preparedSearch?.lowerCodes?.length === 1 && code >= 97 && code <= 122
+      return goPreparedValues(single ? preparedSearch : search, prepared, options, single)
     }
-    if(prepared._mode === 1) return goPreparedKey(search, prepared._targets, prepared._objects, options)
 
-    var preparedOptions = Object.assign({}, options)
-    preparedOptions.keys = prepared._keys
+    var preparedOptions = Object.assign({}, options, {keys:prepared._keys})
     if(options?.['scoreFn']) {
       var scoreFn = options['scoreFn']
       preparedOptions['scoreFn'] = result => {
@@ -389,7 +302,7 @@
     }
     var results = go(search, prepared._targets, preparedOptions)
     for(var i=0; i<results.length; ++i) {
-      if(results[i].obj && results[i].obj._prepared === preparedEntryMarker) results[i].obj = results[i].obj._obj
+      if(results[i].obj?._prepared === preparedEntryMarker) results[i].obj = results[i].obj._obj
     }
     return results
   }
@@ -430,7 +343,7 @@
   }
 
   var new_result = (target, options) => {
-    const result = new Result()
+    var result = new Result()
     result['target']             = target
     result['obj']                = options.obj                   ?? NULL
     result._score                = options._score            ?? NEGATIVE_INFINITY
@@ -459,25 +372,22 @@
   }
 
 
-  var prepareSearch = (search) => {
+  var prepareSearch = search => {
     if(typeof search === 'number') search = ''+search
     else if(typeof search !== 'string') search = ''
     search = search.trim()
     var info = prepareLowerInfo(search)
-
-    var spaceSearches = []
-    if(info.containsSpace) {
-      var searches = search.split(/\s+/)
-      searches = [...new Set(searches)] // distinct
-      for(var i=0; i<searches.length; i++) {
-        var _info = prepareLowerInfo(searches[i])
-        spaceSearches.push({lowerCodes:_info.lowerCodes, _lower:_info._lower, containsSpace:false})
-      }
+    var spaceSearches = info.containsSpace
+      ? [...new Set(search.split(/\s+/))].map(prepareSearch)
+      : []
+    return {
+      lowerCodes:info.lowerCodes,
+      _lower:info._lower,
+      containsSpace:info.containsSpace,
+      bitflags:info.bitflags,
+      spaceSearches,
     }
-
-    return {lowerCodes: info.lowerCodes, _lower: info._lower, containsSpace: info.containsSpace, bitflags: info.bitflags, spaceSearches: spaceSearches}
   }
-
 
 
   var getPrepared = (target) => {
@@ -499,30 +409,21 @@
 
 
   var all = (targets, options) => {
-    var results = []; results.total = targets.length // this total can be wrong if some targets are skipped
-
+    var results = []; results.total = targets.length
     var limit = options?.limit || INFINITY
+    var key = options?.key
+    var keys = !key && options?.keys
 
-    if(options?.key) {
-      var key = options.key
-      var keyGetter = makeGetter(key)
-      for(var i=0;i<targets.length;i++) { var obj = targets[i]
-        var target = keyGetter === NULL ? obj[key] : keyGetter(obj)
-        if(target == NULL) continue
-        if(!isPrepared(target)) target = getPrepared(target)
-        var result = new_result(target.target, {_score: target._score, obj: obj})
-        results.push(result); if(results.length >= limit) return results
-      }
-    } else if(options?.keys) {
-      var keys = options.keys
+    if(keys) {
       var keysLen = keys.length
-      var keyGetters = new Array(keysLen)
-      for(var keyI = 0; keyI < keysLen; ++keyI) keyGetters[keyI] = makeGetter(keys[keyI])
-      for(var i=0;i<targets.length;i++) { var obj = targets[i]
+      var getters = new Array(keysLen)
+      for(var keyI=0; keyI<keysLen; ++keyI) getters[keyI] = makeGetter(keys[keyI])
+      for(var i=0; i<targets.length; ++i) {
+        var obj = targets[i]
         var objResults = new KeysResult(keysLen)
-        for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
-          var keyGetter = keyGetters[keyI]
-          var target = keyGetter === NULL ? obj[keys[keyI]] : keyGetter(obj)
+        for(var keyI=keysLen-1; keyI>=0; --keyI) {
+          var getter = getters[keyI]
+          var target = getter === NULL ? obj[keys[keyI]] : getter(obj)
           if(!target) { objResults[keyI] = noTarget; continue }
           if(!isPrepared(target)) target = getPrepared(target)
           target._score = NEGATIVE_INFINITY
@@ -531,18 +432,26 @@
         }
         objResults.obj = obj
         objResults._score = NEGATIVE_INFINITY
-        results.push(objResults); if(results.length >= limit) return results
+        results.push(objResults)
+        if(results.length >= limit) return results
       }
-    } else {
-      for(var i=0;i<targets.length;i++) { var target = targets[i]
-        if(target == NULL) continue
-        if(!isPrepared(target)) target = getPrepared(target)
-        target._score = NEGATIVE_INFINITY
-        target._indexes.len = 0
-        results.push(target); if(results.length >= limit) return results
-      }
+      return results
     }
 
+    var getter = key && makeGetter(key)
+    for(var i=0; i<targets.length; ++i) {
+      var obj = targets[i]
+      var target = key ? getter === NULL ? obj[key] : getter(obj) : obj
+      if(target == NULL) continue
+      if(!isPrepared(target)) target = getPrepared(target)
+      if(key) target = new_result(target.target, {_score:target._score, obj:obj})
+      else {
+        target._score = NEGATIVE_INFINITY
+        target._indexes.len = 0
+      }
+      results.push(target)
+      if(results.length >= limit) return results
+    }
     return results
   }
 
@@ -560,24 +469,6 @@
     var targetI          = 0 // where you at
     var matchesSimpleLen = 0
 
-    // Prepared collections can answer ASCII letter searches directly from their
-    // shared table, skipping both the target scan and lazy beginning preparation.
-    if(searchLen === 1 && !nextBeginningIndexesChanged && allowSingleCharacter && prepared._preparedRow >= 0 && searchLowerCode>=97 && searchLowerCode<=122) {
-      var preparedSlot = prepared._preparedRow*26 + searchLowerCode-97
-      var simpleMatchIndex = prepared._targetLower.indexOf(searchLower)
-      if(simpleMatchIndex === -1) return NULL
-      var encodedBeginning = prepared._preparedFirstBeginnings[preparedSlot]
-      var successStrict = encodedBeginning !== 0
-      var matchIndex = successStrict ? encodedBeginning-1 : simpleMatchIndex
-      var score = matchIndex === 0 ? 0 : -matchIndex*matchIndex*.2
-      if(!successStrict) score *= 1000
-      else if(prepared._beginningIndexesLen > 24) score *= (prepared._beginningIndexesLen-24)*10
-      prepared._score = score - (targetLen-1)
-      prepared._indexes[0] = matchIndex
-      prepared._indexes.len = 1
-      return prepared
-    }
-
     // very basic fuzzy match; to remove non-matching targets ASAP!
     // walk through target. find sequential matches.
     // if all chars aren't found then exit
@@ -591,13 +482,12 @@
       ++targetI; if(targetI >= targetLen) return NULL // Failed to find searchI
     }
 
-    // Prepared collections keep first word-beginning matches for every letter in
-    // compact shared typed arrays. Other targets cache the first character used.
+    // Cache the best word-beginning match for repeated single-character searches.
     if(searchLen === 1 && !nextBeginningIndexesChanged && allowSingleCharacter) {
       if(prepared._singleMatchCode === searchLowerCode) {
         var matchIndex = prepared._singleMatchIndex
         var successStrict = prepared._singleMatchStrict
-      } else if(prepared._nextBeginningIndexes !== NULL) {
+      } else if(prepared._nextBeginningIndexes != NULL) {
         var nextBeginningIndexes = prepared._nextBeginningIndexes
         targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
         while(targetI < targetLen && searchLowerCode !== targetLowerCodes[targetI]) targetI = nextBeginningIndexes[targetI]
@@ -622,7 +512,7 @@
     var matchesStrictLen = 0
 
     var nextBeginningIndexes = prepared._nextBeginningIndexes
-    if(nextBeginningIndexes === NULL) nextBeginningIndexes = prepared._nextBeginningIndexes = prepareNextBeginningIndexes(prepared)
+    if(nextBeginningIndexes == NULL) nextBeginningIndexes = prepared._nextBeginningIndexes = prepareNextBeginningIndexes(prepared)
     var beginningIndexesLen = nextBeginningIndexesChanged ? 0 : prepared._beginningIndexesLen
     if(!beginningIndexesLen) {
       beginningIndexesLen = 1
@@ -743,8 +633,8 @@
         var indexes = result._indexes
 
         var indexesIsConsecutiveSubstring = true
-        for(let i=0; i<indexes.len-1; i++) {
-          if(indexes[i+1] - indexes[i] !== 1) {
+        for(var j=0; j<indexes.len-1; ++j) {
+          if(indexes[j+1] - indexes[j] !== 1) {
             indexesIsConsecutiveSubstring = false; break;
           }
         }
@@ -752,10 +642,10 @@
         if(indexesIsConsecutiveSubstring) {
           var newBeginningIndex = indexes[indexes.len-1] + 1
           var toReplace = target._nextBeginningIndexes[newBeginningIndex-1]
-          for(let i=newBeginningIndex-1; i>=0; i--) {
-            if(toReplace !== target._nextBeginningIndexes[i]) break
-            target._nextBeginningIndexes[i] = newBeginningIndex
-            nextBeginningIndexesChanges[changeslen*2 + 0] = i
+          for(var j=newBeginningIndex-1; j>=0; --j) {
+            if(toReplace !== target._nextBeginningIndexes[j]) break
+            target._nextBeginningIndexes[j] = newBeginningIndex
+            nextBeginningIndexesChanges[changeslen*2 + 0] = j
             nextBeginningIndexesChanges[changeslen*2 + 1] = toReplace
             changeslen++
           }
@@ -807,21 +697,15 @@
     for(var i=changeslen-1; i>=0; --i) target._nextBeginningIndexes[nextBeginningIndexesChanges[i*2]] = nextBeginningIndexesChanges[i*2+1]
   }
 
-  var characterFolds = {
-    '\\':'/', '"':"'", '`':"'",
-    '‘':"'", '’':"'", '“':"'", '”':"'",
-    '‐':'-', '–':'-', '—':'-', '−':'-',
-    '⁄':'/', '∕':'/', '…':'.',
-    'ø':'o', 'Ø':'O', 'æ':'a', 'Æ':'A',
-    'œ':'o', 'Œ':'O', 'ß':'s', 'ẞ':'S',
-    'ł':'l', 'Ł':'L',
-  }
+  var characterFolds = {}
+  var foldFrom = "\\\"`‘’“”‐–—−⁄∕…øØæÆœŒßẞłŁ"
+  var foldTo = "/''''''----//.oOaAoOsSlL"
+  for(var i=0; i<foldFrom.length; ++i) characterFolds[foldFrom[i]] = foldTo[i]
 
   var customAsciiFolds = false
-
   var remap = mappings => {
-    Object.assign(characterFolds, mappings)
     for(var char in mappings) {
+      characterFolds[char] = mappings[char]
       if(char.charCodeAt(0) < 128) customAsciiFolds = true
     }
   }
@@ -830,50 +714,55 @@
     var folded = characterFolds[char]
     if(folded !== undefined) return folded
     if(char.charCodeAt(0) < 128) return char
-
     folded = char.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
     return folded.length === 1 ? folded : char
   }
 
   var normalizeCharacters = str => {
     if(customAsciiFolds) return str.replace(/[\s\S]/g, foldCharacter)
-
     return /[^\x00-\x7F]|[\\"`]/.test(str)
       ? str.replace(/[^\x00-\x7F]|[\\"`]/g, foldCharacter)
       : str
   }
 
-  var prepareLowerInfo = (str, firstBeginnings=NULL, beginningCounts=NULL, preparedRow=-1) => {
+  var indexFirstCharacters = (prepared, firstBeginnings, row) => {
+    if(prepared.target.length >= 65535) return prepared
+    var target = normalizeCharacters(prepared.target)
+    var lowerCodes = prepared._targetLowerCodes
+    var offset = row * 26
+    var beginnings = 0
+    var wasUpper = false
+    var wasAlphanum = false
+    for(var i=0; i<target.length; ++i) {
+      var code = target.charCodeAt(i)
+      var isUpper = code>=65&&code<=90
+      var isAlphanum = isUpper || code>=97&&code<=122 || code>=48&&code<=57
+      var isBeginning = isUpper&&!wasUpper || !wasAlphanum || !isAlphanum
+      wasUpper = isUpper
+      wasAlphanum = isAlphanum
+      if(isBeginning) {
+        ++beginnings
+        var lowerCode = lowerCodes[i]
+        if(lowerCode>=97&&lowerCode<=122) {
+          var slot = offset + lowerCode-97
+          if(firstBeginnings[slot] === 0) firstBeginnings[slot] = i+1
+        }
+      }
+    }
+    prepared._beginningIndexesLen = beginnings
+    return prepared
+  }
+
+  var prepareLowerInfo = str => {
     str = normalizeCharacters(str)
     var strLen = str.length
     var lower = str.toLowerCase()
     var lowerCodes = [] // new Array(strLen)    sparse array is too slow
     var bitflags = 0
     var containsSpace = false // space isn't stored in bitflags because of how searching with a space works
-    var collectBeginnings = preparedRow >= 0
-    var beginningIndexesLen = 0
-    var wasUpper = false
-    var wasAlphanum = false
-    var beginningOffset = preparedRow * 26
 
     for(var i = 0; i < strLen; ++i) {
       var lowerCode = lowerCodes[i] = lower.charCodeAt(i)
-
-      if(collectBeginnings) {
-        var targetCode = str.charCodeAt(i)
-        var isUpper = targetCode>=65&&targetCode<=90
-        var isAlphanum = isUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
-        var isBeginning = isUpper && !wasUpper || !wasAlphanum || !isAlphanum
-        wasUpper = isUpper
-        wasAlphanum = isAlphanum
-        if(isBeginning) {
-          ++beginningIndexesLen
-          if(lowerCode>=97 && lowerCode<=122) {
-            var beginningSlot = beginningOffset + lowerCode-97
-            if(firstBeginnings[beginningSlot] === 0) firstBeginnings[beginningSlot] = i+1
-          }
-        }
-      }
 
       if(lowerCode === 32) {
         containsSpace = true
@@ -888,7 +777,6 @@
       bitflags |= 1<<bit
     }
 
-    if(collectBeginnings) beginningCounts[preparedRow] = beginningIndexesLen
     return {lowerCodes:lowerCodes, bitflags:bitflags, containsSpace:containsSpace, _lower:lower}
   }
   var prepareSingleMatch = (prepared, searchLowerCode, fallbackIndex) => {
@@ -958,21 +846,18 @@
   // inspecting them for every target.
   var makeGetter = prop => {
     if(typeof prop === 'function') return prop
-    if(Array.isArray(prop)) {
-      return obj => {
-        for(var i=0; obj && i<prop.length; ++i) obj = obj[prop[i]]
-        return obj
+    var path = Array.isArray(prop)
+      ? prop
+      : typeof prop === 'string' && prop.includes('.') ? prop.split('.') : NULL
+    if(path === NULL) return NULL
+    return obj => {
+      if(path !== prop) {
+        var direct = obj[prop]
+        if(direct !== undefined) return direct
       }
+      for(var i=0; obj && i<path.length; ++i) obj = obj[path[i]]
+      return obj
     }
-    if(typeof prop === 'string' && prop.indexOf('.') !== -1) {
-      var segs = prop.split('.')
-      return obj => {
-        var direct = obj[prop]; if(direct !== undefined) return direct
-        for(var i=0; obj && i<segs.length; ++i) obj = obj[segs[i]]
-        return obj
-      }
-    }
-    return NULL
   }
 
   var isPrepared = (x) => { return typeof x === 'object' && typeof x._bitflags === 'number' }
@@ -987,5 +872,6 @@
   var q = fastpriorityqueue() // reuse this
 
   // Quote public names so property mangling only affects internals.
-  return {'single':single, 'go':go, 'prepare':prepare, 'highlight':highlight, 'score':getScore, 'remap':remap, 'cleanup':cleanup}
-}) // UMD
+
+  return {single, go, prepare, highlight, score:getScore, remap, cleanup}
+})()

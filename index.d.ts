@@ -113,7 +113,5 @@ declare namespace Fuzzysort {
   }
 }
 
-declare module "fuzzysort" {
-  const fuzzysort:Fuzzysort.Fuzzysort
-  export = fuzzysort
-}
+declare const fuzzysort: Fuzzysort.Fuzzysort
+export default fuzzysort
