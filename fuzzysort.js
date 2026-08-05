@@ -355,18 +355,25 @@
     var limit = options?.limit || INFINITY
 
     if(options?.key) {
+      var key = options.key
+      var keyGetter = makeGetter(key)
       for(var i=0;i<targets.length;i++) { var obj = targets[i]
-        var target = getValue(obj, options.key)
+        var target = keyGetter === NULL ? getValue(obj, key) : keyGetter(obj)
         if(target == NULL) continue
         if(!isPrepared(target)) target = getPrepared(target)
         var result = new_result(target.target, {_score: target._score, obj: obj})
         results.push(result); if(results.length >= limit) return results
       }
     } else if(options?.keys) {
+      var keys = options.keys
+      var keysLen = keys.length
+      var keyGetters = new Array(keysLen)
+      for(var keyI = 0; keyI < keysLen; ++keyI) keyGetters[keyI] = makeGetter(keys[keyI])
       for(var i=0;i<targets.length;i++) { var obj = targets[i]
-        var objResults = new KeysResult(options.keys.length)
-        for (var keyI = options.keys.length - 1; keyI >= 0; --keyI) {
-          var target = getValue(obj, options.keys[keyI])
+        var objResults = new KeysResult(keysLen)
+        for (var keyI = keysLen - 1; keyI >= 0; --keyI) {
+          var keyGetter = keyGetters[keyI]
+          var target = keyGetter === NULL ? getValue(obj, keys[keyI]) : keyGetter(obj)
           if(!target) { objResults[keyI] = noTarget; continue }
           if(!isPrepared(target)) target = getPrepared(target)
           target._score = NEGATIVE_INFINITY
@@ -422,7 +429,7 @@
     var matchesStrictLen = 0
 
     var nextBeginningIndexes = prepared._nextBeginningIndexes
-    if(nextBeginningIndexes === NULL) nextBeginningIndexes = prepared._nextBeginningIndexes = prepareNextBeginningIndexes(prepared.target)
+    if(nextBeginningIndexes === NULL) nextBeginningIndexes = prepared._nextBeginningIndexes = prepareNextBeginningIndexes(prepared)
     var beginningIndexesLen = nextBeginningIndexesChanged ? 0 : prepared._beginningIndexesLen
     if(!beginningIndexesLen) {
       beginningIndexesLen = 1
@@ -652,11 +659,17 @@
 
     return {lowerCodes:lowerCodes, bitflags:bitflags, containsSpace:containsSpace, _lower:lower}
   }
-  var prepareBeginningIndexes = (target) => {
+  var prepareNextBeginningIndexes = (prepared) => {
+    var target = remove_accents(prepared.target)
     var targetLen = target.length
-    var beginningIndexes = []; var beginningIndexesLen = 0
+    var nextBeginningIndexes = [] // new Array(targetLen)     sparse array is too slow
+    var fillFrom = 0
+    var beginningIndexesLen = 0
     var wasUpper = false
     var wasAlphanum = false
+
+    // Fill each range as soon as its next beginning is discovered. This avoids
+    // allocating a temporary beginnings array while keeping this result packed.
     for(var i = 0; i < targetLen; ++i) {
       var targetCode = target.charCodeAt(i)
       var isUpper = targetCode>=65&&targetCode<=90
@@ -664,25 +677,13 @@
       var isBeginning = isUpper && !wasUpper || !wasAlphanum || !isAlphanum
       wasUpper = isUpper
       wasAlphanum = isAlphanum
-      if(isBeginning) beginningIndexes[beginningIndexesLen++] = i
-    }
-    return beginningIndexes
-  }
-  var prepareNextBeginningIndexes = (target) => {
-    target = remove_accents(target)
-    var targetLen = target.length
-    var beginningIndexes = prepareBeginningIndexes(target)
-    var nextBeginningIndexes = [] // new Array(targetLen)     sparse array is too slow
-    var lastIsBeginning = beginningIndexes[0]
-    var lastIsBeginningI = 0
-    for(var i = 0; i < targetLen; ++i) {
-      if(lastIsBeginning > i) {
-        nextBeginningIndexes[i] = lastIsBeginning
-      } else {
-        lastIsBeginning = beginningIndexes[++lastIsBeginningI]
-        nextBeginningIndexes[i] = lastIsBeginning===undefined ? targetLen : lastIsBeginning
+      if(isBeginning) {
+        ++beginningIndexesLen
+        for(; fillFrom < i; ++fillFrom) nextBeginningIndexes[fillFrom] = i
       }
     }
+    for(; fillFrom < targetLen; ++fillFrom) nextBeginningIndexes[fillFrom] = targetLen
+    prepared._beginningIndexesLen = beginningIndexesLen
     return nextBeginningIndexes
   }
 
