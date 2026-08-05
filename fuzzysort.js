@@ -188,7 +188,10 @@
 
     var target      = result.target
     var targetLen   = target.length
-    var indexes     = result.indexes
+    var rawIndexes  = result['_indexes']
+    var indexes     = rawIndexes === undefined
+      ? result.indexes
+      : rawIndexes.slice(0, rawIndexes['len'] ?? rawIndexes.length).sort((a,b)=>a-b)
     var highlighted = ''
     var matchI      = 0
     var indexesI    = 0
@@ -240,6 +243,13 @@
   }
 
   var cleanup = () => { preparedCache.clear(); preparedSearchCache.clear() }
+
+  // Result accessors and methods live on the prototype, which structuredClone
+  // does not preserve. These helpers also work on results sent from a Worker.
+  var getScore = result => {
+    var score = result['score']
+    return score === undefined ? normalizeScore(result['_score']) : score
+  }
 
 
   // Below this point is only internal code
@@ -691,5 +701,5 @@
   var q = fastpriorityqueue() // reuse this
 
   // fuzzysort is written this way for minification. all names are mangeled unless quoted
-  return {'single':single, 'go':go, 'prepare':prepare, 'cleanup':cleanup}
+  return {'single':single, 'go':go, 'highlight':highlight, 'score':getScore, 'prepare':prepare, 'cleanup':cleanup}
 }) // UMD

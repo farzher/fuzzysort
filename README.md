@@ -95,6 +95,16 @@ result.highlight((m, i) => <react key={i}>{m}</react>)
 // ['some string that contains my ', <react key=0>query</react>, '.']
 ```
 
+When results are returned from a Web Worker, `postMessage()` does not preserve
+prototype methods or accessors. Use the top-level helpers on the cloned result:
+
+```js
+fuzzysort.highlight(result, '<b>', '</b>')
+fuzzysort.score(result)
+```
+
+These helpers also work with normal, uncloned results.
+
 ### Advanced Usage
 
 Search a list of objects, by multiple complex keys, with custom weights.

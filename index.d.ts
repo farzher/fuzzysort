@@ -76,6 +76,13 @@ declare namespace Fuzzysort {
     go<T>(search: string, targets: ReadonlyArray<T>, options: KeyOptions<T>): KeyResults<T>
     go<T>(search: string, targets: ReadonlyArray<T>, options: KeysOptions<T>): KeysResults<T>
 
+    /** Highlight a result, including one received through structuredClone or postMessage */
+    highlight(result: Result, highlightOpen?: string, highlightClose?: string): string
+    highlight<T>(result: Result, callback: HighlightCallback<T>): (string | T)[]
+
+    /** Read the normalized score of a result received through structuredClone or postMessage */
+    score(result: Result | KeysResult<unknown>): number
+
     /**
     * Help the algorithm go fast by providing prepared targets instead of raw strings
     */

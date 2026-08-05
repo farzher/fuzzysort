@@ -330,6 +330,23 @@ async function tests() {
 
     assert(fuzzysort.single('soup time ifs', 'time for soup').highlight((m, i) => `*${m}(${i})*`).join('') === '*time(0)* *f(1)*or *soup(2)*', 'highlight callback')
 
+    // Top-level helpers work with live and structured-cloned Worker results.
+    var result = fuzzysort.single('fb', 'foo bar')
+    assert(fuzzysort.highlight(result, '*', '*') === '*f*oo *b*ar', 'top-level highlight')
+    assert(fuzzysort.score(result) === result.score, 'top-level score')
+    if(typeof structuredClone === 'function') {
+      var clonedResult = structuredClone(result)
+      assert(clonedResult.highlight === undefined && clonedResult.score === undefined, 'structured clone removes result prototype')
+      assert(fuzzysort.highlight(clonedResult, '*', '*') === '*f*oo *b*ar', 'structured-cloned highlight')
+      assert(fuzzysort.highlight(clonedResult, (m, i) => `${i}:${m}`).join('|') === '|0:f|oo |1:b|ar', 'structured-cloned highlight callback')
+      assert(fuzzysort.score(clonedResult) === result.score, 'structured-cloned score')
+
+      var keysResult = fuzzysort.go('fo', [{name:'foo', description:'bar'}], {keys:['name', 'description']})[0]
+      var clonedKeysResult = structuredClone(keysResult)
+      assert(fuzzysort.score(clonedKeysResult) === keysResult.score, 'structured-cloned keys score')
+      assert(fuzzysort.highlight(clonedKeysResult[0]) === '<b>fo</b>o', 'structured-cloned nested highlight')
+    }
+
     // indexes getter and setter
     fuzzysort.single('pants ground', 'pants on the ground')
     var result = fuzzysort.single('p', 'pants on the ground')
