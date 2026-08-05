@@ -364,6 +364,48 @@ async function tests() {
     fuzzysort.go('pants', [['pants on the ground']], {key: obj => obj[0]})
     fuzzysort.go('pants', [['pants on the ground']], {keys: [obj => obj[0], obj => obj[0]]})
   }
+
+  { // common API paths and option combinations
+    var raw = fuzzysort.single('render', 'PreRender/render target')
+    var prepared = fuzzysort.single('render', fuzzysort.prepare('PreRender/render target'))
+    assert(raw._score === prepared._score, 'raw/prepared score equality')
+    assert(JSON.stringify(raw.indexes) === JSON.stringify(prepared.indexes), 'raw/prepared indexes equality')
+
+    // Prefer a later word beginning over an earlier mid-word character.
+    var result = fuzzysort.single('b', 'foobar baz')
+    assert(result.indexes[0] === 7, 'single-character beginning match')
+
+    // Duplicate whitespace-separated terms are intentionally deduplicated.
+    var oneTerm = fuzzysort.single('foo', 'foo bar')
+    var duplicateTerms = fuzzysort.single('  foo   foo  ', 'foo bar')
+    assert(oneTerm._score === duplicateTerms._score, 'duplicate space searches score')
+    assert(JSON.stringify(oneTerm.indexes) === JSON.stringify(duplicateTerms.indexes), 'duplicate space searches indexes')
+
+    var tied = [{id: 1, name: 'alpha'}, {id: 2, name: 'alpha'}, {id: 3, name: 'beta'}]
+    var limited = fuzzysort.go('alpha', tied, {key: 'name', limit: 1})
+    assert(limited.length === 1 && limited.total === 2, 'limit 1 total')
+    assert(limited[0].obj === tied[0], 'limit 1 keeps first equal score')
+
+    var keyPaths = [{direct:'alpha', nested:{value:'beta'}, array:['gamma']}]
+    assert(fuzzysort.go('alpha', keyPaths, {key:'direct'}).length === 1, 'direct key path')
+    assert(fuzzysort.go('beta', keyPaths, {key:'nested.value'}).length === 1, 'dotted key path')
+    assert(fuzzysort.go('gamma', keyPaths, {key:['array', 0]}).length === 1, 'array key path')
+    assert(fuzzysort.go('beta', keyPaths, {key:obj=>obj.nested.value}).length === 1, 'function key path')
+
+    var scoreFnCalls = 0
+    var scored = fuzzysort.go('a', [{name:'a', rank:2}, {name:'a', rank:3}, {name:'a', rank:0}], {
+      keys: ['name'],
+      scoreFn: result => { ++scoreFnCalls; return result.obj.rank },
+    })
+    assert(scoreFnCalls === 3, 'scoreFn called for every matching object')
+    assert(scored.length === 2 && scored[0].obj.rank === 3 && scored[1].obj.rank === 2, 'scoreFn ordering and zero filtering')
+
+    var unread = fuzzysort.go('render', ['PreRender/render target'], {limit:1})[0]
+    var rawScore = unread._score
+    var rawIndexes = unread._indexes
+    unread.score; unread.indexes; unread.highlight()
+    assert(unread._score === rawScore && unread._indexes === rawIndexes, 'reading public fields does not mutate raw result')
+  }
 }
 
 
@@ -499,6 +541,94 @@ async function benchmarks() {
 
   console.log('now benching ...')
 
+  // Focused common paths. Keep these separate so a regression in one workload
+  // is not hidden by faster operations bundled into the same benchmark.
+  const focusedSingleTarget = 'C:/Project/Renderer/RenderTarget.cpp'
+  const focusedSinglePrepared = fuzzysort.prepare(focusedSingleTarget)
+  bench('single raw cached target', function() {
+    fuzzysort.single('render', focusedSingleTarget)
+  }, config)
+  bench('single prepared target', function() {
+    fuzzysort.single('render', focusedSinglePrepared)
+  }, config)
+  bench('single successful non-substring', function() {
+    fuzzysort.single('rtrgt', 'C:/Project/Renderer/RenderTarget.cpp')
+  }, config)
+  bench('single unsuccessful bitflags', function() {
+    fuzzysort.single('qz', 'C:/Project/Renderer/RenderTarget.cpp')
+  }, config)
+  bench('single unsuccessful scan', function() {
+    fuzzysort.single('zcr', 'C:/Project/Renderer/RenderTarget.cppz')
+  }, config)
+  bench('single character', function() {
+    fuzzysort.single('r', 'C:/Project/Renderer/RenderTarget.cpp')
+  }, config)
+  bench('prepare ascii target', function() {
+    fuzzysort.prepare('C:/Project/Renderer/RenderTarget.cpp')
+  }, config)
+  bench('prepare unicode target', function() {
+    fuzzysort.prepare('Café/レンダラー/RenderTarget.cpp')
+  }, config)
+
+  const focusedPrepared = testdata_prepared.ue4_files
+  const focusedRaw = testdata.ue4_files
+  const focusedObjects = testdata_obj.ue4_files
+  const focusedNestedObjects = focusedRaw.map(str => ({nested:{str}}))
+
+  bench('go prepared limit 1', function() {
+    fuzzysort.go('render', focusedPrepared, {limit:1})
+  }, config)
+  bench('go prepared limit 10', function() {
+    fuzzysort.go('render', focusedPrepared, {limit:10})
+  }, config)
+  bench('go prepared limit 100 focused', function() {
+    fuzzysort.go('render', focusedPrepared, {limit:100})
+  }, config)
+  bench('go prepared unlimited focused', function() {
+    fuzzysort.go('render', focusedPrepared)
+  }, config)
+  bench('go prepared threshold', function() {
+    fuzzysort.go('render', focusedPrepared, {limit:10, threshold:.5})
+  }, config)
+  bench('go raw cached limit 10', function() {
+    fuzzysort.go('render', focusedRaw, {limit:10})
+  }, config)
+  bench('go raw cold cache limit 10', function() {
+    fuzzysort.cleanup()
+    fuzzysort.go('render', focusedRaw, {limit:10})
+  }, config)
+
+  bench('go key direct', function() {
+    fuzzysort.go('render', focusedObjects, {key:'str', limit:10})
+  }, config)
+  bench('go key dotted', function() {
+    fuzzysort.go('render', focusedNestedObjects, {key:'nested.str', limit:10})
+  }, config)
+  bench('go key array', function() {
+    fuzzysort.go('render', focusedNestedObjects, {key:['nested', 'str'], limit:10})
+  }, config)
+  bench('go key function', function() {
+    fuzzysort.go('render', focusedObjects, {key:obj=>obj.str, limit:10})
+  }, config)
+  bench('go keys focused', function() {
+    fuzzysort.go('render', focusedObjects, {keys:['str', 'prepared'], limit:10})
+  }, config)
+  bench('go keys scoreFn', function() {
+    fuzzysort.go('render', focusedObjects, {keys:['str', 'prepared'], limit:10, scoreFn:results=>results.score})
+  }, config)
+
+  bench('go results unread', function() {
+    fuzzysort.go('render', focusedPrepared, {limit:10})
+  }, config)
+  bench('go results score read', function() {
+    var results = fuzzysort.go('render', focusedPrepared, {limit:10})
+    for(var i=0; i<results.length; ++i) results[i].score
+  }, config)
+  bench('go results indexes read', function() {
+    var results = fuzzysort.go('render', focusedPrepared, {limit:10})
+    for(var i=0; i<results.length; ++i) results[i].indexes
+  }, config)
+
   bench('spaces & keys', function() {
     fuzzysort.go('github react',      testdata_obj.urls_and_titles, {keys: ['str.title', 'str.url'], limit:100})
     fuzzysort.go('zom query',         testdata_obj.urls_and_titles, {keys: ['str.title', 'str.url'], limit:100})
@@ -617,11 +747,12 @@ async function bench(name, code, {benchtime=2000}={}) {
     if(getms()-startms > benchtime) break // this check goes at the end instead of the beginning, to ensure we get some result
   }
 
-  const fastestloopms = getmin(loopmsarr)
-  // const fastestloopms = getavg(loopmsarr)
-  const hz = 1000/(fastestloopms/loopcount)
+  const medianloopms = getmedian(loopmsarr)
+  const hz = 1000/(medianloopms/loopcount)
 
-  const speeddiff = typeof bench_speeddiff === 'undefined' ? 0 : bench_speeddiff(name, hz)
+  // The historical baselines below used the fastest sample, so they are not
+  // comparable now that benchmarks report medians. Keep them for reference only.
+  const speeddiff = 0
   const speeddiffstr = speeddiff==0?'': speeddiff>0 ? cmdgreen(`+${speeddiff}%`) : cmdred(`${speeddiff}%`)
 
   console.log(
@@ -633,8 +764,11 @@ async function bench(name, code, {benchtime=2000}={}) {
   function cmdyellow(x) { return isNode ? `${'\u001b[33m'}${x}${'\u001b[0m'}` : x }
   function cmdred(x)    { return isNode ? `${'\u001b[31m'}${x}${'\u001b[0m'}`: x }
   function cmdgreen(x)  { return isNode ? `${'\u001b[32m'}${x}${'\u001b[0m'}`: x }
-  function getmin(a) {let min = Infinity; for(const x of a) if(x<min) min = x; return min }
-  function getavg(a) {let sum = 0; for(const x of a) sum += x; return sum/a.length }
+  function getmedian(a) {
+    a.sort((x,y)=>x-y)
+    const middle = a.length >> 1
+    return a.length % 2 ? a[middle] : (a[middle-1] + a[middle]) / 2
+  }
 }
 function bench_speeddiff(name, hz) {
   // fuzzysort 3.0
