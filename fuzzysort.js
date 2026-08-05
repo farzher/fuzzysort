@@ -17,7 +17,8 @@
     var searchBitflags = preparedSearch.bitflags
     if((searchBitflags & target._bitflags) !== searchBitflags) return NULL
 
-    return algorithm(preparedSearch, target)
+    var result = algorithm(preparedSearch, target)
+    return result === NULL ? NULL : materialize(result)
   }
 
   var go = (search, targets, options) => {
@@ -40,6 +41,16 @@
         if(result._score > q.peek()._score) q.replaceTop(result)
       }
     }
+    // Most searches match far more targets than their limit. Delay allocating the
+    // public Result until a candidate actually enters the result heap.
+    function push_prepared(prepared, obj) {
+      if(resultsLen < limit) {
+        q.add(materialize(prepared, obj)); ++resultsLen
+      } else {
+        ++limitedCount
+        if(prepared._score > q.peek()._score) q.replaceTop(materialize(prepared, obj))
+      }
+    }
 
     // This code is copy/pasted 3 times for performance reasons [options.key, options.keys, no keys]
 
@@ -56,8 +67,7 @@
         if(result === NULL) continue
         if(result._score < threshold) continue
 
-        result.obj = obj
-        push_result(result)
+        push_prepared(result, obj)
       }
 
     // options.keys
@@ -88,8 +98,9 @@
           target = tmpTargets[keyI]
           if(target === noTarget) { tmpResults[keyI] = noTarget; continue }
 
-          tmpResults[keyI] = algorithm(preparedSearch, target, /*allowSpaces=*/false, /*allowPartialMatch=*/containsSpace)
-          if(tmpResults[keyI] === NULL) { tmpResults[keyI] = noTarget; continue }
+          var keyResult = algorithm(preparedSearch, target, /*allowSpaces=*/false, /*allowPartialMatch=*/containsSpace)
+          if(keyResult === NULL) { tmpResults[keyI] = noTarget; continue }
+          tmpResults[keyI] = materialize(keyResult)
 
           // todo: this seems weird and wrong. like what if our first match wasn't good. this should just replace it instead of averaging with it
           // if our second match isn't good we ignore it instead of averaging with it
@@ -158,7 +169,7 @@
         if(result === NULL) continue
         if(result._score < threshold) continue
 
-        push_result(result)
+        push_prepared(result)
       }
     }
 
@@ -248,6 +259,15 @@
   class KeysResult extends Array {
     get ['score']() { return normalizeScore(this._score) }
     set ['score'](score) { this._score = denormalizeScore(score) }
+  }
+
+  var materialize = (prepared, obj=NULL) => {
+    var result = new Result()
+    result.target   = prepared.target
+    result.obj      = obj
+    result._score   = prepared._score
+    result._indexes = prepared._indexes
+    return result
   }
 
   var new_result = (target, options) => {
@@ -438,64 +458,49 @@
     // if it's a simple match, we'll switch to a substring match if a substring exists
     // if it's a strict match, we'll switch to a substring match only if that's a better score
 
-    var calculateScore = matches => {
-      var score = 0
-
-      var extraMatchGroupCount = 0
-      for(var i = 1; i < searchLen; ++i) {
-        if(matches[i] - matches[i-1] !== 1) {score -= matches[i]; ++extraMatchGroupCount}
-      }
-      var unmatchedDistance = matches[searchLen-1] - matches[0] - (searchLen-1)
-
-      score -= (12+unmatchedDistance) * extraMatchGroupCount // penality for more groups
-
-      if(matches[0] !== 0) score -= matches[0]*matches[0]*.2 // penality for not starting near the beginning
-
-      if(!successStrict) {
-        score *= 1000
-      } else {
-        // successStrict on a target with too many beginning indexes loses points for being a bad target
-        var uniqueBeginningIndexes = 1
-        for(var i = nextBeginningIndexes[0]; i < targetLen; i=nextBeginningIndexes[i]) ++uniqueBeginningIndexes
-
-        if(uniqueBeginningIndexes > 24) score *= (uniqueBeginningIndexes-24)*10 // quite arbitrary numbers here ...
-      }
-
-      score -= (targetLen - searchLen)/2 // penality for longer targets
-
-      if(isSubstring)          score /= 1+searchLen*searchLen*1 // bonus for being a full substring
-      if(isSubstringBeginning) score /= 1+searchLen*searchLen*1 // bonus for substring starting on a beginningIndex
-
-      score -= (targetLen - searchLen)/2 // penality for longer targets
-
-      return score
-    }
-
     if(!successStrict) {
       if(isSubstring) for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
       var matchesBest = matchesSimple
-      var score = calculateScore(matchesBest)
     } else {
       if(isSubstringBeginning) {
         for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
         var matchesBest = matchesSimple
-        var score = calculateScore(matchesSimple)
       } else {
         var matchesBest = matchesStrict
-        var score = calculateScore(matchesStrict)
       }
     }
+    var score = calculateScore(matchesBest, searchLen, targetLen, successStrict, nextBeginningIndexes, isSubstring, isSubstringBeginning)
 
     prepared._score = score
 
     for(var i = 0; i < searchLen; ++i) prepared._indexes[i] = matchesBest[i]
     prepared._indexes.len = searchLen
 
-    const result    = new Result()
-    result.target   = prepared.target
-    result._score   = prepared._score
-    result._indexes = prepared._indexes
-    return result
+    return prepared
+  }
+  var calculateScore = (matches, searchLen, targetLen, successStrict, nextBeginningIndexes, isSubstring, isSubstringBeginning) => {
+    var score = 0
+    var extraMatchGroupCount = 0
+    for(var i = 1; i < searchLen; ++i) {
+      if(matches[i] - matches[i-1] !== 1) { score -= matches[i]; ++extraMatchGroupCount }
+    }
+    var unmatchedDistance = matches[searchLen-1] - matches[0] - (searchLen-1)
+    score -= (12+unmatchedDistance) * extraMatchGroupCount
+    if(matches[0] !== 0) score -= matches[0]*matches[0]*.2
+
+    if(!successStrict) score *= 1000
+    else {
+      var uniqueBeginningIndexes = 1
+      for(var i = nextBeginningIndexes[0]; i < targetLen; i=nextBeginningIndexes[i]) ++uniqueBeginningIndexes
+      if(uniqueBeginningIndexes > 24) score *= (uniqueBeginningIndexes-24)*10
+    }
+
+    var lengthPenalty = (targetLen - searchLen)/2
+    score -= lengthPenalty
+    var substringBonus = 1+searchLen*searchLen
+    if(isSubstring) score /= substringBonus
+    if(isSubstringBeginning) score /= substringBonus
+    return score - lengthPenalty
   }
   var algorithmSpaces = (preparedSearch, target, allowPartialMatch) => {
     var seen_indexes = new Set()
