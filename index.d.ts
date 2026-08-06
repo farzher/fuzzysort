@@ -60,7 +60,7 @@ declare namespace Fuzzysort {
     readonly _targetType?: T
   }
 
-  interface Options {
+  interface Options<R = Result> {
     /** Don't return matches worse than this (higher is faster) */
     threshold?: number
 
@@ -69,6 +69,9 @@ declare namespace Fuzzysort {
 
     /** If true, returns all results for an empty search */
     all?: boolean
+
+    /** Override a match's score, or return 0 to exclude it */
+    scoreFn?: (result: R) => number
   }
   type Key<T> = string | ((obj: T) => string) | ReadonlyArray<string>
   interface PrepareKeyOptions<T> {
@@ -77,10 +80,8 @@ declare namespace Fuzzysort {
   interface PrepareKeysOptions<T> {
     keys: ReadonlyArray<Key<T>>
   }
-  interface KeyOptions<T> extends Options, PrepareKeyOptions<T> {}
-  interface KeysOptions<T> extends Options, PrepareKeysOptions<T> {
-    scoreFn?: (keysResult: KeysResult<T>) => number
-  }
+  interface KeyOptions<T> extends Options<KeyResult<T>>, PrepareKeyOptions<T> {}
+  interface KeysOptions<T> extends Options<KeysResult<T>>, PrepareKeysOptions<T> {}
 
   interface HighlightCallback<T> { (match: string, index: number): T }
 
@@ -91,8 +92,8 @@ declare namespace Fuzzysort {
     go(search: string, targets: ReadonlyArray<string> | Prepared, options?: Options): Results
     go<T>(search: string, targets: ReadonlyArray<T>, options: KeyOptions<T>): KeyResults<T>
     go<T>(search: string, targets: ReadonlyArray<T>, options: KeysOptions<T>): KeysResults<T>
-    go<T>(search: string, targets: PreparedKey<T>, options?: Options): KeyResults<T>
-    go<T>(search: string, targets: PreparedKeys<T>, options?: Options & {scoreFn?: (keysResult: KeysResult<T>) => number}): KeysResults<T>
+    go<T>(search: string, targets: PreparedKey<T>, options?: Options<KeyResult<T>>): KeyResults<T>
+    go<T>(search: string, targets: PreparedKeys<T>, options?: Options<KeysResult<T>>): KeysResults<T>
 
     /** Build an optimized snapshot for repeated searches. */
     prepare(targets: ReadonlyArray<string>): Prepared

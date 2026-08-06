@@ -61,38 +61,6 @@ const results = fuzzysort.go('a', mystuff, {key: 'file'})
 // [{score: 0.81, obj: {file: 'Apple.cpp'}}, {score: 0.59, obj: {file: 'Banana.cpp'}}]
 ```
 
-### `fuzzysort.prepare(targets, options=null)`
-
-Build an optimized reusable snapshot when the same targets will be searched more than once.
-Keys for object targets are provided while preparing, not while searching. Collections are
-prepared incrementally during browser idle time (and between Node event-loop turns), so
-`prepare()` returns immediately. Searching the collection before it is ready synchronously
-finishes its remaining preparation first.
-
-```js
-const games = fuzzysort.prepare(['Half-Life', 'Portal', 'Team Fortress 2'])
-fuzzysort.go('port', games, {limit: 10})
-
-const files = fuzzysort.prepare(
-  [{name: 'App.js', description: 'Application entry point'},
-   {name: 'Renderer.js', description: 'Renders the interface'}],
-  {keys: ['name', 'description']},
-)
-fuzzysort.go('render interface', files, {limit: 10})
-```
-
-Both `key` and `keys` accept the same dotted paths, path arrays, and getter
-functions as `go`. With `keys`, preparation extracts every value once and caches
-each object's combined character filter, avoiding key traversal and much of the
-per-object setup on every search.
-
-Treat prepared targets and their searchable values as a snapshot. Prepare them again
-when they change. This moves preparation work out of latency-sensitive searches and
-allows fuzzysort to cache additional search metadata safely. Preparation also builds
-a compact first-letter lookup table (about 54 bytes per searchable value) and packed
-word beginnings so one- and two-character searches use the same fast paths for every
-prepared key.
-
 ### Options
 
 ```js
@@ -103,7 +71,7 @@ fuzzysort.go(search, targets, {
 
   key: null,       // For when targets are objects (see its example usage)
   keys: null,      // For when targets are objects (see its example usage)
-  scoreFn: null,   // For use with `keys` (see its example usage)
+  scoreFn: null,   // Override a match's score
 })
 ```
 
@@ -126,16 +94,6 @@ result.highlight((m, i) => <react key={i}>{m}</react>)
 // ['some string that contains my ', <react key=0>query</react>, '.']
 ```
 
-When results are returned from a Web Worker, `postMessage()` does not preserve
-prototype methods or accessors. Use the top-level helpers on the cloned result:
-
-```js
-fuzzysort.highlight(result, '<b>', '</b>')
-fuzzysort.score(result)
-```
-
-These helpers also work with normal, uncloned results.
-
 ### Advanced Usage
 
 Search a list of objects, by multiple complex keys, with custom weights.
@@ -153,7 +111,7 @@ let objects = [{
 
 let results = fuzzysort.go('attack berry', objects, {
   keys: ['title', 'meta.desc', obj => obj.tags?.join()],
-  scoreFn: r => r.score * r.obj.bookmarked ? 2 : 1, // if the item is bookmarked, boost its score
+  scoreFn: r => r.score * (r.obj.bookmarked ? 2 : 1), // if the item is bookmarked, boost its score
 })
 
 var keysResult = results[0]
@@ -174,11 +132,8 @@ let targets = [{file: 'Monitor.cpp'}, {file: 'MeshRenderer.cpp'}]
 // filter out targets that you don't need to search! especially long ones!
 targets = targets.filter(t => t.file.length < 1000)
 
-// Prepare targets before the user starts searching. For object targets, key/keys
-// belong here so their values are extracted only once.
+// if your targets don't change, prepare them first!
 const preparedTargets = fuzzysort.prepare(targets, {key: 'file'})
-// Multiple fields work too:
-// fuzzysort.prepare(targets, {keys: ['file', 'description']})
 
 const options = {
   limit: 100,    // don't return more results than you need!
@@ -192,26 +147,36 @@ fuzzysort.go('fast',  preparedTargets, options)
 
 ### Character remapping
 
-Searches automatically remap accented characters, Unicode compatibility forms, and
-common visual variants (`ø`/`o`, `ｅ`/`e`, `ℯ`/`e`, and smart/straight quotes). Forward and backward
-slashes are equivalent, as are an ellipsis and a period. Context-dependent symbols
-such as `+`/`&` and decimal `,`/`.` remain distinct.
+Searches use NFKD normalization, strip diacritics, and remap common lookalikes such as smart quotes, dash/slash variants, ellipses, and `ø`, `æ`, `œ`, `ß`, `ł`.
+
+Use `fuzzysort.remap()` to add or override mappings:
+
+```js
+fuzzysort.remap({ ',': '.', 'æ': 'ae' })
+```
+
 
 ### Gotcha
-`result.score` is implemented as a getter/setter and stored different internally
-`r.score = .3; // r.score == 0.30000000000000004`
+
+`result.score` is implemented as a getter/setter and stored different internally `r.score = .3; // r.score == 0.30000000000000004`
+
+when cloning a result (web worker threads) you may lose these getters, in this case you can use `fuzzysort.score(result)` and `fuzzysort.highlight(result)`
 
 
-
-
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=farzher/fuzzysort)](https://star-history.com/#farzher/fuzzysort)
 
 
 
 ### Changelog
+
+#### v4.0.0
+- fuzzysort.js is now ESM instead of UMD
+- Major performance optimizations for the slowest cases. 10x faster cold starts
+- Changed `fuzzysort.prepare()` to work on targets instead of a single target
+- Added `fuzzysort.score()` and `fuzzysort.highlight()` for Web Worker support
+- `options.scoreFn` now works in all cases, not only when using `options.keys`
+- Automatically normalize similar looking characters, like special quotes
+- Added `fuzzysort.remap()` to define your own normalization
+- Closes all currently open issues except typos
 
 #### v3.1.0
 - Automatically handle diacritics / accents / ligatures

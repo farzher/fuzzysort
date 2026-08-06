@@ -21,6 +21,7 @@ export function go(search, targets, options) {
   let searchBitflags = query.bitflags
   let threshold = denormalizeScore(options?.threshold || 0)
   let limit = options?.limit || INF
+  let scoreFn = options?.scoreFn
   let resultCount = 0
   let limited = 0
   let getter = key && makeGetter(key)
@@ -32,15 +33,23 @@ export function go(search, targets, options) {
     if(!isPrepared(target)) target = getPrepared(target)
     if((searchBitflags & target._bitflags) !== searchBitflags) continue
     let result = algorithm(query, target)
-    if(result === null || result._score < threshold) continue
+    if(result === null) continue
+    let resultScore = result._score
+    if(scoreFn) {
+      result = materialize(result, key ? obj : undefined)
+      resultScore = scoreFn(result)
+      if(!resultScore) continue
+      result._score = resultScore = denormalizeScore(resultScore)
+    }
+    if(resultScore < threshold) continue
 
     let room = resultCount < limit
     if(room) resultCount++
     else {
       limited++
-      if(result._score <= heap.peek()._score) continue
+      if(resultScore <= heap.peek()._score) continue
     }
-    result = materialize(result, key ? obj : undefined)
+    if(!scoreFn) result = materialize(result, key ? obj : undefined)
     room ? heap.add(result) : heap.replaceTop(result)
   }
   return finishResults(resultCount, limited)
@@ -103,6 +112,7 @@ function goPreparedValues(search, prepared, options, singleChar) {
   let objects = prepared._objects
   let threshold = denormalizeScore(options?.threshold || 0)
   let limit = options?.limit || INF
+  let scoreFn = options?.scoreFn
   let resultCount = 0
   let limited = 0
 
@@ -120,18 +130,26 @@ function goPreparedValues(search, prepared, options, singleChar) {
         : short
           ? algorithm(search, target, false, false, false, true, prepared._beginnings, start, end)
           : algorithm(search, target)
-    if(result === null || result._score < threshold) continue
-    if(objects) result = materialize(result, objects[i])
+    if(result === null) continue
+    let resultScore = result._score
+    if(scoreFn) {
+      result = materialize(result, objects?.[i])
+      resultScore = scoreFn(result)
+      if(!resultScore) continue
+      result._score = resultScore = denormalizeScore(resultScore)
+    }
+    if(resultScore < threshold) continue
+    if(objects && !scoreFn) result = materialize(result, objects[i])
 
     if(resultCount < limit) {
       heap.add(result)
       resultCount++
     } else {
       limited++
-      if(result._score > heap.peek()._score) heap.replaceTop(result)
+      if(resultScore > heap.peek()._score) heap.replaceTop(result)
     }
   }
-  return finishResults(resultCount, limited, !objects && materialize)
+  return finishResults(resultCount, limited, !objects && !scoreFn && materialize)
 }
 
 function goPrepared(search, prepared, options) {

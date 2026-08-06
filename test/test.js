@@ -600,6 +600,37 @@ async function tests() {
     assert(scoreFnCalls === 3, 'scoreFn called for every matching object')
     assert(scored.length === 2 && scored[0].obj.rank === 3 && scored[1].obj.rank === 2, 'scoreFn ordering and zero filtering')
 
+    var stringScoreFnCalls = 0
+    var scoredStrings = fuzzysort.go('a', ['a', 'ba', 'ca'], {
+      limit: 1,
+      threshold: 2,
+      scoreFn: result => {
+        ++stringScoreFnCalls
+        assert(result.indexes.length === 1, 'string scoreFn sees a materialized result')
+        return result.target === 'ba' ? 5 : result.target === 'ca' ? 0 : 2
+      },
+    })
+    assert(stringScoreFnCalls === 3, 'string scoreFn runs before limit and threshold')
+    assert(scoredStrings.length === 1 && scoredStrings.total === 2 && scoredStrings[0].target === 'ba', 'string scoreFn orders, filters, and preserves total')
+
+    var preparedStringScoreFnCalls = 0
+    var preparedScoredStrings = fuzzysort.go('a', fuzzysort.prepare(['a', 'ba']), {
+      scoreFn: result => { ++preparedStringScoreFnCalls; return result.target === 'ba' ? 2 : 1 },
+    })
+    assert(preparedStringScoreFnCalls === 2 && preparedScoredStrings[0].target === 'ba', 'prepared string scoreFn')
+
+    var keyScoreTargets = [{name:'a', rank:2}, {name:'a', rank:3}, {name:'a', rank:0}]
+    var keyScored = fuzzysort.go('a', keyScoreTargets, {
+      key: 'name',
+      scoreFn: result => result.obj.rank,
+    })
+    assert(keyScored.length === 2 && keyScored[0].obj.rank === 3, 'key scoreFn ordering and zero filtering')
+
+    var preparedKeyScored = fuzzysort.go('a', fuzzysort.prepare(keyScoreTargets, {key:'name'}), {
+      scoreFn: result => result.obj.rank,
+    })
+    assert(preparedKeyScored.length === 2 && preparedKeyScored[0].obj.rank === 3, 'prepared key scoreFn')
+
     scoreFnCalls = 0
     var preparedScored = fuzzysort.prepare([{name:'a', rank:2}, {name:'a', rank:3}], {keys:['name']})
     var preparedScoreResults = fuzzysort.go('a', preparedScored, {
