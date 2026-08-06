@@ -678,8 +678,6 @@ async function benchmarks() {
     fuzzysort.go('render', focusedPrepared, {limit:10, threshold:.5})
   }, config)
 
-  // A user typing "elder" necessarily performs each of these searches. Keep the
-  // first character separate because it matches most of this 46k-item dataset.
   bench('go Steam "e" limit 10', function() {
     fuzzysort.go('e', steamPrepared, {limit:10})
   }, config)
@@ -689,15 +687,19 @@ async function benchmarks() {
   bench('go Steam "e" unlimited', function() {
     fuzzysort.go('e', steamPrepared)
   }, config)
-  bench('go Steam "el" limit 10', function() {
-    fuzzysort.go('el', steamPrepared, {limit:10})
-  }, config)
-  bench('go Steam "eld" limit 10', function() {
-    fuzzysort.go('eld', steamPrepared, {limit:10})
-  }, config)
-  bench('go Steam "elder" limit 10', function() {
-    fuzzysort.go('elder', steamPrepared, {limit:10})
-  }, config)
+
+  // Measure one real interaction, including every search issued while typing.
+  // cleanup() is outside the timed region, but makes the first keystroke cold.
+  benchCold('type "elder" prepared Steam targets', function() {
+    fuzzysort.cleanup()
+    return steamPrepared
+  }, function(targets) {
+    fuzzysort.go('e', targets, {limit:10})
+    fuzzysort.go('el', targets, {limit:10})
+    fuzzysort.go('eld', targets, {limit:10})
+    fuzzysort.go('elde', targets, {limit:10})
+    fuzzysort.go('elder', targets, {limit:10})
+  }, {samplecount:15})
 
   bench('go raw cached limit 10', function() {
     fuzzysort.go('render', focusedRaw, {limit:10})
@@ -928,9 +930,7 @@ function bench_speeddiff(name, hz) {
     go Steam "e" limit 10 x 151.23 ops/sec | 18 runs sampled
     go Steam "e" limit 100 x 147.75 ops/sec | 9 runs sampled
     go Steam "e" unlimited x 12.36 ops/sec | 2 runs sampled
-    go Steam "el" limit 10 x 52.60 ops/sec | 10 runs sampled
-    go Steam "eld" limit 10 x 70.25 ops/sec | 9 runs sampled
-    go Steam "elder" limit 10 x 95.73 ops/sec | 12 runs sampled
+    type "elder" prepared Steam targets | 59.00 ms | 17 ops/sec | 15 cold samples
     go raw cached limit 10 x 1,372 ops/sec | 16 runs sampled
     go raw cold cache limit 10 x 155.10 ops/sec | 8 runs sampled
     go key direct x 1,235 ops/sec | 7 runs sampled
