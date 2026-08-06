@@ -1,6 +1,6 @@
 /*
 WHAT: Checks for bugs, and then benchmarks to check for performance issues
-USAGE: npm test / node test.js / npm run test.bat / open test.html in the browser
+USAGE: npm test / node test.js / npm run test.bat / serve the repo over HTTP and open test/test.html
 
 HOW TO WRITE TESTS:
   // matches must not get better
@@ -38,7 +38,6 @@ let testdata_prepared = {}; let testdata_obj = {}
 }
 
 if(!isNode) Object.assign(globalThis, {fuzzysort, testdata, testdata_prepared})
-
 
 
 
@@ -839,11 +838,15 @@ function benchCold(name, setup, code, {samplecount=25}={}) {
   samples.sort((a,b) => a-b)
   const medianms = samples[samplecount >> 1]
   const hz = 1000 / medianms
+  const speeddiff = bench_speeddiff(name, hz)
+  const speeddiffstr = speeddiff==0?'': speeddiff>0
+    ? `\u001b[32m+${speeddiff}%\u001b[0m`
+    : `\u001b[31m${speeddiff}%\u001b[0m`
   console.log(
     `\u001b[36m${name}\u001b[0m`,
     '|', `\u001b[36m${medianms.toFixed(2)} ms\u001b[0m`,
     '|', `${Math.round(hz).toLocaleString()} ops/sec`,
-    '|', samplecount, 'cold samples'
+    `${speeddiffstr?speeddiffstr+' ':''}|`, samplecount, 'cold samples'
   )
 }
 
@@ -880,9 +883,8 @@ async function bench(name, code, {benchtime=2000}={}) {
   const medianloopms = getmedian(loopmsarr)
   const hz = 1000/(medianloopms/loopcount)
 
-  // The historical baselines below used the fastest sample, so they are not
-  // comparable now that benchmarks report medians. Keep them for reference only.
-  const speeddiff = 0
+  // Compare the median throughput with the matching baseline below.
+  const speeddiff = bench_speeddiff(name, hz)
   const speeddiffstr = speeddiff==0?'': speeddiff>0 ? cmdgreen(`+${speeddiff}%`) : cmdred(`${speeddiff}%`)
 
   console.log(
@@ -903,99 +905,72 @@ async function bench(name, code, {benchtime=2000}={}) {
 function bench_speeddiff(name, hz) {
   // fuzzysort 3.0
   var baseline = `
-    spaces & keys x 3,082 ops/sec +23.69% | 45 runs sampled
-    highlight x 341,797 ops/sec +8.13% | 12 runs sampled
-    highlight callback x 183,497 ops/sec +3.83% | 9 runs sampled
-    tricky x 5,692,984 ops/sec -12.79% | 14 runs sampled
-    tricky space x 1,610,290 ops/sec -6.79% | 9 runs sampled
-    tricky lot of space x 1,377,717 ops/sec -4.28% | 8 runs sampled
-    go prepared spaces x 302.61 ops/sec -2.97% | 11 runs sampled
-    go key spaces x 219.66 ops/sec +1.24% | 49 runs sampled
-    go prepared x 657.97 ops/sec -4.12% | 11 runs sampled
-    go prepared key x 559.95 ops/sec +2.35% | 11 runs sampled
-    go key x 369.29 ops/sec +5.84% | 10 runs sampled
-    go keys x 331.96 ops/sec +0.95% | 11 runs sampled
-    go str x 419.58 ops/sec +3.49% | 11 runs sampled
-    huge nomatch x 134,025,769 ops/sec +40.53% | 52 runs sampled
-    huge nomatch !bitflags x 3,208,114 ops/sec -28.81% | 11 runs sampled
-    tricky x 5,593,716 ops/sec -14.32% | 13 runs sampled
-    small x 18,268,139 ops/sec -0.97% | 22 runs sampled
-    somematch x 38,254,024 ops/sec -0.04% | 22 runs sampled
+    single raw cached target x 11,527,279 ops/sec | 18 runs sampled
+    single successful non-substring x 7,211,750 ops/sec | 14 runs sampled
+    single unsuccessful bitflags x 103,964,606 ops/sec | 21 runs sampled
+    single unsuccessful scan x 19,342,006 ops/sec | 11 runs sampled
+    single character x 40,550,989 ops/sec | 17 runs sampled
+    prepare ascii target x 1,871,045 ops/sec | 28 runs sampled
+    prepare unicode target x 397,721 ops/sec | 11 runs sampled
+    prepare all UE4 targets | 5.25 ms | 191 ops/sec | 25 cold samples
+    first go raw UE4 targets | 4.62 ms | 216 ops/sec | 25 cold samples
+    first go prepared UE4 targets | 0.81 ms | 1,238 ops/sec | 25 cold samples
+    second go prepared UE4 targets | 0.56 ms | 1,791 ops/sec | 25 cold samples
+    prepare all Steam targets | 147.42 ms | 7 ops/sec | 15 cold samples
+    first "e" raw Steam targets | 182.87 ms | 5 ops/sec | 15 cold samples
+    first "e" prepared Steam targets | 15.46 ms | 65 ops/sec | 15 cold samples
+    second "e" prepared Steam targets | 6.52 ms | 153 ops/sec | 15 cold samples
+    go prepared limit 1 x 2,929 ops/sec | 10 runs sampled
+    go prepared limit 10 x 3,004 ops/sec | 10 runs sampled
+    go prepared limit 100 focused x 2,619 ops/sec | 9 runs sampled
+    go prepared unlimited focused x 2,312 ops/sec | 10 runs sampled
+    go prepared threshold x 2,928 ops/sec | 10 runs sampled
+    go Steam "e" limit 10 x 151.23 ops/sec | 18 runs sampled
+    go Steam "e" limit 100 x 147.75 ops/sec | 9 runs sampled
+    go Steam "e" unlimited x 12.36 ops/sec | 2 runs sampled
+    go Steam "el" limit 10 x 52.60 ops/sec | 10 runs sampled
+    go Steam "eld" limit 10 x 70.25 ops/sec | 9 runs sampled
+    go Steam "elder" limit 10 x 95.73 ops/sec | 12 runs sampled
+    go raw cached limit 10 x 1,372 ops/sec | 16 runs sampled
+    go raw cold cache limit 10 x 155.10 ops/sec | 8 runs sampled
+    go key direct x 1,235 ops/sec | 7 runs sampled
+    go key dotted x 887.21 ops/sec | 12 runs sampled
+    go key array x 969.68 ops/sec | 11 runs sampled
+    go key function x 1,358 ops/sec | 8 runs sampled
+    go keys focused x 664.38 ops/sec | 13 runs sampled
+    go keys scoreFn x 736.94 ops/sec | 14 runs sampled
+    go results unread x 2,916 ops/sec | 10 runs sampled
+    go results score read x 2,779 ops/sec | 10 runs sampled
+    go results indexes read x 2,840 ops/sec | 10 runs sampled
+    spaces & keys x 3,739 ops/sec | 11 runs sampled
+    highlight x 227,685 ops/sec | 10 runs sampled
+    highlight callback x 135,385 ops/sec | 14 runs sampled
+    tricky x 7,043,466 ops/sec | 13 runs sampled
+    tricky space x 2,154,577 ops/sec | 10 runs sampled
+    tricky lot of space x 1,657,492 ops/sec | 9 runs sampled
+    go prepared spaces x 389.43 ops/sec | 12 runs sampled
+    go key spaces x 232.21 ops/sec | 10 runs sampled
+    go prepared x 873.66 ops/sec | 12 runs sampled
+    go prepared nolimit x 228.20 ops/sec | 10 runs sampled
+    go prepared key x 786.91 ops/sec | 15 runs sampled
+    go key x 366.87 ops/sec | 10 runs sampled
+    go keys x 314.15 ops/sec | 10 runs sampled
+    go str x 410.90 ops/sec | 11 runs sampled
+    huge nomatch x 94,163,036 ops/sec | 19 runs sampled
+    huge nomatch !bitflags x 3,035,058 ops/sec | 10 runs sampled
+    tricky x 7,021,840 ops/sec | 12 runs sampled
+    small x 26,935,857 ops/sec | 12 runs sampled
+    somematch x 32,752,331 ops/sec | 12 runs sampled
   `
-
-  // // fuzzysort 2.0.2
-  // var baseline = `
-  //   highlight x 635.22 ops/sec -1.19% | 62 runs sampled
-  //   tricky x 3,032,593 ops/sec -18.11% | 13 runs sampled
-  //   tricky space x 942,114 ops/sec -35.39% | 14 runs sampled
-  //   tricky lot of space x 847,304 ops/sec -18.54% | 13 runs sampled
-  //   go prepared spaces x 193.00 ops/sec -4.08% | 9 runs sampled
-  //   go key spaces x 136.29 ops/sec -2.45% | 28 runs sampled
-  //   go prepared x 404.49 ops/sec +2.29% | 10 runs sampled
-  //   go prepared key x 335.53 ops/sec +3.25% | 10 runs sampled
-  //   go key x 219.76 ops/sec +7.76% | 9 runs sampled
-  //   go keys x 182.24 ops/sec +9.19% | 20 runs sampled
-  //   go str x 250.21 ops/sec +8.5% | 8 runs sampled
-  //   huge nomatch x 53,612,811 ops/sec +0.1% | 125 runs sampled
-  //   tricky x 3,208,152 ops/sec -13.37% | 12 runs sampled
-  //   small x 6,237,592 ops/sec +0.22% | 16 runs sampled
-  //   somematch x 17,516,025 ops/sec -8.73% | 26 runs sampled
-  // `
-
-  // // fuzzysort 2.0
-  // var baseline = `
-  //   highlight x 642.86 ops/sec | 252 runs sampled
-  //   tricky x 3,703,251 ops/sec -9.02% | 17 runs sampled
-  //   tricky space x 1,458,090 ops/sec | 17 runs sampled
-  //   tricky lot of space x 1,040,051 ops/sec | 14 runs sampled
-  //   go prepared spaces x 201.20 ops/sec | 12 runs sampled
-  //   go key spaces x 139.70 ops/sec | 40 runs sampled
-  //   go prepared x 395.43 ops/sec -6.54% | 12 runs sampled
-  //   go prepared key x 324.96 ops/sec -9.21% | 11 runs sampled
-  //   go key x 203.92 ops/sec -12.16% | 11 runs sampled
-  //   go keys x 166.90 ops/sec -14.17% | 24 runs sampled
-  //   go str x 230.60 ops/sec -7.23% | 11 runs sampled
-  //   huge nomatch x 53,556,706 ops/sec -5.75% | 127 runs sampled
-  //   tricky x 3,737,179 ops/sec -8.18% | 15 runs sampled
-  //   small x 6,223,342 ops/sec -6.34% | 17 runs sampled
-  //   somematch x 19,191,278 ops/sec +4.4% | 29 runs sampled
-  // `
-
-  // // fuzzysort 1.9.0
-  // var baseline = `
-  //   go prepared x 423.08 ops/sec +19.87% | 25 runs sampled
-  //   go prepared key x 357.89 ops/sec +25.72% | 21 runs sampled
-  //   go key x 232.14 ops/sec +11.84% | 35 runs sampled
-  //   go keys x 194.44 ops/sec +13.89% | 27 runs sampled
-  //   go str x 248.55 ops/sec +17.08% | 12 runs sampled
-  //   goAsync x 333.33 ops/sec +7.75% | 12 runs sampled
-  //   goAsync.cancel() x 722.83 ops/sec -99.85% | 11 runs sampled
-  //   huge nomatch x 56,818,187 ops/sec +1128.97% | 120 runs sampled
-  //   tricky x 4,070,008 ops/sec -20.74% | 16 runs sampled
-  //   small x 6,644,523 ops/sec -65.45% | 23 runs sampled
-  //   somematch x 18,382,359 ops/sec +24.99% | 31 runs sampled
-  // `
-
-  // // fuzzysort 1.2.1
-  // var baseline = `
-  //   go prepared x 352.94 ops/sec | 102 runs sampled
-  //   go prepared key x 284.67 ops/sec | 15 runs sampled
-  //   go key x 207.55 ops/sec | 36 runs sampled
-  //   go keys x 170.73 ops/sec | 24 runs sampled
-  //   go str x 212.29 ops/sec | 11 runs sampled
-  //   goAsync x 309.35 ops/sec | 14 runs sampled
-  //   goAsync.cancel() x 462,963 ops/sec | 18 runs sampled
-  //   huge nomatch x 4,623,204 ops/sec | 19 runs sampled
-  //   tricky x 5,134,789 ops/sec | 21 runs sampled
-  //   small x 19,230,769 ops/sec | 31 runs sampled
-  //   somematch x 14,705,888 ops/sec | 25 runs sampled
-  // `
-
   const escapeRegex = str => str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
-  const re = new RegExp(`${escapeRegex(name)} x ([^\\s]+)`)
+  // Normal benchmarks store throughput after "x". Cold benchmarks store the
+  // more precise latency, so derive their baseline throughput from milliseconds.
+  const re = new RegExp(`^\\s*${escapeRegex(name)}(?: x ([^\\s]+)| \\| ([^\\s]+) ms \\|)`, 'm')
 
   const matches = baseline.match(re)
   if(!matches) return 0
-  const baselinehz = parseFloat(matches[1].replace(/[^\d\.]/g, ''))
+  const baselinehz = matches[1]
+    ? parseFloat(matches[1].replace(/[^\d\.]/g, ''))
+    : 1000 / parseFloat(matches[2].replace(/[^\d\.]/g, ''))
   return Math.floor((hz/baselinehz-1)*100   *100)/100
 }

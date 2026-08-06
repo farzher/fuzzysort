@@ -9,7 +9,7 @@
 </style>
 
 
-<script type="module" src="./test.js"></script>
+<!-- ES modules require serving this page over HTTP rather than opening it via file://. -->
 <script src="https://unpkg.com/vue@3.2.35/dist/vue.global.prod.js"></script>
 
 
@@ -43,7 +43,10 @@
 
 
 
-<script>;(function() {
+<script type="module">
+import './test.js'
+
+;(function() {
   var vue = window.vue = Vue.createApp({
 
     data() {
@@ -103,11 +106,9 @@
   function getms() { return performance.now() }
   function mapnumber(e,n,r,a,t,u){var b,m,o,p;b=r-n,m=t-a,o=(e-n)/b,u?.ex&&(p=o<0,o=Math.pow(Math.abs(o),u.ex),p&&(o=-o));let x=m*o+a;return x}
 
-  document.body.onload = () => {
-    const $input = document.getElementById('input')
-    document.onkeyup   = e => { if(e.key == 'Escape') $input.select() }
-    document.onkeydown = e => $input.focus()
-    vue.search()
-  }
+  const $input = document.getElementById('input')
+  document.onkeyup   = e => { if(e.key == 'Escape') $input.select() }
+  document.onkeydown = e => $input.focus()
+  vue.search()
 
 })()</script>
