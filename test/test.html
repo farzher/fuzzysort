@@ -88,13 +88,11 @@ import './test.js'
         const startms = getms()
 
         const targets_are_strings = typeof testdata[vue.testdatakey][0] === 'string'
-        if(targets_are_strings) {
-          vue.keys = []
-          vue.results = fuzzysort.go(vue.input, testdata_prepared[vue.testdatakey], {limit: 100})
-        } else {
-          vue.keys = Object.keys(testdata[vue.testdatakey][0])
-          vue.results = fuzzysort.go(vue.input, testdata[vue.testdatakey], {keys: vue.keys, all:true, limit: 100})
-        }
+        vue.keys = targets_are_strings ? [] : Object.keys(testdata[vue.testdatakey][0])
+        vue.results = fuzzysort.go(vue.input, testdata_prepared[vue.testdatakey], {
+          all: !targets_are_strings,
+          limit: 100,
+        })
 
         vue.duration = formatscore(getms()-startms)
       },

@@ -6,7 +6,7 @@ export function single(search, target) {
   if(!isPrepared(target)) target = getPrepared(target)
   if((query.bitflags & target._bitflags) !== query.bitflags) return null
   let result = algorithm(query, target)
-  return result === null ? null : materialize(result)
+  return result && materialize(result)
 }
 
 export function go(search, targets, options) {
@@ -21,23 +21,15 @@ export function go(search, targets, options) {
   let resultCount = 0
   let limited = 0
 
-  let add = result => {
-    if(resultCount < limit) {
-      heap.add(result)
-      resultCount++
-    } else {
+  let add = (result, prepared, obj) => {
+    let room = resultCount < limit
+    if(room) resultCount++
+    else {
       limited++
-      if(result._score > heap.peek()._score) heap.replaceTop(result)
+      if(result._score <= heap.peek()._score) return
     }
-  }
-  let addPrepared = (result, obj) => {
-    if(resultCount < limit) {
-      heap.add(materialize(result, obj))
-      resultCount++
-    } else {
-      limited++
-      if(result._score > heap.peek()._score) heap.replaceTop(materialize(result, obj))
-    }
+    if(prepared) result = materialize(result, obj)
+    room ? heap.add(result) : heap.replaceTop(result)
   }
 
   let key = options?.key
@@ -51,7 +43,7 @@ export function go(search, targets, options) {
       if(!isPrepared(target)) target = getPrepared(target)
       if((searchBitflags & target._bitflags) !== searchBitflags) continue
       let result = algorithm(query, target)
-      if(result !== null && result._score >= threshold) addPrepared(result, key ? obj : undefined)
+      if(result !== null && result._score >= threshold) add(result, true, key ? obj : undefined)
     }
     return finishResults(resultCount, limited)
   }
@@ -79,47 +71,30 @@ export function go(search, targets, options) {
         keyResults[k] = noTarget
         continue
       }
+      if(!hasSpace && (searchBitflags & target._bitflags) !== searchBitflags) {
+        keyResults[k] = noTarget
+        continue
+      }
       let result = algorithm(query, target, false, hasSpace)
       if(result === null) {
         keyResults[k] = noTarget
         continue
       }
       keyResults[k] = materialize(result)
-
-      if(hasSpace) for(let s = 0; s < spaceCount; s++) {
-        let partial = partials[s]
-        let best = spaceScores[s]
-        if(partial > -1000 && best > -INF) best = Math.max(best, (best + partial) / 4)
-        spaceScores[s] = Math.max(best, partial)
-      }
+      if(hasSpace) mergePartScores(spaceCount)
     }
 
+    let resultScore
     if(hasSpace) {
       for(let s = 0; s < spaceCount; s++) if(spaceScores[s] === -INF) continue outer
+      resultScore = sumScores(spaceScores, spaceCount)
     } else {
-      let matched = false
-      for(let k = 0; k < keys.length; k++) if(keyResults[k]._score !== -INF) {
-        matched = true
-        break
-      }
-      if(!matched) continue
+      resultScore = mergeScores(keyResults, keys.length)
+      if(resultScore === -INF) continue
     }
 
     let result = new KeysResult(keys.length)
     for(let k = 0; k < keys.length; k++) result[k] = keyResults[k]
-
-    let resultScore
-    if(hasSpace) {
-      resultScore = 0
-      for(let s = 0; s < spaceCount; s++) resultScore += spaceScores[s]
-    } else {
-      resultScore = -INF
-      for(let k = 0; k < keys.length; k++) {
-        let score = result[k]._score
-        if(score > -1000 && resultScore > -INF) resultScore = Math.max(resultScore, (resultScore + score) / 4)
-        if(score > resultScore) resultScore = score
-      }
-    }
 
     result.obj = obj
     result._score = resultScore
@@ -133,8 +108,6 @@ export function go(search, targets, options) {
 
   return finishResults(resultCount, limited)
 }
-
-export let prepare = (targets, options) => new PreparedTargets(targets, options)
 
 export function highlight(result, open = '<b>', close = '</b>') {
   let callback = typeof open === 'function' ? open : null
@@ -178,6 +151,8 @@ export function remap(mappings) {
     if(char.charCodeAt(0) < 128) customAsciiRemappings = true
   }
 }
+
+export function prepare(targets, options) { return new PreparedTargets(targets, options) }
 
 export function cleanup() { targetCache.clear(); searchCache.clear() }
 
@@ -229,7 +204,7 @@ function goPreparedValues(search, prepared, options, singleChar) {
     }
   }
 
-  return finishResults(resultCount, limited, !objects)
+  return finishResults(resultCount, limited, !objects && materialize)
 }
 
 function goPrepared(search, prepared, options) {
@@ -245,17 +220,127 @@ function goPrepared(search, prepared, options) {
     return goPreparedValues(query, prepared, options, singleChar)
   }
 
-  let preparedOptions = {...options, keys: prepared._keys}
-  if(options?.scoreFn) {
-    let scoreFn = options.scoreFn
-    preparedOptions.scoreFn = result => {
-      result.obj = result.obj._obj
-      return scoreFn(result)
+  return goPreparedKeys(search, prepared, options)
+}
+
+function goPreparedKeys(search, prepared, options) {
+  let targets = prepared._targets
+  let objects = prepared._objects
+  let keysLength = prepared._keysLength
+  let targetsLength = objects.length
+
+  if(!search) {
+    if(!options?.all) return noResults
+    let results = []
+    results.total = targetsLength
+    let limit = options?.limit || INF
+    for(let i = 0; i < targetsLength && i < limit; i++) {
+      let result = new KeysResult(keysLength)
+      let row = i * keysLength
+      for(let k = 0; k < keysLength; k++) {
+        let target = targets[row + k]
+        result[k] = target === noTarget ? noTarget : newResult(target.target, -INF)
+      }
+      result.obj = objects[i]
+      result._score = -INF
+      results.push(result)
+    }
+    return results
+  }
+
+  let query = getQuery(search)
+  let searchBitflags = query.bitflags
+  let hasSpace = query.hasSpace
+  let spaceCount = query.parts.length
+  let threshold = denormalizeScore(options?.threshold || 0)
+  let limit = options?.limit || INF
+  let searchLen = query.lowerCodes.length
+  let short = !hasSpace && searchLen <= 3
+  let code = query.lowerCodes[0]
+  let singleChar = searchLen === 1 && code >= 97 && code <= 122
+  let scoreFn = options?.scoreFn
+  let deferMaterialization = !scoreFn && (limit !== INF || threshold > -INF)
+  let resultCount = 0
+  let limited = 0
+
+  outer: for(let i = 0; i < targetsLength; i++) {
+    if((searchBitflags & prepared._bitflags[i]) !== searchBitflags) continue
+    if(hasSpace) for(let s = 0; s < spaceCount; s++) spaceScores[s] = -INF
+
+    let row = i * keysLength
+    for(let k = 0; k < keysLength; k++) {
+      let target = targets[row + k]
+      if(target === noTarget) {
+        keyResults[k] = noTarget
+        continue
+      }
+      if(hasSpace) {
+        let possible = false
+        for(let s = 0; s < spaceCount; s++) {
+          let partBitflags = query.parts[s].bitflags
+          if((partBitflags & target._bitflags) === partBitflags) {
+            possible = true
+            break
+          }
+        }
+        if(!possible) {
+          keyResults[k] = noTarget
+          continue
+        }
+      } else if((searchBitflags & target._bitflags) !== searchBitflags) {
+        keyResults[k] = noTarget
+        continue
+      }
+      let valueRow = row + k
+      let targetShort = short && target.target.length < 65535
+      let start = prepared._offsets[valueRow]
+      let end = prepared._offsets[valueRow + 1]
+      let match = singleChar && target.target.length < 65535
+        ? singleCharResult(query, target, prepared._first, valueRow)
+        : targetShort && searchLen === 2
+          ? algorithm2(query, target, prepared._beginnings, start, end)
+          : targetShort
+            ? algorithm(query, target, false, false, false, true, prepared._beginnings, start, end)
+            : algorithm(query, target, false, hasSpace)
+      if(match === null) {
+        keyResults[k] = noTarget
+        continue
+      }
+      keyResults[k] = deferMaterialization ? match : materialize(match)
+      if(hasSpace) mergePartScores(spaceCount)
+    }
+
+    let resultScore
+    if(hasSpace) {
+      for(let s = 0; s < spaceCount; s++) if(spaceScores[s] === -INF) continue outer
+      resultScore = sumScores(spaceScores, spaceCount)
+    } else {
+      resultScore = mergeScores(keyResults, keysLength)
+      if(resultScore === -INF) continue
+    }
+
+    let result = deferMaterialization ? null : captureKeysResult(keyResults, keysLength, objects[i], resultScore)
+    if(scoreFn) {
+      resultScore = scoreFn(result)
+      if(!resultScore) continue
+      result._score = resultScore = denormalizeScore(resultScore)
+    }
+    if(resultScore < threshold) continue
+
+    if(resultCount < limit) {
+      if(result === null) result = captureKeysResult(keyResults, keysLength, objects[i], resultScore)
+      heap.add(result)
+      resultCount++
+    } else {
+      limited++
+      if(resultScore > heap.peek()._score) {
+        if(result === null) result = captureKeysResult(keyResults, keysLength, objects[i], resultScore)
+        heap.replaceTop(result)
+      }
     }
   }
-  let results = go(search, prepared._targets, preparedOptions)
-  for(let result of results) if(result.obj?._prepared === entryMarker) result.obj = result.obj._obj
-  return results
+
+  return finishResults(resultCount, limited, deferMaterialization && materializeKeys)
 }
 
 function all(targets, options) {
@@ -303,15 +388,20 @@ function all(targets, options) {
   return results
 }
 
-function finishResults(length, limited, materializePrepared = false) {
+function finishResults(length, limited, transform) {
   if(!length) return noResults
   let results = new Array(length)
   for(let i = length - 1; i >= 0; i--) {
     let result = heap.poll()
-    results[i] = materializePrepared ? materialize(result) : result
+    results[i] = transform ? transform(result) : result
   }
   results.total = length + limited
   return results
+}
+
+function materializeKeys(result) {
+  for(let k = 0; k < result.length; k++) if(result[k] !== noTarget) result[k] = materialize(result[k])
+  return result
 }
 
 
@@ -343,13 +433,7 @@ function algorithm2(search, target, beginnings, start, end) {
 
   let substringI = target._targetLower.indexOf(search._lower, first)
   let substring = substringI !== -1
-  let low = start
-  let high = end
-  while(low < high) {
-    let middle = low + high >> 1
-    if(beginnings[middle] < substringI) low = middle + 1
-    else high = middle
-  }
+  let low = lowerBound(beginnings, start, end, substringI)
   let substringStart = substring && low < end && beginnings[low] === substringI
   let strict = substringStart && substringI === first
 
@@ -553,6 +637,31 @@ function algorithm(search, target, spaces = false, partial = false, changed = fa
   return target
 }
 
+function mergePartScores(length) {
+  for(let i = 0; i < length; i++) {
+    let partial = partials[i]
+    let best = spaceScores[i]
+    if(partial > -1000 && best > -INF) best = Math.max(best, (best + partial) / 4)
+    spaceScores[i] = Math.max(best, partial)
+  }
+}
+
+function sumScores(scores, length) {
+  let total = 0
+  for(let i = 0; i < length; i++) total += scores[i]
+  return total
+}
+
+function mergeScores(results, length) {
+  let total = -INF
+  for(let i = 0; i < length; i++) {
+    let score = results[i]._score
+    if(score > -1000 && total > -INF) total = Math.max(total, (total + score) / 4)
+    if(score > total) total = score
+  }
+  return total
+}
+
 function calculateScore(matches, searchLen, targetLen, strict, beginningLen, substring, substringStart) {
   let score = 0
   let groups = 0
@@ -654,7 +763,7 @@ class PreparedTargets {
   constructor(targets, options) {
     let mode = this._mode = options?.keys ? 2 : options?.key ? 1 : 0
     let keys = mode === 2 ? options.keys : [options?.key]
-    this._targets = new Array(targets.length)
+    this._targets = new Array(targets.length * (mode === 2 ? keys.length : 1))
 
     if(mode < 2) {
       let key = keys[0]
@@ -673,16 +782,27 @@ class PreparedTargets {
     }
 
     let getters = keys.map(makeGetter)
-    this._keys = keys.map((_, i) => keyGetter(i))
+    this._keysLength = keys.length
+    this._objects = targets.slice()
+    this._bitflags = new Int32Array(targets.length)
+    let valueCount = targets.length * keys.length
+    let firstTable = this._first = new Uint16Array(valueCount * 26)
+    let offsets = this._offsets = new Uint32Array(valueCount + 1)
+    let beginnings = []
     for(let i = 0; i < targets.length; i++) {
       let obj = targets[i]
-      let values = new Array(keys.length)
+      let bitflags = 0
       for(let k = 0; k < keys.length; k++) {
         let value = getters[k] === null ? obj[keys[k]] : getters[k](obj)
-        values[k] = value ? prepTarget(value) : noTarget
+        let row = i * keys.length + k
+        let prepared = this._targets[row] = value ? prepTarget(value) : noTarget
+        if(prepared !== noTarget) indexBeginnings(prepared, firstTable, row, beginnings)
+        offsets[row + 1] = beginnings.length
+        bitflags |= prepared._bitflags
       }
-      this._targets[i] = {_prepared: entryMarker, _obj: obj, _targets: values}
+      this._bitflags[i] = bitflags
     }
+    this._beginnings = Uint16Array.from(beginnings)
   }
 }
 
@@ -874,6 +994,14 @@ function materialize(prepared, obj = null) {
   return result
 }
 
+function captureKeysResult(matches, keysLength, obj, score) {
+  let result = new KeysResult(keysLength)
+  for(let k = 0; k < keysLength; k++) result[k] = matches[k]
+  result.obj = obj
+  result._score = score
+  return result
+}
+
 let normalizeScore = value => value === -INF ? 0 : value > 1 ? value : Math.E ** (((-value + 1) ** .04307 - 1) * -2)
 let denormalizeScore = value => value === 0 ? -INF : value > 1 ? value : 1 - Math.pow(Math.log(value) / -2 + 1, 1 / .04307)
 let isPrepared = value => typeof value === 'object' && typeof value?._bitflags === 'number'
@@ -893,27 +1021,23 @@ function makeGetter(key) {
   }
 }
 
-function nextBeginning(indexes, start, end, index, targetLen) {
-  let low = start
-  let high = end
-  while(low < high) {
-    let middle = low + high >> 1
-    if(indexes[middle] <= index) low = middle + 1
-    else high = middle
+function lowerBound(values, start, end, value, after = false) {
+  while(start < end) {
+    let middle = start + end >> 1
+    if(values[middle] < value || after && values[middle] === value) start = middle + 1
+    else end = middle
   }
-  return low < end ? indexes[low] : targetLen
+  return start
+}
+
+function nextBeginning(indexes, start, end, index, targetLen) {
+  let next = lowerBound(indexes, start, end, index, true)
+  return next < end ? indexes[next] : targetLen
 }
 
 function isBeginning(indexes, start, end, index) {
-  let low = start
-  let high = end
-  while(low < high) {
-    let middle = low + high >> 1
-    let value = indexes[middle]
-    if(value < index) low = middle + 1
-    else high = middle
-  }
-  return low < end && indexes[low] === index
+  let found = lowerBound(indexes, start, end, index)
+  return found < end && indexes[found] === index
 }
 
 function createHeap() {
@@ -975,11 +1099,8 @@ let remapFrom = '\\"`‘’“”‐–—−⁄∕…øØæÆœŒßẞłŁ', re
 for(let i = 0; i < remapFrom.length; i++) remappings[remapFrom[i]] = remapTo[i]
 let customAsciiRemappings = false
 
-let entryMarker = {}
-let keyGetter = index => entry => entry._targets[index]
-
 let heap = createHeap()
 
 let noTarget = prepTarget('')
 
-export default {single, go, prepare, highlight, score, remap, cleanup}
+export default {single, go, highlight, score, remap, prepare, cleanup}

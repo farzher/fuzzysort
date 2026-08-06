@@ -30,7 +30,11 @@ const config = {
 // load testdata into prepared collections and objects
 let testdata_prepared = {}; let testdata_obj = {}
 {
-  for(const key of Object.keys(testdata)) testdata_prepared[key] = fuzzysort.prepare(testdata[key])
+  for(const key of Object.keys(testdata)) {
+    const first = testdata[key][0]
+    const keys = first && typeof first === 'object' ? Object.keys(first) : null
+    testdata_prepared[key] = fuzzysort.prepare(testdata[key], keys ? {keys} : undefined)
+  }
   for(const key of Object.keys(testdata)) {
     testdata_obj[key] = new Array(testdata[key].length)
     for(let i = testdata[key].length-1; i>=0; i-=1) testdata_obj[key][i] = {str: testdata[key][i], alt: testdata[key][i]}
@@ -49,6 +53,7 @@ setTimeout(async function() {
 
   if(assert.count==0/*no asserts were run*/) console.log('testing is disabled!')
   else if(!assert.failed) console.log('all tests passed')
+  else if(isNode) process.exitCode = 1
 
   if(isNode) await benchmarks() // Only bench on node. Don't want the demo to freeze
 })
@@ -418,6 +423,158 @@ async function tests() {
     assert(fuzzysort.go('alpha beta', preparedKeys)[0].obj === keyPaths[0], 'prepared keys preserve object')
     assert(fuzzysort.go('', preparedKey, {all:true})[0].obj === keyPaths[0], 'prepared key all')
 
+    var multiKeyTargets = [
+      {name:'Elder Scrolls', description:'Fantasy role-playing game'},
+      {name:'Portal', description:'First-person puzzle game'},
+      {name:'Missing description'},
+    ]
+    var rawKeys = fuzzysort.go('scrolls fantasy', multiKeyTargets, {keys:['name', 'description']})
+    var preparedMultiKeys = fuzzysort.prepare(multiKeyTargets, {keys:['name', 'description']})
+    var preparedKeysResults = fuzzysort.go('scrolls fantasy', preparedMultiKeys)
+    assert(preparedKeysResults[0].obj === multiKeyTargets[0], 'prepared multiple keys preserves object')
+    assert(preparedKeysResults[0].score === rawKeys[0].score, 'prepared multiple keys preserves score')
+    assert(preparedKeysResults[0][0].highlight() === rawKeys[0][0].highlight(), 'prepared multiple keys preserves first key match')
+    assert(preparedKeysResults[0][1].highlight() === rawKeys[0][1].highlight(), 'prepared multiple keys preserves second key match')
+
+    // Prepared multi-word matching must preserve raw matching behavior across
+    // word joins, backtracking, out-of-order terms, and long targets.
+    var packedWordCases = [
+      ['straw berry', 'strawberry'],
+      ['zz cat', 'xcat--zzcat'],
+      ['a bq', 'abx_bq'],
+      ['bar foo baz', 'foobarbaz'],
+      ['foo bar', 'x '.repeat(25) + 'foobar'],
+    ]
+    for(var packedWordI = 0; packedWordI < packedWordCases.length; packedWordI++) {
+      var packedWordSearch = packedWordCases[packedWordI][0]
+      var packedWordTarget = packedWordCases[packedWordI][1]
+      var rawPackedWord = fuzzysort.single(packedWordSearch, packedWordTarget)
+      var preparedPackedWord = fuzzysort.go(packedWordSearch, fuzzysort.prepare([packedWordTarget]), {limit:1})[0]
+      assert(preparedPackedWord.score === rawPackedWord.score, 'prepared packed multi-word score')
+      assert(JSON.stringify(preparedPackedWord.indexes) === JSON.stringify(rawPackedWord.indexes), 'prepared packed multi-word indexes')
+      assert(preparedPackedWord.highlight() === rawPackedWord.highlight(), 'prepared packed multi-word highlight')
+    }
+
+    var packedWordObject = {value:'strawberry'}
+    var rawPackedWordKey = fuzzysort.go('straw berry', [packedWordObject], {key:'value'})[0]
+    var preparedPackedWordKey = fuzzysort.go('straw berry', fuzzysort.prepare([packedWordObject], {key:'value'}), {limit:1})[0]
+    assert(preparedPackedWordKey.obj === packedWordObject, 'prepared packed multi-word key object')
+    assert(preparedPackedWordKey.score === rawPackedWordKey.score && preparedPackedWordKey.highlight() === rawPackedWordKey.highlight(), 'prepared packed multi-word key result')
+
+    var splitWordTargets = [
+      {id:'split-forward', first:'alpha', second:'beta'},
+      {id:'split-reversed', first:'beta', second:'alpha'},
+      {id:'flags-only', first:'albe', second:'phata'},
+    ]
+    var rawSplitWords = fuzzysort.go('alpha beta', splitWordTargets, {keys:['first', 'second']})
+    var preparedSplitWords = fuzzysort.go('alpha beta', fuzzysort.prepare(splitWordTargets, {keys:['first', 'second']}), {limit:2})
+    assert(rawSplitWords.length === 2 && preparedSplitWords.length === 2, 'prepared word rejection keeps cross-key matches and rejects flags-only rows')
+    assert(preparedSplitWords[0].obj === rawSplitWords[0].obj && preparedSplitWords[1].obj === rawSplitWords[1].obj, 'prepared split words preserve ordering')
+    assert(preparedSplitWords[0].score === rawSplitWords[0].score && preparedSplitWords[1].score === rawSplitWords[1].score, 'prepared split words preserve scores')
+
+    var splitCharacterTargets = [
+      {id:'split-characters', first:'a', second:'b'},
+      {id:'whole-query', first:'ab', second:'other'},
+      {id:'out-of-order', first:'ba', second:'other'},
+    ]
+    var rawSplitCharacters = fuzzysort.go('ab', splitCharacterTargets, {keys:['first', 'second']})
+    var preparedSplitCharacters = fuzzysort.go('ab', fuzzysort.prepare(splitCharacterTargets, {keys:['first', 'second']}))
+    assert(rawSplitCharacters.length === 1 && rawSplitCharacters[0].obj.id === 'whole-query', 'multiple keys reject characters split across keys')
+    assert(preparedSplitCharacters.length === 1 && preparedSplitCharacters[0].obj === rawSplitCharacters[0].obj, 'prepared multiple keys preserve per-key character rejection')
+    assert(preparedSplitCharacters[0].score === rawSplitCharacters[0].score && preparedSplitCharacters[0][0].highlight() === rawSplitCharacters[0][0].highlight(), 'prepared per-key rejection preserves scores and highlighting')
+
+    var preparedStrideTargets = [
+      {id:'first-row', first:'alpha', second:'other', third:'value'},
+      {id:'missing-middle', first:'other', third:'needle'},
+      {id:'last-row', first:'other', second:'value', third:'omega'},
+    ]
+    var preparedStrides = fuzzysort.prepare(preparedStrideTargets, {keys:['first', 'second', 'third']})
+    var preparedStrideResult = fuzzysort.go('needle', preparedStrides)
+    assert(preparedStrideResult.length === 1 && preparedStrideResult[0].obj === preparedStrideTargets[1], 'prepared flattened keys preserve row identity and key stride')
+    assert(preparedStrideResult[0][0].target === '' && preparedStrideResult[0][1].target === '' && preparedStrideResult[0][2].target === 'needle', 'prepared flattened keys preserve unmatched, missing, and trailing values')
+    var preparedStrideAll = fuzzysort.go('', preparedStrides, {all:true})
+    assert(preparedStrideAll.total === 3 && preparedStrideAll[2].obj === preparedStrideTargets[2] && preparedStrideAll[2][2].target === 'omega', 'prepared flattened keys preserve empty-search rows')
+    var preparedNoKeys = fuzzysort.prepare(preparedStrideTargets, {keys:[]})
+    var preparedNoKeysAll = fuzzysort.go('', preparedNoKeys, {all:true, limit:2})
+    assert(preparedNoKeysAll.length === 2 && preparedNoKeysAll.total === 3 && preparedNoKeysAll[0].length === 0 && preparedNoKeysAll[1].obj === preparedStrideTargets[1], 'prepared empty key lists preserve all results')
+
+    var preparedShortKeys = fuzzysort.prepare([{name:'foobar baz', description:'other value'}], {keys:['name', 'description']})
+    assert(fuzzysort.go('b', preparedShortKeys)[0][0].indexes[0] === 7, 'prepared multiple keys one-character optimization')
+    var twoCharacterResult = fuzzysort.go('ba', preparedShortKeys)[0][0]
+    assert(twoCharacterResult.indexes[0] === 7 && twoCharacterResult.indexes[1] === 8, 'prepared multiple keys two-character optimization')
+
+    // Targets at this boundary skip Uint16 indexes and use the regular matcher.
+    var uint16BoundaryTarget = 'a'.repeat(65535)
+    var rawBoundaryResult = fuzzysort.go('aaaa', [uint16BoundaryTarget], {limit:1})[0]
+    var preparedBoundaryResult = fuzzysort.go('aaaa', fuzzysort.prepare([uint16BoundaryTarget]), {limit:1})[0]
+    assert(preparedBoundaryResult.score === rawBoundaryResult.score, 'prepared long value score at Uint16 boundary')
+    assert(JSON.stringify(preparedBoundaryResult.indexes) === JSON.stringify(rawBoundaryResult.indexes), 'prepared long value indexes at Uint16 boundary')
+
+    var uint16BoundaryWords = 'a'.repeat(65532) + 'bbb'
+    var rawBoundaryWords = fuzzysort.single('aaaa bbb', uint16BoundaryWords)
+    var preparedBoundaryWords = fuzzysort.go('aaaa bbb', fuzzysort.prepare([uint16BoundaryWords]), {limit:1})[0]
+    assert(preparedBoundaryWords.score === rawBoundaryWords.score, 'prepared long multi-word score at Uint16 boundary')
+    assert(JSON.stringify(preparedBoundaryWords.indexes) === JSON.stringify(rawBoundaryWords.indexes), 'prepared long multi-word indexes at Uint16 boundary')
+
+    var boundaryObjects = [{name:uint16BoundaryTarget, description:'other'}]
+    var rawBoundaryKeys = fuzzysort.go('aaaa', boundaryObjects, {keys:['name', 'description'], limit:1})[0]
+    var preparedBoundaryKeys = fuzzysort.go('aaaa', fuzzysort.prepare(boundaryObjects, {keys:['name', 'description']}), {limit:1})[0]
+    assert(preparedBoundaryKeys.score === rawBoundaryKeys.score, 'prepared long keys score at Uint16 boundary')
+    assert(JSON.stringify(preparedBoundaryKeys[0].indexes) === JSON.stringify(rawBoundaryKeys[0].indexes), 'prepared long keys indexes at Uint16 boundary')
+
+    // Limited prepared multi-key searches compute with internal matches, but
+    // only materialize candidates that can enter the result heap.
+    var limitedKeyTargets = [
+      {id:'weak', name:'a----b'},
+      {id:'best-first', name:'ab'},
+      {id:'best-later', name:'ab'},
+      {id:'best-other-key', description:'ab'},
+    ]
+    var limitedKeyOptions = {keys:['name', 'description'], limit:1}
+    var rawLimitedKeys = fuzzysort.go('ab', limitedKeyTargets, limitedKeyOptions)
+    var preparedLimitedKeys = fuzzysort.go('ab', fuzzysort.prepare(limitedKeyTargets, limitedKeyOptions), {limit:1})
+    assert(preparedLimitedKeys.length === 1 && preparedLimitedKeys.total === 4, 'prepared keys limit preserves total')
+    assert(preparedLimitedKeys[0].obj === limitedKeyTargets[1], 'prepared keys limit replaces weak result and keeps first best tie')
+    assert(preparedLimitedKeys[0][0].highlight() === '<b>ab</b>', 'prepared keys limit preserves highlighting')
+    assert(preparedLimitedKeys[0].score === rawLimitedKeys[0].score, 'prepared keys limit preserves score')
+
+    var bestThreshold = rawLimitedKeys[0].score * .999
+    var rawThresholdKeys = fuzzysort.go('ab', limitedKeyTargets, {keys:['name', 'description'], limit:2, threshold:bestThreshold})
+    var preparedThresholdKeys = fuzzysort.go('ab', fuzzysort.prepare(limitedKeyTargets, limitedKeyOptions), {limit:2, threshold:bestThreshold})
+    assert(preparedThresholdKeys.total === rawThresholdKeys.total, 'prepared keys threshold preserves total')
+    assert(preparedThresholdKeys.length === rawThresholdKeys.length, 'prepared keys threshold preserves limit')
+    for(var thresholdI = 0; thresholdI < rawThresholdKeys.length; thresholdI++) {
+      assert(preparedThresholdKeys[thresholdI].obj === rawThresholdKeys[thresholdI].obj, 'prepared keys threshold preserves ordering')
+      assert(preparedThresholdKeys[thresholdI].score === rawThresholdKeys[thresholdI].score, 'prepared keys threshold preserves score')
+      for(var thresholdK = 0; thresholdK < 2; thresholdK++) {
+        assert(preparedThresholdKeys[thresholdI][thresholdK].target === rawThresholdKeys[thresholdI][thresholdK].target, 'prepared keys threshold preserves key target')
+        assert(JSON.stringify(preparedThresholdKeys[thresholdI][thresholdK].indexes) === JSON.stringify(rawThresholdKeys[thresholdI][thresholdK].indexes), 'prepared keys threshold preserves key indexes')
+      }
+    }
+
+    var limitedScoreFnCalls = []
+    var preparedLimitedScored = fuzzysort.prepare([
+      {name:'a', rank:2},
+      {name:'a', rank:0},
+      {name:'a', rank:5},
+    ], {keys:['name']})
+    var limitedScoreFnResults = fuzzysort.go('a', preparedLimitedScored, {
+      limit:1,
+      threshold:2,
+      scoreFn: result => {
+        limitedScoreFnCalls.push(result)
+        assert(result[0].indexes[0] === 0 && result[0].highlight() === '<b>a</b>', 'prepared keys scoreFn sees materialized key result')
+        return result.obj.rank
+      },
+    })
+    assert(limitedScoreFnCalls.length === 3, 'prepared keys scoreFn runs before limit and threshold')
+    assert(limitedScoreFnCalls[0] !== limitedScoreFnCalls[1] && limitedScoreFnCalls[1] !== limitedScoreFnCalls[2], 'prepared keys scoreFn receives distinct results')
+    assert(limitedScoreFnResults.length === 1 && limitedScoreFnResults.total === 2, 'prepared keys scoreFn limit preserves total')
+    assert(limitedScoreFnResults[0].obj.rank === 5, 'prepared keys scoreFn limit preserves ordering')
+    multiKeyTargets[0].name = 'Changed after prepare'
+    assert(fuzzysort.go('elder', preparedMultiKeys).length === 1, 'prepared multiple keys is a searchable snapshot')
+    assert(fuzzysort.go('elder', multiKeyTargets, {keys:['name', 'description']}).length === 0, 'raw multiple keys reflects changes')
+
     var scoreFnCalls = 0
     var scored = fuzzysort.go('a', [{name:'a', rank:2}, {name:'a', rank:3}, {name:'a', rank:0}], {
       keys: ['name'],
@@ -553,20 +710,6 @@ function assertResultIntegrity(result) {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

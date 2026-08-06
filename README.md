@@ -71,17 +71,24 @@ const games = fuzzysort.prepare(['Half-Life', 'Portal', 'Team Fortress 2'])
 fuzzysort.go('port', games, {limit: 10})
 
 const files = fuzzysort.prepare(
-  [{name: 'App.js'}, {name: 'Renderer.js'}],
-  {key: 'name'},
+  [{name: 'App.js', description: 'Application entry point'},
+   {name: 'Renderer.js', description: 'Renders the interface'}],
+  {keys: ['name', 'description']},
 )
-fuzzysort.go('render', files, {limit: 10})
+fuzzysort.go('render interface', files, {limit: 10})
 ```
+
+Both `key` and `keys` accept the same dotted paths, path arrays, and getter
+functions as `go`. With `keys`, preparation extracts every value once and caches
+each object's combined character filter, avoiding key traversal and much of the
+per-object setup on every search.
 
 Treat prepared targets and their searchable values as a snapshot. Prepare them again
 when they change. This moves preparation work out of latency-sensitive searches and
 allows fuzzysort to cache additional search metadata safely. Preparation also builds
-a compact first-letter lookup table (about 54 bytes per searchable value) so the first
-keystroke does not need a separate warmup pass.
+a compact first-letter lookup table (about 54 bytes per searchable value) and packed
+word beginnings so one- and two-character searches use the same fast paths for every
+prepared key.
 
 ### Options
 
@@ -167,6 +174,8 @@ targets = targets.filter(t => t.file.length < 1000)
 // Prepare targets before the user starts searching. For object targets, key/keys
 // belong here so their values are extracted only once.
 const preparedTargets = fuzzysort.prepare(targets, {key: 'file'})
+// Multiple fields work too:
+// fuzzysort.prepare(targets, {keys: ['file', 'description']})
 
 const options = {
   limit: 100,    // don't return more results than you need!
