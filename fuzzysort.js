@@ -14,98 +14,35 @@ export function go(search, targets, options) {
   if(!search) return options?.all ? all(targets, options) : noResults
 
   let query = getQuery(search)
+  let key = options?.key
+  let keys = !key && options?.keys
+  if(keys) return goKeys(query, targets, options)
+
   let searchBitflags = query.bitflags
-  let hasSpace = query.hasSpace
   let threshold = denormalizeScore(options?.threshold || 0)
   let limit = options?.limit || INF
   let resultCount = 0
   let limited = 0
+  let getter = key && makeGetter(key)
 
-  let add = (result, prepared, obj) => {
+  for(let i = 0; i < targets.length; i++) {
+    let obj = targets[i]
+    let target = key ? getter === null ? obj[key] : getter(obj) : obj
+    if(!target) continue
+    if(!isPrepared(target)) target = getPrepared(target)
+    if((searchBitflags & target._bitflags) !== searchBitflags) continue
+    let result = algorithm(query, target)
+    if(result === null || result._score < threshold) continue
+
     let room = resultCount < limit
     if(room) resultCount++
     else {
       limited++
-      if(result._score <= heap.peek()._score) return
+      if(result._score <= heap.peek()._score) continue
     }
-    if(prepared) result = materialize(result, obj)
+    result = materialize(result, key ? obj : undefined)
     room ? heap.add(result) : heap.replaceTop(result)
   }
-
-  let key = options?.key
-  let keys = !key && options?.keys
-  if(!keys) {
-    let getter = key && makeGetter(key)
-    for(let i = 0; i < targets.length; i++) {
-      let obj = targets[i]
-      let target = key ? getter === null ? obj[key] : getter(obj) : obj
-      if(!target) continue
-      if(!isPrepared(target)) target = getPrepared(target)
-      if((searchBitflags & target._bitflags) !== searchBitflags) continue
-      let result = algorithm(query, target)
-      if(result !== null && result._score >= threshold) add(result, true, key ? obj : undefined)
-    }
-    return finishResults(resultCount, limited)
-  }
-
-  let getters = keys.map(makeGetter)
-  let spaceCount = query.parts.length
-
-  outer: for(let i = 0; i < targets.length; i++) {
-    let obj = targets[i]
-    let keysBitflags = 0
-
-    for(let k = 0; k < keys.length; k++) {
-      let target = getters[k] === null ? obj[keys[k]] : getters[k](obj)
-      if(!target) target = noTarget
-      else if(!isPrepared(target)) target = getPrepared(target)
-      keyTargets[k] = target
-      keysBitflags |= target._bitflags
-    }
-    if((searchBitflags & keysBitflags) !== searchBitflags) continue
-    if(hasSpace) for(let s = 0; s < spaceCount; s++) spaceScores[s] = -INF
-
-    for(let k = 0; k < keys.length; k++) {
-      let target = keyTargets[k]
-      if(target === noTarget) {
-        keyResults[k] = noTarget
-        continue
-      }
-      if(!hasSpace && (searchBitflags & target._bitflags) !== searchBitflags) {
-        keyResults[k] = noTarget
-        continue
-      }
-      let result = algorithm(query, target, false, hasSpace)
-      if(result === null) {
-        keyResults[k] = noTarget
-        continue
-      }
-      keyResults[k] = materialize(result)
-      if(hasSpace) mergePartScores(spaceCount)
-    }
-
-    let resultScore
-    if(hasSpace) {
-      for(let s = 0; s < spaceCount; s++) if(spaceScores[s] === -INF) continue outer
-      resultScore = sumScores(spaceScores, spaceCount)
-    } else {
-      resultScore = mergeScores(keyResults, keys.length)
-      if(resultScore === -INF) continue
-    }
-
-    let result = new KeysResult(keys.length)
-    for(let k = 0; k < keys.length; k++) result[k] = keyResults[k]
-
-    result.obj = obj
-    result._score = resultScore
-    if(options?.scoreFn) {
-      resultScore = options.scoreFn(result)
-      if(!resultScore) continue
-      result._score = resultScore = denormalizeScore(resultScore)
-    }
-    if(resultScore >= threshold) add(result)
-  }
-
   return finishResults(resultCount, limited)
 }
 
@@ -150,6 +87,7 @@ export function remap(mappings) {
     remappings[char] = mappings[char]
     if(char.charCodeAt(0) < 128) customAsciiRemappings = true
   }
+  cleanup()
 }
 
 export function prepare(targets, options) { return new PreparedTargets(targets, options) }
@@ -158,21 +96,11 @@ export function cleanup() { targetCache.clear(); searchCache.clear() }
 
 
 function goPreparedValues(search, prepared, options, singleChar) {
+  if(!search) return options?.all ? allPrepared(prepared, options) : noResults
+  if(!search.lowerCodes) search = getQuery(search)
+
   let targets = prepared._targets
   let objects = prepared._objects
-
-  if(!search) {
-    if(!options?.all) return noResults
-    let results = []
-    results.total = targets.length
-    let limit = options?.limit || INF
-    for(let i = 0; i < targets.length && i < limit; i++) {
-      results.push(newResult(targets[i].target, targets[i]._score, objects?.[i]))
-    }
-    return results
-  }
-
-  if(!search.lowerCodes) search = getQuery(search)
   let threshold = denormalizeScore(options?.threshold || 0)
   let limit = options?.limit || INF
   let resultCount = 0
@@ -203,12 +131,12 @@ function goPreparedValues(search, prepared, options, singleChar) {
       if(result._score > heap.peek()._score) heap.replaceTop(result)
     }
   }
-
   return finishResults(resultCount, limited, !objects && materialize)
 }
 
 function goPrepared(search, prepared, options) {
   if(options?.key || options?.keys) throw new Error('fuzzysort: key/keys must be provided to prepare(), not go()')
+  prepared._finish()
 
   if(prepared._mode < 2) {
     if(!search) return prepared._mode === 0 ? go(search, prepared._targets, options) : goPreparedValues(search, prepared, options, false)
@@ -224,57 +152,57 @@ function goPrepared(search, prepared, options) {
 }
 
 function goPreparedKeys(search, prepared, options) {
-  let targets = prepared._targets
-  let objects = prepared._objects
-  let keysLength = prepared._keysLength
-  let targetsLength = objects.length
+  if(!search) return options?.all ? allPrepared(prepared, options) : noResults
+  return goKeys(getQuery(search), prepared._objects, options, prepared)
+}
 
-  if(!search) {
-    if(!options?.all) return noResults
-    let results = []
-    results.total = targetsLength
-    let limit = options?.limit || INF
-    for(let i = 0; i < targetsLength && i < limit; i++) {
-      let result = new KeysResult(keysLength)
-      let row = i * keysLength
-      for(let k = 0; k < keysLength; k++) {
-        let target = targets[row + k]
-        result[k] = target === noTarget ? noTarget : newResult(target.target, -INF)
-      }
-      result.obj = objects[i]
-      result._score = -INF
-      results.push(result)
-    }
-    return results
-  }
-
-  let query = getQuery(search)
+// Raw and prepared multi-key searches share their filtering, scoring, and result
+// collection. Prepared rows only specialize target lookup and short matching.
+function goKeys(query, objects, options, prepared) {
+  let indexed = prepared !== undefined
+  let keys = indexed ? null : options.keys
+  let getters = indexed ? null : keys.map(makeGetter)
+  let targets = indexed ? prepared._targets : null
+  let keysLength = indexed ? prepared._keysLength : keys.length
   let searchBitflags = query.bitflags
   let hasSpace = query.hasSpace
   let spaceCount = query.parts.length
   let threshold = denormalizeScore(options?.threshold || 0)
   let limit = options?.limit || INF
   let searchLen = query.lowerCodes.length
-  let short = !hasSpace && searchLen <= 3
+  let short = indexed && !hasSpace && searchLen <= 3
   let code = query.lowerCodes[0]
-  let singleChar = searchLen === 1 && code >= 97 && code <= 122
+  let singleChar = short && searchLen === 1 && code >= 97 && code <= 122
   let scoreFn = options?.scoreFn
-  let deferMaterialization = !scoreFn && (limit !== INF || threshold > -INF)
+  let deferMaterialization = indexed && !scoreFn && (limit !== INF || threshold > -INF)
   let resultCount = 0
   let limited = 0
 
-  outer: for(let i = 0; i < targetsLength; i++) {
-    if((searchBitflags & prepared._bitflags[i]) !== searchBitflags) continue
+  outer: for(let i = 0; i < objects.length; i++) {
+    let row = i * keysLength
+    if(indexed) {
+      if((searchBitflags & prepared._bitflags[i]) !== searchBitflags) continue
+    } else {
+      let obj = objects[i]
+      let keysBitflags = 0
+      for(let k = 0; k < keysLength; k++) {
+        let target = getters[k] === null ? obj[keys[k]] : getters[k](obj)
+        if(!target) target = noTarget
+        else if(!isPrepared(target)) target = getPrepared(target)
+        keyTargets[k] = target
+        keysBitflags |= target._bitflags
+      }
+      if((searchBitflags & keysBitflags) !== searchBitflags) continue
+    }
     if(hasSpace) for(let s = 0; s < spaceCount; s++) spaceScores[s] = -INF
 
-    let row = i * keysLength
     for(let k = 0; k < keysLength; k++) {
-      let target = targets[row + k]
+      let target = indexed ? targets[row + k] : keyTargets[k]
       if(target === noTarget) {
         keyResults[k] = noTarget
         continue
       }
-      if(hasSpace) {
+      if(hasSpace && indexed) {
         let possible = false
         for(let s = 0; s < spaceCount; s++) {
           let partBitflags = query.parts[s].bitflags
@@ -287,21 +215,26 @@ function goPreparedKeys(search, prepared, options) {
           keyResults[k] = noTarget
           continue
         }
-      } else if((searchBitflags & target._bitflags) !== searchBitflags) {
+      } else if(!hasSpace && (searchBitflags & target._bitflags) !== searchBitflags) {
         keyResults[k] = noTarget
         continue
       }
-      let valueRow = row + k
-      let targetShort = short && target.target.length < 65535
-      let start = prepared._offsets[valueRow]
-      let end = prepared._offsets[valueRow + 1]
-      let match = singleChar && target.target.length < 65535
-        ? singleCharResult(query, target, prepared._first, valueRow)
-        : targetShort && searchLen === 2
-          ? algorithm2(query, target, prepared._beginnings, start, end)
-          : targetShort
-            ? algorithm(query, target, false, false, false, true, prepared._beginnings, start, end)
-            : algorithm(query, target, false, hasSpace)
+
+      let match
+      if(indexed) {
+        let valueRow = row + k
+        let targetShort = short && target.target.length < 65535
+        let start = prepared._offsets[valueRow]
+        let end = prepared._offsets[valueRow + 1]
+        match = singleChar && target.target.length < 65535
+          ? singleCharResult(query, target, prepared._first, valueRow)
+          : targetShort && searchLen === 2
+            ? algorithm2(query, target, prepared._beginnings, start, end)
+            : targetShort
+              ? algorithm(query, target, false, false, false, true, prepared._beginnings, start, end)
+              : algorithm(query, target, false, hasSpace)
+      } else match = algorithm(query, target, false, hasSpace)
+
       if(match === null) {
         keyResults[k] = noTarget
         continue
@@ -327,20 +260,39 @@ function goPreparedKeys(search, prepared, options) {
     }
     if(resultScore < threshold) continue
 
-    if(resultCount < limit) {
-      if(result === null) result = captureKeysResult(keyResults, keysLength, objects[i], resultScore)
-      heap.add(result)
-      resultCount++
-    } else {
+    let room = resultCount < limit
+    if(room) resultCount++
+    else {
       limited++
-      if(resultScore > heap.peek()._score) {
-        if(result === null) result = captureKeysResult(keyResults, keysLength, objects[i], resultScore)
-        heap.replaceTop(result)
-      }
+      if(resultScore <= heap.peek()._score) continue
     }
+    if(result === null) result = captureKeysResult(keyResults, keysLength, objects[i], resultScore)
+    room ? heap.add(result) : heap.replaceTop(result)
   }
-
   return finishResults(resultCount, limited, deferMaterialization && materializeKeys)
+}
+
+function allPrepared(prepared, options) {
+  let results = []
+  let targets = prepared._targets
+  let objects = prepared._objects
+  let keysLength = prepared._keysLength
+  let total = keysLength === undefined ? targets.length : objects.length
+  results.total = total
+
+  for(let i = 0, length = Math.min(total, options?.limit || INF); i < length; i++) {
+    if(keysLength === undefined) {
+      results.push(newResult(targets[i].target, targets[i]._score, objects?.[i]))
+      continue
+    }
+    let row = i * keysLength
+    for(let k = 0; k < keysLength; k++) {
+      let target = targets[row + k]
+      keyResults[k] = target === noTarget ? noTarget : newResult(target.target, -INF)
+    }
+    results.push(captureKeysResult(keyResults, keysLength, objects[i], -INF))
+  }
+  return results
 }
 
 function all(targets, options) {
@@ -353,20 +305,17 @@ function all(targets, options) {
   if(keys) {
     let getters = keys.map(makeGetter)
     for(let obj of targets) {
-      let result = new KeysResult(keys.length)
       for(let k = keys.length - 1; k >= 0; k--) {
         let target = getters[k] === null ? obj[keys[k]] : getters[k](obj)
-        if(!target) result[k] = noTarget
+        if(!target) keyResults[k] = noTarget
         else {
           if(!isPrepared(target)) target = getPrepared(target)
           target._score = -INF
           target._indexes.len = 0
-          result[k] = target
+          keyResults[k] = target
         }
       }
-      result.obj = obj
-      result._score = -INF
-      results.push(result)
+      results.push(captureKeysResult(keyResults, keys.length, obj, -INF))
       if(results.length >= limit) break
     }
     return results
@@ -761,48 +710,125 @@ function resetBeginnings(target, changesLen) {
 
 class PreparedTargets {
   constructor(targets, options) {
-    let mode = this._mode = options?.keys ? 2 : options?.key ? 1 : 0
-    let keys = mode === 2 ? options.keys : [options?.key]
-    this._targets = new Array(targets.length * (mode === 2 ? keys.length : 1))
+    this._mode = options?.keys ? 2 : options?.key ? 1 : 0
+    this._keys = this._mode === 2 ? options.keys.slice() : [options?.key]
+    this._input = targets.slice()
+    this._index = 0
+    this._done = false
+    this._error = null
+    this._initialized = false
+    this._scheduled = null
 
+    if(targets.length === 0) this._finish()
+    else this._schedule()
+  }
+
+  _schedule() {
+    let run = deadline => {
+      this._scheduled = null
+      this._run(deadline)
+    }
+    if(typeof requestIdleCallback === 'function') {
+      this._scheduler = 1
+      this._scheduled = requestIdleCallback(run, {timeout:100})
+    } else if(typeof setImmediate === 'function') {
+      this._scheduler = 2
+      this._scheduled = setImmediate(run)
+    } else {
+      this._scheduler = 3
+      this._scheduled = setTimeout(run)
+    }
+  }
+
+  _cancel() {
+    if(this._scheduled === null) return
+    if(this._scheduler === 1) {
+      if(typeof cancelIdleCallback === 'function') cancelIdleCallback(this._scheduled)
+    } else if(this._scheduler === 2) {
+      if(typeof clearImmediate === 'function') clearImmediate(this._scheduled)
+    } else clearTimeout(this._scheduled)
+    this._scheduled = null
+  }
+
+  _initialize() {
+    if(this._initialized) return
+    this._initialized = true
+    let keysLength = this._mode === 2 ? this._keys.length : 1
+    let valueCount = this._input.length * keysLength
+    this._targets = new Array(valueCount)
+    this._first = new Uint16Array(valueCount * 26)
+    this._offsets = new Uint32Array(valueCount + 1)
+    this._buildingBeginnings = []
+    if(this._mode) {
+      this._objects = this._input
+      this._getters = this._keys.map(makeGetter)
+    }
+    if(this._mode === 2) {
+      this._keysLength = keysLength
+      this._bitflags = new Int32Array(this._input.length)
+    }
+  }
+
+  _run(deadline) {
+    if(this._done) return
+    let end = Date.now() + 8
+    try {
+      this._initialize()
+      do this._prepareOne()
+      while(this._index < this._input.length && (deadline && !deadline.didTimeout ? deadline.timeRemaining() > 1 : Date.now() < end))
+      if(this._index === this._input.length) this._complete()
+      else this._schedule()
+    } catch(error) {
+      this._error = error
+      this._done = true
+    }
+  }
+
+  _prepareOne() {
+    let i = this._index++
+    let mode = this._mode
     if(mode < 2) {
-      let key = keys[0]
-      let getter = mode && makeGetter(key)
-      let firstTable = this._first = new Uint16Array(targets.length * 26)
-      let offsets = this._offsets = new Uint32Array(targets.length + 1)
-      let beginnings = []
-      if(mode) this._objects = targets.slice()
-      for(let i = 0; i < targets.length; i++) {
-        let value = mode ? getter === null ? targets[i][key] : getter(targets[i]) : targets[i]
-        this._targets[i] = value ? indexBeginnings(prepTarget(value), firstTable, i, beginnings) : noTarget
-        offsets[i + 1] = beginnings.length
-      }
-      this._beginnings = Uint16Array.from(beginnings)
+      let value = mode
+        ? this._getters[0] === null ? this._input[i][this._keys[0]] : this._getters[0](this._input[i])
+        : this._input[i]
+      this._targets[i] = value ? indexBeginnings(prepTarget(value), this._first, i, this._buildingBeginnings) : noTarget
+      this._offsets[i + 1] = this._buildingBeginnings.length
       return
     }
 
-    let getters = keys.map(makeGetter)
-    this._keysLength = keys.length
-    this._objects = targets.slice()
-    this._bitflags = new Int32Array(targets.length)
-    let valueCount = targets.length * keys.length
-    let firstTable = this._first = new Uint16Array(valueCount * 26)
-    let offsets = this._offsets = new Uint32Array(valueCount + 1)
-    let beginnings = []
-    for(let i = 0; i < targets.length; i++) {
-      let obj = targets[i]
-      let bitflags = 0
-      for(let k = 0; k < keys.length; k++) {
-        let value = getters[k] === null ? obj[keys[k]] : getters[k](obj)
-        let row = i * keys.length + k
-        let prepared = this._targets[row] = value ? prepTarget(value) : noTarget
-        if(prepared !== noTarget) indexBeginnings(prepared, firstTable, row, beginnings)
-        offsets[row + 1] = beginnings.length
-        bitflags |= prepared._bitflags
-      }
-      this._bitflags[i] = bitflags
+    let obj = this._input[i]
+    let bitflags = 0
+    let keysLength = this._keysLength
+    for(let k = 0; k < keysLength; k++) {
+      let value = this._getters[k] === null ? obj[this._keys[k]] : this._getters[k](obj)
+      let row = i * keysLength + k
+      let prepared = this._targets[row] = value ? prepTarget(value) : noTarget
+      if(prepared !== noTarget) indexBeginnings(prepared, this._first, row, this._buildingBeginnings)
+      this._offsets[row + 1] = this._buildingBeginnings.length
+      bitflags |= prepared._bitflags
     }
-    this._beginnings = Uint16Array.from(beginnings)
+    this._bitflags[i] = bitflags
+  }
+
+  _complete() {
+    this._beginnings = Uint16Array.from(this._buildingBeginnings)
+    this._buildingBeginnings = this._input = this._getters = this._keys = null
+    this._done = true
+  }
+
+  _finish() {
+    if(this._error) throw this._error
+    if(this._done) return
+    this._cancel()
+    try {
+      this._initialize()
+      while(this._index < this._input.length) this._prepareOne()
+      this._complete()
+    } catch(error) {
+      this._error = error
+      this._done = true
+      throw error
+    }
   }
 }
 

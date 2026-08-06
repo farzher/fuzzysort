@@ -64,7 +64,10 @@ const results = fuzzysort.go('a', mystuff, {key: 'file'})
 ### `fuzzysort.prepare(targets, options=null)`
 
 Build an optimized reusable snapshot when the same targets will be searched more than once.
-Keys for object targets are provided while preparing, not while searching.
+Keys for object targets are provided while preparing, not while searching. Collections are
+prepared incrementally during browser idle time (and between Node event-loop turns), so
+`prepare()` returns immediately. Searching the collection before it is ready synchronously
+finishes its remaining preparation first.
 
 ```js
 const games = fuzzysort.prepare(['Half-Life', 'Portal', 'Team Fortress 2'])

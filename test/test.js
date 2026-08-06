@@ -212,6 +212,16 @@ async function tests() {
     assert(!fuzzysort.single('+', '&'), '+ does not match &')
     assert(!fuzzysort.single('.', ','), '. does not match ,')
 
+    // custom mappings can add new equivalents and override built-ins
+    assert(!fuzzysort.single('x', '☃'), 'custom remap target starts distinct')
+    assert(fuzzysort.single('l', 'ł'), 'built-in remap works before override')
+    fuzzysort.remap({'☃':'x', 'ł':'x'})
+    assert(fuzzysort.single('x', '☃'), 'custom remap invalidates cached target')
+    assert(fuzzysort.single('☃', 'x'), 'custom remap invalidates cached search')
+    assert(fuzzysort.go('x', ['☃'])[0].highlight() === '<b>☃</b>', 'custom remap works with go')
+    assert(fuzzysort.go('x', fuzzysort.prepare(['☃']))[0].target === '☃', 'custom remap works with prepared targets')
+    assert(fuzzysort.single('x', 'ł') && !fuzzysort.single('l', 'ł'), 'custom remap overrides built-in')
+
     // make sure ジ highlights correctly
     assert(fuzzysort.go('ジ', ['ファイナルファンタジーXIV スターターパック'])[0].highlight() == 'ファイナルファンタ<b>ジ</b>ーXIV スターターパック', 'ジ')
 
@@ -391,6 +401,13 @@ async function tests() {
     var prepared = fuzzysort.go('render', fuzzysort.prepare(['PreRender/render target']))
     assert(raw[0]._score === prepared[0]._score, 'raw/prepared score equality')
     assert(JSON.stringify(raw[0].indexes) === JSON.stringify(prepared[0].indexes), 'raw/prepared indexes equality')
+
+    var prepareCalls = 0
+    var lazyObjects = Array.from({length:101}, (_, i) => ({name:'item ' + i}))
+    var lazyPrepared = fuzzysort.prepare(lazyObjects, {key: obj => { prepareCalls++; return obj.name }})
+    assert(prepareCalls === 0, 'large prepare returns before doing background work')
+    assert(fuzzysort.go('item 100', lazyPrepared)[0].obj === lazyObjects[100], 'go finishes pending preparation')
+    assert(prepareCalls === lazyObjects.length, 'go finishes every pending target')
 
     // Prefer a later word beginning over an earlier mid-word character. Every
     // letter in a prepared collection has an independent precomputed entry.
@@ -735,11 +752,13 @@ async function benchmarks() {
   bench('single character', function() {
     fuzzysort.single('r', 'C:/Project/Renderer/RenderTarget.cpp')
   }, config)
-  bench('prepare ascii target', function() {
-    fuzzysort.prepare(['C:/Project/Renderer/RenderTarget.cpp'])
+  bench('prepare + go ascii target', function() {
+    var prepared = fuzzysort.prepare(['C:/Project/Renderer/RenderTarget.cpp'])
+    fuzzysort.go('', prepared, {all:true, limit:1})
   }, config)
-  bench('prepare unicode target', function() {
-    fuzzysort.prepare(['Café/レンダラー/RenderTarget.cpp'])
+  bench('prepare + go unicode target', function() {
+    var prepared = fuzzysort.prepare(['Café/レンダラー/RenderTarget.cpp'])
+    fuzzysort.go('', prepared, {all:true, limit:1})
   }, config)
 
   const focusedPrepared = testdata_prepared.ue4_files
@@ -754,7 +773,8 @@ async function benchmarks() {
   benchCold('prepare all UE4 targets', function() {
     return focusedRaw
   }, function(targets) {
-    fuzzysort.prepare(targets)
+    var prepared = fuzzysort.prepare(targets)
+    fuzzysort.go('', prepared, {all:true, limit:1})
   })
   benchCold('first go raw UE4 targets', function() {
     fuzzysort.cleanup()
@@ -782,7 +802,8 @@ async function benchmarks() {
   benchCold('prepare all Steam targets', function() {
     return steamRaw
   }, function(targets) {
-    fuzzysort.prepare(targets)
+    var prepared = fuzzysort.prepare(targets)
+    fuzzysort.go('', prepared, {all:true, limit:1})
   }, {samplecount:15})
   benchCold('first "e" raw Steam targets', function() {
     fuzzysort.cleanup()
