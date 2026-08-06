@@ -1,13 +1,20 @@
 {
+  "ecma": 2020,
+  "module": true,
+  "toplevel": true,
   "compress": {
-    "passes": 3
+    "passes": 10,
+    "unsafe": true,
+    "unsafe_arrows": true,
+    "unsafe_methods": true
   },
   "mangle": {
+    "toplevel": true,
     "properties": {
-      "regex": "^_|^(lowerCodes|bitflags|containsSpace|spaceSearches|add|poll|peek|replaceTop)$"
+      "regex": "^_|^(lowerCodes|bitflags|hasSpace|parts|add|poll|peek|replaceTop)$"
     }
   },
   "format": {
-    "comments": "some"
+    "comments": false
   }
 }

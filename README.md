@@ -178,10 +178,10 @@ fuzzysort.go('fast',  preparedTargets, options)
 ```
 
 
-### Character normalization
+### Character remapping
 
-Searches automatically fold accents, Unicode compatibility forms, and common visual
-variants (`ø`/`o`, `ｅ`/`e`, `ℯ`/`e`, and smart/straight quotes). Forward and backward
+Searches automatically remap accented characters, Unicode compatibility forms, and
+common visual variants (`ø`/`o`, `ｅ`/`e`, `ℯ`/`e`, and smart/straight quotes). Forward and backward
 slashes are equivalent, as are an ellipsis and a period. Context-dependent symbols
 such as `+`/`&` and decimal `,`/`.` remain distinct.
 

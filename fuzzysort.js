@@ -1,873 +1,985 @@
 /*! https://github.com/farzher/fuzzysort v4.0.0 */
 
-export let single = (search, target) => {
-  if(!search || !target) return NULL
-
-  var preparedSearch = getPreparedSearch(search)
+export function single(search, target) {
+  if(!search || !target) return null
+  let query = getQuery(search)
   if(!isPrepared(target)) target = getPrepared(target)
-
-  var searchBitflags = preparedSearch.bitflags
-  if((searchBitflags & target._bitflags) !== searchBitflags) return NULL
-
-  var result = algorithm(preparedSearch, target)
-  return result === NULL ? NULL : materialize(result)
+  if((query.bitflags & target._bitflags) !== query.bitflags) return null
+  let result = algorithm(query, target)
+  return result === null ? null : materialize(result)
 }
 
-export let go = (search, targets, options) => {
+export function go(search, targets, options) {
   if(targets instanceof PreparedTargets) return goPrepared(search, targets, options)
   if(!search) return options?.all ? all(targets, options) : noResults
 
-  var preparedSearch = getPreparedSearch(search)
-  var searchBitflags = preparedSearch.bitflags
-  var containsSpace = preparedSearch.containsSpace
-  var threshold = denormalizeScore(options?.threshold || 0)
-  var limit = options?.limit || INFINITY
-  var resultsLen = 0; var limitedCount = 0
+  let query = getQuery(search)
+  let searchBitflags = query.bitflags
+  let hasSpace = query.hasSpace
+  let threshold = denormalizeScore(options?.threshold || 0)
+  let limit = options?.limit || INF
+  let resultCount = 0
+  let limited = 0
 
-  function push(result) {
-    if(resultsLen < limit) { q.add(result); ++resultsLen }
-    else {
-      ++limitedCount
-      if(result._score > q.peek()._score) q.replaceTop(result)
+  let add = result => {
+    if(resultCount < limit) {
+      heap.add(result)
+      resultCount++
+    } else {
+      limited++
+      if(result._score > heap.peek()._score) heap.replaceTop(result)
     }
   }
-  function pushPrepared(prepared, obj) {
-    if(resultsLen < limit) { q.add(materialize(prepared, obj)); ++resultsLen }
-    else {
-      ++limitedCount
-      if(prepared._score > q.peek()._score) q.replaceTop(materialize(prepared, obj))
+  let addPrepared = (result, obj) => {
+    if(resultCount < limit) {
+      heap.add(materialize(result, obj))
+      resultCount++
+    } else {
+      limited++
+      if(result._score > heap.peek()._score) heap.replaceTop(materialize(result, obj))
     }
   }
 
-  var key = options?.key
-  var keys = !key && options?.keys
-  if(keys) {
-    var keysLen = keys.length
-    var getters = new Array(keysLen)
-    var spacesLen = preparedSearch.spaceSearches.length
-    for(var keyI=0; keyI<keysLen; ++keyI) getters[keyI] = makeGetter(keys[keyI])
-
-    outer: for(var i=0; i<targets.length; ++i) {
-      var obj = targets[i]
-      var keysBitflags = 0
-      for(var keyI=0; keyI<keysLen; ++keyI) {
-        var getter = getters[keyI]
-        var target = getter === NULL ? obj[keys[keyI]] : getter(obj)
-        if(!target) { tmpTargets[keyI] = noTarget; continue }
-        if(!isPrepared(target)) target = getPrepared(target)
-        tmpTargets[keyI] = target
-        keysBitflags |= target._bitflags
-      }
-      if((searchBitflags & keysBitflags) !== searchBitflags) continue
-
-      if(containsSpace) for(var spaceI=0; spaceI<spacesLen; ++spaceI) keysSpacesBestScores[spaceI] = NEGATIVE_INFINITY
-
-      for(var keyI=0; keyI<keysLen; ++keyI) {
-        target = tmpTargets[keyI]
-        if(target === noTarget) { tmpResults[keyI] = noTarget; continue }
-        var result = algorithm(preparedSearch, target, false, containsSpace)
-        if(result === NULL) { tmpResults[keyI] = noTarget; continue }
-        tmpResults[keyI] = materialize(result)
-
-        if(containsSpace) for(var spaceI=0; spaceI<spacesLen; ++spaceI) {
-          var partialScore = allowPartialMatchScores[spaceI]
-          var bestScore = keysSpacesBestScores[spaceI]
-          if(partialScore > -1000 && bestScore > NEGATIVE_INFINITY) {
-            var combinedScore = (bestScore + partialScore) / 4
-            if(combinedScore > bestScore) bestScore = combinedScore
-          }
-          if(partialScore > bestScore) bestScore = partialScore
-          keysSpacesBestScores[spaceI] = bestScore
-        }
-      }
-
-      if(containsSpace) {
-        for(var spaceI=0; spaceI<spacesLen; ++spaceI) {
-          if(keysSpacesBestScores[spaceI] === NEGATIVE_INFINITY) continue outer
-        }
-      } else {
-        var hasMatch = false
-        for(var keyI=0; keyI<keysLen; ++keyI) {
-          if(tmpResults[keyI]._score !== NEGATIVE_INFINITY) { hasMatch = true; break }
-        }
-        if(!hasMatch) continue
-      }
-
-      var objResults = new KeysResult(keysLen)
-      for(var keyI=0; keyI<keysLen; ++keyI) objResults[keyI] = tmpResults[keyI]
-
-      if(containsSpace) {
-        var score = 0
-        for(var spaceI=0; spaceI<spacesLen; ++spaceI) score += keysSpacesBestScores[spaceI]
-      } else {
-        var score = NEGATIVE_INFINITY
-        for(var keyI=0; keyI<keysLen; ++keyI) {
-          var result = objResults[keyI]
-          if(result._score > -1000 && score > NEGATIVE_INFINITY) {
-            var combinedScore = (score + result._score) / 4
-            if(combinedScore > score) score = combinedScore
-          }
-          if(result._score > score) score = result._score
-        }
-      }
-
-      objResults.obj = obj
-      objResults._score = score
-      if(options?.['scoreFn']) {
-        score = options['scoreFn'](objResults)
-        if(!score) continue
-        objResults._score = score = denormalizeScore(score)
-      }
-      if(score >= threshold) push(objResults)
-    }
-  } else {
-    var getter = key && makeGetter(key)
-    for(var i=0; i<targets.length; ++i) {
-      var obj = targets[i]
-      var target = key ? getter === NULL ? obj[key] : getter(obj) : obj
+  let key = options?.key
+  let keys = !key && options?.keys
+  if(!keys) {
+    let getter = key && makeGetter(key)
+    for(let i = 0; i < targets.length; i++) {
+      let obj = targets[i]
+      let target = key ? getter === null ? obj[key] : getter(obj) : obj
       if(!target) continue
       if(!isPrepared(target)) target = getPrepared(target)
       if((searchBitflags & target._bitflags) !== searchBitflags) continue
-      var result = algorithm(preparedSearch, target)
-      if(result !== NULL && result._score >= threshold) pushPrepared(result, key ? obj : undefined)
+      let result = algorithm(query, target)
+      if(result !== null && result._score >= threshold) addPrepared(result, key ? obj : undefined)
     }
+    return finishResults(resultCount, limited)
   }
 
-  if(!resultsLen) return noResults
-  var results = new Array(resultsLen)
-  for(var i=resultsLen-1; i>=0; --i) results[i] = q.poll()
-  results.total = resultsLen + limitedCount
-  return results
+  let getters = keys.map(makeGetter)
+  let spaceCount = query.parts.length
+
+  outer: for(let i = 0; i < targets.length; i++) {
+    let obj = targets[i]
+    let keysBitflags = 0
+
+    for(let k = 0; k < keys.length; k++) {
+      let target = getters[k] === null ? obj[keys[k]] : getters[k](obj)
+      if(!target) target = noTarget
+      else if(!isPrepared(target)) target = getPrepared(target)
+      keyTargets[k] = target
+      keysBitflags |= target._bitflags
+    }
+    if((searchBitflags & keysBitflags) !== searchBitflags) continue
+    if(hasSpace) for(let s = 0; s < spaceCount; s++) spaceScores[s] = -INF
+
+    for(let k = 0; k < keys.length; k++) {
+      let target = keyTargets[k]
+      if(target === noTarget) {
+        keyResults[k] = noTarget
+        continue
+      }
+      let result = algorithm(query, target, false, hasSpace)
+      if(result === null) {
+        keyResults[k] = noTarget
+        continue
+      }
+      keyResults[k] = materialize(result)
+
+      if(hasSpace) for(let s = 0; s < spaceCount; s++) {
+        let partial = partials[s]
+        let best = spaceScores[s]
+        if(partial > -1000 && best > -INF) best = Math.max(best, (best + partial) / 4)
+        spaceScores[s] = Math.max(best, partial)
+      }
+    }
+
+    if(hasSpace) {
+      for(let s = 0; s < spaceCount; s++) if(spaceScores[s] === -INF) continue outer
+    } else {
+      let matched = false
+      for(let k = 0; k < keys.length; k++) if(keyResults[k]._score !== -INF) {
+        matched = true
+        break
+      }
+      if(!matched) continue
+    }
+
+    let result = new KeysResult(keys.length)
+    for(let k = 0; k < keys.length; k++) result[k] = keyResults[k]
+
+    let resultScore
+    if(hasSpace) {
+      resultScore = 0
+      for(let s = 0; s < spaceCount; s++) resultScore += spaceScores[s]
+    } else {
+      resultScore = -INF
+      for(let k = 0; k < keys.length; k++) {
+        let score = result[k]._score
+        if(score > -1000 && resultScore > -INF) resultScore = Math.max(resultScore, (resultScore + score) / 4)
+        if(score > resultScore) resultScore = score
+      }
+    }
+
+    result.obj = obj
+    result._score = resultScore
+    if(options?.scoreFn) {
+      resultScore = options.scoreFn(result)
+      if(!resultScore) continue
+      result._score = resultScore = denormalizeScore(resultScore)
+    }
+    if(resultScore >= threshold) add(result)
+  }
+
+  return finishResults(resultCount, limited)
 }
 
+export let prepare = (targets, options) => new PreparedTargets(targets, options)
 
-export let highlight = (result, open='<b>', close='</b>') => {
-  var callback = typeof open === 'function' ? open : NULL
-  var rawIndexes = result['_indexes']
-  var indexes = rawIndexes === undefined
+export function highlight(result, open = '<b>', close = '</b>') {
+  let callback = typeof open === 'function' ? open : null
+  let raw = result._indexes
+  let indexes = raw === undefined
     ? result.indexes
-    : rawIndexes.slice(0, rawIndexes['len'] ?? rawIndexes.length).sort((a,b)=>a-b)
-  var target = result.target
+    : raw.slice(0, raw.len ?? raw.length).sort((a, b) => a - b)
+  let target = result.target
   if(!indexes.length) return callback ? [] : target
-  var output = callback ? [] : ''
-  var lastIndex = 0
-  var matchI = 0
 
-  for(var i=0; i<indexes.length;) {
-    var start = indexes[i++]
-    var end = start + 1
-    while(indexes[i] === end) { ++i; ++end }
-    var before = target.slice(lastIndex, start)
-    var match = target.slice(start, end)
+  let output = callback ? [] : ''
+  let lastIndex = 0
+  let matchI = 0
+
+  for(let i = 0; i < indexes.length;) {
+    let start = indexes[i++]
+    let end = start + 1
+    while(indexes[i] === end) {
+      i++
+      end++
+    }
+    let before = target.slice(lastIndex, start)
+    let match = target.slice(start, end)
     if(callback) output.push(before, callback(match, matchI++))
     else output += before + open + match + close
     lastIndex = end
   }
-
   if(callback) output.push(target.slice(lastIndex))
   else output += target.slice(lastIndex)
   return output
 }
 
-
-var prepareTarget = target => {
-  if(typeof target === 'number') target = ''+target
-  else if(typeof target !== 'string') target = ''
-  var info = prepareLowerInfo(target)
-  return new_result(target, {_targetLower:info._lower, _targetLowerCodes:info.lowerCodes, _bitflags:info.bitflags})
+export function score(result) {
+  let value = result.score
+  return value === undefined ? normalizeScore(result._score) : value
 }
 
-var preparedEntryMarker = {}
-var makePreparedKeyGetter = i => entry => entry._targets[i]
-
-class PreparedTargets {
-  constructor(targets, options) {
-    var mode = this._mode = options?.keys ? 2 : options?.key ? 1 : 0
-    var keys = mode === 2 ? options.keys : [options?.key]
-    var keysLen = keys.length
-    var firstBeginnings = mode < 2 && new Uint16Array(targets.length * 26)
-    this._targets = new Array(targets.length)
-
-    if(mode < 2) {
-      this._firstBeginnings = firstBeginnings
-      var key = keys[0]
-      var getter = mode && makeGetter(key)
-      if(mode) this._objects = targets.slice()
-      for(var i=0; i<targets.length; ++i) {
-        var value = mode ? getter === NULL ? targets[i][key] : getter(targets[i]) : targets[i]
-        this._targets[i] = value ? indexFirstCharacters(prepareTarget(value), firstBeginnings, i) : noTarget
-      }
-      return
-    }
-
-    var getters = new Array(keysLen)
-    this._keys = new Array(keysLen)
-    for(var keyI=0; keyI<keysLen; ++keyI) {
-      getters[keyI] = makeGetter(keys[keyI])
-      this._keys[keyI] = makePreparedKeyGetter(keyI)
-    }
-    for(var i=0; i<targets.length; ++i) {
-      var obj = targets[i]
-      var values = new Array(keysLen)
-      for(var keyI=0; keyI<keysLen; ++keyI) {
-        var getter = getters[keyI]
-        var value = getter === NULL ? obj[keys[keyI]] : getter(obj)
-        values[keyI] = value ? prepareTarget(value) : noTarget
-      }
-      this._targets[i] = {_prepared:preparedEntryMarker, _obj:obj, _targets:values}
-    }
+export function remap(mappings) {
+  for(let char in mappings) {
+    remappings[char] = mappings[char]
+    if(char.charCodeAt(0) < 128) customAsciiRemappings = true
   }
 }
 
-export let prepare = (targets, options) => new PreparedTargets(targets, options)
+export function cleanup() { targetCache.clear(); searchCache.clear() }
 
-var preparedSingleResult = (search, target, firstBeginnings, row) => {
-  var matchIndex = target._targetLower.indexOf(search._lower)
-  if(matchIndex === -1) return NULL
-  var beginning = firstBeginnings[row * 26 + search.lowerCodes[0] - 97]
-  var successStrict = beginning !== 0
-  if(successStrict) matchIndex = beginning - 1
-  var score = matchIndex === 0 ? 0 : -matchIndex * matchIndex * .2
-  if(!successStrict) score *= 1000
-  else if(target._beginningIndexesLen > 24) score *= (target._beginningIndexesLen - 24) * 10
-  target._score = score - target._targetLowerCodes.length + 1
-  target._indexes[0] = matchIndex
-  target._indexes.len = 1
-  return target
-}
 
-var goPreparedValues = (search, prepared, options, single) => {
-  var targets = prepared._targets
-  var objects = prepared._objects
-  var firstBeginnings = prepared._firstBeginnings
+function goPreparedValues(search, prepared, options, singleChar) {
+  let targets = prepared._targets
+  let objects = prepared._objects
+
   if(!search) {
     if(!options?.all) return noResults
-    var results = []; results.total = targets.length
-    var limit = options?.limit || INFINITY
-    for(var i=0; i<targets.length && i<limit; ++i) {
-      results.push(new_result(targets[i].target, {_score:targets[i]._score, obj:objects[i]}))
+    let results = []
+    results.total = targets.length
+    let limit = options?.limit || INF
+    for(let i = 0; i < targets.length && i < limit; i++) {
+      results.push(newResult(targets[i].target, targets[i]._score, objects?.[i]))
     }
     return results
   }
 
-  if(!single) search = getPreparedSearch(search)
-  var searchBitflags = search.bitflags
-  var threshold = denormalizeScore(options?.threshold || 0)
-  var limit = options?.limit || INFINITY
-  var resultsLen = 0; var limitedCount = 0
+  if(!search.lowerCodes) search = getQuery(search)
+  let threshold = denormalizeScore(options?.threshold || 0)
+  let limit = options?.limit || INF
+  let resultCount = 0
+  let limited = 0
 
-  for(var i=0; i<targets.length; ++i) {
-    var target = targets[i]
-    if(target === noTarget || (searchBitflags & target._bitflags) !== searchBitflags) continue
-    var result = single && target.target.length < 65535
-      ? preparedSingleResult(search, target, firstBeginnings, i)
-      : algorithm(search, target)
-    if(result === NULL || result._score < threshold) continue
+  for(let i = 0; i < targets.length; i++) {
+    let target = targets[i]
+    if(target === noTarget || (search.bitflags & target._bitflags) !== search.bitflags) continue
+    let searchLen = search.lowerCodes.length
+    let short = !search.hasSpace && searchLen <= 3 && target.target.length < 65535
+    let start = prepared._offsets[i]
+    let end = prepared._offsets[i + 1]
+    let result = singleChar && target.target.length < 65535
+      ? singleCharResult(search, target, prepared._first, i)
+      : short && searchLen === 2
+        ? algorithm2(search, target, prepared._beginnings, start, end)
+        : short
+          ? algorithm(search, target, false, false, false, true, prepared._beginnings, start, end)
+          : algorithm(search, target)
+    if(result === null || result._score < threshold) continue
     if(objects) result = materialize(result, objects[i])
-    if(resultsLen < limit) { q.add(result); ++resultsLen }
-    else {
-      ++limitedCount
-      if(result._score > q.peek()._score) q.replaceTop(result)
+
+    if(resultCount < limit) {
+      heap.add(result)
+      resultCount++
+    } else {
+      limited++
+      if(result._score > heap.peek()._score) heap.replaceTop(result)
     }
   }
 
-  if(!resultsLen) return noResults
-  var results = new Array(resultsLen)
-  for(var i=resultsLen-1; i>=0; --i) {
-    var result = q.poll()
-    results[i] = objects ? result : materialize(result)
-  }
-  results.total = resultsLen + limitedCount
-  return results
+  return finishResults(resultCount, limited, !objects)
 }
 
-var goPrepared = (search, prepared, options) => {
+function goPrepared(search, prepared, options) {
   if(options?.key || options?.keys) throw new Error('fuzzysort: key/keys must be provided to prepare(), not go()')
+
   if(prepared._mode < 2) {
-    if(prepared._mode === 0 && (!search || !options?.limit)) return go(search, prepared._targets, options)
-    var preparedSearch = search && getPreparedSearch(search)
-    var code = preparedSearch?.lowerCodes?.[0]
-    var single = preparedSearch?.lowerCodes?.length === 1 && code >= 97 && code <= 122
-    return goPreparedValues(single ? preparedSearch : search, prepared, options, single)
+    if(!search) return prepared._mode === 0 ? go(search, prepared._targets, options) : goPreparedValues(search, prepared, options, false)
+    let query = getQuery(search)
+    let searchLen = query.lowerCodes.length
+    if(prepared._mode === 0 && !options?.limit && searchLen > 3) return go(search, prepared._targets, options)
+    let code = query.lowerCodes[0]
+    let singleChar = searchLen === 1 && code >= 97 && code <= 122
+    return goPreparedValues(query, prepared, options, singleChar)
   }
 
-  var preparedOptions = Object.assign({}, options, {keys:prepared._keys})
-  if(options?.['scoreFn']) {
-    var scoreFn = options['scoreFn']
-    preparedOptions['scoreFn'] = result => {
+  let preparedOptions = {...options, keys: prepared._keys}
+  if(options?.scoreFn) {
+    let scoreFn = options.scoreFn
+    preparedOptions.scoreFn = result => {
       result.obj = result.obj._obj
       return scoreFn(result)
     }
   }
-  var results = go(search, prepared._targets, preparedOptions)
-  for(var i=0; i<results.length; ++i) {
-    if(results[i].obj?._prepared === preparedEntryMarker) results[i].obj = results[i].obj._obj
-  }
+  let results = go(search, prepared._targets, preparedOptions)
+  for(let result of results) if(result.obj?._prepared === entryMarker) result.obj = result.obj._obj
   return results
 }
 
-export let cleanup = () => { preparedCache.clear(); preparedSearchCache.clear() }
-
-// Result accessors and methods live on the prototype, which structuredClone
-// does not preserve. These helpers also work on results sent from a Worker.
-export let score = result => {
-  var score = result['score']
-  return score === undefined ? normalizeScore(result['_score']) : score
-}
-
-
-// Below this point is internal code.
-
-
-class Result {
-  get ['indexes']() { return this._indexes.slice(0, this._indexes.len).sort((a,b)=>a-b) }
-  set ['indexes'](indexes) { return this._indexes = indexes }
-  ['highlight'](open, close) { return highlight(this, open, close) }
-  get ['score']() { return normalizeScore(this._score) }
-  set ['score'](score) { this._score = denormalizeScore(score) }
-}
-
-class KeysResult extends Array {
-  get ['score']() { return normalizeScore(this._score) }
-  set ['score'](score) { this._score = denormalizeScore(score) }
-}
-
-var materialize = (prepared, obj=NULL) => {
-  var result = new Result()
-  result.target   = prepared.target
-  result.obj      = obj
-  result._score   = prepared._score
-  result._indexes = prepared._indexes
-  return result
-}
-
-var new_result = (target, options) => {
-  var result = new Result()
-  result['target']             = target
-  result['obj']                = options.obj               ?? NULL
-  result._score                = options._score            ?? NEGATIVE_INFINITY
-  result._indexes              = []
-  result._targetLower          = options._targetLower      ?? ''
-  result._targetLowerCodes     = options._targetLowerCodes ?? NULL
-  result._nextBeginningIndexes = NULL
-  result._beginningIndexesLen  = 0
-  result._singleMatchCode      = -1
-  result._singleMatchIndex     = -1
-  result._singleMatchStrict    = false
-  result._bitflags             = options._bitflags         ?? 0
-  return result
-}
-
-
-var normalizeScore = score => {
-  if(score === NEGATIVE_INFINITY) return 0
-  if(score > 1) return score
-  return Math.E ** ( ((-score + 1)**.04307 - 1) * -2)
-}
-var denormalizeScore = normalizedScore => {
-  if(normalizedScore === 0) return NEGATIVE_INFINITY
-  if(normalizedScore > 1) return normalizedScore
-  return 1 - Math.pow((Math.log(normalizedScore) / -2 + 1), 1 / 0.04307)
-}
-
-
-var prepareSearch = search => {
-  if(typeof search === 'number') search = ''+search
-  else if(typeof search !== 'string') search = ''
-  search = search.trim()
-  var info = prepareLowerInfo(search)
-  var spaceSearches = info.containsSpace
-    ? [...new Set(search.split(/\s+/))].map(prepareSearch)
-    : []
-  return {
-    lowerCodes:info.lowerCodes,
-    _lower:info._lower,
-    containsSpace:info.containsSpace,
-    bitflags:info.bitflags,
-    spaceSearches,
-  }
-}
-
-
-var getPrepared = (target) => {
-  if(target.length > 999) return prepareTarget(target) // don't cache huge targets
-  var targetPrepared = preparedCache.get(target)
-  if(targetPrepared !== undefined) return targetPrepared
-  targetPrepared = prepareTarget(target)
-  preparedCache.set(target, targetPrepared)
-  return targetPrepared
-}
-var getPreparedSearch = (search) => {
-  if(search.length > 999) return prepareSearch(search) // don't cache huge searches
-  var searchPrepared = preparedSearchCache.get(search)
-  if(searchPrepared !== undefined) return searchPrepared
-  searchPrepared = prepareSearch(search)
-  preparedSearchCache.set(search, searchPrepared)
-  return searchPrepared
-}
-
-
-var all = (targets, options) => {
-  var results = []; results.total = targets.length
-  var limit = options?.limit || INFINITY
-  var key = options?.key
-  var keys = !key && options?.keys
+function all(targets, options) {
+  let results = []
+  results.total = targets.length
+  let limit = options?.limit || INF
+  let key = options?.key
+  let keys = !key && options?.keys
 
   if(keys) {
-    var keysLen = keys.length
-    var getters = new Array(keysLen)
-    for(var keyI=0; keyI<keysLen; ++keyI) getters[keyI] = makeGetter(keys[keyI])
-    for(var i=0; i<targets.length; ++i) {
-      var obj = targets[i]
-      var objResults = new KeysResult(keysLen)
-      for(var keyI=keysLen-1; keyI>=0; --keyI) {
-        var getter = getters[keyI]
-        var target = getter === NULL ? obj[keys[keyI]] : getter(obj)
-        if(!target) { objResults[keyI] = noTarget; continue }
-        if(!isPrepared(target)) target = getPrepared(target)
-        target._score = NEGATIVE_INFINITY
-        target._indexes.len = 0
-        objResults[keyI] = target
+    let getters = keys.map(makeGetter)
+    for(let obj of targets) {
+      let result = new KeysResult(keys.length)
+      for(let k = keys.length - 1; k >= 0; k--) {
+        let target = getters[k] === null ? obj[keys[k]] : getters[k](obj)
+        if(!target) result[k] = noTarget
+        else {
+          if(!isPrepared(target)) target = getPrepared(target)
+          target._score = -INF
+          target._indexes.len = 0
+          result[k] = target
+        }
       }
-      objResults.obj = obj
-      objResults._score = NEGATIVE_INFINITY
-      results.push(objResults)
-      if(results.length >= limit) return results
+      result.obj = obj
+      result._score = -INF
+      results.push(result)
+      if(results.length >= limit) break
     }
     return results
   }
 
-  var getter = key && makeGetter(key)
-  for(var i=0; i<targets.length; ++i) {
-    var obj = targets[i]
-    var target = key ? getter === NULL ? obj[key] : getter(obj) : obj
-    if(target == NULL) continue
+  let getter = key && makeGetter(key)
+  for(let obj of targets) {
+    let target = key ? getter === null ? obj[key] : getter(obj) : obj
+    if(target == null) continue
     if(!isPrepared(target)) target = getPrepared(target)
-    if(key) target = new_result(target.target, {_score:target._score, obj:obj})
+    if(key) target = newResult(target.target, target._score, obj)
     else {
-      target._score = NEGATIVE_INFINITY
+      target._score = -INF
       target._indexes.len = 0
     }
     results.push(target)
-    if(results.length >= limit) return results
+    if(results.length >= limit) break
   }
   return results
 }
 
+function finishResults(length, limited, materializePrepared = false) {
+  if(!length) return noResults
+  let results = new Array(length)
+  for(let i = length - 1; i >= 0; i--) {
+    let result = heap.poll()
+    results[i] = materializePrepared ? materialize(result) : result
+  }
+  results.total = length + limited
+  return results
+}
 
-var algorithm = (preparedSearch, prepared, allowSpaces=false, allowPartialMatch=false, nextBeginningIndexesChanged=false, allowSingleCharacter=true) => {
-  if(allowSpaces===false && preparedSearch.containsSpace) return algorithmSpaces(preparedSearch, prepared, allowPartialMatch)
 
-  var searchLower      = preparedSearch._lower
-  var searchLowerCodes = preparedSearch.lowerCodes
-  var searchLowerCode  = searchLowerCodes[0]
-  var targetLowerCodes = prepared._targetLowerCodes
-  var searchLen        = searchLowerCodes.length
-  var targetLen        = targetLowerCodes.length
-  var searchI          = 0 // where we at
-  var targetI          = 0 // where you at
-  var matchesSimpleLen = 0
+function singleCharResult(search, target, firstTable, row) {
+  let matchI = target._targetLower.indexOf(search._lower)
+  if(matchI === -1) return null
+  let beginning = firstTable[row * 26 + search.lowerCodes[0] - 97]
+  let strict = beginning !== 0
+  if(strict) matchI = beginning - 1
+  let score = matchI === 0 ? 0 : -matchI * matchI * .2
+  if(!strict) score *= 1000
+  else if(target._beginningsLen > 24) score *= (target._beginningsLen - 24) * 10
+  target._score = score - target._targetLowerCodes.length + 1
+  target._indexes[0] = matchI
+  target._indexes.len = 1
+  return target
+}
 
-  // very basic fuzzy match; to remove non-matching targets ASAP!
-  // walk through target. find sequential matches.
-  // if all chars aren't found then exit
+function algorithm2(search, target, beginnings, start, end) {
+  let targetCodes = target._targetLowerCodes
+  let targetLen = targetCodes.length
+  let firstCode = search.lowerCodes[0]
+  let secondCode = search.lowerCodes[1]
+
+  let first = 0
+  while(targetCodes[first] !== firstCode) if(++first >= targetLen) return null
+  let second = first + 1
+  while(targetCodes[second] !== secondCode) if(++second >= targetLen) return null
+
+  let substringI = target._targetLower.indexOf(search._lower, first)
+  let substring = substringI !== -1
+  let low = start
+  let high = end
+  while(low < high) {
+    let middle = low + high >> 1
+    if(beginnings[middle] < substringI) low = middle + 1
+    else high = middle
+  }
+  let substringStart = substring && low < end && beginnings[low] === substringI
+  let strict = substringStart && substringI === first
+
+  if(!strict) {
+    let firstBeginning = start
+    while(firstBeginning < end && beginnings[firstBeginning] < first) firstBeginning++
+
+    for(let backtracks = 0; firstBeginning < end;) {
+      let strictFirst = beginnings[firstBeginning]
+      if(targetCodes[strictFirst] !== firstCode) {
+        firstBeginning++
+        continue
+      }
+
+      let consecutive = strictFirst + 1
+      if(targetCodes[consecutive] === secondCode) {
+        first = strictFirst
+        second = consecutive
+        strict = true
+        break
+      }
+
+      let secondBeginning = firstBeginning + 1
+      while(secondBeginning < end && beginnings[secondBeginning] <= consecutive) secondBeginning++
+      while(secondBeginning < end && targetCodes[beginnings[secondBeginning]] !== secondCode) secondBeginning++
+      if(secondBeginning < end) {
+        first = strictFirst
+        second = beginnings[secondBeginning]
+        strict = true
+        break
+      }
+
+      if(++backtracks > 200) break
+      firstBeginning++
+    }
+  }
+
+  if(substring && !substringStart) {
+    while(low < end && beginnings[low] <= substringI) low++
+    for(; low < end; low++) {
+      let index = beginnings[low]
+      if(targetCodes[index] === firstCode && targetCodes[index + 1] === secondCode) {
+        substringI = index
+        substringStart = true
+        break
+      }
+    }
+  }
+
+  if(substring && (!strict || substringStart)) {
+    first = substringI
+    second = substringI + 1
+  }
+
+  let resultScore = second - first === 1 ? 0 : first - second * 2 - 11
+  if(first) resultScore -= first * first * .2
+  if(!strict) resultScore *= 1000
+  else if(end - start > 24) resultScore *= (end - start - 24) * 10
+
+  let lengthPenalty = (targetLen - 2) / 2
+  resultScore -= lengthPenalty
+  if(substring) resultScore /= 5
+  if(substringStart) resultScore /= 5
+  target._score = resultScore - lengthPenalty
+  target._indexes[0] = first
+  target._indexes[1] = second
+  target._indexes.len = 2
+  return target
+}
+
+function algorithm(search, target, spaces = false, partial = false, changed = false, singleMatch = true, beginnings = null, start = 0, end = 0) {
+  if(!spaces && search.hasSpace) return algorithmSpaces(search, target, partial)
+
+  let searchCodes = search.lowerCodes
+  let targetCodes = target._targetLowerCodes
+  let searchLen = searchCodes.length
+  let targetLen = targetCodes.length
+  let searchCode = searchCodes[0]
+  let searchI = 0
+  let targetI = 0
+  let simpleLen = 0
+
   for(;;) {
-    var isMatch = searchLowerCode === targetLowerCodes[targetI]
-    if(isMatch) {
-      matchesSimple[matchesSimpleLen++] = targetI
-      ++searchI; if(searchI === searchLen) break
-      searchLowerCode = searchLowerCodes[searchI]
+    if(searchCode === targetCodes[targetI]) {
+      simpleMatch[simpleLen++] = targetI
+      if(++searchI === searchLen) break
+      searchCode = searchCodes[searchI]
     }
-    ++targetI; if(targetI >= targetLen) return NULL // Failed to find searchI
+    if(++targetI >= targetLen) return null
   }
 
-  // Cache the best word-beginning match for repeated single-character searches.
-  if(searchLen === 1 && !nextBeginningIndexesChanged && allowSingleCharacter) {
-    if(prepared._singleMatchCode === searchLowerCode) {
-      var matchIndex = prepared._singleMatchIndex
-      var successStrict = prepared._singleMatchStrict
-    } else if(prepared._nextBeginningIndexes != NULL) {
-      var nextBeginningIndexes = prepared._nextBeginningIndexes
-      targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
-      while(targetI < targetLen && searchLowerCode !== targetLowerCodes[targetI]) targetI = nextBeginningIndexes[targetI]
-      var successStrict = targetI < targetLen
-      var matchIndex = successStrict ? targetI : matchesSimple[0]
+  if(searchLen === 1 && !changed && singleMatch) {
+    let matchI
+    let strict
+    if(target._singleMatchCode === searchCode) {
+      matchI = target._singleMatchIndex
+      strict = target._singleMatchStrict
+    } else if(target._nextBeginningIndexes !== null) {
+      let next = target._nextBeginningIndexes
+      targetI = simpleMatch[0] === 0 ? 0 : next[simpleMatch[0] - 1]
+      while(targetI < targetLen && searchCode !== targetCodes[targetI]) targetI = next[targetI]
+      strict = targetI < targetLen
+      matchI = strict ? targetI : simpleMatch[0]
     } else {
-      prepareSingleMatch(prepared, searchLowerCode, matchesSimple[0])
-      var matchIndex = prepared._singleMatchIndex
-      var successStrict = prepared._singleMatchStrict
+      prepareSingleMatch(target, searchCode, simpleMatch[0])
+      matchI = target._singleMatchIndex
+      strict = target._singleMatchStrict
     }
-    var score = matchIndex === 0 ? 0 : -matchIndex*matchIndex*.2
-    if(!successStrict) score *= 1000
-    else if(prepared._beginningIndexesLen > 24) score *= (prepared._beginningIndexesLen-24)*10
-    prepared._score = score - (targetLen-1)
-    prepared._indexes[0] = matchIndex
-    prepared._indexes.len = 1
-    return prepared
+
+    let resultScore = matchI === 0 ? 0 : -matchI * matchI * .2
+    if(!strict) resultScore *= 1000
+    else if(target._beginningsLen > 24) resultScore *= (target._beginningsLen - 24) * 10
+    target._score = resultScore - (targetLen - 1)
+    target._indexes[0] = matchI
+    target._indexes.len = 1
+    return target
   }
 
-  var searchI = 0
-  var successStrict = false
-  var matchesStrictLen = 0
-
-  var nextBeginningIndexes = prepared._nextBeginningIndexes
-  if(nextBeginningIndexes == NULL) nextBeginningIndexes = prepared._nextBeginningIndexes = prepareNextBeginningIndexes(prepared)
-  var beginningIndexesLen = nextBeginningIndexesChanged ? 0 : prepared._beginningIndexesLen
-  if(!beginningIndexesLen) {
-    beginningIndexesLen = 1
-    for(var i = nextBeginningIndexes[0]; i < targetLen; i=nextBeginningIndexes[i]) ++beginningIndexesLen
-    if(!nextBeginningIndexesChanged) prepared._beginningIndexesLen = beginningIndexesLen
+  searchI = 0
+  let strict = false
+  let strictLen = 0
+  let next = target._nextBeginningIndexes
+  if(beginnings === null && next === null) next = target._nextBeginningIndexes = makeNextBeginnings(target)
+  let beginningLen = beginnings === null ? (changed ? 0 : target._beginningsLen) : end - start
+  if(!beginningLen) {
+    beginningLen = 1
+    for(let i = next[0]; i < targetLen; i = next[i]) beginningLen++
+    if(!changed) target._beginningsLen = beginningLen
   }
 
-  // A substring beginning at the first simple match is necessarily a strict
-  // match. This common case can skip the strict backtracking pass entirely.
-  var substringIndex = searchLen <= 1 ? -1 : prepared._targetLower.indexOf(searchLower, matchesSimple[0])
-  var isSubstring = substringIndex !== -1
-  var isSubstringBeginning = isSubstring && (substringIndex===0 || nextBeginningIndexes[substringIndex-1] === substringIndex)
-  if(isSubstringBeginning && substringIndex === matchesSimple[0]) {
-    successStrict = true
-  } else {
-    targetI = matchesSimple[0]===0 ? 0 : nextBeginningIndexes[matchesSimple[0]-1]
+  let substringI = searchLen <= 1 ? -1 : target._targetLower.indexOf(search._lower, simpleMatch[0])
+  let isSubstring = substringI !== -1
+  let substringStart = isSubstring && (substringI === 0 || (beginnings
+    ? isBeginning(beginnings, start, end, substringI)
+    : next[substringI - 1] === substringI))
 
-    // Try a strict match: every character must be consecutive or at a word beginning.
-    var backtrackCount = 0
+  if(substringStart && substringI === simpleMatch[0]) strict = true
+  else {
+    targetI = simpleMatch[0] === 0 ? 0 : beginnings
+      ? nextBeginning(beginnings, start, end, simpleMatch[0] - 1, targetLen)
+      : next[simpleMatch[0] - 1]
+    let backtracks = 0
     if(targetI !== targetLen) for(;;) {
       if(targetI >= targetLen) {
-        if(searchI <= 0) break
-        ++backtrackCount; if(backtrackCount > 200) break
-        --searchI
-        var lastMatch = matchesStrict[--matchesStrictLen]
-        targetI = nextBeginningIndexes[lastMatch]
-      } else if(searchLowerCodes[searchI] === targetLowerCodes[targetI]) {
-        matchesStrict[matchesStrictLen++] = targetI
-        ++searchI; if(searchI === searchLen) { successStrict = true; break }
-        ++targetI
-      } else {
-        targetI = nextBeginningIndexes[targetI]
+        if(searchI <= 0 || ++backtracks > 200) break
+        searchI--
+        let previous = strictMatch[--strictLen]
+        targetI = beginnings
+          ? nextBeginning(beginnings, start, end, previous, targetLen)
+          : next[previous]
+      } else if(searchCodes[searchI] === targetCodes[targetI]) {
+        strictMatch[strictLen++] = targetI
+        if(++searchI === searchLen) {
+          strict = true
+          break
+        }
+        targetI++
+      } else targetI = beginnings
+        ? nextBeginning(beginnings, start, end, targetI, targetLen)
+        : next[targetI]
+    }
+  }
+
+  if(isSubstring && !substringStart) {
+    if(beginnings) {
+      for(let b = start; b < end; b++) {
+        let i = beginnings[b]
+        if(i <= substringI) continue
+        let s = 0
+        for(; s < searchLen && searchCodes[s] === targetCodes[i + s]; s++);
+        if(s === searchLen) {
+          substringI = i
+          substringStart = true
+          break
+        }
+      }
+    } else for(let i = 0; i < next.length; i = next[i]) {
+      if(i <= substringI) continue
+      let s = 0
+      for(; s < searchLen && searchCodes[s] === targetCodes[i + s]; s++);
+      if(s === searchLen) {
+        substringI = i
+        substringStart = true
+        break
       }
     }
   }
 
-  // if it's a substring match but not at a beginning index, let's try to find a substring starting at a beginning index for a better score
-  if(isSubstring && !isSubstringBeginning) {
-    for(var i=0; i<nextBeginningIndexes.length; i=nextBeginningIndexes[i]) {
-      if(i <= substringIndex) continue
+  let matches
+  if(!strict) {
+    if(isSubstring) for(let i = 0; i < searchLen; i++) simpleMatch[i] = substringI + i
+    matches = simpleMatch
+  } else if(substringStart) {
+    for(let i = 0; i < searchLen; i++) simpleMatch[i] = substringI + i
+    matches = simpleMatch
+  } else matches = strictMatch
 
-      for(var s=0; s<searchLen; s++) if(searchLowerCodes[s] !== targetLowerCodes[i+s]) break
-      if(s === searchLen) { substringIndex = i; isSubstringBeginning = true; break }
-    }
-  }
-
-  // tally up the score & keep track of matches for highlighting later
-  // if it's a simple match, we'll switch to a substring match if a substring exists
-  // if it's a strict match, we'll switch to a substring match only if that's a better score
-
-  if(!successStrict) {
-    if(isSubstring) for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
-    var matchesBest = matchesSimple
-  } else {
-    if(isSubstringBeginning) {
-      for(var i=0; i<searchLen; ++i) matchesSimple[i] = substringIndex+i // at this point it's safe to overwrite matchehsSimple with substr matches
-      var matchesBest = matchesSimple
-    } else {
-      var matchesBest = matchesStrict
-    }
-  }
-  var score = calculateScore(matchesBest, searchLen, targetLen, successStrict, beginningIndexesLen, isSubstring, isSubstringBeginning)
-
-  prepared._score = score
-
-  for(var i = 0; i < searchLen; ++i) prepared._indexes[i] = matchesBest[i]
-  prepared._indexes.len = searchLen
-
-  return prepared
+  target._score = calculateScore(matches, searchLen, targetLen, strict, beginningLen, isSubstring, substringStart)
+  for(let i = 0; i < searchLen; i++) target._indexes[i] = matches[i]
+  target._indexes.len = searchLen
+  return target
 }
-var calculateScore = (matches, searchLen, targetLen, successStrict, beginningIndexesLen, isSubstring, isSubstringBeginning) => {
-  var score = 0
-  var extraMatchGroupCount = 0
-  for(var i = 1; i < searchLen; ++i) {
-    if(matches[i] - matches[i-1] !== 1) { score -= matches[i]; ++extraMatchGroupCount }
+
+function calculateScore(matches, searchLen, targetLen, strict, beginningLen, substring, substringStart) {
+  let score = 0
+  let groups = 0
+  for(let i = 1; i < searchLen; i++) if(matches[i] - matches[i - 1] !== 1) {
+    score -= matches[i]
+    groups++
   }
-  var unmatchedDistance = matches[searchLen-1] - matches[0] - (searchLen-1)
-  score -= (12+unmatchedDistance) * extraMatchGroupCount
-  if(matches[0] !== 0) score -= matches[0]*matches[0]*.2
+  let unmatchedDistance = matches[searchLen - 1] - matches[0] - (searchLen - 1)
+  score -= (12 + unmatchedDistance) * groups
+  if(matches[0] !== 0) score -= matches[0] * matches[0] * .2
+  if(!strict) score *= 1000
+  else if(beginningLen > 24) score *= (beginningLen - 24) * 10
 
-  if(!successStrict) score *= 1000
-  else if(beginningIndexesLen > 24) score *= (beginningIndexesLen-24)*10
-
-  var lengthPenalty = (targetLen - searchLen)/2
+  let lengthPenalty = (targetLen - searchLen) / 2
   score -= lengthPenalty
-  var substringBonus = 1+searchLen*searchLen
-  if(isSubstring) score /= substringBonus
-  if(isSubstringBeginning) score /= substringBonus
+  let substringBonus = 1 + searchLen * searchLen
+  if(substring) score /= substringBonus
+  if(substringStart) score /= substringBonus
   return score - lengthPenalty
 }
-var algorithmSpaces = (preparedSearch, target, allowPartialMatch) => {
-  var seenIndexesLen = 0
-  var seenIndexesGeneration = ++seenIndexesGenerationCounter
-  var score = 0
-  var result = NULL
 
-  var first_seen_index_last_search = 0
-  var searches = preparedSearch.spaceSearches
-  var searchesLen = searches.length
-  var changeslen = 0
+function algorithmSpaces(search, target, partial) {
+  let seenLen = 0
+  let generation = ++seenGeneration
+  let score = 0
+  let result = null
+  let previousFirst = 0
+  let searches = search.parts
+  let changesLen = 0
+  let matched = false
 
-  var hasAtLeast1Match = false
-  for(var i=0; i<searchesLen; ++i) {
-    allowPartialMatchScores[i] = NEGATIVE_INFINITY
-    var search = searches[i]
-
-    result = algorithm(search, target, false, false, changeslen !== 0, false)
-    if(allowPartialMatch) {
-      if(result === NULL) continue
-      hasAtLeast1Match = true
-    } else {
-      if(result === NULL) { resetNextBeginningIndexes(target, changeslen); return NULL }
+  for(let i = 0; i < searches.length; i++) {
+    partials[i] = -INF
+    result = algorithm(searches[i], target, false, false, changesLen !== 0, false)
+    if(result === null) {
+      if(partial) continue
+      resetBeginnings(target, changesLen)
+      return null
     }
+    matched = true
 
-    // if not the last search, we need to mutate _nextBeginningIndexes for the next search
-    var isTheLastSearch = i === searchesLen - 1
-    if(!isTheLastSearch) {
-      var indexes = result._indexes
-
-      var indexesIsConsecutiveSubstring = true
-      for(var j=0; j<indexes.len-1; ++j) {
-        if(indexes[j+1] - indexes[j] !== 1) {
-          indexesIsConsecutiveSubstring = false; break;
-        }
+    if(i < searches.length - 1) {
+      let indexes = result._indexes
+      let consecutive = true
+      for(let j = 0; j < indexes.len - 1; j++) if(indexes[j + 1] - indexes[j] !== 1) {
+        consecutive = false
+        break
       }
-
-      if(indexesIsConsecutiveSubstring) {
-        var newBeginningIndex = indexes[indexes.len-1] + 1
-        var toReplace = target._nextBeginningIndexes[newBeginningIndex-1]
-        for(var j=newBeginningIndex-1; j>=0; --j) {
-          if(toReplace !== target._nextBeginningIndexes[j]) break
-          target._nextBeginningIndexes[j] = newBeginningIndex
-          nextBeginningIndexesChanges[changeslen*2 + 0] = j
-          nextBeginningIndexesChanges[changeslen*2 + 1] = toReplace
-          changeslen++
+      if(consecutive) {
+        let beginning = indexes[indexes.len - 1] + 1
+        let previous = target._nextBeginningIndexes[beginning - 1]
+        for(let j = beginning - 1; j >= 0 && target._nextBeginningIndexes[j] === previous; j--) {
+          target._nextBeginningIndexes[j] = beginning
+          changes[changesLen * 2] = j
+          changes[changesLen * 2 + 1] = previous
+          changesLen++
         }
       }
     }
 
-    score += result._score / searchesLen
-    allowPartialMatchScores[i] = result._score / searchesLen
+    let partScore = result._score / searches.length
+    score += partScore
+    partials[i] = partScore
+    if(result._indexes[0] < previousFirst) score -= (previousFirst - result._indexes[0]) * 2
+    previousFirst = result._indexes[0]
 
-    // dock points based on order otherwise "c man" returns Manifest.cpp instead of CheatManager.h
-    if(result._indexes[0] < first_seen_index_last_search) {
-      score -= (first_seen_index_last_search - result._indexes[0]) * 2
-    }
-    first_seen_index_last_search = result._indexes[0]
-
-    for(var j=0; j<result._indexes.len; ++j) {
-      var index = result._indexes[j]
-      if(seenIndexesFlags[index] !== seenIndexesGeneration) {
-        seenIndexesFlags[index] = seenIndexesGeneration
-        seenIndexes[seenIndexesLen++] = index
-      }
+    for(let j = 0; j < result._indexes.len; j++) {
+      let index = result._indexes[j]
+      if(seenAt[index] === generation) continue
+      seenAt[index] = generation
+      seen[seenLen++] = index
     }
   }
 
-  if(allowPartialMatch && !hasAtLeast1Match) return NULL
+  if(partial && !matched) return null
+  resetBeginnings(target, changesLen)
 
-  resetNextBeginningIndexes(target, changeslen)
-
-  // allows a search with spaces that's an exact substring to score well
-  var allowSpacesResult = algorithm(preparedSearch, target, /*allowSpaces=*/true)
-  if(allowSpacesResult !== NULL && allowSpacesResult._score > score) {
-    if(allowPartialMatch) {
-      for(var i=0; i<searchesLen; ++i) {
-        allowPartialMatchScores[i] = allowSpacesResult._score / searchesLen
-      }
-    }
-    return allowSpacesResult
+  let spacedResult = algorithm(search, target, true)
+  if(spacedResult !== null && spacedResult._score > score) {
+    if(partial) for(let i = 0; i < searches.length; i++) partials[i] = spacedResult._score / searches.length
+    return spacedResult
   }
 
-  if(allowPartialMatch) result = target
+  if(partial) result = target
   result._score = score
-
-  for(var i = 0; i < seenIndexesLen; ++i) result._indexes[i] = seenIndexes[i]
-  result._indexes.len = seenIndexesLen
-
+  for(let i = 0; i < seenLen; i++) result._indexes[i] = seen[i]
+  result._indexes.len = seenLen
   return result
 }
-var resetNextBeginningIndexes = (target, changeslen) => {
-  for(var i=changeslen-1; i>=0; --i) target._nextBeginningIndexes[nextBeginningIndexesChanges[i*2]] = nextBeginningIndexesChanges[i*2+1]
-}
 
-var characterFolds = {}
-var foldFrom = "\\\"`‘’“”‐–—−⁄∕…øØæÆœŒßẞłŁ"
-var foldTo = "/''''''----//.oOaAoOsSlL"
-for(var i=0; i<foldFrom.length; ++i) characterFolds[foldFrom[i]] = foldTo[i]
-
-var customAsciiFolds = false
-export let remap = mappings => {
-  for(var char in mappings) {
-    characterFolds[char] = mappings[char]
-    if(char.charCodeAt(0) < 128) customAsciiFolds = true
+function resetBeginnings(target, changesLen) {
+  for(let i = changesLen - 1; i >= 0; i--) {
+    target._nextBeginningIndexes[changes[i * 2]] = changes[i * 2 + 1]
   }
 }
 
-var foldCharacter = char => {
-  var folded = characterFolds[char]
-  if(folded !== undefined) return folded
-  if(char.charCodeAt(0) < 128) return char
-  folded = char.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
-  return folded.length === 1 ? folded : char
-}
 
-var normalizeCharacters = str => {
-  if(customAsciiFolds) return str.replace(/[\s\S]/g, foldCharacter)
-  return /[^\x00-\x7F]|[\\"`]/.test(str)
-    ? str.replace(/[^\x00-\x7F]|[\\"`]/g, foldCharacter)
-    : str
-}
+class PreparedTargets {
+  constructor(targets, options) {
+    let mode = this._mode = options?.keys ? 2 : options?.key ? 1 : 0
+    let keys = mode === 2 ? options.keys : [options?.key]
+    this._targets = new Array(targets.length)
 
-var indexFirstCharacters = (prepared, firstBeginnings, row) => {
-  if(prepared.target.length >= 65535) return prepared
-  var target = normalizeCharacters(prepared.target)
-  var lowerCodes = prepared._targetLowerCodes
-  var offset = row * 26
-  var beginnings = 0
-  var wasUpper = false
-  var wasAlphanum = false
-  for(var i=0; i<target.length; ++i) {
-    var code = target.charCodeAt(i)
-    var isUpper = code>=65&&code<=90
-    var isAlphanum = isUpper || code>=97&&code<=122 || code>=48&&code<=57
-    var isBeginning = isUpper&&!wasUpper || !wasAlphanum || !isAlphanum
-    wasUpper = isUpper
-    wasAlphanum = isAlphanum
-    if(isBeginning) {
-      ++beginnings
-      var lowerCode = lowerCodes[i]
-      if(lowerCode>=97&&lowerCode<=122) {
-        var slot = offset + lowerCode-97
-        if(firstBeginnings[slot] === 0) firstBeginnings[slot] = i+1
+    if(mode < 2) {
+      let key = keys[0]
+      let getter = mode && makeGetter(key)
+      let firstTable = this._first = new Uint16Array(targets.length * 26)
+      let offsets = this._offsets = new Uint32Array(targets.length + 1)
+      let beginnings = []
+      if(mode) this._objects = targets.slice()
+      for(let i = 0; i < targets.length; i++) {
+        let value = mode ? getter === null ? targets[i][key] : getter(targets[i]) : targets[i]
+        this._targets[i] = value ? indexBeginnings(prepTarget(value), firstTable, i, beginnings) : noTarget
+        offsets[i + 1] = beginnings.length
       }
+      this._beginnings = Uint16Array.from(beginnings)
+      return
+    }
+
+    let getters = keys.map(makeGetter)
+    this._keys = keys.map((_, i) => keyGetter(i))
+    for(let i = 0; i < targets.length; i++) {
+      let obj = targets[i]
+      let values = new Array(keys.length)
+      for(let k = 0; k < keys.length; k++) {
+        let value = getters[k] === null ? obj[keys[k]] : getters[k](obj)
+        values[k] = value ? prepTarget(value) : noTarget
+      }
+      this._targets[i] = {_prepared: entryMarker, _obj: obj, _targets: values}
     }
   }
-  prepared._beginningIndexesLen = beginnings
+}
+
+function prepTarget(target) {
+  if(typeof target === 'number') target = '' + target
+  else if(typeof target !== 'string') target = ''
+  let info = lowerInfo(target)
+  return newResult(target, -INF, null, info._lower, info.lowerCodes, info.bitflags)
+}
+
+function prepQuery(search) {
+  if(typeof search === 'number') search = '' + search
+  else if(typeof search !== 'string') search = ''
+  search = search.trim()
+  let info = lowerInfo(search)
+  info.parts = info.hasSpace ? [...new Set(search.split(/\s+/))].map(prepQuery) : []
+  return info
+}
+
+function getPrepared(target) {
+  if(target.length > 999) return prepTarget(target)
+  let prepared = targetCache.get(target)
+  if(prepared === undefined) targetCache.set(target, prepared = prepTarget(target))
   return prepared
 }
 
-var prepareLowerInfo = str => {
-  str = normalizeCharacters(str)
-  var strLen = str.length
-  var lower = str.toLowerCase()
-  var lowerCodes = [] // new Array(strLen)    sparse array is too slow
-  var bitflags = 0
-  var containsSpace = false // space isn't stored in bitflags because of how searching with a space works
-
-  for(var i = 0; i < strLen; ++i) {
-    var lowerCode = lowerCodes[i] = lower.charCodeAt(i)
-
-    if(lowerCode === 32) {
-      containsSpace = true
-      continue // it's important that we don't set any bitflags for space
-    }
-
-    var bit = lowerCode>=97&&lowerCode<=122 ? lowerCode-97 // alphabet
-            : lowerCode>=48&&lowerCode<=57  ? 26           // numbers
-                                                           // 3 bits available
-            : lowerCode<=127                ? 30           // other ascii
-            :                                 31           // other utf8
-    bitflags |= 1<<bit
-  }
-
-  return {lowerCodes:lowerCodes, bitflags:bitflags, containsSpace:containsSpace, _lower:lower}
+function getQuery(search) {
+  if(search.length > 999) return prepQuery(search)
+  let prepared = searchCache.get(search)
+  if(prepared === undefined) searchCache.set(search, prepared = prepQuery(search))
+  return prepared
 }
-var prepareSingleMatch = (prepared, searchLowerCode, fallbackIndex) => {
-  var target = normalizeCharacters(prepared.target)
-  var targetLowerCodes = prepared._targetLowerCodes
-  var matchIndex = fallbackIndex
-  var successStrict = false
-  var beginningIndexesLen = 0
-  var wasUpper = false
-  var wasAlphanum = false
-  for(var i = 0; i < target.length; ++i) {
-    var targetCode = target.charCodeAt(i)
-    var isUpper = targetCode>=65&&targetCode<=90
-    var isAlphanum = isUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
-    var isBeginning = isUpper && !wasUpper || !wasAlphanum || !isAlphanum
+
+function indexBeginnings(prepared, firstTable, row, packed) {
+  if(prepared.target.length >= 65535) return prepared
+  let target = remapChars(prepared.target)
+  let lowerCodes = prepared._targetLowerCodes
+  let offset = row * 26
+  let count = 0
+  let wasUpper = false
+  let wasAlnum = false
+
+  for(let i = 0; i < target.length; i++) {
+    let code = target.charCodeAt(i)
+    let isUpper = code >= 65 && code <= 90
+    let isAlnum = isUpper || code >= 97 && code <= 122 || code >= 48 && code <= 57
+    let isBeginning = isUpper && !wasUpper || !wasAlnum || !isAlnum
     wasUpper = isUpper
-    wasAlphanum = isAlphanum
-    if(isBeginning) {
-      ++beginningIndexesLen
-      if(!successStrict && searchLowerCode === targetLowerCodes[i]) {
-        matchIndex = i
-        successStrict = true
-      }
+    wasAlnum = isAlnum
+    if(!isBeginning) continue
+
+    count++
+    packed.push(i)
+    let lowerCode = lowerCodes[i]
+    if(lowerCode >= 97 && lowerCode <= 122) {
+      let slot = offset + lowerCode - 97
+      if(firstTable[slot] === 0) firstTable[slot] = i + 1
     }
   }
-  prepared._beginningIndexesLen = beginningIndexesLen
-  prepared._singleMatchCode = searchLowerCode
-  prepared._singleMatchIndex = matchIndex
-  prepared._singleMatchStrict = successStrict
+  prepared._beginningsLen = count
+  return prepared
 }
-var prepareNextBeginningIndexes = (prepared) => {
-  var target = normalizeCharacters(prepared.target)
-  var targetLen = target.length
-  var nextBeginningIndexes = [] // new Array(targetLen)     sparse array is too slow
-  var fillFrom = 0
-  var beginningIndexesLen = 0
-  var wasUpper = false
-  var wasAlphanum = false
-  for(var i = 0; i < targetLen; ++i) {
-    var targetCode = target.charCodeAt(i)
-    var isUpper = targetCode>=65&&targetCode<=90
-    var isAlphanum = isUpper || targetCode>=97&&targetCode<=122 || targetCode>=48&&targetCode<=57
-    var isBeginning = isUpper && !wasUpper || !wasAlphanum || !isAlphanum
+
+function prepareSingleMatch(prepared, searchCode, fallbackIndex) {
+  let target = remapChars(prepared.target)
+  let lowerCodes = prepared._targetLowerCodes
+  let matchI = fallbackIndex
+  let strict = false
+  let beginnings = 0
+  let wasUpper = false
+  let wasAlnum = false
+
+  for(let i = 0; i < target.length; i++) {
+    let code = target.charCodeAt(i)
+    let isUpper = code >= 65 && code <= 90
+    let isAlnum = isUpper || code >= 97 && code <= 122 || code >= 48 && code <= 57
+    let isBeginning = isUpper && !wasUpper || !wasAlnum || !isAlnum
     wasUpper = isUpper
-    wasAlphanum = isAlphanum
-    if(isBeginning) {
-      ++beginningIndexesLen
-      for(; fillFrom < i; ++fillFrom) nextBeginningIndexes[fillFrom] = i
+    wasAlnum = isAlnum
+    if(!isBeginning) continue
+
+    beginnings++
+    if(!strict && searchCode === lowerCodes[i]) {
+      matchI = i
+      strict = true
     }
   }
-  for(; fillFrom < targetLen; ++fillFrom) nextBeginningIndexes[fillFrom] = targetLen
-  prepared._beginningIndexesLen = beginningIndexesLen
-  return nextBeginningIndexes
+  prepared._beginningsLen = beginnings
+  prepared._singleMatchCode = searchCode
+  prepared._singleMatchIndex = matchI
+  prepared._singleMatchStrict = strict
 }
 
-var preparedCache       = new Map()
-var preparedSearchCache = new Map()
+function makeNextBeginnings(prepared) {
+  let target = remapChars(prepared.target)
+  let next = []
+  let fill = 0
+  let beginnings = 0
+  let wasUpper = false
+  let wasAlnum = false
 
-// the theory behind these being globals is to reduce garbage collection by not making new arrays
-var matchesSimple = []; var matchesStrict = []
-var seenIndexes = []; var seenIndexesFlags = []; var seenIndexesGenerationCounter = 0
-var nextBeginningIndexesChanges = [] // allows straw berry to match strawberry well, by modifying the end of a substring to be considered a beginning index for the rest of the search
-var keysSpacesBestScores = []; var allowPartialMatchScores = []
-var tmpTargets = []; var tmpResults = []
+  for(let i = 0; i < target.length; i++) {
+    let code = target.charCodeAt(i)
+    let isUpper = code >= 65 && code <= 90
+    let isAlnum = isUpper || code >= 97 && code <= 122 || code >= 48 && code <= 57
+    let isBeginning = isUpper && !wasUpper || !wasAlnum || !isAlnum
+    wasUpper = isUpper
+    wasAlnum = isAlnum
+    if(!isBeginning) continue
 
-// Resolve complex key shapes once per go(), rather than coercing and
-// inspecting them for every target.
-var makeGetter = prop => {
-  if(typeof prop === 'function') return prop
-  var path = Array.isArray(prop)
-    ? prop
-    : typeof prop === 'string' && prop.includes('.') ? prop.split('.') : NULL
-  if(path === NULL) return NULL
+    beginnings++
+    for(; fill < i; fill++) next[fill] = i
+  }
+  for(; fill < target.length; fill++) next[fill] = target.length
+  prepared._beginningsLen = beginnings
+  return next
+}
+
+function remapCharacter(char) {
+  let remapped = remappings[char]
+  if(remapped !== undefined) return remapped
+  if(char.charCodeAt(0) < 128) return char
+  remapped = char.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+  return remapped.length === 1 ? remapped : char
+}
+
+function remapChars(value) {
+  if(customAsciiRemappings) return value.replace(/[\s\S]/g, remapCharacter)
+  return /[^\x00-\x7F]|[\\"`]/.test(value) ? value.replace(/[^\x00-\x7F]|[\\"`]/g, remapCharacter) : value
+}
+
+function lowerInfo(value) {
+  value = remapChars(value)
+  let lower = value.toLowerCase()
+  let lowerCodes = []
+  let bitflags = 0
+  let hasSpace = false
+
+  for(let i = 0; i < lower.length; i++) {
+    let code = lowerCodes[i] = lower.charCodeAt(i)
+    if(code === 32) {
+      hasSpace = true
+      continue
+    }
+    let bit = code >= 97 && code <= 122 ? code - 97
+      : code >= 48 && code <= 57 ? 26
+      : code <= 127 ? 30 : 31
+    bitflags |= 1 << bit
+  }
+  return {lowerCodes, bitflags, hasSpace, _lower: lower}
+}
+
+
+class Result {
+  get ['indexes']() { return this._indexes.slice(0, this._indexes.len).sort((a, b) => a - b) }
+  set ['indexes'](value) { this._indexes = value }
+  ['highlight'](open, close) { return highlight(this, open, close) }
+  get ['score']() { return normalizeScore(this._score) }
+  set ['score'](value) { this._score = denormalizeScore(value) }
+}
+
+class KeysResult extends Array {
+  get ['score']() { return normalizeScore(this._score) }
+  set ['score'](value) { this._score = denormalizeScore(value) }
+}
+
+function newResult(target, score = -INF, obj = null, lower = '', lowerCodes = null, bitflags = 0) {
+  let result = new Result()
+  result.target = target
+  result.obj = obj
+  result._score = score
+  result._indexes = []
+  result._targetLower = lower
+  result._targetLowerCodes = lowerCodes
+  result._nextBeginningIndexes = null
+  result._beginningsLen = 0
+  result._singleMatchCode = result._singleMatchIndex = -1
+  result._singleMatchStrict = false
+  result._bitflags = bitflags
+  return result
+}
+
+function materialize(prepared, obj = null) {
+  let result = new Result()
+  result.target = prepared.target
+  result.obj = obj
+  result._score = prepared._score
+  result._indexes = prepared._indexes
+  return result
+}
+
+let normalizeScore = value => value === -INF ? 0 : value > 1 ? value : Math.E ** (((-value + 1) ** .04307 - 1) * -2)
+let denormalizeScore = value => value === 0 ? -INF : value > 1 ? value : 1 - Math.pow(Math.log(value) / -2 + 1, 1 / .04307)
+let isPrepared = value => typeof value === 'object' && typeof value?._bitflags === 'number'
+
+function makeGetter(key) {
+  if(typeof key === 'function') return key
+  let path = Array.isArray(key) ? key
+    : typeof key === 'string' && key.includes('.') ? key.split('.') : null
+  if(path === null) return null
   return obj => {
-    if(path !== prop) {
-      var direct = obj[prop]
+    if(path !== key) {
+      let direct = obj[key]
       if(direct !== undefined) return direct
     }
-    for(var i=0; obj && i<path.length; ++i) obj = obj[path[i]]
+    for(let i = 0; obj && i < path.length; i++) obj = obj[path[i]]
     return obj
   }
 }
 
-var isPrepared = (x) => { return typeof x === 'object' && typeof x._bitflags === 'number' }
-var INFINITY = Infinity; var NEGATIVE_INFINITY = -INFINITY
-var noResults = []; noResults.total = 0
-var NULL = null
+function nextBeginning(indexes, start, end, index, targetLen) {
+  let low = start
+  let high = end
+  while(low < high) {
+    let middle = low + high >> 1
+    if(indexes[middle] <= index) low = middle + 1
+    else high = middle
+  }
+  return low < end ? indexes[low] : targetLen
+}
 
-var noTarget = prepareTarget('')
+function isBeginning(indexes, start, end, index) {
+  let low = start
+  let high = end
+  while(low < high) {
+    let middle = low + high >> 1
+    let value = indexes[middle]
+    if(value < index) low = middle + 1
+    else high = middle
+  }
+  return low < end && indexes[low] === index
+}
 
-// Hacked version of https://github.com/lemire/FastPriorityQueue.js
-var fastpriorityqueue=r=>{var e=[],o=0,a={},v=r=>{for(var a=0,v=e[a],c=1;c<o;){var s=c+1;a=c,s<o&&e[s]._score<e[c]._score&&(a=s),e[a-1>>1]=e[a],c=1+(a<<1)}for(var f=a-1>>1;a>0&&v._score<e[f]._score;f=(a=f)-1>>1)e[a]=e[f];e[a]=v};return a.add=(r=>{var a=o;e[o++]=r;for(var v=a-1>>1;a>0&&r._score<e[v]._score;v=(a=v)-1>>1)e[a]=e[v];e[a]=r}),a.poll=(r=>{if(0!==o){var a=e[0];return e[0]=e[--o],v(),a}}),a.peek=(r=>{if(0!==o)return e[0]}),a.replaceTop=(r=>{e[0]=r,v()}),a}
-var q = fastpriorityqueue() // reuse this
+function createHeap() {
+  let items = []
+  let length = 0
+
+  function down() {
+    let index = 0
+    let item = items[0]
+    for(let child = 1; child < length; child = 1 + index * 2) {
+      let right = child + 1
+      index = right < length && items[right]._score < items[child]._score ? right : child
+      items[(index - 1) >> 1] = items[index]
+    }
+    for(let parent = (index - 1) >> 1; index > 0 && item._score < items[parent]._score; parent = (index = parent) - 1 >> 1) {
+      items[index] = items[parent]
+    }
+    items[index] = item
+  }
+
+  return {
+    add(item) {
+      let index = length++
+      for(let parent = (index - 1) >> 1; index > 0 && item._score < items[parent]._score; parent = (index = parent) - 1 >> 1) {
+        items[index] = items[parent]
+      }
+      items[index] = item
+    },
+    poll() {
+      if(!length) return
+      let root = items[0]
+      items[0] = items[--length]
+      down()
+      return root
+    },
+    peek() { return length ? items[0] : undefined },
+    replaceTop(item) {
+      items[0] = item
+      down()
+    },
+  }
+}
+
+
+let INF = Infinity
+let noResults = []
+noResults.total = 0
+
+let targetCache = new Map(), searchCache = new Map()
+
+let simpleMatch = [], strictMatch = []
+let seen = [], seenAt = []
+let changes = [], partials = [], spaceScores = []
+let keyTargets = [], keyResults = []
+let seenGeneration = 0
+
+let remappings = {}
+let remapFrom = '\\"`‘’“”‐–—−⁄∕…øØæÆœŒßẞłŁ', remapTo = "/''''''----//.oOaAoOsSlL"
+for(let i = 0; i < remapFrom.length; i++) remappings[remapFrom[i]] = remapTo[i]
+let customAsciiRemappings = false
+
+let entryMarker = {}
+let keyGetter = index => entry => entry._targets[index]
+
+let heap = createHeap()
+
+let noTarget = prepTarget('')
 
 export default {single, go, prepare, highlight, score, remap, cleanup}
