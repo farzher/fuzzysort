@@ -114,7 +114,7 @@ function goPreparedValues(search, prepared, options, singleChar) {
     let start = prepared._offsets[i]
     let end = prepared._offsets[i + 1]
     let result = singleChar && target.target.length < 65535
-      ? singleCharResult(search, target, prepared._first, i)
+      ? algorithm1(search, target, prepared._first, i)
       : short && searchLen === 2
         ? algorithm2(search, target, prepared._beginnings, start, end)
         : short
@@ -227,7 +227,7 @@ function goKeys(query, objects, options, prepared) {
         let start = prepared._offsets[valueRow]
         let end = prepared._offsets[valueRow + 1]
         match = singleChar && target.target.length < 65535
-          ? singleCharResult(query, target, prepared._first, valueRow)
+          ? algorithm1(query, target, prepared._first, valueRow)
           : targetShort && searchLen === 2
             ? algorithm2(query, target, prepared._beginnings, start, end)
             : targetShort
@@ -354,7 +354,7 @@ function materializeKeys(result) {
 }
 
 
-function singleCharResult(search, target, firstTable, row) {
+function algorithm1(search, target, firstTable, row) {
   let matchI = target._targetLower.indexOf(search._lower)
   if(matchI === -1) return null
   let beginning = firstTable[row * 26 + search.lowerCodes[0] - 97]
