@@ -105,31 +105,29 @@ export function cleanup() { targetCache.clear(); searchCache.clear() }
 
 
 function goPreparedValues(search, prepared, options, singleChar) {
-  if(!search) return options?.all ? allPrepared(prepared, options) : noResults
-  if(!search.lowerCodes) search = getQuery(search)
-
   let targets = prepared._targets
   let objects = prepared._objects
   let threshold = denormalizeScore(options?.threshold || 0)
   let limit = options?.limit || INF
   let scoreFn = options?.scoreFn
+  let searchLen = search.lowerCodes.length
+  let shortSearch = !search.hasSpace && searchLen <= 3
   let resultCount = 0
   let limited = 0
 
   for(let i = 0; i < targets.length; i++) {
     let target = targets[i]
     if(target === noTarget || (search.bitflags & target._bitflags) !== search.bitflags) continue
-    let searchLen = search.lowerCodes.length
-    let short = !search.hasSpace && searchLen <= 3 && target.target.length < 65535
-    let start = prepared._offsets[i]
-    let end = prepared._offsets[i + 1]
-    let result = singleChar && target.target.length < 65535
-      ? algorithm1(search, target, prepared._first, i)
-      : short && searchLen === 2
+    let targetShort = shortSearch && target.target.length < 65535
+    let result
+    if(singleChar && targetShort) result = algorithm1(search, target, prepared._first, i)
+    else if(targetShort) {
+      let start = prepared._offsets[i]
+      let end = prepared._offsets[i + 1]
+      result = searchLen === 2
         ? algorithm2(search, target, prepared._beginnings, start, end)
-        : short
-          ? algorithm(search, target, false, false, false, true, prepared._beginnings, start, end)
-          : algorithm(search, target)
+        : algorithm(search, target, false, false, false, true, prepared._beginnings, start, end)
+    } else result = algorithm(search, target)
     if(result === null) continue
     let resultScore = result._score
     if(scoreFn) {
@@ -139,15 +137,15 @@ function goPreparedValues(search, prepared, options, singleChar) {
       result._score = resultScore = denormalizeScore(resultScore)
     }
     if(resultScore < threshold) continue
-    if(objects && !scoreFn) result = materialize(result, objects[i])
 
-    if(resultCount < limit) {
-      heap.add(result)
-      resultCount++
-    } else {
+    let room = resultCount < limit
+    if(room) resultCount++
+    else {
       limited++
-      if(resultScore > heap.peek()._score) heap.replaceTop(result)
+      if(resultScore <= heap.peek()._score) continue
     }
+    if(objects && !scoreFn) result = materialize(result, objects[i])
+    room ? heap.add(result) : heap.replaceTop(result)
   }
   return finishResults(resultCount, limited, !objects && !scoreFn && materialize)
 }
@@ -156,9 +154,13 @@ function goPrepared(search, prepared, options) {
   if(options?.key || options?.keys) throw new Error('fuzzysort: key/keys must be provided to prepare(), not go()')
   prepared._finish()
 
+  if(!search) {
+    if(!options?.all) return noResults
+    return prepared._mode === 0 ? all(prepared._targets, options) : allPrepared(prepared, options)
+  }
+
+  let query = getQuery(search)
   if(prepared._mode < 2) {
-    if(!search) return prepared._mode === 0 ? go(search, prepared._targets, options) : goPreparedValues(search, prepared, options, false)
-    let query = getQuery(search)
     let searchLen = query.lowerCodes.length
     if(prepared._mode === 0 && !options?.limit && searchLen > 3) return go(search, prepared._targets, options)
     let code = query.lowerCodes[0]
@@ -166,16 +168,9 @@ function goPrepared(search, prepared, options) {
     return goPreparedValues(query, prepared, options, singleChar)
   }
 
-  return goPreparedKeys(search, prepared, options)
+  return goKeys(query, prepared._objects, options, prepared)
 }
 
-function goPreparedKeys(search, prepared, options) {
-  if(!search) return options?.all ? allPrepared(prepared, options) : noResults
-  return goKeys(getQuery(search), prepared._objects, options, prepared)
-}
-
-// Raw and prepared multi-key searches share their filtering, scoring, and result
-// collection. Prepared rows only specialize target lookup and short matching.
 function goKeys(query, objects, options, prepared) {
   let indexed = prepared !== undefined
   let keys = indexed ? null : options.keys
@@ -242,15 +237,14 @@ function goKeys(query, objects, options, prepared) {
       if(indexed) {
         let valueRow = row + k
         let targetShort = short && target.target.length < 65535
-        let start = prepared._offsets[valueRow]
-        let end = prepared._offsets[valueRow + 1]
-        match = singleChar && target.target.length < 65535
-          ? algorithm1(query, target, prepared._first, valueRow)
-          : targetShort && searchLen === 2
+        if(singleChar && targetShort) match = algorithm1(query, target, prepared._first, valueRow)
+        else if(targetShort) {
+          let start = prepared._offsets[valueRow]
+          let end = prepared._offsets[valueRow + 1]
+          match = searchLen === 2
             ? algorithm2(query, target, prepared._beginnings, start, end)
-            : targetShort
-              ? algorithm(query, target, false, false, false, true, prepared._beginnings, start, end)
-              : algorithm(query, target, false, hasSpace)
+            : algorithm(query, target, false, false, false, true, prepared._beginnings, start, end)
+        } else match = algorithm(query, target, false, hasSpace)
       } else match = algorithm(query, target, false, hasSpace)
 
       if(match === null) {
@@ -263,8 +257,12 @@ function goKeys(query, objects, options, prepared) {
 
     let resultScore
     if(hasSpace) {
-      for(let s = 0; s < spaceCount; s++) if(spaceScores[s] === -INF) continue outer
-      resultScore = sumScores(spaceScores, spaceCount)
+      resultScore = 0
+      for(let s = 0; s < spaceCount; s++) {
+        let partScore = spaceScores[s]
+        if(partScore === -INF) continue outer
+        resultScore += partScore
+      }
     } else {
       resultScore = mergeScores(keyResults, keysLength)
       if(resultScore === -INF) continue
@@ -611,12 +609,6 @@ function mergePartScores(length) {
     if(partial > -1000 && best > -INF) best = Math.max(best, (best + partial) / 4)
     spaceScores[i] = Math.max(best, partial)
   }
-}
-
-function sumScores(scores, length) {
-  let total = 0
-  for(let i = 0; i < length; i++) total += scores[i]
-  return total
 }
 
 function mergeScores(results, length) {
