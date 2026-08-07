@@ -3,16 +3,11 @@
 </a></p>
 
 <p align="center">
-  Fast, Tiny, & Good fuzzy search for JavaScript.
+  <b>Fast, tiny, good fuzzy search for JavaScript.</b><br>
+  &lt;1ms for 13,000 files · 0 dependencies · clean ranking
 </p>
 
-<p align="center">
-  <b>Fast:</b> <b>&lt;1ms</b> to search <b>13,000</b> files.
-  <br>
-  <b>Tiny:</b> <b>1 file</b>, <b>0 dependencies</b>, <b>5kb</b>.
-  <br>
-  <b>Good:</b> clean api + sorts results well.
-</p>
+
 
 
 ## [Demo](https://rawgit.com/farzher/fuzzysort/master/test/test.html)
@@ -31,7 +26,7 @@ https://rawgit.com/farzher/fuzzysort/master/test/test.html
 
 
 
-## Installation Node / Bun / Deno
+## Install
 
 ```sh
 npm i fuzzysort
@@ -40,9 +35,7 @@ npm i fuzzysort
 import fuzzysort from 'fuzzysort'
 ```
 
-
-
-## Installation Browser
+Browser:
 
 ```html
 <script type="module">
@@ -51,27 +44,25 @@ import fuzzysort from 'fuzzysort'
 ```
 
 
-## Usage
-
-### `fuzzysort.go(search, targets, options=null)`
+## Quick start
 
 ```js
-const mystuff = [{file: 'Apple.cpp'}, {file: 'Banana.cpp'}]
-const results = fuzzysort.go('a', mystuff, {key: 'file'})
-// [{score: 0.81, obj: {file: 'Apple.cpp'}}, {score: 0.59, obj: {file: 'Banana.cpp'}}]
+const files = [{file: 'Apple.cpp'}, {file: 'Banana.cpp'}]
+
+const results = fuzzysort.go('a', files, {key: 'file'})
+// [{score: 0.81, obj: files[0]}, {score: 0.59, obj: files[1]}]
 ```
 
-### Options
+### `fuzzysort.go(search, targets, options)`
 
 ```js
 fuzzysort.go(search, targets, {
-  threshold: 0,    // Don't return matches worse than this
-  limit: 0,        // Don't return more results than this
-  all: false,      // If true, returns all results for an empty search
-
-  key: null,       // For when targets are objects (see its example usage)
-  keys: null,      // For when targets are objects (see its example usage)
-  scoreFn: null,   // Override a match's score
+  key: null,       // Search one property
+  keys: null,      // Search multiple properties
+  limit: 0,        // Max results; 0 = unlimited
+  threshold: 0,    // Minimum score; 0 = any match
+  all: false,      // Return all targets when search is empty
+  scoreFn: null,   // Override result scoring
 })
 ```
 
@@ -88,14 +79,10 @@ result.obj     // reference to your original obj when using options.key
 result.indexes // [29, 30, 31, 32, 33]
 
 result.highlight('<b>', '</b>') // 'some string that contains my <b>query</b>.'
-
 result.highlight((m, i) => <react key={i}>{m}</react>)
-// ['some string that contains my ', <react key=0>query</react>, '.']
 ```
 
-### Advanced Usage
-
-Search a list of objects, by multiple complex keys, with custom weights.
+### Advanced Usage - objects, multiple complex keys, custom scoring
 
 ```js
 let objects = [{
@@ -113,8 +100,8 @@ let results = fuzzysort.go('attack berry', objects, {
   scoreFn: r => r.score * (r.obj.bookmarked ? 2 : 1), // if the item is bookmarked, boost its score
 })
 
-var keysResult = results[0]
 // When using multiple `keys`, results are different. They're indexable to get each normal result
+var keysResult = results[0]
 keysResult[0].highlight() // 'Liechi <b>Berry</b>'
 keysResult[1].highlight() // 'Raises <b>Attack</b> when HP is low.'
 keysResult.score          // .84
@@ -130,7 +117,7 @@ let targets = [{file: 'Monitor.cpp'}, {file: 'MeshRenderer.cpp'}]
 
 let options = {
   limit: 100,    // don't return more results than you need!
-  threshold: .5, // don't return bad results
+  threshold: .5, // don't return bad results!
 }
 
 // filter out targets that you don't need to search! especially long ones!
@@ -154,34 +141,29 @@ fuzzysort.go('fast',  targets, options)
 
 ### Character remapping
 
-Searches use NFKD normalization, strip diacritics, and remap common lookalikes such as smart quotes, dash/slash variants, ellipses, and øØłŁđĐðÐıħĦŧŦ
+Searches use NFKD normalization, strip diacritics, and remap common quote, dash, slash, ellipsis, and lookalike characters.
 
-Use `fuzzysort.remap()` to add or override mappings:
+Add or override mappings with `fuzzysort.remap()`:
 
 ```js
 fuzzysort.remap({',': '.'}) // 12,5 = 12.5
 ```
 
 
-### Gotcha
+### Gotcha · Web Workers / cloned results
 
-`result.score` is implemented as a getter/setter and stored different internally `r.score = .3; // r.score == 0.30000000000000004`
-
-when cloning a result (web worker threads) you may lose these getters, in this case you can use `fuzzysort.score(result)` and `fuzzysort.highlight(result)`
-
-
-
+`result.score` is a getter/setter backed by an internal score representation. Structured cloning can remove those getters. For cloned results, use: `fuzzysort.score(result)` and `fuzzysort.highlight(result)`
 
 
 ### Changelog
 
 #### v4.0.0
-- fuzzysort.js is now ESM instead of UMD
-- Added `fuzzysort.snapshot()` for 10x faster cold starts
+- ESM instead of UMD
+- Added `fuzzysort.snapshot()` for the best search performance
 - Added `fuzzysort.score()` and `fuzzysort.highlight()` for Web Worker support
-- Added `fuzzysort.remap()` to define your own normalization
-- Automatically normalize similar looking characters, like special quotes
-- `options.scoreFn` now works in all cases, not only when using `options.keys`
+- Added `fuzzysort.remap()` for custom normalization
+- Automatically remaps common lookalike characters
+- `scoreFn` now works with all search modes
 
 #### v3.1.0
 - Automatically handle diacritics / accents / ligatures

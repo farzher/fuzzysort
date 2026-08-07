@@ -60,16 +60,16 @@ declare namespace Fuzzysort {
   }
 
   interface Options<R = Result> {
-    /** Don't return matches worse than this (higher is faster) */
-    threshold?: number
-
-    /** Don't return more results than this (lower is faster) */
+    /** Max results; 0 = unlimited */
     limit?: number
 
-    /** Return all targets when the search is empty */
+    /** Minimum score; 0 = any match */
+    threshold?: number
+
+    /** Return all targets when search is empty */
     all?: boolean
 
-    /** Replace the score used for sorting and filtering; return 0 to exclude a match */
+    /** Override result scoring */
     scoreFn?: (result: R) => number
   }
   /** A property path, path segments, or getter */
@@ -96,10 +96,10 @@ declare namespace Fuzzysort {
     go<T>(search: string, targets: SnapshotKey<T>, options?: Options<KeyResult<T>>): KeyResults<T>
     go<T>(search: string, targets: SnapshotKeys<T>, options?: Options<KeysResult<T>>): KeysResults<T>
 
-    /** Prepare one target for repeated searches in a mutable collection */
+    /** Prepare one target for fast searching */
     prepare(target: string): PreparedTarget
 
-    /** Create an immutable snapshot for the fastest repeated searches; use when targets don't change */
+    /** Create an immutable snapshot for the best search performance; use when targets don't change */
     snapshot(targets: ReadonlyArray<string>): Snapshot
     snapshot<T>(targets: ReadonlyArray<T>, options: SnapshotKeyOptions<T>): SnapshotKey<T>
     snapshot<T>(targets: ReadonlyArray<T>, options: SnapshotKeysOptions<T>): SnapshotKeys<T>
