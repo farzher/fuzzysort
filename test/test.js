@@ -1,6 +1,6 @@
 /*
 WHAT: Checks for bugs, and then benchmarks to check for performance issues
-USAGE: npm test / node test.js / npm run test.bat / serve the repo over HTTP and open test/test.html
+USAGE: npm test / node test/test.js / serve the repo over HTTP and open test/test.html
 
 HOW TO WRITE TESTS:
   // matches must not get better

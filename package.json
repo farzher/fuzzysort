@@ -6,42 +6,36 @@
   "license"     : "MIT",
   "description" : "Fast SublimeText-like fuzzy search for JavaScript",
 
-  "keywords": ["fuzzy search", "fuzzy", "search", "filter", "javascript", "node", "fast", "sublime"],
+  "homepage"    : "https://github.com/farzher/fuzzysort",
+  "bugs"        : "https://github.com/farzher/fuzzysort/issues",
 
-  "repository": {
-    "type" : "git",
-    "url"  : "https://github.com/farzher/fuzzysort.git"
-  },
+  "keywords"    : ["fuzzy-search", "fuzzy-matching", "fuzzy", "search", "ranking", "autocomplete", "typeahead", "filter", "javascript", "esm", "sublime" ],
 
-  "type": "module",
-  "main": "fuzzysort.js",
+  "files"       : ["fuzzysort.js", "fuzzysort.min.js", "index.d.ts"],
+  "types"       : "index.d.ts",
+  "type"        : "module",
+  "main"        : "fuzzysort.js",
+
   "exports": {
     ".": {
-      "types": "./index.d.ts",
-      "import": "./fuzzysort.js"
+      "types"   : "./index.d.ts",
+      "import"  : "./fuzzysort.js"
     }
   },
 
-  "scripts": {
-    "test"     : "node test/test.js",
-    "test-min" : "node test/test.js min",
-
-    "minify"   : "terser fuzzysort.js -o fuzzysort.min.js --config-file terser.config.json",
-    "check"    : "npm test && npm run test-min",
-    "build"    : "npm run minify && npm run check",
-    "release"  : "npm run build && node test/build.js"
+  "repository": {
+    "type"      : "git",
+    "url"       : "git+https://github.com/farzher/fuzzysort.git"
   },
 
-  "files": [
-    "fuzzysort.js",
-    "fuzzysort.min.js",
-    "index.d.ts"
-  ],
+  "scripts": {
+    "test"      : "node test/test.js",
+    "test-min"  : "node test/test.js min",
 
-  "types": "index.d.ts",
+    "minify"    : "terser fuzzysort.js -o fuzzysort.min.js --config-file terser.config.json",
+    "check"     : "npm test && npm run test-min",
+    "build"     : "npm run minify && npm run check"
+  },
 
-  "devDependencies": {
-    "terser": "^5.49.2"
-  }
-
+  "devDependencies": {"terser": "^5.49.2"}
 }
