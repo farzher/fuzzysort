@@ -5,7 +5,7 @@ export function single(search, target) {
   let query = getQuery(search)
   if(!isPrepared(target)) target = getPrepared(target)
   if((query.bitflags & target._bitflags) !== query.bitflags) return null
-  let result = algorithm(query, target)
+  let result = !query.hasSpace && query.lowerCodes.length === 2 ? algorithm2(query, target) : algorithm(query, target)
   return result && materialize(result)
 }
 
@@ -19,6 +19,7 @@ export function go(search, targets, options) {
   if(keys) return goKeys(query, targets, options)
 
   let searchBitflags = query.bitflags
+  let twoChar = !query.hasSpace && query.lowerCodes.length === 2
   let threshold = denormalizeScore(options?.threshold || 0)
   let limit = options?.limit || INF
   let scoreFn = options?.scoreFn
@@ -32,7 +33,7 @@ export function go(search, targets, options) {
     if(!target) continue
     if(!isPrepared(target)) target = getPrepared(target)
     if((searchBitflags & target._bitflags) !== searchBitflags) continue
-    let result = algorithm(query, target)
+    let result = twoChar ? algorithm2(query, target) : algorithm(query, target)
     if(result === null) continue
     let resultScore = result._score
     if(scoreFn) {
@@ -114,6 +115,7 @@ function goPreparedValues(search, prepared, options, singleChar) {
   let scoreFn = options?.scoreFn
   let searchLen = search.lowerCodes.length
   let shortSearch = !search.hasSpace && searchLen <= 3
+  let twoChar = !search.hasSpace && searchLen === 2
   let rows = prepared._candidateRows
   let rowsLength = prepared._candidateLength
   let matchedRows = prepared._rows
@@ -129,12 +131,15 @@ function goPreparedValues(search, prepared, options, singleChar) {
     let cutoff = !scoreFn && threshold === -INF && resultCount >= limit ? heap.peek()._score : -INF
     let result
     if(singleChar && targetShort) result = algorithm1(search, target, prepared._first, i)
+    else if(twoChar && targetShort) {
+      let start = prepared._offsets[i]
+      let end = prepared._offsets[i + 1]
+      result = algorithm2(search, target, prepared._beginnings, start, end, cutoff)
+    } else if(twoChar) result = algorithm2(search, target, null, 0, 0, cutoff)
     else if(targetShort) {
       let start = prepared._offsets[i]
       let end = prepared._offsets[i + 1]
-      result = searchLen === 2
-        ? algorithm2(search, target, prepared._beginnings, start, end, cutoff)
-        : algorithm(search, target, false, false, false, true, prepared._beginnings, start, end, cutoff)
+      result = algorithm(search, target, false, false, false, true, prepared._beginnings, start, end, cutoff)
     } else result = algorithm(search, target, false, false, false, true, null, 0, 0, cutoff)
     if(result === null) continue
     matchedRows[matchedCount++] = i
@@ -208,6 +213,7 @@ function goKeys(query, objects, options, prepared) {
   let limit = options?.limit || INF
   let searchLen = query.lowerCodes.length
   let short = indexed && !hasSpace && searchLen <= 3
+  let twoChar = !hasSpace && searchLen === 2
   let code = query.lowerCodes[0]
   let singleChar = short && searchLen === 1 && code >= 97 && code <= 122
   let scoreFn = options?.scoreFn
@@ -268,14 +274,17 @@ function goKeys(query, objects, options, prepared) {
         let valueRow = row + k
         let targetShort = short && target.target.length < 65535
         if(singleChar && targetShort) match = algorithm1(query, target, prepared._first, valueRow)
+        else if(twoChar && targetShort) {
+          let start = prepared._offsets[valueRow]
+          let end = prepared._offsets[valueRow + 1]
+          match = algorithm2(query, target, prepared._beginnings, start, end)
+        } else if(twoChar) match = algorithm2(query, target)
         else if(targetShort) {
           let start = prepared._offsets[valueRow]
           let end = prepared._offsets[valueRow + 1]
-          match = searchLen === 2
-            ? algorithm2(query, target, prepared._beginnings, start, end)
-            : algorithm(query, target, false, false, false, true, prepared._beginnings, start, end)
+          match = algorithm(query, target, false, false, false, true, prepared._beginnings, start, end)
         } else match = algorithm(query, target, false, hasSpace)
-      } else match = algorithm(query, target, false, hasSpace)
+      } else match = twoChar ? algorithm2(query, target) : algorithm(query, target, false, hasSpace)
 
       if(match === null) {
         keyResults[k] = noTarget
@@ -417,7 +426,7 @@ function algorithm1(search, target, firstTable, row) {
   return target
 }
 
-function algorithm2(search, target, beginnings, start, end, cutoff = -INF) {
+function algorithm2(search, target, beginnings = null, start = 0, end = 0, cutoff = -INF) {
   let targetCodes = target._targetLowerCodes
   let targetLen = targetCodes.length
   let firstCode = search.lowerCodes[0]
@@ -427,7 +436,14 @@ function algorithm2(search, target, beginnings, start, end, cutoff = -INF) {
   while(targetCodes[first] !== firstCode) if(++first >= targetLen) return null
   let second = first + 1
   while(targetCodes[second] !== secondCode) if(++second >= targetLen) return null
+
   if(cutoff !== -INF && scoreCeiling(2, targetLen) <= cutoff) return prunedMatch
+
+  if(beginnings === null) {
+    beginnings = target._beginnings
+    if(beginnings === null) target._beginnings = beginnings = makeBeginnings(target)
+    end = beginnings.length
+  }
 
   let substringI = target._targetLower.indexOf(search._lower, first)
   let substring = substringI !== -1
@@ -1145,6 +1161,25 @@ function prepareSingleMatch(prepared, searchCode, fallbackIndex) {
   prepared._singleMatchStrict = strict
 }
 
+function makeBeginnings(prepared) {
+  let target = remapChars(prepared.target)
+  let beginnings = []
+  let wasUpper = false
+  let wasAlnum = false
+
+  for(let i = 0; i < target.length; i++) {
+    let code = target.charCodeAt(i)
+    let isUpper = code >= 65 && code <= 90
+    let isAlnum = isUpper || code >= 97 && code <= 122 || code >= 48 && code <= 57
+    let isBeginning = isUpper && !wasUpper || !wasAlnum || !isAlnum
+    wasUpper = isUpper
+    wasAlnum = isAlnum
+    if(isBeginning) beginnings.push(i)
+  }
+  prepared._beginningsLen = beginnings.length
+  return beginnings
+}
+
 function makeNextBeginnings(prepared) {
   let target = remapChars(prepared.target)
   let next = []
@@ -1227,6 +1262,7 @@ function newResult(target, score = -INF, obj = null, lower = '', lowerCodes = nu
   result._targetLower = lower
   result._targetLowerCodes = lowerCodes
   result._nextBeginningIndexes = null
+  result._beginnings = null
   result._beginningsLen = 0
   result._singleMatchCode = result._singleMatchIndex = -1
   result._singleMatchStrict = false

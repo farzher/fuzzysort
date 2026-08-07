@@ -896,6 +896,49 @@ async function benchmarks() {
     fuzzysort.go('e', targets, {limit:10})
   }, {samplecount:15})
 
+  // Realistic cold interactions: a user types a one-, two-, then three-letter
+  // query over the full 183k-row collection. Every sample gets fresh data/query
+  // state; snapshot preparation is excluded only for the explicitly "ready"
+  // cases, which model an application that indexed before accepting input.
+  const typeShortQuery = targets => {
+    fuzzysort.go('e', targets, {limit:10})
+    fuzzysort.go('el', targets, {limit:10})
+    fuzzysort.go('eld', targets, {limit:10})
+  }
+  const finishSnapshot = targets => {
+    fuzzysort.go('', targets, {all:true, limit:1})
+    return targets
+  }
+  const coldSamples = {samplecount:7}
+  for(const query of ['e', 'el', 'eld']) {
+    benchCold(`cold first "${query}" ready Steam snapshot`, function() {
+      fuzzysort.cleanup()
+      return finishSnapshot(fuzzysort.snapshot(steamRaw))
+    }, function(targets) {
+      fuzzysort.go(query, targets, {limit:10})
+    }, coldSamples)
+  }
+  benchCold('cold type "eld" raw Steam strings', function() {
+    fuzzysort.cleanup()
+    return steamRaw
+  }, typeShortQuery, coldSamples)
+  benchCold('cold type "eld" new Steam snapshot', function() {
+    fuzzysort.cleanup()
+    return fuzzysort.snapshot(steamRaw)
+  }, typeShortQuery, coldSamples)
+  benchCold('cold type "eld" ready Steam snapshot', function() {
+    fuzzysort.cleanup()
+    return finishSnapshot(fuzzysort.snapshot(steamRaw))
+  }, typeShortQuery, coldSamples)
+  benchCold('cold type "eld" ready Steam object key', function() {
+    fuzzysort.cleanup()
+    return finishSnapshot(fuzzysort.snapshot(testdata.steam_games_2_keys, {key:'name'}))
+  }, typeShortQuery, coldSamples)
+  benchCold('cold type "eld" ready Steam object keys', function() {
+    fuzzysort.cleanup()
+    return finishSnapshot(fuzzysort.snapshot(testdata.steam_games_2_keys, {keys:['name', 'description']}))
+  }, typeShortQuery, coldSamples)
+
   bench('go prepared limit 1', function() {
     fuzzysort.go('render', focusedPrepared, {limit:1})
   }, config)
@@ -921,19 +964,6 @@ async function benchmarks() {
   bench('go Steam "e" unlimited', function() {
     fuzzysort.go('e', steamPrepared)
   }, config)
-
-  // Measure one real interaction, including every search issued while typing.
-  // cleanup() is outside the timed region, but makes the first keystroke cold.
-  benchCold('type "elder" prepared Steam targets', function() {
-    fuzzysort.cleanup()
-    return steamPrepared
-  }, function(targets) {
-    fuzzysort.go('e', targets, {limit:10})
-    fuzzysort.go('el', targets, {limit:10})
-    fuzzysort.go('eld', targets, {limit:10})
-    fuzzysort.go('elde', targets, {limit:10})
-    fuzzysort.go('elder', targets, {limit:10})
-  }, {samplecount:15})
 
   bench('go Steam "el" unlimited', function() {
     fuzzysort.go('el', steamPrepared, {limit:10})
