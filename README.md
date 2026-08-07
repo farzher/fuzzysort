@@ -132,7 +132,7 @@ let targets = [{file: 'Monitor.cpp'}, {file: 'MeshRenderer.cpp'}]
 // filter out targets that you don't need to search! especially long ones!
 targets = targets.filter(t => t.file.length < 1000)
 
-// if your targets don't change, build an immutable snapshot first!
+// if your targets don't change, take an immutable snapshot first!
 targets = fuzzysort.snapshot(targets, {key: 'file'})
 
 const options = {

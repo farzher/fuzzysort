@@ -114,23 +114,34 @@ function goPreparedValues(search, prepared, options, singleChar) {
   let scoreFn = options?.scoreFn
   let searchLen = search.lowerCodes.length
   let shortSearch = !search.hasSpace && searchLen <= 3
+  let rows = prepared._candidateRows
+  let rowsLength = prepared._candidateLength
+  let matchedRows = prepared._rows
+  let matchedCount = 0
   let resultCount = 0
   let limited = 0
 
-  for(let i = 0; i < targets.length; i++) {
+  for(let n = 0; n < rowsLength; n++) {
+    let i = rows === null ? n : rows[n]
     let target = targets[i]
     if(target === noTarget || (search.bitflags & target._bitflags) !== search.bitflags) continue
     let targetShort = shortSearch && target.target.length < 65535
+    let cutoff = !scoreFn && threshold === -INF && resultCount >= limit ? heap.peek()._score : -INF
     let result
     if(singleChar && targetShort) result = algorithm1(search, target, prepared._first, i)
     else if(targetShort) {
       let start = prepared._offsets[i]
       let end = prepared._offsets[i + 1]
       result = searchLen === 2
-        ? algorithm2(search, target, prepared._beginnings, start, end)
-        : algorithm(search, target, false, false, false, true, prepared._beginnings, start, end)
-    } else result = algorithm(search, target)
+        ? algorithm2(search, target, prepared._beginnings, start, end, cutoff)
+        : algorithm(search, target, false, false, false, true, prepared._beginnings, start, end, cutoff)
+    } else result = algorithm(search, target, false, false, false, true, null, 0, 0, cutoff)
     if(result === null) continue
+    matchedRows[matchedCount++] = i
+    if(result === prunedMatch) {
+      limited++
+      continue
+    }
     let resultScore = result._score
     if(scoreFn) {
       result = materialize(result, objects?.[i])
@@ -149,6 +160,7 @@ function goPreparedValues(search, prepared, options, singleChar) {
     if(objects && !scoreFn) result = materialize(result, objects[i])
     room ? heap.add(result) : heap.replaceTop(result)
   }
+  prepared._matchedRowsLen = matchedCount
   return finishResults(resultCount, limited, !objects && !scoreFn && materialize)
 }
 
@@ -162,15 +174,25 @@ function goPrepared(search, prepared, options) {
   }
 
   let query = getQuery(search)
-  if(prepared._mode < 2) {
-    let searchLen = query.lowerCodes.length
-    if(prepared._mode === 0 && !options?.limit && searchLen > 3) return go(search, prepared._targets, options)
-    let code = query.lowerCodes[0]
-    let singleChar = searchLen === 1 && code >= 97 && code <= 122
-    return goPreparedValues(query, prepared, options, singleChar)
-  }
+  let backtrack = prepared._backtrack(query, options)
+  if(backtrack) return backtrack
 
-  return goKeys(query, prepared._objects, options, prepared)
+  prepared._beginSearch(query)
+  try {
+    let results
+    if(prepared._mode < 2) {
+      let searchLen = query.lowerCodes.length
+      let code = query.lowerCodes[0]
+      let singleChar = searchLen === 1 && code >= 97 && code <= 122
+      results = goPreparedValues(query, prepared, options, singleChar)
+    } else results = goKeys(query, prepared._objects, options, prepared)
+    prepared._endSearch(query)
+    prepared._remember(query, results, options)
+    return results
+  } catch(error) {
+    prepared._abortSearch()
+    throw error
+  }
 }
 
 function goKeys(query, objects, options, prepared) {
@@ -190,10 +212,15 @@ function goKeys(query, objects, options, prepared) {
   let singleChar = short && searchLen === 1 && code >= 97 && code <= 122
   let scoreFn = options?.scoreFn
   let deferMaterialization = indexed && !scoreFn && (limit !== INF || threshold > -INF)
+  let rows = indexed ? prepared._candidateRows : null
+  let rowsLength = indexed ? prepared._candidateLength : objects.length
+  let matchedRows = indexed ? prepared._rows : null
+  let matchedCount = 0
   let resultCount = 0
   let limited = 0
 
-  outer: for(let i = 0; i < objects.length; i++) {
+  outer: for(let n = 0; n < rowsLength; n++) {
+    let i = rows === null ? n : rows[n]
     let row = i * keysLength
     if(indexed) {
       if((searchBitflags & prepared._bitflags[i]) !== searchBitflags) continue
@@ -217,6 +244,7 @@ function goKeys(query, objects, options, prepared) {
         keyResults[k] = noTarget
         continue
       }
+
       if(hasSpace && indexed) {
         let possible = false
         for(let s = 0; s < spaceCount; s++) {
@@ -269,6 +297,7 @@ function goKeys(query, objects, options, prepared) {
       resultScore = mergeScores(keyResults, keysLength)
       if(resultScore === -INF) continue
     }
+    if(indexed) matchedRows[matchedCount++] = i
 
     let result = deferMaterialization ? null : captureKeysResult(keyResults, keysLength, objects[i], resultScore)
     if(scoreFn) {
@@ -287,6 +316,7 @@ function goKeys(query, objects, options, prepared) {
     if(result === null) result = captureKeysResult(keyResults, keysLength, objects[i], resultScore)
     room ? heap.add(result) : heap.replaceTop(result)
   }
+  if(indexed) prepared._matchedRowsLen = matchedCount
   return finishResults(resultCount, limited, deferMaterialization && materializeKeys)
 }
 
@@ -387,7 +417,7 @@ function algorithm1(search, target, firstTable, row) {
   return target
 }
 
-function algorithm2(search, target, beginnings, start, end) {
+function algorithm2(search, target, beginnings, start, end, cutoff = -INF) {
   let targetCodes = target._targetLowerCodes
   let targetLen = targetCodes.length
   let firstCode = search.lowerCodes[0]
@@ -397,6 +427,7 @@ function algorithm2(search, target, beginnings, start, end) {
   while(targetCodes[first] !== firstCode) if(++first >= targetLen) return null
   let second = first + 1
   while(targetCodes[second] !== secondCode) if(++second >= targetLen) return null
+  if(cutoff !== -INF && scoreCeiling(2, targetLen) <= cutoff) return prunedMatch
 
   let substringI = target._targetLower.indexOf(search._lower, first)
   let substring = substringI !== -1
@@ -471,7 +502,7 @@ function algorithm2(search, target, beginnings, start, end) {
   return target
 }
 
-function algorithm(search, target, spaces = false, partial = false, changed = false, singleMatch = true, beginnings = null, start = 0, end = 0) {
+function algorithm(search, target, spaces = false, partial = false, changed = false, singleMatch = true, beginnings = null, start = 0, end = 0, cutoff = -INF) {
   if(!spaces && search.hasSpace) return algorithmSpaces(search, target, partial)
 
   let searchCodes = search.lowerCodes
@@ -491,6 +522,8 @@ function algorithm(search, target, spaces = false, partial = false, changed = fa
     }
     if(++targetI >= targetLen) return null
   }
+
+  if(cutoff !== -INF && searchLen > 1 && scoreCeiling(searchLen, targetLen) <= cutoff) return prunedMatch
 
   if(searchLen === 1 && !changed && singleMatch) {
     let matchI
@@ -736,6 +769,7 @@ class SnapshotTargets {
   }
 
   _schedule() {
+    if(this._scheduled !== null) return
     let run = deadline => {
       this._scheduled = null
       this._run(deadline)
@@ -767,32 +801,58 @@ class SnapshotTargets {
     this._initialized = true
     let keysLength = this._mode === 2 ? this._keys.length : 1
     let valueCount = this._input.length * keysLength
+    let rowCount = this._input.length
     this._targets = new Array(valueCount)
     this._first = new Uint16Array(valueCount * 26)
     this._offsets = new Uint32Array(valueCount + 1)
     this._buildingBeginnings = []
+    this._rowCount = rowCount
+    this._rowWords = rowCount + 31 >> 5
+    this._rowBits = new Uint32Array(this._rowWords * 32)
+    this._rows = new Uint32Array(rowCount)
+    this._lastRowsLen = 0
+    this._matchedRowsLen = 0
+    this._lastQuery = null
+    this._candidateRows = null
+    this._candidateLength = rowCount
+    this._history = []
     if(this._mode) {
       this._objects = this._input
       this._getters = this._keys.map(makeGetter)
     }
     if(this._mode === 2) {
       this._keysLength = keysLength
-      this._bitflags = new Int32Array(this._input.length)
+      this._bitflags = new Int32Array(rowCount)
     }
   }
 
   _run(deadline) {
-    if(this._done) return
-    let end = Date.now() + 8
+    if(this._done || this._error) return
+    let end = Date.now() + 4
+    let hasTime = () => deadline && !deadline.didTimeout ? deadline.timeRemaining() > 1 : Date.now() < end
     try {
       this._initialize()
       do this._prepareOne()
-      while(this._index < this._input.length && (deadline && !deadline.didTimeout ? deadline.timeRemaining() > 1 : Date.now() < end))
+      while(this._index < this._input.length && hasTime())
       if(this._index === this._input.length) this._complete()
       else this._schedule()
     } catch(error) {
       this._error = error
       this._done = true
+    }
+  }
+
+  _indexRow(row, bitflags) {
+    let flags = bitflags >>> 0
+    let word = row >> 5
+    let mask = 1 << (row & 31)
+    let words = this._rowWords
+    let bits = this._rowBits
+    while(flags) {
+      let lowest = flags & -flags
+      let bit = 31 - Math.clz32(lowest)
+      bits[bit * words + word] |= mask
+      flags = (flags & flags - 1) >>> 0
     }
   }
 
@@ -803,8 +863,9 @@ class SnapshotTargets {
       let value = mode
         ? this._getters[0] === null ? this._input[i][this._keys[0]] : this._getters[0](this._input[i])
         : this._input[i]
-      this._targets[i] = value ? indexBeginnings(prepTarget(value), this._first, i, this._buildingBeginnings) : noTarget
+      let prepared = this._targets[i] = value ? indexBeginnings(prepTarget(value), this._first, i, this._buildingBeginnings) : noTarget
       this._offsets[i + 1] = this._buildingBeginnings.length
+      this._indexRow(i, prepared._bitflags)
       return
     }
 
@@ -820,12 +881,136 @@ class SnapshotTargets {
       bitflags |= prepared._bitflags
     }
     this._bitflags[i] = bitflags
+    this._indexRow(i, bitflags)
   }
 
   _complete() {
     this._beginnings = Uint16Array.from(this._buildingBeginnings)
     this._buildingBeginnings = this._input = this._getters = this._keys = null
     this._done = true
+  }
+
+  _bitOffsets(bitflags) {
+    let offsetsLen = 0
+    let words = this._rowWords
+    for(let bit = 0; bit < 32; bit++) if(bitflags & 1 << bit) candidateBitOffsets[offsetsLen++] = bit * words
+    return offsetsLen
+  }
+
+  _countRows(bitflags, stop = INF) {
+    let offsetsLen = this._bitOffsets(bitflags)
+    if(!offsetsLen) return this._rowCount
+    let bits = this._rowBits
+    let words = this._rowWords
+    let count = 0
+    for(let word = 0; word < words; word++) {
+      let matches = bits[candidateBitOffsets[0] + word]
+      for(let i = 1; i < offsetsLen && matches; i++) matches &= bits[candidateBitOffsets[i] + word]
+      count += bitCount(matches)
+      if(count >= stop) return count
+    }
+    return count
+  }
+
+  _fillRows(bitflags) {
+    let offsetsLen = this._bitOffsets(bitflags)
+    if(!offsetsLen) {
+      this._candidateRows = null
+      this._candidateLength = this._rowCount
+      return
+    }
+    let bits = this._rowBits
+    let words = this._rowWords
+    let rows = this._rows
+    let rowsLen = 0
+    for(let word = 0; word < words; word++) {
+      let matches = bits[candidateBitOffsets[0] + word]
+      for(let i = 1; i < offsetsLen && matches; i++) matches &= bits[candidateBitOffsets[i] + word]
+      while(matches) {
+        let lowest = matches & -matches
+        rows[rowsLen++] = (word << 5) + 31 - Math.clz32(lowest)
+        matches = (matches & matches - 1) >>> 0
+      }
+    }
+    this._candidateRows = rows
+    this._candidateLength = rowsLen
+  }
+
+  _beginSearch(query) {
+    this._matchedRowsLen = 0
+    let previousQuery = this._lastQuery
+    let previousLength = this._lastRowsLen
+    this._lastQuery = null
+    let bitflags = query.bitflags >>> 0
+
+    if(previousQuery !== null && query._lower.startsWith(previousQuery)) {
+      let staticCount = this._countRows(bitflags, previousLength)
+      if(previousLength <= staticCount) {
+        this._candidateRows = this._rows
+        this._candidateLength = previousLength
+        return
+      }
+    }
+    this._fillRows(bitflags)
+  }
+
+  _endSearch(query) {
+    this._lastRowsLen = this._matchedRowsLen
+    this._matchedRowsLen = 0
+    this._lastQuery = query._lower
+    this._candidateRows = null
+    this._candidateLength = 0
+  }
+
+  _backtrack(query, options) {
+    let history = this._history
+    if(history.length < 2 || options?.scoreFn || options?.threshold) return null
+    let limit = options?.limit || INF
+    if(limit === INF) return null
+
+    let current = history[history.length - 1]
+    let value = query._lower
+    if(value.length >= current.query.length || !current.query.startsWith(value)) return null
+
+    for(let i = history.length - 2; i >= 0; i--) {
+      let entry = history[i]
+      if(entry.query === value && entry.limit === limit) {
+        history.length = i + 1
+        this._lastQuery = null
+        this._lastRowsLen = 0
+        this._matchedRowsLen = 0
+        this._candidateRows = null
+        this._candidateLength = 0
+        return copyResults(entry.results)
+      }
+      if(entry.query.length < value.length) break
+    }
+    return null
+  }
+
+  _remember(query, results, options) {
+    let history = this._history
+    let limit = options?.limit || INF
+    let value = query._lower
+    let last = history[history.length - 1]
+
+    if(last && !value.startsWith(last.query)) history.length = 0
+    if(options?.scoreFn || options?.threshold || limit === INF || results.length > 256) {
+      history.length = 0
+      return
+    }
+
+    last = history[history.length - 1]
+    if(last?.query === value && last.limit === limit) history.pop()
+    history.push({query:value, limit, results:copyResults(results)})
+  }
+
+  _abortSearch() {
+    this._lastQuery = null
+    this._lastRowsLen = 0
+    this._matchedRowsLen = 0
+    this._candidateRows = null
+    this._candidateLength = 0
   }
 
   _finish() {
@@ -842,6 +1027,32 @@ class SnapshotTargets {
       throw error
     }
   }
+}
+
+function copyResult(result) {
+  if(result === noTarget) return noTarget
+  if(result instanceof KeysResult) {
+    let copy = new KeysResult(result.length)
+    for(let i = 0; i < result.length; i++) copy[i] = copyResult(result[i])
+    copy.obj = result.obj
+    copy._score = result._score
+    return copy
+  }
+  let copy = new Result()
+  copy.target = result.target
+  copy.obj = result.obj
+  copy._score = result._score
+  let indexes = result._indexes
+  copy._indexes = indexes.slice(0, indexes.len ?? indexes.length)
+  copy._indexes.len = copy._indexes.length
+  return copy
+}
+
+function copyResults(results) {
+  let copies = new Array(results.length)
+  for(let i = 0; i < results.length; i++) copies[i] = copyResult(results[i])
+  copies.total = results.total
+  return copies
 }
 
 function prepTarget(target) {
@@ -1059,6 +1270,18 @@ function makeGetter(key) {
   }
 }
 
+function scoreCeiling(searchLen, targetLen) {
+  let lengthPenalty = (targetLen - searchLen) / 2
+  let bonus = 1 + searchLen * searchLen
+  return -lengthPenalty - lengthPenalty / (bonus * bonus)
+}
+
+function bitCount(value) {
+  value -= value >>> 1 & 0x55555555
+  value = (value & 0x33333333) + (value >>> 2 & 0x33333333)
+  return ((value + (value >>> 4) & 0x0F0F0F0F) * 0x01010101 >>> 24)
+}
+
 function lowerBound(values, start, end, value, after = false) {
   while(start < end) {
     let middle = start + end >> 1
@@ -1130,6 +1353,7 @@ let simpleMatch = [], strictMatch = []
 let seen = [], seenAt = []
 let changes = [], partials = [], spaceScores = []
 let keyTargets = [], keyResults = []
+let candidateBitOffsets = []
 let seenGeneration = 0
 
 let remappings = {}
@@ -1140,5 +1364,6 @@ let customAsciiRemappings = false
 let heap = createHeap()
 
 let noTarget = prepTarget('')
+let prunedMatch = {}
 
 export default {single, go, highlight, score, remap, prepare, snapshot, cleanup}

@@ -438,6 +438,24 @@ async function tests() {
     assert(fuzzysort.go('f', singleCharacters)[0].indexes[0] === 0, 'prepared single-character switch')
     assert(fuzzysort.go('b', singleCharacters)[0].indexes[0] === 7, 'prepared single-character switch back')
 
+    // Snapshot caches preserve results and transparently fall back when a
+    // request needs more rows than the cached query contains.
+    var cachedTargets = ['alpha', 'alphabet', 'alpine', 'beta']
+    var cachedSnapshot = fuzzysort.snapshot(cachedTargets)
+    var cachedAlpha = fuzzysort.go('al', cachedSnapshot, {limit:1})
+    fuzzysort.go('b', cachedSnapshot, {limit:1})
+    var cachedAlphaAgain = fuzzysort.go('al', cachedSnapshot, {limit:1})
+    assert(cachedAlphaAgain.total === cachedAlpha.total && cachedAlphaAgain[0].target === cachedAlpha[0].target, 'snapshot cached query')
+    cachedAlphaAgain[0].indexes = [4]
+    assert(fuzzysort.go('al', cachedSnapshot, {limit:1})[0].indexes[0] === 0, 'snapshot cache returns independent results')
+    var expandedAlpha = fuzzysort.go('al', cachedSnapshot, {limit:3})
+    assert(expandedAlpha.length === 3 && expandedAlpha.total === 3, 'snapshot cache falls back for a larger limit')
+    var cachedTies = Array.from({length:150}, (_, id) => ({id, name:'alpha'}))
+    var cachedTieSnapshot = fuzzysort.snapshot(cachedTies, {key:'name'})
+    fuzzysort.go('a', cachedTieSnapshot, {limit:128})
+    var cachedTieResults = fuzzysort.go('a', cachedTieSnapshot, {limit:10})
+    assert(cachedTieResults.every((result, i) => result.obj.id === i), 'snapshot cached ties preserve input order')
+
     // Duplicate whitespace-separated terms are intentionally deduplicated.
     var oneTerm = fuzzysort.single('foo', 'foo bar')
     var duplicateTerms = fuzzysort.single('  foo   foo  ', 'foo bar')
