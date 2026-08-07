@@ -45,17 +45,23 @@ declare namespace Fuzzysort {
   }
 
 
-  /** An optimized snapshot of string targets returned by fuzzysort.prepare(). */
-  interface Prepared {
+  /** A prepared target string returned by fuzzysort.prepare(target). */
+  interface PreparedTarget {
+    readonly [preparedBrand]: 'target'
+    /** Your original target string */
+    readonly target: string
+  }
+  /** An immutable optimized snapshot of string targets. */
+  interface Snapshot {
     readonly [preparedBrand]: 'strings'
   }
-  /** An optimized snapshot of object targets prepared by one key. */
-  interface PreparedKey<T> {
+  /** An immutable optimized snapshot of object targets searchable by one key. */
+  interface SnapshotKey<T> {
     readonly [preparedBrand]: 'key'
     readonly _targetType?: T
   }
-  /** An optimized snapshot of object targets prepared by multiple keys. */
-  interface PreparedKeys<T> {
+  /** An immutable optimized snapshot of object targets searchable by multiple keys. */
+  interface SnapshotKeys<T> {
     readonly [preparedBrand]: 'keys'
     readonly _targetType?: T
   }
@@ -73,32 +79,35 @@ declare namespace Fuzzysort {
     /** Override a match's score, or return 0 to exclude it */
     scoreFn?: (result: R) => number
   }
-  type Key<T> = string | ((obj: T) => string) | ReadonlyArray<string>
-  interface PrepareKeyOptions<T> {
+  type Key<T> = string | ((obj: T) => string | PreparedTarget) | ReadonlyArray<string>
+  interface SnapshotKeyOptions<T> {
     key: Key<T>
   }
-  interface PrepareKeysOptions<T> {
+  interface SnapshotKeysOptions<T> {
     keys: ReadonlyArray<Key<T>>
   }
-  interface KeyOptions<T> extends Options<KeyResult<T>>, PrepareKeyOptions<T> {}
-  interface KeysOptions<T> extends Options<KeysResult<T>>, PrepareKeysOptions<T> {}
+  interface KeyOptions<T> extends Options<KeyResult<T>>, SnapshotKeyOptions<T> {}
+  interface KeysOptions<T> extends Options<KeysResult<T>>, SnapshotKeysOptions<T> {}
 
   interface HighlightCallback<T> { (match: string, index: number): T }
 
   interface Fuzzysort {
 
-    single(search: string, target: string): Result | null
+    single(search: string, target: string | PreparedTarget): Result | null
 
-    go(search: string, targets: ReadonlyArray<string> | Prepared, options?: Options): Results
+    go(search: string, targets: ReadonlyArray<string | PreparedTarget> | Snapshot, options?: Options): Results
     go<T>(search: string, targets: ReadonlyArray<T>, options: KeyOptions<T>): KeyResults<T>
     go<T>(search: string, targets: ReadonlyArray<T>, options: KeysOptions<T>): KeysResults<T>
-    go<T>(search: string, targets: PreparedKey<T>, options?: Options<KeyResult<T>>): KeyResults<T>
-    go<T>(search: string, targets: PreparedKeys<T>, options?: Options<KeysResult<T>>): KeysResults<T>
+    go<T>(search: string, targets: SnapshotKey<T>, options?: Options<KeyResult<T>>): KeyResults<T>
+    go<T>(search: string, targets: SnapshotKeys<T>, options?: Options<KeysResult<T>>): KeysResults<T>
 
-    /** Build an optimized snapshot for repeated searches. */
-    prepare(targets: ReadonlyArray<string>): Prepared
-    prepare<T>(targets: ReadonlyArray<T>, options: PrepareKeyOptions<T>): PreparedKey<T>
-    prepare<T>(targets: ReadonlyArray<T>, options: PrepareKeysOptions<T>): PreparedKeys<T>
+    /** Prepare one target for use in a mutable target collection. */
+    prepare(target: string): PreparedTarget
+
+    /** Build an immutable optimized snapshot for repeated searches. */
+    snapshot(targets: ReadonlyArray<string>): Snapshot
+    snapshot<T>(targets: ReadonlyArray<T>, options: SnapshotKeyOptions<T>): SnapshotKey<T>
+    snapshot<T>(targets: ReadonlyArray<T>, options: SnapshotKeysOptions<T>): SnapshotKeys<T>
 
     /** Highlight a result, including one received through structuredClone or postMessage */
     highlight(result: Result, highlightOpen?: string, highlightClose?: string): string

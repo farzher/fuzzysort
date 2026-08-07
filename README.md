@@ -132,16 +132,16 @@ let targets = [{file: 'Monitor.cpp'}, {file: 'MeshRenderer.cpp'}]
 // filter out targets that you don't need to search! especially long ones!
 targets = targets.filter(t => t.file.length < 1000)
 
-// if your targets don't change, prepare them first!
-const preparedTargets = fuzzysort.prepare(targets, {key: 'file'})
+// if your targets don't change, build an immutable snapshot first!
+targets = fuzzysort.snapshot(targets, {key: 'file'})
 
 const options = {
   limit: 100,    // don't return more results than you need!
   threshold: .5, // don't return bad results
 }
-fuzzysort.go('gotta', preparedTargets, options)
-fuzzysort.go('go',    preparedTargets, options)
-fuzzysort.go('fast',  preparedTargets, options)
+fuzzysort.go('gotta', targets, options)
+fuzzysort.go('go',    targets, options)
+fuzzysort.go('fast',  targets, options)
 ```
 
 
@@ -171,7 +171,7 @@ when cloning a result (web worker threads) you may lose these getters, in this c
 #### v4.0.0
 - fuzzysort.js is now ESM instead of UMD
 - Major performance optimizations for the slowest cases. 10x faster cold starts
-- Changed `fuzzysort.prepare()` to work on targets instead of a single target
+- Added `fuzzysort.snapshot()`
 - Added `fuzzysort.score()` and `fuzzysort.highlight()` for Web Worker support
 - `options.scoreFn` now works in all cases, not only when using `options.keys`
 - Automatically normalize similar looking characters, like special quotes

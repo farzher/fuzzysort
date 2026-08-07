@@ -10,7 +10,7 @@ export function single(search, target) {
 }
 
 export function go(search, targets, options) {
-  if(targets instanceof PreparedTargets) return goPrepared(search, targets, options)
+  if(targets instanceof SnapshotTargets) return goPrepared(search, targets, options)
   if(!search) return options?.all ? all(targets, options) : noResults
 
   let query = getQuery(search)
@@ -99,7 +99,9 @@ export function remap(mappings) {
   cleanup()
 }
 
-export function prepare(targets, options) { return new PreparedTargets(targets, options) }
+export function prepare(target) { return prepTarget(target) }
+
+export function snapshot(targets, options) { return new SnapshotTargets(targets, options) }
 
 export function cleanup() { targetCache.clear(); searchCache.clear() }
 
@@ -151,7 +153,7 @@ function goPreparedValues(search, prepared, options, singleChar) {
 }
 
 function goPrepared(search, prepared, options) {
-  if(options?.key || options?.keys) throw new Error('fuzzysort: key/keys must be provided to prepare(), not go()')
+  if(options?.key || options?.keys) throw new Error('fuzzysort: key/keys must be provided to snapshot(), not go()')
   prepared._finish()
 
   if(!search) {
@@ -718,7 +720,7 @@ function resetBeginnings(target, changesLen) {
 }
 
 
-class PreparedTargets {
+class SnapshotTargets {
   constructor(targets, options) {
     this._mode = options?.keys ? 2 : options?.key ? 1 : 0
     this._keys = this._mode === 2 ? options.keys.slice() : [options?.key]
@@ -1139,4 +1141,4 @@ let heap = createHeap()
 
 let noTarget = prepTarget('')
 
-export default {single, go, highlight, score, remap, prepare, cleanup}
+export default {single, go, highlight, score, remap, prepare, snapshot, cleanup}

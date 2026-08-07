@@ -46,6 +46,15 @@
 <script type="module">
 import './test.js'
 
+// Keep the normal steam_games collection beside raw and mutable-array versions.
+const rawSteamKey = 'steam_games_raw'
+testdata[rawSteamKey] = testdata.steam_games
+testdata_prepared[rawSteamKey] = testdata.steam_games
+
+const targetPreparedSteamKey = 'steam_games_target_prepared'
+testdata[targetPreparedSteamKey] = testdata.steam_games
+testdata_prepared[targetPreparedSteamKey] = testdata.steam_games.map(target => fuzzysort.prepare(target))
+
 ;(function() {
   var vue = window.vue = Vue.createApp({
 
@@ -92,6 +101,7 @@ import './test.js'
         vue.results = fuzzysort.go(vue.input, testdata_prepared[vue.testdatakey], {
           all: !targets_are_strings,
           limit: 100,
+          // keys: vue.keys,
         })
 
         vue.duration = formatscore(getms()-startms)
