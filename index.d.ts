@@ -1,69 +1,62 @@
 declare namespace Fuzzysort {
 
-  const preparedBrand: unique symbol
+  const typeBrand: unique symbol
+  const targetTypeBrand: unique symbol
 
   interface Result {
-    /**
-    * 1 is a perfect match. 0.5 is a good match. 0 is no match. 
-    */
+    /** Match score: 1 is exact, 0.5 is good, and 0 is no match */
     readonly score: number
 
-    /** Your original target string */
+    /** Original target string */
     readonly target: string
 
     highlight(highlightOpen?: string, highlightClose?: string): string
     highlight<T>(callback: HighlightCallback<T>): (string | T)[]
 
+    /** Matched character indexes */
     indexes: ReadonlyArray<number>
   }
-  interface Results extends ReadonlyArray<Result> {
-    /** Total matches before limit */
+  interface Results<T = Result> extends ReadonlyArray<T> {
+    /** Number of matches before applying `limit` */
     readonly total: number
   }
 
   interface KeyResult<T> extends Result {
-    /** Your original object */
+    /** Original target object */
     readonly obj: T
   }
-  interface KeyResults<T> extends ReadonlyArray<KeyResult<T>> {
-    /** Total matches before limit */
-    readonly total: number
-  }
+  interface KeyResults<T> extends Results<KeyResult<T>> {}
 
   interface KeysResult<T> extends ReadonlyArray<Result> {
-    /**
-    * 1 is a perfect match. 0.5 is a good match. 0 is no match. 
-    */
+    /** Combined match score: 1 is exact, 0.5 is good, and 0 is no match */
     readonly score: number
 
-    /** Your original object */
+    /** Original target object */
     readonly obj: T
   }
-  interface KeysResults<T> extends ReadonlyArray<KeysResult<T>> {
-    /** Total matches before limit */
-    readonly total: number
-  }
+  interface KeysResults<T> extends Results<KeysResult<T>> {}
 
-
-  /** A prepared target string returned by fuzzysort.prepare(target). */
+  /** A target returned by `fuzzysort.prepare()` */
   interface PreparedTarget {
-    readonly [preparedBrand]: 'target'
-    /** Your original target string */
+    readonly [typeBrand]: 'target'
+    /** Original target string */
     readonly target: string
   }
-  /** An immutable optimized snapshot of string targets. */
+  type Target = string | PreparedTarget
+
+  /** An immutable snapshot of string targets */
   interface Snapshot {
-    readonly [preparedBrand]: 'strings'
+    readonly [typeBrand]: 'strings'
   }
-  /** An immutable optimized snapshot of object targets searchable by one key. */
+  /** An immutable snapshot of objects searchable by one key */
   interface SnapshotKey<T> {
-    readonly [preparedBrand]: 'key'
-    readonly _targetType?: T
+    readonly [typeBrand]: 'key'
+    readonly [targetTypeBrand]?: T
   }
-  /** An immutable optimized snapshot of object targets searchable by multiple keys. */
+  /** An immutable snapshot of objects searchable by multiple keys */
   interface SnapshotKeys<T> {
-    readonly [preparedBrand]: 'keys'
-    readonly _targetType?: T
+    readonly [typeBrand]: 'keys'
+    readonly [targetTypeBrand]?: T
   }
 
   interface Options<R = Result> {
@@ -73,55 +66,55 @@ declare namespace Fuzzysort {
     /** Don't return more results than this (lower is faster) */
     limit?: number
 
-    /** If true, returns all results for an empty search */
+    /** Return all targets when the search is empty */
     all?: boolean
 
-    /** Override a match's score, or return 0 to exclude it */
+    /** Replace the score used for sorting and filtering; return 0 to exclude a match */
     scoreFn?: (result: R) => number
   }
-  type Key<T> = string | ((obj: T) => string | PreparedTarget) | ReadonlyArray<string>
+  /** A property path, path segments, or getter */
+  type Key<T> = string | ReadonlyArray<string> | ((obj: T) => Target | null | undefined)
   interface SnapshotKeyOptions<T> {
+    /** Key to search */
     key: Key<T>
   }
   interface SnapshotKeysOptions<T> {
+    /** Keys to search */
     keys: ReadonlyArray<Key<T>>
   }
   interface KeyOptions<T> extends Options<KeyResult<T>>, SnapshotKeyOptions<T> {}
   interface KeysOptions<T> extends Options<KeysResult<T>>, SnapshotKeysOptions<T> {}
 
-  interface HighlightCallback<T> { (match: string, index: number): T }
+  type HighlightCallback<T> = (match: string, index: number) => T
 
   interface Fuzzysort {
+    single(search: string, target: Target): Result | null
 
-    single(search: string, target: string | PreparedTarget): Result | null
-
-    go(search: string, targets: ReadonlyArray<string | PreparedTarget> | Snapshot, options?: Options): Results
+    go(search: string, targets: ReadonlyArray<Target> | Snapshot, options?: Options): Results
     go<T>(search: string, targets: ReadonlyArray<T>, options: KeyOptions<T>): KeyResults<T>
     go<T>(search: string, targets: ReadonlyArray<T>, options: KeysOptions<T>): KeysResults<T>
     go<T>(search: string, targets: SnapshotKey<T>, options?: Options<KeyResult<T>>): KeyResults<T>
     go<T>(search: string, targets: SnapshotKeys<T>, options?: Options<KeysResult<T>>): KeysResults<T>
 
-    /** Prepare one target for use in a mutable target collection. */
+    /** Prepare one target for repeated searches in a mutable collection */
     prepare(target: string): PreparedTarget
 
-    /** Build an immutable optimized snapshot for repeated searches. */
+    /** Create an immutable snapshot for the fastest repeated searches; use when targets don't change */
     snapshot(targets: ReadonlyArray<string>): Snapshot
     snapshot<T>(targets: ReadonlyArray<T>, options: SnapshotKeyOptions<T>): SnapshotKey<T>
     snapshot<T>(targets: ReadonlyArray<T>, options: SnapshotKeysOptions<T>): SnapshotKeys<T>
 
-    /** Highlight a result, including one received through structuredClone or postMessage */
+    /** Highlight a result, including a structured clone */
     highlight(result: Result, highlightOpen?: string, highlightClose?: string): string
     highlight<T>(result: Result, callback: HighlightCallback<T>): (string | T)[]
 
-    /** Read the normalized score of a result received through structuredClone or postMessage */
+    /** Read a result's score, including from a structured clone */
     score(result: Result | KeysResult<unknown>): number
 
-    /** Add or override character remappings. */
+    /** Add or override character remappings */
     remap(mappings: Readonly<Record<string, string>>): void
 
-    /**
-    * Free memory caches if you're done using fuzzysort for now
-    */
+    /** Clear internal caches */
     cleanup(): void
   }
 }
