@@ -82,16 +82,15 @@ fuzzysort.go(search, targets, {
 
 ```js
 const result = fuzzysort.single('query', 'some string that contains my query.')
-result.score       // .80 (1 is a perfect match. 0.5 is a good match. 0 is no match.)
-result.target      // 'some string that contains my query.'
-result.obj         // reference to your original obj when using options.key
-result.indexes     // [29, 30, 31, 32, 33]
+result.score   // .80 (1 is a perfect match. 0.5 is a good match. 0 is no match.)
+result.target  // 'some string that contains my query.'
+result.obj     // reference to your original obj when using options.key
+result.indexes // [29, 30, 31, 32, 33]
 
-result.highlight('<b>', '</b>')
-// 'some string that contains my <b>query</b>.'
+result.highlight('<b>', '</b>') // 'some string that contains my <b>query</b>.'
 
 result.highlight((m, i) => <react key={i}>{m}</react>)
-// ['some string that contains my ', <react key=0>query</react>, '.']
+// ['some string that contains my ', <react key=0>query</react>, '.']
 ```
 
 ### Advanced Usage
@@ -124,21 +123,29 @@ keysResult.obj.title      // 'Liechi Berry'
 
 
 
-## How To Go Fast · Performance Tips
+## How To Go Fast · Performance Tips · `fuzzysort.snapshot`
 
 ```js
 let targets = [{file: 'Monitor.cpp'}, {file: 'MeshRenderer.cpp'}]
 
-// filter out targets that you don't need to search! especially long ones!
-targets = targets.filter(t => t.file.length < 1000)
-
-// if your targets don't change, take an immutable snapshot first!
-targets = fuzzysort.snapshot(targets, {key: 'file'})
-
-const options = {
+let options = {
   limit: 100,    // don't return more results than you need!
   threshold: .5, // don't return bad results
 }
+
+// filter out targets that you don't need to search! especially long ones!
+targets = targets.filter(t => t.file.length < 1000)
+
+// BEST: if your targets don't change, take an immutable snapshot!
+let canSnapshot = true
+if(canSnapshot) targets = fuzzysort.snapshot(targets, {key: 'file'})
+
+// FALLBACK: if you can't snapshot, provide prepared targets instead of raw strings!
+if(!canSnapshot) {
+  targets.forEach(t => t.filePrepared = fuzzysort.prepare(t.file))
+  options.key = 'filePrepared'
+}
+
 fuzzysort.go('gotta', targets, options)
 fuzzysort.go('go',    targets, options)
 fuzzysort.go('fast',  targets, options)
@@ -147,12 +154,12 @@ fuzzysort.go('fast',  targets, options)
 
 ### Character remapping
 
-Searches use NFKD normalization, strip diacritics, and remap common lookalikes such as smart quotes, dash/slash variants, ellipses, and `ø`, `æ`, `œ`, `ß`, `ł`.
+Searches use NFKD normalization, strip diacritics, and remap common lookalikes such as smart quotes, dash/slash variants, ellipses, and øØłŁđĐðÐıħĦŧŦ
 
 Use `fuzzysort.remap()` to add or override mappings:
 
 ```js
-fuzzysort.remap({ ',': '.', 'æ': 'ae' })
+fuzzysort.remap({',': '.'}) // 12,5 = 12.5
 ```
 
 
@@ -170,13 +177,11 @@ when cloning a result (web worker threads) you may lose these getters, in this c
 
 #### v4.0.0
 - fuzzysort.js is now ESM instead of UMD
-- Major performance optimizations for the slowest cases. 10x faster cold starts
-- Added `fuzzysort.snapshot()`
+- Added `fuzzysort.snapshot()` for 10x faster cold starts
 - Added `fuzzysort.score()` and `fuzzysort.highlight()` for Web Worker support
-- `options.scoreFn` now works in all cases, not only when using `options.keys`
-- Automatically normalize similar looking characters, like special quotes
 - Added `fuzzysort.remap()` to define your own normalization
-- Closes all currently open issues except typos
+- Automatically normalize similar looking characters, like special quotes
+- `options.scoreFn` now works in all cases, not only when using `options.keys`
 
 #### v3.1.0
 - Automatically handle diacritics / accents / ligatures
