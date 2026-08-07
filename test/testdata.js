@@ -1,6 +1,13783 @@
 const testdata = {
 
-    pokemon_items: [{"name":"Master Ball","desc":"The best Ball with the ultimate level of performance. It will catch any wild Pokémon without fail.","type":"Pokeballs"},{"name":"Ultra Ball","desc":"An ultra-performance Ball that provides a higher Pokémon catch rate than a Great Ball.","type":"Pokeballs"},{"name":"Great Ball","desc":"A good, high-performance Ball that provides a higher Pokémon catch rate than a standard Poké Ball.","type":"Pokeballs"},{"name":"Poké Ball","desc":"A device for catching wild Pokémon. It is thrown like a ball at the target. It is designed as a capsule system.","type":"Pokeballs"},{"name":"Safari Ball","desc":"A special Poké Ball that is used only in the Great Marsh. It is decorated in a camouflage pattern.","type":"Pokeballs"},{"name":"Net Ball","desc":"A somewhat different Poké Ball that works especially well on Water- and Bug-type Pokémon.","type":"Pokeballs"},{"name":"Dive Ball","desc":"A somewhat different Poké Ball that works especially well on Pokémon that live underwater.","type":"Pokeballs"},{"name":"Nest Ball","desc":"A somewhat different Poké Ball that works especially well on weaker Pokémon in the wild.","type":"Pokeballs"},{"name":"Repeat Ball","desc":"A somewhat different Poké Ball that works especially well on Pokémon species that were previously caught.","type":"Pokeballs"},{"name":"Timer Ball","desc":"A somewhat different BALL that becomes progressively better the more turns there are in a battle.","type":"Pokeballs"},{"name":"Luxury Ball","desc":"A comfortable Poké Ball that makes a caught wild Pokémon quickly grow friendly.","type":"Pokeballs"},{"name":"Premier Ball","desc":"A somewhat rare Poké Ball that has been specially made to commemorate an event of some sort.","type":"Pokeballs"},{"name":"Dusk Ball","desc":"A somewhat different Poké Ball that makes it easier to catch wild Pokémon at night or in dark places like caves.","type":"Pokeballs"},{"name":"Heal Ball","desc":"A remedial Poké Ball that restores the caught Pokémon's HP and eliminates any status problem.","type":"Pokeballs"},{"name":"Quick Ball","desc":"A somewhat different Poké Ball that provides a better catch rate if it is used at the start of a wild encounter.","type":"Pokeballs"},{"name":"Cherish Ball","desc":"A quite rare Poké Ball that has been specially crafted to commemorate an occasion of some sort.","type":"Pokeballs"},{"name":"Potion","desc":"Restores 20 HP.","type":"Medicine"},{"name":"Antidote","desc":"A spray-type medicine. It lifts the effect of poison from one Pokémon.","type":"Medicine"},{"name":"Burn Heal","desc":"A spray-type medicine. It heals a single Pokémon that is suffering from a burn.","type":"Medicine"},{"name":"Ice Heal","desc":"A spray-type medicine. It defrosts a Pokémon that has been frozen solid.","type":"Medicine"},{"name":"Awakening","desc":"A spray-type medicine. It awakens a Pokémon from the clutches of sleep.","type":"Medicine"},{"name":"Paralyze Heal","desc":"A spray-type medicine. It eliminates paralysis from a single Pokémon.","type":"Medicine"},{"name":"Full Restore","desc":"A medicine that fully restores the HP and heals any status problems of a single Pokémon.","type":"Medicine"},{"name":"Max Potion","desc":"Fully restores HP.","type":"Medicine"},{"name":"Hyper Potion","desc":"Restores 120 HP.","type":"Medicine"},{"name":"Super Potion","desc":"Restores 60 HP.","type":"Medicine"},{"name":"Full Heal","desc":"A spray-type medicine. It heals all the status problems of a single Pokémon.","type":"Medicine"},{"name":"Revive","desc":"A medicine that revives a fainted Pokémon. It restores half the Pokémon's maximum HP.","type":"Medicine"},{"name":"Max Revive","desc":"A medicine that revives a fainted Pokémon. It fully restores the Pokémon's HP.","type":"Medicine"},{"name":"Fresh Water","desc":"Restores 30 HP.","type":"Medicine"},{"name":"Soda Pop","desc":"Restores 50 HP.","type":"Medicine"},{"name":"Lemonade","desc":"Restores 70 HP.","type":"Medicine"},{"name":"Moomoo Milk","desc":"Milk with a very high nutrition content. It restores the HP of one Pokémon by 100 points.","type":"Medicine"},{"name":"Energy Powder","desc":"Restores 60 HP but lowers Friendship.","type":"Medicine"},{"name":"Energy Root","desc":"Restores 120 HP but lowers Friendship.","type":"Medicine"},{"name":"Heal Powder","desc":"Heals all status problems, but lowers Friendship.","type":"Medicine"},{"name":"Revival Herb","desc":"Revives a Pokémon to max HP, but lowers Friendship.","type":"Medicine"},{"name":"Ether","desc":"It restores the PP of a Pokémon's selected move by a maximum of 10 points.","type":"Medicine"},{"name":"Max Ether","desc":"It fully restores the PP of a single selected move that has been learned by the target Pokémon.","type":"Medicine"},{"name":"Elixir","desc":"It restores the PP of all the moves learned by the targeted Pokémon by 10 points each.","type":"Medicine"},{"name":"Max Elixir","desc":"It fully restores the PP of all the moves learned by the targeted Pokémon.","type":"Medicine"},{"name":"Lava Cookie","desc":"Heals all major status conditions.","type":"Medicine"},{"name":"Berry Juice","desc":"A 100% pure juice made of Berries. It restores the HP of one Pokémon by just 20 points.","type":"Medicine"},{"name":"Sacred Ash","desc":"It revives all fainted Pokémon. In doing so, it also fully restores their HP.","type":"Medicine"},{"name":"HP Up","desc":"Increases HP EVs by 10.","type":"Medicine"},{"name":"Protein","desc":"Increases Attack EVs by 10.","type":"Medicine"},{"name":"Iron","desc":"Increases Defense EVs by 10.","type":"Medicine"},{"name":"Carbos","desc":"Increases Speed EVs by 10.","type":"Medicine"},{"name":"Calcium","desc":"Increases Special Attack EVs by 10.","type":"Medicine"},{"name":"Rare Candy","desc":"A candy that is packed with energy. It raises the level of a single Pokémon by one.","type":"Medicine"},{"name":"PP Up","desc":"It slightly raises the maximum PP of a selected move that has been learned by the target Pokémon.","type":"Medicine"},{"name":"Zinc","desc":"Increases Special Defense EVs by 10.","type":"Medicine"},{"name":"PP Max","desc":"It maximally raises the top PP of a selected move that has been learned by the target Pokémon.","type":"Medicine"},{"name":"Old Gateau","desc":"Heals all major status conditions.","type":"Medicine"},{"name":"Guard Spec.","desc":"Prevents stat reduction for five turns.","type":"Battle items"},{"name":"Dire Hit","desc":"Raises critical-hit ratio of a Pokémon in battle.","type":"Battle items"},{"name":"X Attack","desc":"Raises Attack of a Pokémon in battle.","type":"Battle items"},{"name":"X Defense","desc":"Raises Defense of a Pokémon in battle.","type":"Battle items"},{"name":"X Speed","desc":"Raises Speed of a Pokémon in battle.","type":"Battle items"},{"name":"X Accuracy","desc":"Raises Accuracy of a Pokémon in battle.","type":"Battle items"},{"name":"X Sp. Atk","desc":"Raises Special Attack of a Pokémon in battle.","type":"Battle items"},{"name":"X Sp. Def","desc":"Raises Special Defense of a Pokémon in battle.","type":"Battle items"},{"name":"Poké Doll","desc":"A doll that attracts Pokémon. Use it to flee from any battle with a wild Pokémon.","type":"General items"},{"name":"Fluffy Tail","desc":"An item that attracts Pokémon. Use it to flee from any battle with a wild Pokémon.","type":"General items"},{"name":"Blue Flute","desc":"A toy flute made from blue glass. A maniac will buy it for a high price.","type":"General items"},{"name":"Yellow Flute","desc":"A toy flute made from yellow glass. A maniac will buy it for a high price.","type":"General items"},{"name":"Red Flute","desc":"A toy flute made from red glass. A maniac will buy it for a high price.","type":"General items"},{"name":"Black Flute","desc":"A toy flute made from black glass. A maniac will buy it for a high price.","type":"General items"},{"name":"White Flute","desc":"A toy flute made from white glass. A maniac will buy it for a high price.","type":"General items"},{"name":"Shoal Salt","desc":"Pure salt that can be discovered deep inside the Shoal Cave. A maniac will buy it for a high price.","type":"General items"},{"name":"Shoal Shell","desc":"A pretty seashell that can be found deep inside the Shoal Cave. A maniac will buy it for a high price.","type":"General items"},{"name":"Red Shard","desc":"A small red shard. It appears to be from some sort of implement made long ago.","type":"General items"},{"name":"Blue Shard","desc":"A small blue shard. It appears to be from some sort of implement made long ago.","type":"General items"},{"name":"Yellow Shard","desc":"A small yellow shard. It appears to be from some sort of implement made long ago.","type":"General items"},{"name":"Green Shard","desc":"A small green shard. It appears to be from some sort of implement made long ago.","type":"General items"},{"name":"Super Repel","desc":"An item that prevents weak wild Pokémon from appearing for 200 steps after its use.","type":"General items"},{"name":"Max Repel","desc":"An item that prevents weak wild Pokémon from appearing for 250 steps after its use.","type":"General items"},{"name":"Escape Rope","desc":"A long, durable rope. Use it to escape instantly from a cave or a dungeon.","type":"General items"},{"name":"Repel","desc":"An item that prevents weak wild Pokémon from appearing for 100 steps after its use.","type":"General items"},{"name":"Sun Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Moon Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Fire Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Thunder Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Water Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Leaf Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Tiny Mushroom","desc":"A small and rare mushroom. It is sought after by collectors.","type":"General items"},{"name":"Big Mushroom","desc":"A large and rare mushroom. It is sought after by collectors.","type":"General items"},{"name":"Pearl","desc":"A somewhat-small pearl that sparkles in a pretty silver color. It can be sold cheaply to shops.","type":"General items"},{"name":"Big Pearl","desc":"A quite-large pearl that sparkles in a pretty silver color. It can be sold at a high price to shops.","type":"General items"},{"name":"Stardust","desc":"Lovely, red-colored sand with a loose, silky feel. It can be sold at a high price to shops.","type":"General items"},{"name":"Star Piece","desc":"A shard of a pretty gem that sparkles in a red color. It can be sold at a high price to shops.","type":"General items"},{"name":"Nugget","desc":"A nugget of pure gold that gives off a lustrous gleam. It can be sold at a high price to shops.","type":"General items"},{"name":"Heart Scale","desc":"A pretty, heart-shaped scale that is extremely rare. It glows faintly in the colors of the rainbow.","type":"General items"},{"name":"Honey","desc":"A sweet honey with a lush aroma that attracts wild Pokémon when it is used in grass, caves, or on special trees.","type":"General items"},{"name":"Growth Mulch","desc":"A fertilizer to be spread on soft soil in regions where Berries are grown. A maniac will buy it for a high price.","type":"General items"},{"name":"Damp Mulch","desc":"A fertilizer to be spread on soft soil in regions where Berries are grown. A maniac will buy it for a high price.","type":"General items"},{"name":"Stable Mulch","desc":"A fertilizer to be spread on soft soil in regions where Berries are grown. A maniac will buy it for a high price.","type":"General items"},{"name":"Gooey Mulch","desc":"A fertilizer to be spread on soft soil in regions where Berries are grown. A maniac will buy it for a high price.","type":"General items"},{"name":"Root Fossil","desc":"A fossil of an ancient Pokémon that lived in the sea. It appears to be part of a plant root.","type":"General items"},{"name":"Claw Fossil","desc":"A fossil of an ancient Pokémon that lived in the sea. It appears to be part of a claw.","type":"General items"},{"name":"Dome Fossil","desc":"A fossil of an ancient Pokémon that lived in the sea. It appears to be part of a shell.","type":"General items"},{"name":"Old Amber","desc":"A piece of amber that contains the genetic material of an ancient Pokémon. It is clear with a reddish tint.","type":"General items"},{"name":"Armor Fossil","desc":"A fossil from a prehistoric Pokémon that lived on the land. It appears to be part of a collar.","type":"General items"},{"name":"Skull Fossil","desc":"A fossil from a prehistoric Pokémon that lived on the land. It appears to be part of a head.","type":"General items"},{"name":"Rare Bone","desc":"A bone that is extremely valuable for Pokémon archeology. It can be sold for a high price to shops.","type":"General items"},{"name":"Shiny Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Dusk Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Dawn Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Oval Stone","desc":"Evolves Happiny when held.","type":"General items"},{"name":"Odd Keystone","desc":"A vital item that is needed to keep a stone tower from collapsing. Voices can be heard from it occasionally.","type":"General items"},{"name":"Griseous Orb","desc":"Increases the power of Dragon- and Ghost-type moves when held by Giratina, and changes it to Origin Forme.","type":"Hold items"},{"name":"Tea","desc":"An aromatic tea prepared by an old lady. It will slake even the worst thirst.","type":"Key Items"},{"name":"Autograph","desc":"The autograph you got from the Vermilion City Gym Leader, Lt. Surge. He wrote, \"Good luck!\"","type":"Key Items"},{"name":"Douse Drive","desc":"Changes Techno Blast to a Water-type move when held by Genesect.","type":"Hold items"},{"name":"Shock Drive","desc":"Changes Techno Blast to an Electric-type move when held by Genesect.","type":"Hold items"},{"name":"Burn Drive","desc":"Changes Techno Blast to a Fire-type move when held by Genesect.","type":"Hold items"},{"name":"Chill Drive","desc":"Changes Techno Blast to an Ice-type move when held by Genesect.","type":"Hold items"},{"name":"TM Case","desc":"A case that holds TMs and HMs. It is attached to the BAG's compartment for important items.","type":"Key Items"},{"name":"Sweet Heart","desc":"Very sweet chocolate. It restores the HP of one Pokémon by only 20 points.","type":"Medicine"},{"name":"Adamant Orb","desc":"Increases the power of Dragon- and Steel-type moves when held by Dialga.","type":"Hold items"},{"name":"Lustrous Orb","desc":"Increases the power of Dragon- and Water-type moves when held by Palkia.","type":"Hold items"},{"name":"Cheri Berry","desc":"If held by a Pokémon, it recovers from paralysis.","type":"Berries"},{"name":"Chesto Berry","desc":"If held by a Pokémon, it recovers from sleep.","type":"Berries"},{"name":"Pecha Berry","desc":"If held by a Pokémon, it recovers from poison.","type":"Berries"},{"name":"Rawst Berry","desc":"If held by a Pokémon, it recovers from a burn.","type":"Berries"},{"name":"Aspear Berry","desc":"If held by a Pokémon, it defrosts it.","type":"Berries"},{"name":"Leppa Berry","desc":"If held by a Pokémon, it restores a move's PP by 10.","type":"Berries"},{"name":"Oran Berry","desc":"If held by a Pokémon, it heals the user by just 10 HP.","type":"Berries"},{"name":"Persim Berry","desc":"If held by a Pokémon, it recovers from confusion.","type":"Berries"},{"name":"Lum Berry","desc":"If held by a Pokémon, it recovers from any status problem.","type":"Berries"},{"name":"Sitrus Berry","desc":"If held by a Pokémon, it heals the user's HP a little.","type":"Berries"},{"name":"Figy Berry","desc":"Restores HP if it's low, but may cause confusion.","type":"Berries"},{"name":"Wiki Berry","desc":"Restores HP if it's low, but may cause confusion.","type":"Berries"},{"name":"Mago Berry","desc":"Restores HP if it's low, but may cause confusion.","type":"Berries"},{"name":"Aguav Berry","desc":"Restores HP if it's low, but may cause confusion.","type":"Berries"},{"name":"Iapapa Berry","desc":"Restores HP if it's low, but may cause confusion.","type":"Berries"},{"name":"Razz Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Bluk Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Nanab Berry","desc":"A Berry to be used in cooking. Calms a Pokémon in battle, in Let's Go Pikachu/Eevee.","type":"Berries"},{"name":"Wepear Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Pinap Berry","desc":"A Berry to be used in cooking. Increases chances of getting items when a Pokémon is caught, in Pokémon Let's Go.","type":"Berries"},{"name":"Kelpsy Berry","desc":"Increases Friendship but lowers Attack EVs.","type":"Berries"},{"name":"Qualot Berry","desc":"Increases Friendship but lowers Defense EVs.","type":"Berries"},{"name":"Hondew Berry","desc":"Increases Friendship but lowers Special Attack EVs.","type":"Berries"},{"name":"Grepa Berry","desc":"Increases Friendship but lowers Special Defense EVs.","type":"Berries"},{"name":"Tamato Berry","desc":"Increases Friendship but lowers Speed EVs.","type":"Berries"},{"name":"Cornn Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Magost Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Rabuta Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Nomel Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Spelon Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Pamtre Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Watmel Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Durin Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Belue Berry","desc":"A Berry which is very rare in the Unova region. A maniac will buy it for a high price.","type":"Berries"},{"name":"Occa Berry","desc":"Weakens a supereffective Fire-type attack against the holding Pokémon.","type":"Berries"},{"name":"Passho Berry","desc":"Weakens a supereffective Water-type attack against the holding Pokémon.","type":"Berries"},{"name":"Wacan Berry","desc":"Weakens a supereffective Electric-type attack against the holding Pokémon.","type":"Berries"},{"name":"Rindo Berry","desc":"Weakens a supereffective Grass-type attack against the holding Pokémon.","type":"Berries"},{"name":"Yache Berry","desc":"Weakens a supereffective Ice-type attack against the holding Pokémon.","type":"Berries"},{"name":"Chople Berry","desc":"Weakens a supereffective Fighting-type attack against the holding Pokémon.","type":"Berries"},{"name":"Kebia Berry","desc":"Weakens a supereffective Poison-type attack against the holding Pokémon.","type":"Berries"},{"name":"Shuca Berry","desc":"Weakens a supereffective Ground-type attack against the holding Pokémon.","type":"Berries"},{"name":"Coba Berry","desc":"Weakens a supereffective Flying-type attack against the holding Pokémon.","type":"Berries"},{"name":"Payapa Berry","desc":"Weakens a supereffective Psychic-type attack against the holding Pokémon.","type":"Berries"},{"name":"Tanga Berry","desc":"Weakens a supereffective Bug-type attack against the holding Pokémon.","type":"Berries"},{"name":"Charti Berry","desc":"Weakens a supereffective Rock-type attack against the holding Pokémon.","type":"Berries"},{"name":"Kasib Berry","desc":"Weakens a supereffective Ghost-type attack against the holding Pokémon.","type":"Berries"},{"name":"Haban Berry","desc":"Weakens a supereffective Dragon-type attack against the holding Pokémon.","type":"Berries"},{"name":"Colbur Berry","desc":"Weakens a supereffective Dark-type attack against the holding Pokémon.","type":"Berries"},{"name":"Babiri Berry","desc":"Weakens a supereffective Steel-type attack against the holding Pokémon.","type":"Berries"},{"name":"Chilan Berry","desc":"Weakens a Normal-type attack against the Pokémon holding this berry.","type":"Berries"},{"name":"Liechi Berry","desc":"Raises Attack when HP is low.","type":"Berries"},{"name":"Ganlon Berry","desc":"Raises Defense when HP is low.","type":"Berries"},{"name":"Salac Berry","desc":"Raises Speed when HP is low.","type":"Berries"},{"name":"Petaya Berry","desc":"Raises Special Attack when HP is low.","type":"Berries"},{"name":"Apicot Berry","desc":"Raises Special Defense when HP is low.","type":"Berries"},{"name":"Lansat Berry","desc":"Increases critical-hit ratio when HP is low.","type":"Berries"},{"name":"Starf Berry","desc":"Sharply raises a random stat when HP is low.","type":"Berries"},{"name":"Enigma Berry","desc":"If held by a Pokémon, it restores its HP if it is hit by any supereffective attack.","type":"Berries"},{"name":"Micle Berry","desc":"Increases a move's accuracy when HP is low.","type":"Berries"},{"name":"Custap Berry","desc":"Holder can move first when HP is low.","type":"Berries"},{"name":"Jaboca Berry","desc":"If held by a Pokémon and a physical attack lands, the attacker also takes damage.","type":"Berries"},{"name":"Rowap Berry","desc":"If held by a Pokémon and a special attack lands, the attacker also takes damage.","type":"Berries"},{"name":"Bright Powder","desc":"Lowers the opponent's accuracy.","type":"Hold items"},{"name":"White Herb","desc":"An item to be held by a POKéMON. It restores any lowered stat in battle. It can be used only once.","type":"Hold items"},{"name":"Macho Brace","desc":"An item to be held by a Pokémon. It is a stiff and heavy brace that promotes strong growth but lowers Speed.","type":"Hold items"},{"name":"Exp. Share","desc":"An item to be held by a Pokémon. The holder gets a share of a battle's Exp. Points without battling.","type":"Hold items"},{"name":"Quick Claw","desc":"An item to be held by a Pokémon. A light, sharp claw that lets the bearer move first occasionally.","type":"Hold items"},{"name":"Soothe Bell","desc":"An item to be held by a Pokémon. It is a bell with a comforting chime that calms the holder and makes it friendly.","type":"Hold items"},{"name":"Mental Herb","desc":"An item to be held by a Pokémon. It snaps the holder out of infatuation. It can be used only once.","type":"Hold items"},{"name":"Choice Band","desc":"Raises Attack, but only one move can be used.","type":"Hold items"},{"name":"King's Rock","desc":"May cause opponent to flinch. Evolves Poliwhirl and Slowpoke when traded holding the item.","type":"Hold items"},{"name":"Silver Powder","desc":"Increases the power of Bug-type moves.","type":"Hold items"},{"name":"Amulet Coin","desc":"Doubles prize money if held.","type":"Hold items"},{"name":"Cleanse Tag","desc":"An item to be held by a Pokémon. It helps keep wild Pokémon away if the holder is the first one in the party.","type":"Hold items"},{"name":"Soul Dew","desc":"Increases the power of Psychic- and Dragon-type moves when held by Latios or Latias. Increases Sp.Atk/Sp.Def prior to Gen 7.","type":"Hold items"},{"name":"Deep Sea Tooth","desc":"Increases Special Attack when held by Clamperl. Evolves Clamperl when traded holding the item.","type":"Hold items"},{"name":"Deep Sea Scale","desc":"Increases Special Defense when held by Clamperl. Evolves Clamperl when traded holding the item.","type":"Hold items"},{"name":"Smoke Ball","desc":"An item to be held by a Pokémon. It enables the holder to flee from any wild Pokémon without fail.","type":"Hold items"},{"name":"Everstone","desc":"An item to be held by a Pokémon. The Pokémon holding this peculiar stone is prevented from evolving.","type":"Hold items"},{"name":"Focus Band","desc":"An item to be held by a Pokémon. The holder may endure a potential KO attack, leaving it with just 1 HP.","type":"Hold items"},{"name":"Lucky Egg","desc":"An item to be held by a Pokémon. It is an egg filled with happiness that earns extra Exp. Points in battle.","type":"Hold items"},{"name":"Scope Lens","desc":"Increases critical-hit ratio.","type":"Hold items"},{"name":"Metal Coat","desc":"Increases the power of Steel-type moves. Evolves Onix and Scyther when traded holding the item.","type":"Hold items"},{"name":"Leftovers","desc":"An item to be held by a Pokémon. The holder's HP is gradually restored during battle.","type":"Hold items"},{"name":"Dragon Scale","desc":"Evolves Seadra when traded holding the item.","type":"General items"},{"name":"Light Ball","desc":"An item to be held by PIKACHU. It is a puzzling orb that raises the Attack and Sp. Atk stat.","type":"Hold items"},{"name":"Soft Sand","desc":"Increases the power of Ground-type moves.","type":"Hold items"},{"name":"Hard Stone","desc":"Increases the power of Rock-type moves.","type":"Hold items"},{"name":"Miracle Seed","desc":"Increases the power of Grass-type moves.","type":"Hold items"},{"name":"Black Glasses","desc":"Increases the power of Dark-type moves.","type":"Hold items"},{"name":"Black Belt","desc":"Increases the power of Fighting-type moves.","type":"Hold items"},{"name":"Magnet","desc":"Increases the power of Electric-type moves.","type":"Hold items"},{"name":"Mystic Water","desc":"Increases the power of Water-type moves.","type":"Hold items"},{"name":"Sharp Beak","desc":"Increases the power of Flying-type moves.","type":"Hold items"},{"name":"Poison Barb","desc":"Increases the power of Poison-type moves.","type":"Hold items"},{"name":"Never-Melt Ice","desc":"Increases the power of Ice-type moves.","type":"Hold items"},{"name":"Spell Tag","desc":"Increases the power of Ghost-type moves.","type":"Hold items"},{"name":"Twisted Spoon","desc":"Increases the power of Psychic-type moves.","type":"Hold items"},{"name":"Charcoal","desc":"Increases the power of Fire-type moves.","type":"Hold items"},{"name":"Dragon Fang","desc":"Increases the power of Dragon-type moves.","type":"Hold items"},{"name":"Silk Scarf","desc":"Increases the power of Normal-type moves.","type":"Hold items"},{"name":"Upgrade","desc":"Evolves Porygon when traded holding the item.","type":"General items"},{"name":"Shell Bell","desc":"An item to be held by a Pokémon. The holder's HP is restored a little every time it inflicts damage.","type":"Hold items"},{"name":"Sea Incense","desc":"Increases the power of Water-type moves. Breeding Marill or Azumarill produces Azurill when held.","type":"Hold items"},{"name":"Lax Incense","desc":"Lowers the opponent's accuracy. Breeding Wobbuffet produces Wynaut when held.","type":"Hold items"},{"name":"Lucky Punch","desc":"Increases critical-hit ratio when held by Chansey.","type":"Hold items"},{"name":"Metal Powder","desc":"Increases Defense when held by Ditto.","type":"Hold items"},{"name":"Thick Club","desc":"Increases Attack when held by Cubone or Marowak.","type":"Hold items"},{"name":"Leek","desc":"Increases critical-hit ratio when held by Farfetch'd.","type":"Hold items"},{"name":"Red Scarf","desc":"Raises holder's Cool aspect in a Contest.","type":"General items"},{"name":"Blue Scarf","desc":"Raises holder's Beauty aspect in a Contest.","type":"General items"},{"name":"Pink Scarf","desc":"Raises holder's Cute aspect in a Contest.","type":"General items"},{"name":"Green Scarf","desc":"Raises holder's Smart aspect in a Contest.","type":"General items"},{"name":"Yellow Scarf","desc":"Raises holder's Tough aspect in a Contest.","type":"General items"},{"name":"Wide Lens","desc":"Increases the accuracy of moves.","type":"Hold items"},{"name":"Muscle Band","desc":"Increases the power of Physical-category moves.","type":"Hold items"},{"name":"Wise Glasses","desc":"Increases the power of Special-category moves.","type":"Hold items"},{"name":"Expert Belt","desc":"Increases the power of super-effective moves.","type":"Hold items"},{"name":"Light Clay","desc":"A Pokémon held item that extends the duration of barrier moves like Light Screen and Reflect used by the holder.","type":"Hold items"},{"name":"Life Orb","desc":"Increases the power of moves, but loses HP each turn.","type":"Hold items"},{"name":"Power Herb","desc":"A single-use item to be held by a Pokémon. It allows the immediate use of a move that charges on the first turn.","type":"Hold items"},{"name":"Toxic Orb","desc":"An item to be held by a Pokémon. It is a bizarre orb that badly poisons the holder in battle.","type":"Hold items"},{"name":"Flame Orb","desc":"An item to be held by a Pokémon. It is a bizarre orb that inflicts a burn on the holder in battle.","type":"Hold items"},{"name":"Quick Powder","desc":"Increases Speed when held by Ditto.","type":"Hold items"},{"name":"Focus Sash","desc":"An item to be held by a Pokémon. If it has full HP, the holder will endure one potential KO attack, leaving 1 HP.","type":"Hold items"},{"name":"Zoom Lens","desc":"Raises a move's accuracy if the holder moves after its target.","type":"Hold items"},{"name":"Metronome","desc":"Increases the power of moves used consecutively.","type":"Hold items"},{"name":"Iron Ball","desc":"A Pokémon held item that cuts Speed. It makes Flying-type and levitating holders susceptible to Ground moves.","type":"Hold items"},{"name":"Lagging Tail","desc":"Holder always attacks last.","type":"Hold items"},{"name":"Destiny Knot","desc":"A long, thin, bright-red string to be held by a Pokémon. If the holder becomes infatuated, the foe does too.","type":"Hold items"},{"name":"Black Sludge","desc":"A held item that gradually restores the HP of Poison-type Pokémon. It inflicts damage on all other types.","type":"Hold items"},{"name":"Icy Rock","desc":"A Pokémon held item that extends the duration of the move Hail used by the holder.","type":"Hold items"},{"name":"Smooth Rock","desc":"A Pokémon held item that extends the duration of the move Sandstorm used by the holder.","type":"Hold items"},{"name":"Heat Rock","desc":"A Pokémon held item that extends the duration of the move Sunny Day used by the holder.","type":"Hold items"},{"name":"Damp Rock","desc":"A Pokémon held item that extends the duration of the move Rain Dance used by the holder.","type":"Hold items"},{"name":"Grip Claw","desc":"A Pokémon held item that extends the duration of multiturn attacks like Bind and Wrap.","type":"Hold items"},{"name":"Choice Scarf","desc":"Raises Speed, but only one move can be used.","type":"Hold items"},{"name":"Sticky Barb","desc":"A held item that damages the holder on every turn. It may latch on to foes and allies that touch the holder.","type":"Hold items"},{"name":"Power Bracer","desc":"A Pokémon held item that promotes Attack gain on leveling, but reduces the Speed stat.","type":"Hold items"},{"name":"Power Belt","desc":"A Pokémon held item that promotes Defense gain on leveling, but reduces the Speed stat.","type":"Hold items"},{"name":"Power Lens","desc":"A Pokémon held item that promotes Sp. Atk gain on leveling, but reduces the Speed stat.","type":"Hold items"},{"name":"Power Band","desc":"A Pokémon held item that promotes Sp. Def gain on leveling, but reduces the Speed stat.","type":"Hold items"},{"name":"Power Anklet","desc":"A Pokémon held item that promotes Speed gain on leveling, but reduces the Speed stat.","type":"Hold items"},{"name":"Power Weight","desc":"A Pokémon held item that promotes HP gain on leveling, but reduces the Speed stat.","type":"Hold items"},{"name":"Shed Shell","desc":"A tough, discarded carapace to be held by a Pokémon. It enables the holder to switch with a waiting Pokémon in battle.","type":"Hold items"},{"name":"Big Root","desc":"Recovers more HP from HP-stealing moves.","type":"Hold items"},{"name":"Choice Specs","desc":"Raises Special Attack, but only one move can be used.","type":"Hold items"},{"name":"Flame Plate","desc":"Increases power of Fire-type moves. Changes Arceus' type to Fire.","type":"Hold items"},{"name":"Splash Plate","desc":"Increases power of Water-type moves. Changes Arceus' type to Water.","type":"Hold items"},{"name":"Zap Plate","desc":"Increases power of Electric-type moves. Changes Arceus' type to Electric.","type":"Hold items"},{"name":"Meadow Plate","desc":"Increases power of Grass-type moves. Changes Arceus' type to Grass.","type":"Hold items"},{"name":"Icicle Plate","desc":"Increases power of Ice-type moves. Changes Arceus' type to Ice.","type":"Hold items"},{"name":"Fist Plate","desc":"Increases power of Fighting-type moves. Changes Arceus' type to Fighting.","type":"Hold items"},{"name":"Toxic Plate","desc":"Increases power of Poison-type moves. Changes Arceus' type to Poison.","type":"Hold items"},{"name":"Earth Plate","desc":"Increases power of Ground-type moves. Changes Arceus' type to Ground.","type":"Hold items"},{"name":"Sky Plate","desc":"Increases power of Flying-type moves. Changes Arceus' type to Flying.","type":"Hold items"},{"name":"Mind Plate","desc":"Increases power of Psychic-type moves. Changes Arceus' type to Psychic.","type":"Hold items"},{"name":"Insect Plate","desc":"Increases power of Bug-type moves. Changes Arceus' type to Bug.","type":"Hold items"},{"name":"Stone Plate","desc":"Increases power of Rock-type moves. Changes Arceus' type to Rock.","type":"Hold items"},{"name":"Spooky Plate","desc":"Increases power of Ghost-type moves. Changes Arceus' type to Ghost.","type":"Hold items"},{"name":"Draco Plate","desc":"Increases power of Dragon-type moves. Changes Arceus' type to Dragon.","type":"Hold items"},{"name":"Dread Plate","desc":"Increases power of Dark-type moves. Changes Arceus' type to Dark.","type":"Hold items"},{"name":"Iron Plate","desc":"Increases power of Steel-type moves. Changes Arceus' type to Steel.","type":"Hold items"},{"name":"Odd Incense","desc":"Increases the power of Psychic-type moves. Breeding Mr. Mime produces Mime Jr. when held.","type":"Hold items"},{"name":"Rock Incense","desc":"Increases the power of Rock-type moves. Breeding Sudowoodo produces Bonsly when held.","type":"Hold items"},{"name":"Full Incense","desc":"Holder always attacks last. Breeding Snorlax produces Munchlax when held.","type":"Hold items"},{"name":"Wave Incense","desc":"Increases the power of Water-type moves. Breeding Mantine produces Mantyke when held.","type":"Hold items"},{"name":"Rose Incense","desc":"Increases the power of Grass-type moves. Breeding Roselia or Roserade produces Budew when held.","type":"Hold items"},{"name":"Luck Incense","desc":"Doubles prize money if held. Breeding Chansey or Blissey produces Happiny when held.","type":"Hold items"},{"name":"Pure Incense","desc":"Descreases the likelihood of meeting wild Pokémon. Breeding Chimecho produces Chingling when held.","type":"Hold items"},{"name":"Protector","desc":"Evolves Rhydon when traded holding the item.","type":"General items"},{"name":"Electirizer","desc":"Evolves Electabuzz when traded holding the item.","type":"General items"},{"name":"Magmarizer","desc":"Evolves Magmar when traded holding the item.","type":"General items"},{"name":"Dubious Disc","desc":"Evolves Porygon2 when traded holding the item.","type":"General items"},{"name":"Reaper Cloth","desc":"Evolves Dusclops when traded holding the item.","type":"General items"},{"name":"Razor Claw","desc":"Increases critical-hit ratio. Evolves Sneasel when held at night.","type":"Hold items"},{"name":"Razor Fang","desc":"May cause opponent to flinch. Evolves Gligar when held at night.","type":"Hold items"},{"name":"TM01","desc":"Teaches the move Mega Punch/Dynamic Punch/Focus Punch/Hone Claws/Work Up/Headbutt.","type":"Machines"},{"name":"TM02","desc":"Teaches the move Razor Wind/Headbutt/Dragon Claw/Taunt.","type":"Machines"},{"name":"TM03","desc":"Teaches the move Swords Dance/Curse/Water Pulse/Psyshock/Helping Hand.","type":"Machines"},{"name":"TM04","desc":"Teaches the move Whirlwind/Rollout/Calm Mind/Teleport.","type":"Machines"},{"name":"TM05","desc":"Teaches the move Mega Kick/Roar/Rest.","type":"Machines"},{"name":"TM06","desc":"Teaches the move Toxic/Light Screen.","type":"Machines"},{"name":"TM07","desc":"Teaches the move Horn Drill/Zap Cannon/Hail/Protect.","type":"Machines"},{"name":"TM08","desc":"Teaches the move Body Slam/Rock Smash/Bulk Up/Substitute.","type":"Machines"},{"name":"TM09","desc":"Teaches the move Take Down/Psych Up/Bullet Seed/Venoshock/Reflect.","type":"Machines"},{"name":"TM10","desc":"Teaches the move Double-Edge/Hidden Power/Dig.","type":"Machines"},{"name":"TM11","desc":"Teaches the move BubbleBeam/Sunny Day/Will-O-Wisp.","type":"Machines"},{"name":"TM12","desc":"Teaches the move Water Gun/Sweet Scent/Taunt/Facade.","type":"Machines"},{"name":"TM13","desc":"Teaches the move Snore/Ice Beam/Brick Break.","type":"Machines"},{"name":"TM14","desc":"Teaches the move Blizzard/Fly.","type":"Machines"},{"name":"TM15","desc":"Teaches the move Hyper Beam/Seismic Toss.","type":"Machines"},{"name":"TM16","desc":"Teaches the move Pay Day/Icy Wind/Light Screen/Thunder Wave.","type":"Machines"},{"name":"TM17","desc":"Teaches the move Submission/Protect/Dragon Tail.","type":"Machines"},{"name":"TM18","desc":"Teaches the move Counter/Rain Dance/U-turn.","type":"Machines"},{"name":"TM19","desc":"Teaches the move Seismic Toss/Giga Drain/Telekinesis/Roost/Iron Tail.","type":"Machines"},{"name":"TM20","desc":"Teaches the move Rage/Endure/Safeguard/Dark Pulse.","type":"Machines"},{"name":"TM21","desc":"Teaches the move Mega Drain/Frustration/Foul Play.","type":"Machines"},{"name":"TM22","desc":"Teaches the move SolarBeam/Rock Slide.","type":"Machines"},{"name":"TM23","desc":"Teaches the move Dragon Rage/Iron Tail/Smack Down/Thunder Punch.","type":"Machines"},{"name":"TM24","desc":"Teaches the move Thunderbolt/DragonBreath/X-Scissor.","type":"Machines"},{"name":"TM25","desc":"Teaches the move Thunder/Waterfall.","type":"Machines"},{"name":"TM26","desc":"Teaches the move Earthquake/Poison Jab.","type":"Machines"},{"name":"TM27","desc":"Teaches the move Fissure/Return/Toxic.","type":"Machines"},{"name":"TM28","desc":"Teaches the move Dig/Leech Life/Tri Attack.","type":"Machines"},{"name":"TM29","desc":"Teaches the move Psychic/Scald.","type":"Machines"},{"name":"TM30","desc":"Teaches the move Teleport/Shadow Ball/Bulk Up.","type":"Machines"},{"name":"TM31","desc":"Teaches the move Mimic/Mud-Slap/Brick Break/Fire Punch.","type":"Machines"},{"name":"TM32","desc":"Teaches the move Double Team/Dazzling Gleam.","type":"Machines"},{"name":"TM33","desc":"Teaches the move Ice Punch/Reflect/Calm Mind.","type":"Machines"},{"name":"TM34","desc":"Teaches the move Bide/Swagger/Shock Wave/Sludge Wave/Dragon Pulse.","type":"Machines"},{"name":"TM35","desc":"Teaches the move Metronome/Sleep Talk/Flamethrower/Ice Punch.","type":"Machines"},{"name":"TM36","desc":"Teaches the move Selfdestruct/Sludge Bomb/Thunderbolt.","type":"Machines"},{"name":"TM37","desc":"Teaches the move Egg Bomb/Sandstorm/Flamethrower.","type":"Machines"},{"name":"TM38","desc":"Teaches the move Fire Blast/Thunder.","type":"Machines"},{"name":"TM39","desc":"Teaches the move Swift/Rock Tomb/Outrage.","type":"Machines"},{"name":"TM40","desc":"Teaches the move Skull Bash/Defense Curl/Aerial Ace/Psychic.","type":"Machines"},{"name":"TM41","desc":"Teaches the move Softboiled/ThunderPunch/Torment/Earthquake.","type":"Machines"},{"name":"TM42","desc":"Teaches the move Dream Eater/Facade/Self-Destruct.","type":"Machines"},{"name":"TM43","desc":"Teaches the move Sky Attack/Detect/Secret Power/Flame Charge/Shadow Ball.","type":"Machines"},{"name":"TM44","desc":"Teaches the move Rest/Play Rough.","type":"Machines"},{"name":"TM45","desc":"Teaches the move Thunder Wave/Attract/Solar Beam.","type":"Machines"},{"name":"TM46","desc":"Teaches the move Psywave/Thief/Fire Blast.","type":"Machines"},{"name":"TM47","desc":"Teaches the move Explosion/Steel Wing/Low Sweep/Surf.","type":"Machines"},{"name":"TM48","desc":"Teaches the move Rock Slide/Fire Punch/Skill Swap/Round/Hyper Beam.","type":"Machines"},{"name":"TM49","desc":"Teaches the move Tri Attack/Fury Cutter/Snatch/Echoed Voice/Superpower.","type":"Machines"},{"name":"TM50","desc":"Teaches the move Substitute/Nightmare/Overheat/Roost.","type":"Machines"},{"name":"TM51","desc":"Teaches the move Roost/Ally Switch/Steel Wing/Blizzard.","type":"Machines"},{"name":"TM52","desc":"Teaches the move Focus Blast/Sludge Bomb.","type":"Machines"},{"name":"TM53","desc":"Teaches the move Energy Ball/Mega Drain.","type":"Machines"},{"name":"TM54","desc":"Teaches the move False Swipe/Flash Cannon.","type":"Machines"},{"name":"TM55","desc":"Teaches the move Brine/Scald/Ice Beam.","type":"Machines"},{"name":"TM56","desc":"Teaches the move Fling/Stealth Rock.","type":"Machines"},{"name":"TM57","desc":"Teaches the move Charge Beam/Pay Day.","type":"Machines"},{"name":"TM58","desc":"Teaches the move Endure/Sky Drop/Drill Run.","type":"Machines"},{"name":"TM59","desc":"Teaches the move Dragon Pulse/Incinerate/Brutal Swing/Dream Eater.","type":"Machines"},{"name":"TM60","desc":"Teaches the move Drain Punch/Quash/Megahorn.","type":"Machines"},{"name":"TM61","desc":"Teaches the move Will-O-Wisp.","type":"Machines"},{"name":"TM62","desc":"Teaches the move Silver Wind/Acrobatics.","type":"Machines"},{"name":"TM63","desc":"Teaches the move Embargo.","type":"Machines"},{"name":"TM64","desc":"Teaches the move Explosion.","type":"Machines"},{"name":"TM65","desc":"Teaches the move Shadow Claw.","type":"Machines"},{"name":"TM66","desc":"Teaches the move Payback.","type":"Machines"},{"name":"TM67","desc":"Teaches the move Recycle/Retaliate/Smart Strike.","type":"Machines"},{"name":"TM68","desc":"Teaches the move Giga Impact.","type":"Machines"},{"name":"TM69","desc":"Teaches the move Rock Polish.","type":"Machines"},{"name":"TM70","desc":"Teaches the move Flash/Aurora Veil.","type":"Machines"},{"name":"TM71","desc":"Teaches the move Stone Edge.","type":"Machines"},{"name":"TM72","desc":"Teaches the move Avalanche/Volt Switch.","type":"Machines"},{"name":"TM73","desc":"Teaches the move Thunder Wave.","type":"Machines"},{"name":"TM74","desc":"Teaches the move Gyro Ball.","type":"Machines"},{"name":"TM75","desc":"Teaches the move Swords Dance.","type":"Machines"},{"name":"TM76","desc":"Teaches the move Stealth Rock/Struggle Bug/Fly.","type":"Machines"},{"name":"TM77","desc":"Teaches the move Psych Up.","type":"Machines"},{"name":"TM78","desc":"Teaches the move Captivate/Bulldoze.","type":"Machines"},{"name":"TM79","desc":"Teaches the move Dark Pulse/Frost Breath.","type":"Machines"},{"name":"TM80","desc":"Teaches the move Rock Slide.","type":"Machines"},{"name":"TM81","desc":"Teaches the move X-Scissor.","type":"Machines"},{"name":"TM82","desc":"Teaches the move Sleep Talk/Dragon Tail.","type":"Machines"},{"name":"TM83","desc":"Teaches the move Natural Gift/Work Up/Infestation.","type":"Machines"},{"name":"TM84","desc":"Teaches the move Poison Jab.","type":"Machines"},{"name":"TM85","desc":"Teaches the move Dream Eater.","type":"Machines"},{"name":"TM86","desc":"Teaches the move Grass Knot.","type":"Machines"},{"name":"TM87","desc":"Teaches the move Swagger.","type":"Machines"},{"name":"TM88","desc":"Teaches the move Pluck/Sleep Talk.","type":"Machines"},{"name":"TM89","desc":"Teaches the move U-turn.","type":"Machines"},{"name":"TM90","desc":"Teaches the move Substitute.","type":"Machines"},{"name":"TM91","desc":"Teaches the move Flash Cannon.","type":"Machines"},{"name":"TM92","desc":"Teaches the move Trick Room.","type":"Machines"},{"name":"HM01","desc":"Teaches the move Cut.","type":"Machines"},{"name":"HM02","desc":"Teaches the move Fly.","type":"Machines"},{"name":"HM03","desc":"Teaches the move Surf.","type":"Machines"},{"name":"HM04","desc":"Teaches the move Strength.","type":"Machines"},{"name":"HM05","desc":"Teaches the move Flash/Defog/Whirlpool/Waterfall.","type":"Machines"},{"name":"HM06","desc":"Teaches the move Whirlpool/Rock Smash/Dive.","type":"Machines"},{"name":"Explorer Kit","desc":"A bag filled with convenient tools for exploring. It provides access to the Underground.","type":"Key Items"},{"name":"Loot Sack","desc":"A sturdy, spacious bag that is used to carry loot obtained in the coal mine.","type":"Key Items"},{"name":"Rule Book","desc":"It lists the rules for holding battles. For linked battles, you may choose which set of rules you wish to use.","type":"Key Items"},{"name":"Poké Radar","desc":"A tool that can search out Pokémon that are hiding in grass. Its battery is recharged as you walk.","type":"Key Items"},{"name":"Point Card","desc":"A card that lists the Battle Points you have earned. ","type":"Key Items"},{"name":"Journal","desc":"A notebook that keeps a day-to-day record of your adventure so far. ","type":"Key Items"},{"name":"Seal Case","desc":"A case for storing Seals that can be applied to the capsule cases of Poké Balls.","type":"Key Items"},{"name":"Fashion Case","desc":"A lovely case to store colorful Props for your Pokémon to wear in a musical.","type":"Key Items"},{"name":"Seal Bag","desc":"A tiny bag that can hold ten Seals for decorating Poké Balls.","type":"Key Items"},{"name":"Pal Pad","desc":"A convenient notepad that is used for registering your friends, Friend Codes, and keeping a record of game play.","type":"Key Items"},{"name":"Works Key","desc":"A large key for operating the doors of the Valley Windworks in the canyon. It was held by a Team Galactic Grunt.","type":"Key Items"},{"name":"Old Charm","desc":"An ancient good-luck charm made of Pokémon bones to be taken to the elder of Celestic Town.","type":"Key Items"},{"name":"Galactic Key","desc":"A card key for disengaging security systems in the Galactic HQ. Losing it can result in punishment, apparently.","type":"Key Items"},{"name":"Red Chain","desc":"A mythical chain that is said to link the legendary Pokémon that created the Sinnoh region.","type":"Key Items"},{"name":"Town Map","desc":"A very convenient map that can be viewed anytime. It even shows your present location.","type":"Key Items"},{"name":"Vs. Seeker","desc":"A device that indicates Trainers who want to battle. Its battery charges while you walk.","type":"Key Items"},{"name":"Coin Case","desc":"A case for holding Coins obtained at the Game Corner. It holds up to 50,000 Coins.","type":"Key Items"},{"name":"Old Rod","desc":"An old and beat-up fishing rod. Use it by any body of water to fish for wild aquatic Pokémon.","type":"Key Items"},{"name":"Good Rod","desc":"A new, good-quality fishing rod. Use it by any body of water to fish for wild aquatic Pokémon.","type":"Key Items"},{"name":"Super Rod","desc":"An awesome, high-tech fishing rod. Use it by any body of water to fish for wild aquatic Pokémon.","type":"Key Items"},{"name":"Sprayduck","desc":"A watering can shaped like a PSYDUCK. It helps promote healthy growth of Berries planted in soft soil.","type":"Key Items"},{"name":"Poffin Case","desc":"A case for storing Poffin cooked from Berries. ","type":"Key Items"},{"name":"Suite Key","desc":"A key to one of the suites at the luxury hotel by a lake. For some odd reason, it often disappears.","type":"Key Items"},{"name":"Oak's Letter","desc":"A letter from Prof. Oak. Written in it is a request for you to go to Rt. 224.","type":"Key Items"},{"name":"Lunar Wing","desc":"A feather that glows like the moon. It is said to possess the power to dispel nightmares.","type":"Key Items"},{"name":"Member Card","desc":"A card needed for entering the inn in Canalave City. Oddly, the last date marked on it was 50 years ago.","type":"Key Items"},{"name":"Azure Flute","desc":"A flute that puts out echoing sounds that do not seem to be of this world. It is unknown who made it.","type":"Key Items"},{"name":"Contest Pass","desc":"The pass required for entering POKéMON CONTESTS. It has a drawing of an award ribbon on it.","type":"Key Items"},{"name":"Magma Stone","desc":"A stone formed when boulders melted in intensely hot magma, then hardened. Magma remains sealed inside.","type":"Key Items"},{"name":"Coupon 1","desc":"A coupon to be exchanged for a Pokémon Watch (Pokétch for short). Three coupons are needed.","type":"Key Items"},{"name":"Coupon 2","desc":"A coupon to be exchanged for a Pokémon Watch (Pokétch for short). Three coupons are needed.","type":"Key Items"},{"name":"Coupon 3","desc":"A coupon to be exchanged for a Pokémon Watch (Pokétch for short). Three coupons are needed.","type":"Key Items"},{"name":"Secret Potion","desc":"A fantastic medicine dispensed by the pharmacy in Cianwood City. It fully heals a Pokémon of any ailment.","type":"Key Items"},{"name":"Vs. Recorder","desc":"An amazing device that can record a battle either between friends or at a special battle facility.","type":"Key Items"},{"name":"Gracidea","desc":"A flower sometimes bundled in bouquets to convey gratitude on special occasions like birthdays.","type":"Key Items"},{"name":"Apricorn Box","desc":"A handy box where you can store up to 99 Apricorns of each kind.","type":"Key Items"},{"name":"Unown Report","desc":"A report of all the discovered kinds of UNOWN.","type":"Key Items"},{"name":"Berry Pots","desc":"Handy containers for cultivating Berries wherever you go.","type":"Key Items"},{"name":"Dowsing Machine","desc":"Searches for hidden items on the ground.","type":"Key Items"},{"name":"Blue Card","desc":"A card to save points for the Buena's Password show.","type":"Key Items"},{"name":"Slowpoke Tail","desc":"A very tasty tail of something. It sells for a high price.","type":"Key Items"},{"name":"Clear Bell","desc":"A very old-fashioned bell that makes a gentle ringing.","type":"Key Items"},{"name":"Squirt Bottle","desc":"A bottle used for watering plants in the Berry Pots.","type":"Key Items"},{"name":"Red Scale","desc":"A scale from the red GYARADOS. It glows red like a flame.","type":"Key Items"},{"name":"Lost Item","desc":"The Mime Jr. doll that was lost by the Copycat.","type":"Key Items"},{"name":"Pass","desc":"A ticket required for riding the Magnet Train. It allows you to ride whenever and however much you'd like.","type":"Key Items"},{"name":"Machine Part","desc":"An important machine part for the Power Plant that was stolen.","type":"Key Items"},{"name":"Silver Wing","desc":"A strange, silvery feather that sparkles.","type":"Key Items"},{"name":"Rainbow Wing","desc":"A mystical rainbow feather that sparkles.","type":"Key Items"},{"name":"Mystery Egg","desc":"A mysterious Egg obtained from Mr. Pokémon. What's in the Egg is unknown.","type":"Key Items"},{"name":"Red Apricorn","desc":"A red Apricorn. It assails your nostrils.","type":"General items"},{"name":"Blue Apricorn","desc":"A blue Apricorn. It smells a bit like grass.","type":"General items"},{"name":"Yellow Apricorn","desc":"A yellow Apricorn. It has an invigorating scent.","type":"General items"},{"name":"Green Apricorn","desc":"A green Apricorn. It has a mysterious, aromatic scent.","type":"General items"},{"name":"Pink Apricorn","desc":"A pink Apricorn. It has a nice, sweet scent.","type":"General items"},{"name":"White Apricorn","desc":"A white Apricorn. It doesn't smell like anything.","type":"General items"},{"name":"Black Apricorn","desc":"A black Apricorn It has an indescribable scent.","type":"General items"},{"name":"Fast Ball","desc":"A Poké Ball that makes it easier to catch Pokémon which are quick to run away.","type":"Pokeballs"},{"name":"Level Ball","desc":"A Poké Ball for catching Pokémon that are a lower level than your own.","type":"Pokeballs"},{"name":"Lure Ball","desc":"A Poké Ball for catching Pokémon hooked by a Rod when fishing.","type":"Pokeballs"},{"name":"Heavy Ball","desc":"A Poké Ball for catching very heavy Pokémon.","type":"Pokeballs"},{"name":"Love Ball","desc":"Poké Ball for catching Pokémon that are the opposite gender of your Pokémon.","type":"Pokeballs"},{"name":"Friend Ball","desc":"A Poké Ball that makes caught Pokémon more friendly.","type":"Pokeballs"},{"name":"Moon Ball","desc":"A Poké Ball for catching Pokémon that evolve using the Moon Stone.","type":"Pokeballs"},{"name":"Sport Ball","desc":"A special Poké Ball for the Bug-Catching Contest.","type":"Pokeballs"},{"name":"Park Ball","desc":"A special Poké Ball for the Pal Park.","type":"Pokeballs"},{"name":"Photo Album","desc":"A nice photo album for storing all the photos taken along your adventure.","type":"Key Items"},{"name":"GB Sounds","desc":"A music player that allows you to listen to nostalgic songs. It's operated with a single switch.","type":"Key Items"},{"name":"Tidal Bell","desc":"A very old-fashioned bell that makes a gentle ringing.","type":"Key Items"},{"name":"Rage Candy Bar","desc":"Heals all major status conditions.","type":"Medicine"},{"name":"Data Card 01","desc":"It holds Pokéathlon records. It's a card that shows how many victories you've had.","type":"Key Items"},{"name":"Data Card 02","desc":"It holds Pokéathlon records. It's a card that shows how many losses you've had.","type":"Key Items"},{"name":"Data Card 03","desc":"It holds Pokéathlon records. It's a card that shows how many times your Pokémon have dashed.","type":"Key Items"},{"name":"Data Card 04","desc":"It holds Pokéathlon records. It's a card that shows how many times your Pokémon have jumped.","type":"Key Items"},{"name":"Data Card 05","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won the Hurdle Dash.","type":"Key Items"},{"name":"Data Card 06","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won the Relay Run.","type":"Key Items"},{"name":"Data Card 07","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won Pennant Capture.","type":"Key Items"},{"name":"Data Card 08","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won Block Smash.","type":"Key Items"},{"name":"Data Card 09","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won Disc Catch.","type":"Key Items"},{"name":"Data Card 10","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won Snow Throw.","type":"Key Items"},{"name":"Data Card 11","desc":"It holds Pokéathlon records. It's a card that shows how many points your Pokémon scored.","type":"Key Items"},{"name":"Data Card 12","desc":"It holds Pokéathlon records. It's a card that shows how many times your Pokémon have failed.","type":"Key Items"},{"name":"Data Card 13","desc":"It holds Pokéathlon records. It's a card that shows how many times your Pokémon impeded themselves.","type":"Key Items"},{"name":"Data Card 14","desc":"It holds Pokéathlon records. It's a card that shows how many times your Pokémon have tackled.","type":"Key Items"},{"name":"Data Card 15","desc":"It holds Pokéathlon records. It's a card that shows how many times your Pokémon have fallen down.","type":"Key Items"},{"name":"Data Card 16","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won Ring Drop.","type":"Key Items"},{"name":"Data Card 17","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won Lamp Jump.","type":"Key Items"},{"name":"Data Card 18","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won Circle Push.","type":"Key Items"},{"name":"Data Card 19","desc":"It holds Pokéathlon records. It's a card that shows how many Link Pokéathlon wins you've had.","type":"Key Items"},{"name":"Data Card 20","desc":"It holds Pokéathlon records. It's a card that shows how many Link Pokéathlon losses you've had.","type":"Key Items"},{"name":"Data Card 21","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won an event.","type":"Key Items"},{"name":"Data Card 22","desc":"It holds Pokéathlon records. It's a card that shows how many times you've lost an event.","type":"Key Items"},{"name":"Data Card 23","desc":"It holds Pokéathlon records. It's a card that shows how many times you've switched Pokémon.","type":"Key Items"},{"name":"Data Card 24","desc":"It holds Pokéathlon records. It's a card that shows how many times you've won Goal Roll.","type":"Key Items"},{"name":"Data Card 25","desc":"It holds Pokéathlon records. It's a card that shows how many times your Pokémon won individual prizes.","type":"Key Items"},{"name":"Data Card 26","desc":"It holds Pokéathlon records. It's a card that shows how many times you've instructed your Pokémon.","type":"Key Items"},{"name":"Data Card 27","desc":"It holds Pokéathlon records. It's a card that shows how much time you've spent in the Pokéathlon.","type":"Key Items"},{"name":"Jade Orb","desc":" A shiny green orb that is said to have a legend and has a deep connection with the Hoenn region.","type":"Key Items"},{"name":"Lock Capsule","desc":"A sturdy Capsule that can only be opened with a special key.","type":"Key Items"},{"name":"Red Orb","desc":"A shiny red orb that is said to have a legend and has a deep connection with the Hoenn region.","type":"Key Items"},{"name":"Blue Orb","desc":"A shiny blue orb that is said to have a legend and has a deep connection with the Hoenn region.","type":"Key Items"},{"name":"Enigma Stone","desc":"A crystal ball that was excavated from the ground. A very beautiful stone that is covered with bits of rock and earth.","type":"Key Items"},{"name":"Eviolite","desc":"A mysterious evolutionary lump. When held, it raises the Defense and Sp. Def of a Pokémon that can still evolve.","type":"Hold items"},{"name":"Float Stone","desc":"A very light stone. It reduces the weight of a Pokémon when held.","type":"Hold items"},{"name":"Rocky Helmet","desc":"If the holder of this item takes damage, the attacker will also be damaged upon contact.","type":"Hold items"},{"name":"Air Balloon","desc":"When held by a Pokémon, the Pokémon will float into the air. When the holder is attacked, this item will burst.","type":"Hold items"},{"name":"Red Card","desc":"A card with a mysterious power. When the holder is struck by a foe, the attacker is removed from battle.","type":"Hold items"},{"name":"Ring Target","desc":"Moves that would otherwise have no effect will land on the Pokémon that holds it.","type":"Hold items"},{"name":"Binding Band","desc":"A band that increases the power of binding moves when held.","type":"Hold items"},{"name":"Absorb Bulb","desc":"A consumable bulb. If the holder is hit by a Water-type move, its Sp. Atk will rise.","type":"Hold items"},{"name":"Cell Battery","desc":"A consumable battery. If the holder is hit by an Electric-type move, its Attack will rise.","type":"Hold items"},{"name":"Eject Button","desc":"If the holder is hit by an attack, it will switch with another Pokémon in your party.","type":"Hold items"},{"name":"Fire Gem","desc":"Increases the power of a Fire-type move only once.","type":"Hold items"},{"name":"Water Gem","desc":"Increases the power of a Water-type move only once.","type":"Hold items"},{"name":"Electric Gem","desc":"Increases the power of an Electric-type move only once.","type":"Hold items"},{"name":"Grass Gem","desc":"Increases the power of a Grass-type move only once.","type":"Hold items"},{"name":"Ice Gem","desc":"Increases the power of an Ice-type move only once.","type":"Hold items"},{"name":"Fighting Gem","desc":"Increases the power of a Fighting-type move only once.","type":"Hold items"},{"name":"Poison Gem","desc":"Increases the power of a Poison-type move only once.","type":"Hold items"},{"name":"Ground Gem","desc":"Increases the power of a Ground-type move only once.","type":"Hold items"},{"name":"Flying Gem","desc":"Increases the power of a Flying-type move only once.","type":"Hold items"},{"name":"Psychic Gem","desc":"Increases the power of a Psychic-type move only once.","type":"Hold items"},{"name":"Rock Gem","desc":"Increases the power of a Rock-type move only once.","type":"Hold items"},{"name":"Ghost Gem","desc":"Increases the power of a Ghost-type move only once.","type":"Hold items"},{"name":"Dragon Gem","desc":"Increases the power of a Dragon-type move only once.","type":"Hold items"},{"name":"Dark Gem","desc":"Increases the power of a Dark-type move only once.","type":"Hold items"},{"name":"Steel Gem","desc":"Increases the power of a Steel-type move only once.","type":"Hold items"},{"name":"Normal Gem","desc":"Increases the power of a Normal-type move only once.","type":"Hold items"},{"name":"Cover Fossil","desc":"A fossil of an ancient Pokémon that lived in the sea in ancient times. It appears to be part of its back.","type":"General items"},{"name":"Plume Fossil","desc":"A fossil of an ancient Pokémon that flew in the sky in ancient times. It appears to be part of its wing.","type":"General items"},{"name":"Liberty Pass","desc":"A special pass to go to Liberty Garden. Board the ship in Castelia City.","type":"Key Items"},{"name":"Pass Orb","desc":"A mysterious orb containing the power of the Unova region, to be used when generating Pass Power.","type":"Hold items"},{"name":"Dream Ball","desc":"A special Poké Ball that appears out of nowhere in a bag at the Entree Forest. It can catch any Pokémon.","type":"Pokeballs"},{"name":"Poké Toy","desc":"An item that attracts Pokémon. Use it to flee from any battle with a wild Pokémon.","type":"General items"},{"name":"Prop Case","desc":"A lovely case to store colorful Props for your Pokémon to wear in a musical.","type":"Key Items"},{"name":"Dragon Skull","desc":"A skull of a Pokémon which was said to have braved the angry waters to fly around the world.","type":"Key Items"},{"name":"Balm Mushroom","desc":"A rare mushroom which gives off a nice fragrance. A maniac will buy it for a high price.","type":"General items"},{"name":"Big Nugget","desc":"A big nugget of pure gold that gives off a lustrous gleam. A maniac will buy it for a high price.","type":"General items"},{"name":"Pearl String","desc":"Very large pearls that sparkle in a pretty silver color. A maniac will buy them for a high price.","type":"General items"},{"name":"Comet Shard","desc":"A shard which fell to the ground when a comet approached. A maniac will buy it for a high price.","type":"General items"},{"name":"Relic Copper","desc":"A copper coin used in a civilization about 3,000 years ago. A maniac will buy it for a high price.","type":"General items"},{"name":"Relic Silver","desc":"A silver coin used in a civilization about 3,000 years ago. A maniac will buy it for a high price.","type":"General items"},{"name":"Relic Gold","desc":"A gold coin used in a civilization about 3,000 years ago. A maniac will buy it for a high price.","type":"General items"},{"name":"Relic Vase","desc":"A vase made in a civilization about 3,000 years ago. A maniac will buy it for a high price.","type":"General items"},{"name":"Relic Band","desc":"A bracelet made in a civilization about 3,000 years ago. A maniac will buy it for a high price.","type":"General items"},{"name":"Relic Statue","desc":"A stone figure made in a civilization about 3,000 years ago. A maniac will buy it for a high price.","type":"General items"},{"name":"Relic Crown","desc":"A crown made in a civilization about 3,000 years ago. A maniac will buy it for a high price.","type":"General items"},{"name":"Casteliacone","desc":"Heals all major status conditions.","type":"Medicine"},{"name":"Dire Hit 2","desc":"Raises a Pokémon's critical-hit ratio in battle.","type":"Battle items"},{"name":"X Speed 2","desc":"Sharply raises Speed of a Pokémon in battle.","type":"Battle items"},{"name":"X Sp. Atk 2","desc":"Sharply raises Special Attack of a Pokémon in battle.","type":"Battle items"},{"name":"X Sp. Def 2","desc":"Sharply raises Special Defense of a Pokémon in battle.","type":"Battle items"},{"name":"X Defense 2","desc":"Sharply raises Defense of a Pokémon in battle.","type":"Battle items"},{"name":"X Attack 2","desc":"Sharply raises Attack of a Pokémon in battle.","type":"Battle items"},{"name":"X Accuracy 2","desc":"Sharply raises Accuracy of a Pokémon in battle.","type":"Battle items"},{"name":"X Speed 3","desc":"Drastically raises Speed of a Pokémon in battle.","type":"Battle items"},{"name":"X Sp. Atk 3","desc":"Drastically raises Special Attack of a Pokémon in battle.","type":"Battle items"},{"name":"X Sp. Def 3","desc":"Drastically raises Special Defense of a Pokémon in battle.","type":"Battle items"},{"name":"X Defense 3","desc":"Drastically raises Defense of a Pokémon in battle.","type":"Battle items"},{"name":"X Attack 3","desc":"Drastically raises Attack of a Pokémon in battle.","type":"Battle items"},{"name":"X Accuracy 3","desc":"Drastically raises Accuracy of a Pokémon in battle.","type":"Battle items"},{"name":"X Speed 6","desc":"Immensely raises Speed of a Pokémon in battle.","type":"Battle items"},{"name":"X Sp. Def 6","desc":"Immensely raises Special Defense of a Pokémon in battle.","type":"Battle items"},{"name":"X Defense 6","desc":"Immensely raises Defense of a Pokémon in battle.","type":"Battle items"},{"name":"X Attack 6","desc":"Immensely raises Attack of a Pokémon in battle.","type":"Battle items"},{"name":"X Accuracy 6","desc":"Immensely raises Accuracy of a Pokémon in battle.","type":"Battle items"},{"name":"Ability Urge","desc":"When used, it activates the Ability of an ally Pokémon.","type":"Battle items"},{"name":"Item Drop","desc":"When used, it causes an ally Pokémon to drop a held item.","type":"Battle items"},{"name":"Item Urge","desc":"When used, it causes an ally Pokémon to use its held item.","type":"Battle items"},{"name":"Reset Urge","desc":"When used, it restores any stat changes of an ally Pokémon.","type":"Battle items"},{"name":"Dire Hit 3","desc":"Greatly raises a Pokémon's critical-hit ratio in battle.","type":"Battle items"},{"name":"Light Stone","desc":"Reshiram's body was destroyed and changed into this stone. It is said to be waiting for the emergence of a hero.","type":"Key Items"},{"name":"Dark Stone","desc":"Zekrom's body was destroyed and changed into this stone. It is said to be waiting for the emergence of a hero.","type":"Key Items"},{"name":"TM93","desc":"Teaches the move Wild Charge.","type":"Machines"},{"name":"TM94","desc":"Teaches the move Rock Smash/Surf.","type":"Machines"},{"name":"TM95","desc":"Teaches the move Snarl.","type":"Machines"},{"name":"Gram 1","desc":"An important letter which Wingull delivers.","type":"Key Items"},{"name":"Gram 2","desc":"An important letter which Wingull delivers.","type":"Key Items"},{"name":"Gram 3","desc":"An important letter which Wingull delivers.","type":"Key Items"},{"name":"Xtransceiver","desc":"A high-tech transceiver with a camera function. It allows up to four-way calls.","type":"Key Items"},{"name":"Medal Box","desc":"A box-shaped machine that stores Medals and Medal information.","type":"Key Items"},{"name":"DNA Splicers","desc":"A splicer that fuses Kyurem and a certain Pokémon. They are said to have been one in the beginning.","type":"General items"},{"name":"Permit","desc":"A permit that is needed to enter the Nature Preserve. Not many know about it.","type":"General items"},{"name":"Oval Charm","desc":"An oval charm said to increase the chance of Pokémon Eggs being found at the Day Care.","type":"General items"},{"name":"Shiny Charm","desc":"A shiny charm said to increase the chance of finding a Shiny Pokémon in the wild.","type":"General items"},{"name":"Plasma Card","desc":"A card key needed to enter the password inside the Plasma Frigate.","type":"Hold items"},{"name":"Grubby Hanky","desc":"A handkerchief dropped by a regular at Café Warehouse. It smells faintly like a Pokémon.","type":"Hold items"},{"name":"Colress Machine","desc":"A special device that wrings out the potential of Pokémon. It is an imperfect prototype.","type":"Hold items"},{"name":"Dropped Item","desc":"The Xtransceiver found at the Nimbasa City amusement park. It seems it belongs to a boy.","type":"Hold items"},{"name":"Reveal Glass","desc":"A looking glass that reveals the truth. It's a mysterious glass that returns a Pokémon to its original shape.","type":"General items"},{"name":"Weakness Policy","desc":"Sharply raises Attack and Special Attack if hit by a super-effective move.","type":"Hold items"},{"name":"Assault Vest","desc":"Raises Special Defense but prevents the use of status moves.","type":"Hold items"},{"name":"Prof's Letter","desc":"A letter that Professor Sycamore wrote to your mother. A faint but pleasant perfume seems to cling to the paper.","type":"Hold items"},{"name":"Roller Skates","desc":"Attaches roller skates to the bottom of your shoes, allowing you to glide quickly around and perform tricks.","type":"General items"},{"name":"Pixie Plate","desc":"Increases power of Fairy-type moves. Changes Arceus' type to Fairy.","type":"Hold items"},{"name":"Ability Capsule","desc":"A capsule that allows a Pokémon with two Abilities to switch between these Abilities when it is used.","type":"Hold items"},{"name":"Whipped Dream","desc":"Evolves Swirlix when traded holding the item.","type":"General items"},{"name":"Sachet","desc":"Evolves Spritzee when traded holding the item.","type":"General items"},{"name":"Luminous Moss","desc":"Raises Special Defense if hit by a Water-type move.","type":"Hold items"},{"name":"Snowball","desc":"Raises Attack if hit by an Ice-type move.","type":"Hold items"},{"name":"Safety Goggles","desc":"Prevents damage from weather and powder.","type":"Hold items"},{"name":"Poké Flute","desc":"A flute that is said to instantly awaken any POKéMON. It has a lovely tone.","type":"Key Items"},{"name":"Rich Mulch","desc":"Mulch to be used in a Berry field. It increases the Berry harvest without the need for particularly diligent care.","type":"Key Items"},{"name":"Surprise Mulch","desc":"Mulch to be used in a Berry field. It causes strange, sudden mutations based on the combination of Berries.","type":"Key Items"},{"name":"Boost Mulch","desc":"Mulch to be used in a Berry field. It increases the Berry harvest that can be grown by diligent watering.","type":"Key Items"},{"name":"Amaze Mulch","desc":"Mulch to be used in a Berry field. An amazing Mulch with the effects of Rich, Surprise, and Boost Mulch.","type":"Key Items"},{"name":"Gengarite","desc":"Enables Gengar to Mega Evolve during battle.","type":"Hold items"},{"name":"Gardevoirite","desc":"Enables Gardevoir to Mega Evolve during battle.","type":"Hold items"},{"name":"Ampharosite","desc":"Enables Ampharos to Mega Evolve during battle.","type":"Hold items"},{"name":"Venusaurite","desc":"Enables Venusaur to Mega Evolve during battle.","type":"Hold items"},{"name":"Charizardite X","desc":"Enables Charizard to Mega Evolve during battle.","type":"Hold items"},{"name":"Blastoisinite","desc":"Enables Blastoise to Mega Evolve during battle.","type":"Hold items"},{"name":"Mewtwonite X","desc":"Enables Mewtwo to Mega Evolve during battle.","type":"Hold items"},{"name":"Mewtwonite Y","desc":"Enables Mewtwo to Mega Evolve during battle.","type":"Hold items"},{"name":"Blazikenite","desc":"Enables Blaziken to Mega Evolve during battle.","type":"Hold items"},{"name":"Medichamite","desc":"Enables Medicham to Mega Evolve during battle.","type":"Hold items"},{"name":"Houndoominite","desc":"Enables Houndoom to Mega Evolve during battle.","type":"Hold items"},{"name":"Aggronite","desc":"Enables Aggron to Mega Evolve during battle.","type":"Hold items"},{"name":"Banettite","desc":"Enables Banette to Mega Evolve during battle.","type":"Hold items"},{"name":"Tyranitarite","desc":"Enables Tyranitar to Mega Evolve during battle.","type":"Hold items"},{"name":"Scizorite","desc":"Enables Scizor to Mega Evolve during battle.","type":"Hold items"},{"name":"Pinsirite","desc":"Enables Pinsir to Mega Evolve during battle.","type":"Hold items"},{"name":"Aerodactylite","desc":"Enables Aerodactyl to Mega Evolve during battle.","type":"Hold items"},{"name":"Lucarionite","desc":"Enables Lucario to Mega Evolve during battle.","type":"Hold items"},{"name":"Abomasite","desc":"Enables Abomasnow to Mega Evolve during battle.","type":"Hold items"},{"name":"Kangaskhanite","desc":"Enables Kangaskhan to Mega Evolve during battle.","type":"Hold items"},{"name":"Gyaradosite","desc":"Enables Gyarados to Mega Evolve during battle.","type":"Hold items"},{"name":"Absolite","desc":"Enables Absol to Mega Evolve during battle.","type":"Hold items"},{"name":"Charizardite Y","desc":"Enables Charizard to Mega Evolve during battle.","type":"Hold items"},{"name":"Alakazite","desc":"Enables Alakazam to Mega Evolve during battle.","type":"Hold items"},{"name":"Heracronite","desc":"Enables Heracross to Mega Evolve during battle.","type":"Hold items"},{"name":"Mawilite","desc":"Enables Mawile to Mega Evolve during battle.","type":"Hold items"},{"name":"Manectite","desc":"Enables Manectric to Mega Evolve during battle.","type":"Hold items"},{"name":"Garchompite","desc":"Enables Garchomp to Mega Evolve during battle.","type":"Hold items"},{"name":"Latiasite","desc":"Enables Latias to Mega Evolve during battle.","type":"Hold items"},{"name":"Latiosite","desc":"Enables Latios to Mega Evolve during battle.","type":"Hold items"},{"name":"Roseli Berry","desc":"If held by a Pokémon, this Berry will lessen the damage taken from one supereffective Fairy-type attack.","type":"Berries"},{"name":"Kee Berry","desc":"If held by a Pokémon, this Berry will increase the holder's Defense if it's hit with a physical move.","type":"Berries"},{"name":"Maranga Berry","desc":"If held by a Pokémon, this Berry will increase the holder's Sp. Def if it's hit with a special move.","type":"Berries"},{"name":"Sprinklotad","desc":"A watering can shaped like a Lotad. It helps promote the healthy growth of any Berries planted in good, soft soil.","type":"General items"},{"name":"TM96","desc":"Teaches the move Nature Power.","type":"Machines"},{"name":"TM97","desc":"Teaches the move Dark Pulse.","type":"Machines"},{"name":"TM98","desc":"Teaches the move Power-Up Punch/Waterfall.","type":"Machines"},{"name":"TM99","desc":"Teaches the move Dazzling Gleam.","type":"Machines"},{"name":"TM100","desc":"Teaches the move Confide.","type":"Machines"},{"name":"Power Plant Pass","desc":"This pass serves as an ID card for gaining access to the power plant that lies along Route 13.","type":"Hold items"},{"name":"Mega Ring","desc":"Enables Pokémon carrying Mega Stones to Mega Evolve in battle.","type":"Key Items"},{"name":"Intriguing Stone","desc":"A rather curious stone that might appear to be valuable to some. It's all in the eye of the beholder.","type":"Hold items"},{"name":"Discount Coupon","desc":"This special coupon allows you to buy items at a discount when you are shopping at a boutique.","type":"General items"},{"name":"Elevator Key","desc":"A card key that activates the elevator in Lysandre Labs. It is emblazoned with Team Flare's logo.","type":"Hold items"},{"name":"TMV Pass","desc":"A commuter pass that allows the holder to ride the TMV between Lumiose City and Kiloude City at any time.","type":"General items"},{"name":"Strange Souvenir","desc":"An ornament depicting a Pokémon that is venerated as a protector in some region far from Kalos.","type":"General items"},{"name":"Lens Case","desc":"A rather chic-looking case for carrying contact lenses.","type":"Key Items"},{"name":"Makeup Bag","desc":"A rather chic-looking case for carrying lipsticks.","type":"Key Items"},{"name":"Lumiose Galette","desc":"Heals all major status conditions.","type":"Medicine"},{"name":"Shalour Sable","desc":"Heals all major status conditions.","type":"Medicine"},{"name":"Looker Ticket","desc":"A ticket that was handmade by Looker. It's decorated with a liberal amount of glittery paint.","type":"Hold items"},{"name":"Bike","desc":"A folding Bike that enables a rider to get around much faster than with Running Shoes.","type":"Key Items"},{"name":"Holo Caster","desc":"A device that allows users to receive and view hologram clips at any time. It is also used to chat with others.","type":"Key Items"},{"name":"Fairy Gem","desc":"Increases the power of a Fairy-type move only once.","type":"General items"},{"name":"Mach Bike","desc":"A folding bicycle that is at least twice as fast as walking.","type":"Key Items"},{"name":"Acro Bike","desc":"A folding bicycle that is capable of stunts like jumps and wheelies.","type":"Key Items"},{"name":"Wailmer Pail","desc":"A nifty watering pail. Use it to promote strong growth in BERRIES planted in soft soil.","type":"Key Items"},{"name":"Devon Parts","desc":"A case that contains mechanical parts of some sort made by the Devon Corporation.","type":"Key Items"},{"name":"Soot Sack","desc":"A sack used to collect volcanic ash automatically during walks over deep ash.","type":"Key Items"},{"name":"Basement Key","desc":"A key that opens a door in the Goldenrod Tunnel.","type":"Key Items"},{"name":"Pokéblock Kit","desc":"A set containing a Berry Blender for making Pokéblocks and a Pokéblock Case for storing Pokéblocks.","type":"Key Items"},{"name":"Letter","desc":"An extremely important letter to STEVEN from the PRESIDENT of the DEVON CORPORATION.","type":"Key Items"},{"name":"Eon Ticket","desc":"The ticket required for sailing on a ferry to a distant southern island. It features a drawing of an island.","type":"Key Items"},{"name":"Scanner","desc":"A device used to search for life-forms in water. It looks too difficult to use.","type":"Key Items"},{"name":"Go-Goggles","desc":"A pair of protective goggles. They enable a TRAINER to travel through even desert sandstorms.","type":"Key Items"},{"name":"Key to Room 1","desc":"Unlocks Room 1 in Abandoned Ship/Sea Mauville.","type":"Key Items"},{"name":"Key to Room 2","desc":"Unlocks Room 2 in Abandoned Ship/Sea Mauville.","type":"Key Items"},{"name":"Key to Room 4","desc":"Unlocks Room 4 in Abandoned Ship/Sea Mauville.","type":"Key Items"},{"name":"Key to Room 6","desc":"Unlocks Room 6 in Abandoned Ship/Sea Mauville.","type":"Key Items"},{"name":"Storage Key","desc":"The key to Team Galactic's sinister warehouse located at the edge of Veilstone City.","type":"Key Items"},{"name":"Devon Scope","desc":"A scope that signals the presence of any unseeable POKéMON. It is made by the DEVON CORP.","type":"Key Items"},{"name":"HM07","desc":"Teaches the move Waterfall.","type":"Machines"},{"name":"Devon Scuba Gear","desc":"A device made by Devon Corporation that provides oxygen to users during the use of Dive.","type":"Key Items"},{"name":"Contest Costume","desc":"A very cool suit to be worn during the Contest Spectacular.","type":"Key Items"},{"name":"Magma Suit","desc":"A suit made with the collective technological know-how of Team Magma. It can withstand any impact.","type":"Key Items"},{"name":"Aqua Suit","desc":"A suit made with the collective technological know-how of Team Aqua. It can withstand any impact.","type":"Key Items"},{"name":"Pair of Tickets","desc":"Tickets for two to the astronomical show being held at the Mossdeep Space Center.","type":"Key Items"},{"name":"Mega Bracelet","desc":"This cuff contains an untold power that somehow enables Pokémon carrying a Mega Stone to Mega Evolve in battle.","type":"Key Items"},{"name":"Swampertite","desc":"Enables Swampert to Mega Evolve during battle.","type":"Hold items"},{"name":"Sceptilite","desc":"Enables Sceptile to Mega Evolve during battle.","type":"Hold items"},{"name":"Sablenite","desc":"Enables Sableye to Mega Evolve during battle.","type":"Hold items"},{"name":"Altarianite","desc":"Enables Altaria to Mega Evolve during battle.","type":"Hold items"},{"name":"Galladite","desc":"Enables Gallade to Mega Evolve during battle.","type":"Hold items"},{"name":"Audinite","desc":"Enables Audino to Mega Evolve during battle.","type":"Hold items"},{"name":"Metagrossite","desc":"Enables Metagross to Mega Evolve during battle.","type":"Hold items"},{"name":"Sharpedonite","desc":"Enables Sharpedo to Mega Evolve during battle.","type":"Hold items"},{"name":"Slowbronite","desc":"Enables Slowbro to Mega Evolve during battle.","type":"Hold items"},{"name":"Steelixite","desc":"Enables Steelix to Mega Evolve during battle.","type":"Hold items"},{"name":"Pidgeotite","desc":"Enables Pidgeot to Mega Evolve during battle.","type":"Hold items"},{"name":"Glalitite","desc":"Enables Glalie to Mega Evolve during battle.","type":"Hold items"},{"name":"Diancite","desc":"Enables Diancie to Mega Evolve during battle.","type":"Hold items"},{"name":"Prison Bottle","desc":"Transforms Hoopa Confined to Hoopa Unbound.","type":"Hold items"},{"name":"Cameruptite","desc":"Enables Camerupt to Mega Evolve during battle.","type":"Hold items"},{"name":"Lopunnite","desc":"Enables Lopunny to Mega Evolve during battle.","type":"Hold items"},{"name":"Salamencite","desc":"Enables Salamence to Mega Evolve during battle.","type":"Hold items"},{"name":"Beedrillite","desc":"Enables Beedrill to Mega Evolve during battle.","type":"Hold items"},{"name":"Meteorite","desc":"A meteorite that fell from space onto MT. MOON long ago. It is very lumpy and hard.","type":"Key Items"},{"name":"Key Stone","desc":"A stone filled with an unexplained power. It makes Pokémon that battle with a Mega Stone Mega Evolve.","type":"Key Items"},{"name":"Meteorite Shard","desc":"One of the fragments of a Meteorite from Granite Cave. It's faintly warm to the touch.","type":"Key Items"},{"name":"Eon Flute","desc":"A flute that can be used to summon Latios or Latias no matter where you are.","type":"Key Items"},{"name":"Bottle Cap","desc":"Maximizes one IV stat in Hyper Training.","type":"General items"},{"name":"Gold Bottle Cap","desc":"Maximizes all of a Pokémon's IV stats in Hyper Training.","type":"General items"},{"name":"Z-Ring","desc":"A mysterious ring that enables Pokémon to use Z-Power. It requires both the willpower and the physical power of the Trainer wearing it.","type":"Key Items"},{"name":"Normalium Z","desc":"Allows the use of Breakneck Blitz, the Normal type Z-Move.","type":"Hold items"},{"name":"Firium Z","desc":"Allows the use of Inferno Overdrive, the Fire type Z-Move.","type":"Hold items"},{"name":"Waterium Z","desc":"Allows the use of Hydro Vortex, the Water type Z-Move.","type":"Hold items"},{"name":"Electrium Z","desc":"Allows the use of Gigavolt Havoc, the Electric type Z-Move.","type":"Hold items"},{"name":"Grassium Z","desc":"Allows the use of Bloom Doom, the Grass type Z-Move.","type":"Hold items"},{"name":"Icium Z","desc":"Allows the use of Subzero Slammer, the Ice type Z-Move.","type":"Hold items"},{"name":"Fightinium Z","desc":"Allows the use of All-Out Pummeling, the Fighting type Z-Move.","type":"Hold items"},{"name":"Poisonium Z","desc":"Allows the use of Acid Downpour, the Poison type Z-Move.","type":"Hold items"},{"name":"Groundium Z","desc":"Allows the use of Tectonic Rage, the Ground type Z-Move.","type":"Hold items"},{"name":"Flyinium Z","desc":"Allows the use of Supersonic Skystrike, the Flying type Z-Move.","type":"Hold items"},{"name":"Psychium Z","desc":"Allows the use of Shattered Psyche, the Psychic type Z-Move.","type":"Hold items"},{"name":"Buginium Z","desc":"Allows the use of Savage Spin-Out, the Bug type Z-Move.","type":"Hold items"},{"name":"Rockium Z","desc":"Allows the use of Continental Crush, the Rock type Z-Move.","type":"Hold items"},{"name":"Ghostium Z","desc":"Allows the use of Never-Ending Nightmare, the Ghost type Z-Move.","type":"Hold items"},{"name":"Dragonium Z","desc":"Allows the use of Devastating Drake, the Dragon type Z-Move.","type":"Hold items"},{"name":"Darkinium Z","desc":"Allows the use of Black Hole Eclipse, the Dark type Z-Move.","type":"Hold items"},{"name":"Steelium Z","desc":"Allows the use of Corkscrew Crash, the Steel type Z-Move.","type":"Hold items"},{"name":"Fairium Z","desc":"Allows the use of Twinkle Tackle, the Fairy type Z-Move.","type":"Hold items"},{"name":"Pikanium Z","desc":"Allows Pikachu to upgrade Volt Tackle to a Z-Move, Catastropika.","type":"Hold items"},{"name":"Decidium Z","desc":"Allows Decidueye to upgrade Spirit Shackle to a Z-Move, Sinister Arrow Raid.","type":"Hold items"},{"name":"Incinium Z","desc":"Allows Incineroar to upgrade Darkest Lariat to a Z-Move, Malicious Moonsault.","type":"Hold items"},{"name":"Primarium Z","desc":"Allows Primarina to upgrade Sparkling Aria to a Z-Move, Oceanic Operetta.","type":"Hold items"},{"name":"Tapunium Z","desc":"Allows the Tapus to upgrade Nature's Madness to a Z-Move, Guardian of Alola.","type":"Hold items"},{"name":"Marshadium Z","desc":"Allows Marshadow to upgrade Spectral Thief to a Z-Move, Soul-Stealing 7-Star Strike.","type":"Hold items"},{"name":"Aloraichium Z","desc":"Allows Alolan Raichu to upgrade Thunderbolt to a Z-Move, Stoked Sparksurfer.","type":"Hold items"},{"name":"Snorlium Z","desc":"Allows Snorlax to upgrade Giga Impact to a Z-Move, Pulverizing Pancake.","type":"Hold items"},{"name":"Eevium Z","desc":"Allows Eevee to upgrade Last Resort to a Z-Move, Extreme Evoboost.","type":"Hold items"},{"name":"Mewnium Z","desc":"Allows Mew to upgrade Psychic to a Z-Move, Genesis Supernova.","type":"Hold items"},{"name":"Pikashunium Z","desc":"Allows Pikachu in a cap to upgrade Thunderbolt to a Z-Move, 10,000,000 Volt Thunderbolt.","type":"Hold items"},{"name":"Forage Bag","desc":"A bag to carry ingredients gathered during Mallow's trial in the jungle.","type":"Key Items"},{"name":"Professor's Mask","desc":"The mask that belongs to The Masked Royal. This pro wrestler apparently sews his mask on a machine himself.","type":"Key Items"},{"name":"Festival Ticket","desc":"A ticket that allows you to host a mission in Festival Plaza.","type":"General items"},{"name":"Sparkling Stone","desc":"A stone entrusted by a Pokémon that has been venerated as a guardian deity in the Alola region. There is said to be some secret in how it sparkles.","type":"Key Items"},{"name":"Adrenaline Orb","desc":"Using it makes wild Pokémon more likely to call for help. If held by a Pokémon, it boosts Speed when intimidated. It can be used only once.","type":"Hold items"},{"name":"Zygarde Cube","desc":"An item to store Zygarde Cores and Cells. You can also use it to teach Zygarde moves.","type":"Key Items"},{"name":"Ice Stone","desc":"Evolves certain species of Pokémon.","type":"General items"},{"name":"Ride Pager","desc":"By entering certain numbers on this pager, you can summon Ride Pokémon in an instant.","type":"Key Items"},{"name":"Beast Ball","desc":"A special Poké Ball designed to catch Ultra Beasts. It has a low success rate for catching others.","type":"Pokeballs"},{"name":"Big Malasada","desc":"Heals all major status conditions.","type":"Medicine"},{"name":"Red Nectar","desc":"A flower nectar obtained at Ula'ula Meadow. It changes the form of certain species of Pokémon.","type":"Hold items"},{"name":"Yellow Nectar","desc":"A flower nectar obtained at Melemele Meadow. It changes the form of certain species of Pokémon.","type":"Hold items"},{"name":"Pink Nectar","desc":"The flower nectar obtained at the flowering shrubs on Royal Avenue. It changes the form of certain species of Pokémon.","type":"Hold items"},{"name":"Purple Nectar","desc":"A flower nectar obtained at Poni Meadow. It changes the form of certain species of Pokémon.","type":"Hold items"},{"name":"Sun Flute","desc":"It is said that the tones it produces were offered up as an expression of gratitude to the Legendary Pokémon of the sun.","type":"Key Items"},{"name":"Moon Flute","desc":"It is said that the tones it produces were offered up as an expression of gratitude to the Legendary Pokémon of the moon.","type":"Key Items"},{"name":"Enigmatic Card","desc":"A mysterious card. Written on it is a request for you to go to a guest room in an Akala motel on Route 8.","type":"Key Items"},{"name":"Silver Razz Berry","desc":"Makes a Pokémon easier to catch in Pokémon Let's Go.","type":"Berries"},{"name":"Golden Razz Berry","desc":"Makes a Pokémon easier to catch in Pokémon Let's Go.","type":"Berries"},{"name":"Silver Nanab Berry","desc":"Greatly calms a Pokémon in battle, in Let's Go Pikachu/Eevee.","type":"Berries"},{"name":"Golden Nanab Berry","desc":"Drastically calms a Pokémon in battle, in Let's Go Pikachu/Eevee.","type":"Berries"},{"name":"Silver Pinap Berry","desc":"Greatly increases chance of getting items when a Pokémon is caught, in Pokémon Let's Go.","type":"Berries"},{"name":"Golden Pinap Berry","desc":"Drastically increases chance of getting items when a Pokémon is caught, in Pokémon Let's Go.","type":"Berries"},{"name":"Secret Key","desc":"A high-tech key that has to be used at a specific location. It emits a special electric signal to open a door.","type":"Key Items"},{"name":"S.S. Ticket","desc":"The ticket required for sailing on the ferry S.S. Aqua. It has a drawing of a ship on it.","type":"Key Items"},{"name":"Silph Scope","desc":"A scope that makes unseeable POKéMON visible. It is made by SILPH CO.","type":"Key Items"},{"name":"Parcel","desc":"A parcel entrusted in your care. You are supposed to deliver it to your childhood friend who left Twinleaf Town.","type":"Key Items"},{"name":"Card Key","desc":"A card key that opens a shutter in the Radio Tower.","type":"Key Items"},{"name":"Gold Teeth","desc":"A set of false teeth lost by the SAFARI ZONE'S WARDEN. It makes his smile sparkle.","type":"Key Items"},{"name":"Lift Key","desc":"A key that operates the elevator in TEAM ROCKET's HIDEOUT. It bears the TEAM ROCKET logo.","type":"Key Items"},{"name":"Terrain Extender","desc":"An item to be held by a Pokémon. It extends the duration of the terrain caused by the holder's move or Ability.","type":"Hold items"},{"name":"Protective Pads","desc":"An item to be held by a Pokémon. These pads protect the holder from effects caused by making direct contact with the target.","type":"Hold items"},{"name":"Electric Seed","desc":"An item to be held by a Pokémon. It boosts Defense on Electric Terrain. It can only be used once.","type":"Hold items"},{"name":"Psychic Seed","desc":"An item to be held by a Pokémon. It boosts Sp. Def on Psychic Terrain. It can only be used once.","type":"Hold items"},{"name":"Misty Seed","desc":"An item to be held by a Pokémon. It boosts Sp. Def on Misty Terrain. It can only be used once.","type":"Hold items"},{"name":"Grassy Seed","desc":"An item to be held by a Pokémon. It boosts Defense on Grassy Terrain. It can only be used once.","type":"Hold items"},{"name":"Stretchy Spring","desc":"","type":"General items"},{"name":"Chalky Stone","desc":"A small whitish stone picked up at the edge of the road.","type":"General items"},{"name":"Marble","desc":"","type":"General items"},{"name":"Lone Earring","desc":"","type":"General items"},{"name":"Beach Glass","desc":"A piece of colored glass. Waves have rounded its edges. It's slightly rough to the touch.","type":"General items"},{"name":"Gold Leaf","desc":"","type":"General items"},{"name":"Silver Leaf","desc":"","type":"General items"},{"name":"Polished Mud Ball","desc":"","type":"General items"},{"name":"Tropical Shell","desc":"","type":"General items"},{"name":"Leaf Letter","desc":"A letter written on a leaf. Something is written using Eevee's footprints.","type":"General items"},{"name":"Small Bouquet","desc":"","type":"General items"},{"name":"Lure","desc":"Attracts Pokémon in the wild.","type":"General items"},{"name":"Super Lure","desc":"Attracts Pokémon in the wild.","type":"General items"},{"name":"Max Lure","desc":"Attracts Pokémon in the wild.","type":"General items"},{"name":"Pewter Crunchies","desc":"Heals all major status conditions.","type":"Medicine"},{"name":"Fighting Memory","desc":"Changes Silvally and its move Multi-Attack to Fighting type.","type":"Hold items"},{"name":"Flying Memory","desc":"Changes Silvally and its move Multi-Attack to Flying type.","type":"Hold items"},{"name":"Poison Memory","desc":"Changes Silvally and its move Multi-Attack to Poison type.","type":"Hold items"},{"name":"Ground Memory","desc":"Changes Silvally and its move Multi-Attack to Ground type.","type":"Hold items"},{"name":"Rock Memory","desc":"Changes Silvally and its move Multi-Attack to Rock type.","type":"Hold items"},{"name":"Bug Memory","desc":"Changes Silvally and its move Multi-Attack to Bug type.","type":"Hold items"},{"name":"Ghost Memory","desc":"Changes Silvally and its move Multi-Attack to Ghost type.","type":"Hold items"},{"name":"Steel Memory","desc":"Changes Silvally and its move Multi-Attack to Steel type.","type":"Hold items"},{"name":"Fire Memory","desc":"Changes Silvally and its move Multi-Attack to Fire type.","type":"Hold items"},{"name":"Water Memory","desc":"Changes Silvally and its move Multi-Attack to Water type.","type":"Hold items"},{"name":"Grass Memory","desc":"Changes Silvally and its move Multi-Attack to Grass type.","type":"Hold items"},{"name":"Electric Memory","desc":"Changes Silvally and its move Multi-Attack to Electric type.","type":"Hold items"},{"name":"Psychic Memory","desc":"Changes Silvally and its move Multi-Attack to Psychic type.","type":"Hold items"},{"name":"Ice Memory","desc":"Changes Silvally and its move Multi-Attack to Ice type.","type":"Hold items"},{"name":"Dragon Memory","desc":"Changes Silvally and its move Multi-Attack to Dragon type.","type":"Hold items"},{"name":"Dark Memory","desc":"Changes Silvally and its move Multi-Attack to Dark type.","type":"Hold items"},{"name":"Fairy Memory","desc":"Changes Silvally and its move Multi-Attack to Fairy type.","type":"Hold items"},{"name":"Solganium Z","desc":"Allows Solgaleo to upgrade Sunsteel Strike to a Z-Move, Searing Sunraze Smash.","type":"Hold items"},{"name":"Lunalium Z","desc":"Allows Lunala to upgrade Moongeist Beam to a Z-Move, Menacing Moonraze Maelstrom.","type":"Hold items"},{"name":"Ultranecrozium Z","desc":"Allows Ultra Necrozma to upgrade Photon Geyser to a Z-Move, Light That Burns the Sky.","type":"Hold items"},{"name":"Mimikium Z","desc":"Allows Mimikyu to upgrade Play Rough to a Z-Move, Let's Snuggle Forever.","type":"Hold items"},{"name":"Lycanium Z","desc":"Allows Lycanroc to upgrade Stone Edge to a Z-Move, Splintered Stormshards.","type":"Hold items"},{"name":"Kommonium Z","desc":"Allows Kommo-o to upgrade Clanging Scales to a Z-Move, Clangorous Soulblaze.","type":"Hold items"},{"name":"Pink Petal","desc":"Petal received from Mina during Mina's trial.","type":"Key Items"},{"name":"Orange Petal","desc":"Petal received from Ilima during Mina's trial.","type":"Key Items"},{"name":"Blue Petal","desc":"Petal received from Lana during Mina's trial.","type":"Key Items"},{"name":"Red Petal","desc":"Petal received from Kiawe during Mina's trial.","type":"Key Items"},{"name":"Green Petal","desc":"Petal received from Mallow during Mina's trial.","type":"Key Items"},{"name":"Yellow Petal","desc":"Petal received from Sophocles during Mina's trial.","type":"Key Items"},{"name":"Purple Petal","desc":"Petal received from Nanu during Mina's trial.","type":"Key Items"},{"name":"Rainbow Flower","desc":"Flower made of the petals received from captains.","type":"Key Items"},{"name":"Surge Badge","desc":"Novelty badge from the Kantonian Gym.","type":"Key Items"},{"name":"N-Solarizer","desc":"A machine to fuse/separate Necrozma and Solgaleo.","type":"Key Items"},{"name":"N-Lunarizer","desc":" A machine to fuse/separate Necrozma and Lunala.","type":"Key Items"},{"name":"Left Poké Ball","desc":"A Poké Ball with a Pokémon that lost its Trainer inside.","type":"Key Items"},{"name":"Roto Hatch","desc":"Helps Eggs hatch faster.","type":"Battle items"},{"name":"Roto Bargain","desc":"Reduces the prices of products at Poké Marts by half.","type":"Battle items"},{"name":"Roto Prize Money","desc":"Triples the prize money you receive after battle.","type":"Battle items"},{"name":"Roto Exp. Points","desc":"Increases the Exp. Points your Pokémon receive after battle a little.","type":"Battle items"},{"name":"Roto Friendship","desc":"Helps Pokémon in your party grow friendly faster.","type":"Battle items"},{"name":"Roto Encounter","desc":"Increases the chance of encountering high-level wild Pokémon a lot for a certain period of time.","type":"Battle items"},{"name":"Roto Stealth","desc":"Prevents you from encountering wild Pokémon for a certain period of time.","type":"Battle items"},{"name":"Roto HP Restore","desc":"Fully restores the HP of your battling Pokémon.","type":"Battle items"},{"name":"Roto PP Restore","desc":"Fully restores the PP of your battling Pokémon.","type":"Battle items"},{"name":"Roto Boost","desc":"Raises all stats of your battling Pokémon.","type":"Battle items"},{"name":"Roto Catch","desc":"Increases the chance to catch Pokémon a lot.","type":"Battle items"},{"name":"Health Candy","desc":"Increases a Pokémon's HP stat by 1.","type":"Medicine"},{"name":"Mighty Candy","desc":"Increases a Pokémon's Attack stat by 1.","type":"Medicine"},{"name":"Tough Candy","desc":"Increases a Pokémon's Defense stat by 1.","type":"Medicine"},{"name":"Smart Candy","desc":"Increases a Pokémon's Special Attack stat by 1.","type":"Medicine"},{"name":"Courage Candy","desc":"Increases a Pokémon's Special Defense stat by 1.","type":"Medicine"},{"name":"Quick Candy","desc":"Increases a Pokémon's Speed stat by 1.","type":"Medicine"},{"name":"Health Candy L","desc":"Increases a Pokémon's HP stat.","type":"Medicine"},{"name":"Mighty Candy L","desc":"Increases a Pokémon's Attack stat.","type":"Medicine"},{"name":"Tough Candy L","desc":"Increases a Pokémon's Defense stat.","type":"Medicine"},{"name":"Smart Candy L","desc":"Increases a Pokémon's Special Attack stat.","type":"Medicine"},{"name":"Courage Candy L","desc":"Increases a Pokémon's Special Defense stat.","type":"Medicine"},{"name":"Quick Candy L","desc":"Increases a Pokémon's Speed stat.","type":"Medicine"},{"name":"Health Candy XL","desc":"Increases a Pokémon's HP stat.","type":"Medicine"},{"name":"Mighty Candy XL","desc":"Increases a Pokémon's Attack stat.","type":"Medicine"},{"name":"Tough Candy XL","desc":"Increases a Pokémon's Defense stat.","type":"Medicine"},{"name":"Smart Candy XL","desc":"Increases a Pokémon's Special Attack stat.","type":"Medicine"},{"name":"Courage Candy XL","desc":"Increases a Pokémon's Special Defense stat.","type":"Medicine"},{"name":"Quick Candy XL","desc":"Increases a Pokémon's Speed stat.","type":"Medicine"},{"name":"Pokémon Box Link","desc":"","type":"Key Items"},{"name":"Wishing Star","desc":"A stone found in the Galar region with a mysterious power. It’s said that your dreams come true if you find one.","type":"Key Items"},{"name":"Dynamax Band","desc":"","type":"Key Items"},{"name":"Fishing Rod","desc":"A Fishing Rod made by Captain Lana. Cast a line over piles of underwater rocks to fish for wild aquatic Pokémon.","type":"Key Items"},{"name":"Sausages","desc":"One of the many ingredients that can be used for cooking at your camp. These sausages should be boiled before eating.","type":"General items"},{"name":"Bob's Food Tin","desc":"One of the many ingredients that can be used for cooking at your camp. The tinned food that Bob sells is curiously popular in Galar.","type":"General items"},{"name":"Bach's Food Tin","desc":"One of the many ingredients that can be used for cooking at your camp. The tinned food that Bach sells is curiously popular in Galar.","type":"General items"},{"name":"Tin of Beans","desc":"One of the many ingredients that can be used for cooking at your camp. When simmered, the beans suffuse a dish with their mild flavor.","type":"General items"},{"name":"Bread","desc":"One of the many ingredients that can be used for cooking at your camp. An indispensable tool for mopping up that extra curry left on your plate.","type":"General items"},{"name":"Pasta","desc":"One of the many ingredients that can be used for cooking at your camp. These flour noodles make for a surprisingly good match with curry.","type":"General items"},{"name":"Mixed Mushrooms","desc":"One of the many ingredients that can be used for cooking at your camp. The chewy texture of the mushrooms transforms any dish they’re added to.","type":"General items"},{"name":"Smoke-Poke Tail","desc":"One of the many ingredients that can be used for cooking at your camp. When a Slowpoke’s tail falls off, it grows back quickly.","type":"General items"},{"name":"Large Leek","desc":"One of the many ingredients that can be used for cooking at your camp. Whether this is the kind of vegetable stalk that Farfetch’d like is unknown.","type":"General items"},{"name":"Fancy Apple","desc":"One of the many ingredients that can be used for cooking at your camp. An apple chosen above others. It has spectacular form and a brilliant sheen.","type":"General items"},{"name":"Brittle Bones","desc":"One of the many ingredients that can be used for cooking at your camp. The taste boiled off from the bones is sure to give a dish a light umami taste.","type":"General items"},{"name":"Pack of Potatoes","desc":"One of the many ingredients that can be used for cooking at your camp. Potatoes help mellow out a spicy taste, to make a dish more mild.","type":"General items"},{"name":"Pungent Root","desc":"One of the many ingredients that can be used for cooking at your camp. Though carelessly picked, these herbs can add a fragrant accent to a dish.","type":"General items"},{"name":"Salad Mix","desc":"One of the many ingredients that can be used for cooking at your camp. The assortment of vegetables looks quite appealing and healthy.","type":"General items"},{"name":"Fried Food","desc":"One of the many ingredients that can be used for cooking at your camp. It’s been a while since it was fried, so it’s gotten greasy.","type":"General items"},{"name":"Boiled Egg","desc":"One of the many ingredients that can be used for cooking at your camp. Even just one boiled egg can really enhance a dish.","type":"General items"},{"name":"Camping Gear","desc":"","type":"Key Items"},{"name":"Rusted Sword","desc":"It is said that a hero used this sword to halt a terrible disaster in ancient times. But it’s grown rusty and worn.","type":"Key Items"},{"name":"Rusted Shield","desc":"It is said that a hero used this shield to halt a terrible disaster in ancient times. But it’s grown rusty and worn.","type":"Key Items"},{"name":"Fossilized Bird","desc":"The fossil of an ancient Pokémon that once soared through the sky. What it looked like is a mystery.","type":"General items"},{"name":"Fossilized Fish","desc":"The fossil of an ancient Pokémon that once lived in the sea. What it looked like is a mystery.","type":"General items"},{"name":"Fossilized Drake","desc":"The fossil of an ancient Pokémon that once roamed the land. What it looked like is a mystery.","type":"General items"},{"name":"Fossilized Dino","desc":"The fossil of an ancient Pokémon that once lived in the sea. What it looked like is a mystery.","type":"General items"},{"name":"Strawberry Sweet","desc":"Evolves Milcery into Strawberry Flavor Alcremie.","type":"Hold items"},{"name":"Love Sweet","desc":"Evolves Milcery into Heart Flavor Alcremie.","type":"Hold items"},{"name":"Berry Sweet","desc":"Evolves Milcery into Blueberry Flavor Alcremie.","type":"Hold items"},{"name":"Clover Sweet","desc":"Evolves Milcery into Clover Flavor Alcremie.","type":"Hold items"},{"name":"Flower Sweet","desc":"Evolves Milcery into Flower Flavor Alcremie.","type":"Hold items"},{"name":"Star Sweet","desc":"Evolves Milcery into Star Flavor Alcremie.","type":"Hold items"},{"name":"Ribbon Sweet","desc":"Evolves Milcery into Ribbon Flavor Alcremie.","type":"Hold items"},{"name":"Sweet Apple","desc":"Evolves Applin into Appletun.","type":"Hold items"},{"name":"Tart Apple","desc":"Evolves Applin into Flapple.","type":"Hold items"},{"name":"Throat Spray","desc":"Raises Sp. Atk when a sound-based move is used.","type":"Hold items"},{"name":"Eject Pack","desc":"The Pokémon switches out if its stats are lowered.","type":"Hold items"},{"name":"Heavy-Duty Boots","desc":"Protects the holder from traps set on the battlefield.","type":"Hold items"},{"name":"Blunder Policy","desc":"Raises Speed sharply if its attack misses.","type":"Hold items"},{"name":"Room Service","desc":"Lowers the Pokémon's speed during Trick Room.","type":"Hold items"},{"name":"Utility Umbrella","desc":"An item to be held by a Pokémon. This sturdy umbrella protects the holder from the effects of weather.","type":"Hold items"},{"name":"Exp. Candy XS","desc":"","type":"Medicine"},{"name":"Exp. Candy S","desc":"","type":"Medicine"},{"name":"Exp. Candy M","desc":"","type":"Medicine"},{"name":"Exp. Candy L","desc":"","type":"Medicine"},{"name":"Exp. Candy XL","desc":"Increases the Pokémon's Exp points by 30,000.","type":"Medicine"},{"name":"Dynamax Candy","desc":"Raises Dynamax Level.","type":"Medicine"},{"name":"TR00","desc":"Teaches the move Swords Dance.","type":"Machines"},{"name":"TR01","desc":"","type":"Machines"},{"name":"TR02","desc":"","type":"Machines"},{"name":"TR03","desc":"","type":"Machines"},{"name":"TR04","desc":"","type":"Machines"},{"name":"TR05","desc":"","type":"Machines"},{"name":"TR06","desc":"","type":"Machines"},{"name":"TR07","desc":"","type":"Machines"},{"name":"TR08","desc":"","type":"Machines"},{"name":"TR09","desc":"","type":"Machines"},{"name":"TR10","desc":"","type":"Machines"},{"name":"TR11","desc":"","type":"Machines"},{"name":"TR12","desc":"","type":"Machines"},{"name":"TR13","desc":"","type":"Machines"},{"name":"TR14","desc":"","type":"Machines"},{"name":"TR15","desc":"","type":"Machines"},{"name":"TR16","desc":"","type":"Machines"},{"name":"TR17","desc":"","type":"Machines"},{"name":"TR18","desc":"","type":"Machines"},{"name":"TR19","desc":"","type":"Machines"},{"name":"TR20","desc":"","type":"Machines"},{"name":"TR21","desc":"","type":"Machines"},{"name":"TR22","desc":"","type":"Machines"},{"name":"TR23","desc":"","type":"Machines"},{"name":"TR24","desc":"","type":"Machines"},{"name":"TR25","desc":"","type":"Machines"},{"name":"TR26","desc":"","type":"Machines"},{"name":"TR27","desc":"","type":"Machines"},{"name":"TR28","desc":"","type":"Machines"},{"name":"TR29","desc":"","type":"Machines"},{"name":"TR30","desc":"","type":"Machines"},{"name":"TR31","desc":"","type":"Machines"},{"name":"TR32","desc":"","type":"Machines"},{"name":"TR33","desc":"","type":"Machines"},{"name":"TR34","desc":"","type":"Machines"},{"name":"TR35","desc":"","type":"Machines"},{"name":"TR36","desc":"","type":"Machines"},{"name":"TR37","desc":"","type":"Machines"},{"name":"TR38","desc":"","type":"Machines"},{"name":"TR39","desc":"","type":"Machines"},{"name":"TR40","desc":"","type":"Machines"},{"name":"TR41","desc":"","type":"Machines"},{"name":"TR42","desc":"","type":"Machines"},{"name":"TR43","desc":"","type":"Machines"},{"name":"TR44","desc":"","type":"Machines"},{"name":"TR45","desc":"","type":"Machines"},{"name":"TR46","desc":"","type":"Machines"},{"name":"TR47","desc":"","type":"Machines"},{"name":"TR48","desc":"","type":"Machines"},{"name":"TR49","desc":"","type":"Machines"},{"name":"TR50","desc":"","type":"Machines"},{"name":"TR51","desc":"Teaches the move Dragon Dance.","type":"Machines"},{"name":"TR52","desc":"","type":"Machines"},{"name":"TR53","desc":"","type":"Machines"},{"name":"TR54","desc":"","type":"Machines"},{"name":"TR55","desc":"","type":"Machines"},{"name":"TR56","desc":"","type":"Machines"},{"name":"TR57","desc":"","type":"Machines"},{"name":"TR58","desc":"","type":"Machines"},{"name":"TR59","desc":"","type":"Machines"},{"name":"TR60","desc":"","type":"Machines"},{"name":"TR61","desc":"","type":"Machines"},{"name":"TR62","desc":"","type":"Machines"},{"name":"TR63","desc":"","type":"Machines"},{"name":"TR64","desc":"","type":"Machines"},{"name":"TR65","desc":"","type":"Machines"},{"name":"TR66","desc":"","type":"Machines"},{"name":"TR67","desc":"","type":"Machines"},{"name":"TR68","desc":"","type":"Machines"},{"name":"TR69","desc":"","type":"Machines"},{"name":"TR70","desc":"","type":"Machines"},{"name":"TR71","desc":"","type":"Machines"},{"name":"TR72","desc":"","type":"Machines"},{"name":"TR73","desc":"","type":"Machines"},{"name":"TR74","desc":"","type":"Machines"},{"name":"TR75","desc":"","type":"Machines"},{"name":"TR76","desc":"","type":"Machines"},{"name":"TR77","desc":"","type":"Machines"},{"name":"TR78","desc":"","type":"Machines"},{"name":"TR79","desc":"","type":"Machines"},{"name":"TR80","desc":"","type":"Machines"},{"name":"TR81","desc":"Teaches the move Foul Play.","type":"Machines"},{"name":"TR82","desc":"","type":"Machines"},{"name":"TR83","desc":"","type":"Machines"},{"name":"TR84","desc":"Teaches the move Scald.","type":"Machines"},{"name":"TR85","desc":"","type":"Machines"},{"name":"TR86","desc":"","type":"Machines"},{"name":"TR87","desc":"","type":"Machines"},{"name":"TR88","desc":"","type":"Machines"},{"name":"TR89","desc":"","type":"Machines"},{"name":"TR90","desc":"","type":"Machines"},{"name":"TR91","desc":"","type":"Machines"},{"name":"TR92","desc":"","type":"Machines"},{"name":"TR93","desc":"","type":"Machines"},{"name":"TR94","desc":"","type":"Machines"},{"name":"TR95","desc":"","type":"Machines"},{"name":"TR97","desc":"","type":"Machines"},{"name":"TR98","desc":"","type":"Machines"},{"name":"TR99","desc":"","type":"Machines"},{"name":"TM00","desc":"Teaches a move.","type":"Machines"},{"name":"Lonely Mint","desc":"Changes the Pokémon's stats to match the Lonely nature.","type":"Battle items"},{"name":"Adamant Mint","desc":"Changes the Pokémon's stats to match the Adamant nature.","type":"Battle items"},{"name":"Naughty Mint","desc":"Changes the Pokémon's stats to match the Naughty nature.","type":"Battle items"},{"name":"Brave Mint","desc":"Changes the Pokémon's stats to match the Brave nature.","type":"Battle items"},{"name":"Bold Mint","desc":"Changes the Pokémon's stats to match the Bold nature.","type":"Battle items"},{"name":"Impish Mint","desc":"Changes the Pokémon's stats to match the Impish nature.","type":"Battle items"},{"name":"Lax Mint","desc":"Changes the Pokémon's stats to match the Lax nature.","type":"Battle items"},{"name":"Relaxed Mint","desc":"Changes the Pokémon's stats to match the Relaxed nature.","type":"Battle items"},{"name":"Modest Mint","desc":"Changes the Pokémon's stats to match the Modest nature.","type":"Battle items"},{"name":"Mild Mint","desc":"Changes the Pokémon's stats to match the Mild nature.","type":"Battle items"},{"name":"Rash Mint","desc":"Changes the Pokémon's stats to match the Rash nature.","type":"Battle items"},{"name":"Quiet Mint","desc":"Changes the Pokémon's stats to match the Quiet nature.","type":"Battle items"},{"name":"Calm Mint","desc":"Changes the Pokémon's stats to match the Calm nature.","type":"Battle items"},{"name":"Gentle Mint","desc":"Changes the Pokémon's stats to match the Gentle nature.","type":"Battle items"},{"name":"Careful Mint","desc":"Changes the Pokémon's stats to match the Careful nature.","type":"Battle items"},{"name":"Sassy Mint","desc":"Changes the Pokémon's stats to match the Sassy nature.","type":"Battle items"},{"name":"Timid Mint","desc":"Changes the Pokémon's stats to match the Timid nature.","type":"Battle items"},{"name":"Hasty Mint","desc":"Changes the Pokémon's stats to match the Hasty nature.","type":"Battle items"},{"name":"Jolly Mint","desc":"Changes the Pokémon's stats to match the Jolly nature.","type":"Battle items"},{"name":"Naive Mint","desc":"Changes the Pokémon's stats to match the Naive nature.","type":"Battle items"},{"name":"Serious Mint","desc":"Changes the Pokémon's stats to match a neutral nature.","type":"Battle items"},{"name":"Wishing Piece","desc":"Activates a Pokémon Den for a Max Raid Battle.","type":"General items"},{"name":"Cracked Pot","desc":"Evolves Sinistea into Polteageist.","type":"Hold items"},{"name":"Chipped Pot","desc":"Evolves Sinistea into Polteageist.","type":"Hold items"},{"name":"Hi-tech Earbuds","desc":"Strange earbuds that allow you to freely control the volume of various sounds.","type":"Hold items"},{"name":"Fruit Bunch","desc":"One of the many ingredients that can be used for cooking at your camp. The syrupy fruits give off a strong tropical feel.","type":"General items"},{"name":"Moomoo Cheese","desc":"One of the many ingredients that can be used for cooking at your camp. Melted cheese can really give a curry some richness.","type":"General items"},{"name":"Spice Mix","desc":"One of the many ingredients that can be used for cooking at your camp. There are over fifty spices contained within this ingredient’s hot flavor.","type":"General items"},{"name":"Fresh Cream","desc":"One of the many ingredients that can be used for cooking at your camp. Add some whipped cream to a spicy curry to give it some sweetness.","type":"General items"},{"name":"Packaged Curry","desc":"One of the many ingredients that can be used for cooking at your camp. Using packaged curry helps make sure there are no slipups when cooking.","type":"General items"},{"name":"Coconut Milk","desc":"One of the many ingredients that can be used for cooking at your camp. The refined sweetness of this coconut milk makes it quite popular.","type":"General items"},{"name":"Instant Noodles","desc":"One of the many ingredients that can be used for cooking at your camp. It has a junk-food sort of taste, but it goes well with curry.","type":"General items"},{"name":"Precooked Burger","desc":"One of the many ingredients that can be used for cooking at your camp. If you’re unsure about what to cook, you can’t go wrong with some burger.","type":"General items"},{"name":"Gigantamix","desc":"One of the many ingredients that can be used for cooking at your camp. A mysterious spice. Even a tiny sprinkle is sure to make a curry gigantic.","type":"General items"},{"name":"Wishing Chip","desc":"Toss a number of them into a Pokémon Den for the chance to attract a wild Dynamax Pokémon.","type":"Key Items"},{"name":"Rotom Bike","desc":"This bike can be combined with the Pokémon Rotom to not only do a turbo boost but also run on the water.","type":"Key Items"},{"name":"Catching Charm","desc":"Holding it is said to increase the chance of getting a critical catch. Curiously, the charm doesn’t shake much.","type":"Key Items"},{"name":"Old Letter","desc":"A letter entrusted to you by a girl, to be delivered to a boy. Strangely, it looks old to you.","type":"Key Items"},{"name":"Band Autograph","desc":"It’s signed by all members of the Galar region’s most charismatic band, the Maximizers.","type":"Key Items"},{"name":"Sonia's Book","desc":"Professor Sonia’s published writings. Her new discoveries about the Galar region’s legends are recorded in this enjoyable read.","type":"Key Items"},{"name":"Rotom Catalog","desc":"A catalog of devices that Rotom like. Use the catalog to have Rotom hop in and out of the various devices listed within.","type":"Key Items"}],
+    pokemon: [
+  {
+    "name": "Bulbasaur",
+    "desc": "Bulbasaur can be seen napping in bright sunlight. There is a seed on its back. By soaking up the sun’s rays, the seed grows progressively larger.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Ivysaur",
+    "desc": "There is a bud on this Pokémon’s back. To support its weight, Ivysaur’s legs and trunk grow thick and strong. If it starts spending more time lying in the sunlight, it’s a sign that the bud will bloom into a large flower soon.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Venusaur",
+    "desc": "There is a large flower on Venusaur’s back. The flower is said to take on vivid colors if it gets plenty of nutrition and sunlight. The flower’s aroma soothes the emotions of people.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Charmander",
+    "desc": "The flame that burns at the tip of its tail is an indication of its emotions. The flame wavers when Charmander is enjoying itself. If the Pokémon becomes enraged, the flame burns fiercely.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Charmeleon",
+    "desc": "Charmeleon mercilessly destroys its foes using its sharp claws. If it encounters a strong foe, it turns aggressive. In this excited state, the flame at the tip of its tail flares with a bluish white color.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Charizard",
+    "desc": "Charizard flies around the sky in search of powerful opponents. It breathes fire of such great heat that it melts anything. However, it never turns its fiery breath on any opponent weaker than itself.",
+    "type": "Pokemon: Fire, Flying"
+  },
+  {
+    "name": "Squirtle",
+    "desc": "Squirtle’s shell is not merely used for protection. The shell’s rounded shape and the grooves on its surface help minimize resistance in water, enabling this Pokémon to swim at high speeds.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Wartortle",
+    "desc": "Its tail is large and covered with a rich, thick fur. The tail becomes increasingly deeper in color as Wartortle ages. The scratches on its shell are evidence of this Pokémon’s toughness as a battler.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Blastoise",
+    "desc": "Blastoise has water spouts that protrude from its shell. The water spouts are very accurate. They can shoot bullets of water with enough accuracy to strike empty cans from a distance of over 160 feet.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Caterpie",
+    "desc": "Its body is soft and weak. In nature, its perpetual fate is to be seen by others as food.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Metapod",
+    "desc": "Its hard shell doesn’t crack a bit even if Pikipek pecks at it, but it will tip over, spilling out its insides.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Butterfree",
+    "desc": "Nectar from pretty flowers is its favorite food. In fields of flowers, it has heated battles with Cutiefly for territory.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Weedle",
+    "desc": "Weedle has an extremely acute sense of smell. It is capable of distinguishing its favorite kinds of leaves from those it dislikes just by sniffing with its big red proboscis (nose).",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Kakuna",
+    "desc": "Kakuna remains virtually immobile as it clings to a tree. However, on the inside, it is extremely busy as it prepares for its coming evolution. This is evident from how hot the shell becomes to the touch.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Beedrill",
+    "desc": "Beedrill is extremely territorial. No one should ever approach its nest—this is for their own safety. If angered, they will attack in a furious swarm.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Pidgey",
+    "desc": "Pidgey has an extremely sharp sense of direction. It is capable of unerringly returning home to its nest, however far it may be removed from its familiar surroundings.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Pidgeotto",
+    "desc": "Pidgeotto claims a large area as its own territory. This Pokémon flies around, patrolling its living space. If its territory is violated, it shows no mercy in thoroughly punishing the foe with its sharp claws.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Pidgeot",
+    "desc": "This Pokémon has a dazzling plumage of beautifully glossy feathers. Many Trainers are captivated by the striking beauty of the feathers on its head, compelling them to choose Pidgeot as their Pokémon.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Rattata",
+    "desc": "This Pokémon is common but hazardous. Its sharp incisors can easily cut right through hard wood.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Raticate",
+    "desc": "Its whiskers are essential for maintaining its balance. No matter how friendly you are, it will get angry and bite you if you touch its whiskers.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Spearow",
+    "desc": "Due to its short wings, it can’t fly long distances. It wanders about restlessly and pecks at bug Pokémon.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Fearow",
+    "desc": "In Alola, fish Pokémon are its prey. It can be seen circling above the ocean searching for food.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Ekans",
+    "desc": "The eggs of bird Pokémon are its favorite food. It swallows eggs whole, so sometimes an egg gets stuck, and Ekans faints.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Arbok",
+    "desc": "After stunning its opponents with the pattern on its stomach, it quickly wraps them up in its body and waits for them to stop moving.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Pikachu",
+    "desc": "While sleeping, it generates electricity in the sacs in its cheeks. If it’s not getting enough sleep, it will be able to use only weak electricity.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Raichu",
+    "desc": "Because so many Trainers like the way Pikachu looks, you don’t see this Pokémon very often.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Sandshrew",
+    "desc": "When its skin gets wrinkled from moisture, it heads for a volcano. It lies flat on a spot with a lot of geothermal heat and dries itself out.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Sandslash",
+    "desc": "Thanks to its thick claws, it’s good at climbing trees. There are plenty of Sandslash that park themselves in trees and go right to sleep.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Nidoran♀",
+    "desc": "Nidoran♀ has barbs that secrete a powerful poison. They are thought to have developed as protection for this small-bodied Pokémon. When enraged, it releases a horrible toxin from its horn.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Nidorina",
+    "desc": "When Nidorina are with their friends or family, they keep their barbs tucked away to prevent hurting each other. This Pokémon appears to become nervous if separated from the others.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Nidoqueen",
+    "desc": "Nidoqueen’s body is encased in extremely hard scales. It is adept at sending foes flying with harsh tackles. This Pokémon is at its strongest when it is defending its young.",
+    "type": "Pokemon: Poison, Ground"
+  },
+  {
+    "name": "Nidoran♂",
+    "desc": "Nidoran♂ has developed muscles for moving its ears. Thanks to them, the ears can be freely moved in any direction. Even the slightest sound does not escape this Pokémon’s notice.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Nidorino",
+    "desc": "Nidorino has a horn that is harder than a diamond. If it senses a hostile presence, all the barbs on its back bristle up at once, and it challenges the foe with all its might.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Nidoking",
+    "desc": "Nidoking’s thick tail packs enormously destructive power. With one swing, it can topple a metal transmission tower. Once this Pokémon goes on a rampage, there is no stopping it.",
+    "type": "Pokemon: Poison, Ground"
+  },
+  {
+    "name": "Clefairy",
+    "desc": "Bathed in moonlight, its wings glow faintly. Without even flapping, Clefairy rises into the air, where it dances around.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Clefable",
+    "desc": "Some scientists believe that it gazes intently at the sky on nights with a full moon because it’s homesick.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Vulpix",
+    "desc": "It manipulates balls of fire to catch its prey. If you raise one from when it’s young, it will grow close to you like a puppy Pokémon.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Ninetales",
+    "desc": "The flickering flames it spews from its mouth leave its opponents hypnotized. Then, this extremely intelligent Pokémon attacks.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Jigglypuff",
+    "desc": "The songs they sing are totally different depending on the region they live in. Some even sound like they’re shouting!",
+    "type": "Pokemon: Normal, Fairy"
+  },
+  {
+    "name": "Wigglytuff",
+    "desc": "When it gets angry, it inhales with all its might, and its body gradually inflates. Sometimes they can grow 20 times larger!",
+    "type": "Pokemon: Normal, Fairy"
+  },
+  {
+    "name": "Zubat",
+    "desc": "Their skin is so thin that they’ll be burned if sunlight hits them. When it gets cold out, they gather together to warm one another’s bodies.",
+    "type": "Pokemon: Poison, Flying"
+  },
+  {
+    "name": "Golbat",
+    "desc": "They can suck down over 10 ounces of blood in one go. They have been known to drink so much blood that they can no longer fly.",
+    "type": "Pokemon: Poison, Flying"
+  },
+  {
+    "name": "Oddish",
+    "desc": "Oddish searches for fertile, nutrient-rich soil, then plants itself. During the daytime, while it is planted, this Pokémon’s feet are thought to change shape and become similar to the roots of trees.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Gloom",
+    "desc": "From its mouth Gloom drips honey that smells absolutely horrible. Apparently, it loves the horrid stench. It sniffs the noxious fumes and then drools even more of its honey.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Vileplume",
+    "desc": "Vileplume has the world’s largest petals. They are used to attract prey that are then doused with toxic spores. Once the prey are immobilized, this Pokémon catches and devours them.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Paras",
+    "desc": "The mushrooms, known as tochukaso, are controlling the bug. Even if the bug bugs the mushrooms, they tell it to bug off.",
+    "type": "Pokemon: Bug, Grass"
+  },
+  {
+    "name": "Parasect",
+    "desc": "Its poisonous spores are also used in traditional medicine. Apparently, spores produced in Alola are not of very good quality.",
+    "type": "Pokemon: Bug, Grass"
+  },
+  {
+    "name": "Venonat",
+    "desc": "Venonat is said to have evolved with a coat of thin, stiff hair that covers its entire body for protection. It possesses large eyes that never fail to spot even minuscule prey.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Venomoth",
+    "desc": "Venomoth is nocturnal—it is a Pokémon that only becomes active at night. Its favorite prey are small insects that gather around streetlights, attracted by the light in the darkness.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Diglett",
+    "desc": "Around their crops, farmers plant the kind of tree that Diglett like to eat as a way of getting Diglett to plow the fields for them.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Dugtrio",
+    "desc": "Dugtrio’s heads are sleek and smooth and incredibly hard. It can dig through any soil with its headbutts.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Meowth",
+    "desc": "It loves coins, so if you give it one, you can make friends with Meowth easily. But it’s fickle, so you can’t count on that friendship lasting.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Persian",
+    "desc": "This Pokémon is popular with rich people. It’s also targeted by hunters who are after the jewel in its forehead.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Psyduck",
+    "desc": "It has been found that its brain cells are 10 times more active when Psyduck is experiencing a headache.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Golduck",
+    "desc": "A professional swimmer, it can continue swimming for two days straight by waving its long tail skillfully.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Mankey",
+    "desc": "If one gets angry, all the others around it will get angry, so silence is a rare visitor in a troop of Mankey.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Primeape",
+    "desc": "The blood vessels in its brain are sturdier than those of other Pokémon, so it can stay healthy despite its constant raging.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Growlithe",
+    "desc": "It has lived alongside humans since ages ago. Its bones have been found in excavations of ruins from the Stone Age.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Arcanine",
+    "desc": "There are so many old tales about them that they’re called legendary Pokémon, but there are way more of them around than you’d expect.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Poliwag",
+    "desc": "The direction of the swirl on their stomachs differs depending on where they live. Poliwag aficionados can tell them apart at a glance.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Poliwhirl",
+    "desc": "Its health suffers when its skin dries out, so be sure to moisturize it diligently.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Poliwrath",
+    "desc": "The muscles it has developed through swimming are thick and powerful. When it lands a square punch, it can turn huge boulders to dust.",
+    "type": "Pokemon: Water, Fighting"
+  },
+  {
+    "name": "Abra",
+    "desc": "It can read others’ minds and will teleport away when danger approaches. You must clear your mind if you want to catch it.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Kadabra",
+    "desc": "It possesses strong mental capabilities, but its psychic powers are halved when it’s not holding a silver spoon.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Alakazam",
+    "desc": "If it trusts someone deeply, it will let them have one of its spoons. Anything you eat with that spoon is apparently delicious.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Machop",
+    "desc": "It likes food that’s highly nutritious because its instincts drive it to build muscle efficiently.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Machoke",
+    "desc": "A popular motif for sculptures, its incredibly well-developed muscles have captured the imagination of many an artist.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Machamp",
+    "desc": "With four arms, it can attack and defend simultaneously. It’s said to have mastered every martial art in the world.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Bellsprout",
+    "desc": "Bellsprout’s thin and flexible body lets it bend and sway to avoid any attack, however strong it may be. From its mouth, this Pokémon spits a corrosive fluid that melts even iron.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Weepinbell",
+    "desc": "Weepinbell has a large hook on its rear end. At night, the Pokémon hooks on to a tree branch and goes to sleep. If it moves around in its sleep, it may wake up to find itself on the ground.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Victreebel",
+    "desc": "Victreebel has a long vine that extends from its head. This vine is waved and flicked about as if it were an animal to attract prey. When an unsuspecting prey draws near, this Pokémon swallows it whole.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Tentacool",
+    "desc": "Its body is 99% water. The remaining 1% contains the organ that makes its poison.",
+    "type": "Pokemon: Water, Poison"
+  },
+  {
+    "name": "Tentacruel",
+    "desc": "It communicates with others of its kind by lighting up the red orbs on its head. When the orbs are blinking, it’s a warning sign.",
+    "type": "Pokemon: Water, Poison"
+  },
+  {
+    "name": "Geodude",
+    "desc": "It uses both hands to climb precipitous cliffs. People who see it in action have been known to take up bouldering.",
+    "type": "Pokemon: Rock, Ground"
+  },
+  {
+    "name": "Graveler",
+    "desc": "It travels by rolling down cliffs. If it falls into a river, it will explode with its last gasp.",
+    "type": "Pokemon: Rock, Ground"
+  },
+  {
+    "name": "Golem",
+    "desc": "It detonates its own body. The power from that explosion can propel it up steep mountain paths with amazing speed.",
+    "type": "Pokemon: Rock, Ground"
+  },
+  {
+    "name": "Ponyta",
+    "desc": "Ponyta is very weak at birth. It can barely stand up. This Pokémon becomes stronger by stumbling and falling to keep up with its parent.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Rapidash",
+    "desc": "Rapidash usually can be seen casually cantering in the fields and plains. However, when this Pokémon turns serious, its fiery manes flare and blaze as it gallops its way up to 150 mph.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Slowpoke",
+    "desc": "Although their tails, which fall off naturally, can easily be found lying around, they’re a precious ingredient for cooking.",
+    "type": "Pokemon: Water, Psychic"
+  },
+  {
+    "name": "Slowbro",
+    "desc": "Shellder, in its greed to suck out more and more sweetness from Slowbro’s tail, has metamorphosed into a spiral-shaped shell.",
+    "type": "Pokemon: Water, Psychic"
+  },
+  {
+    "name": "Magnemite",
+    "desc": "Perhaps because electrical lines are often buried these days, the number of Magnemite attacks on power plants has increased.",
+    "type": "Pokemon: Electric, Steel"
+  },
+  {
+    "name": "Magneton",
+    "desc": "When rain clouds form, many Magneton gather in high places to wait for lightning to strike.",
+    "type": "Pokemon: Electric, Steel"
+  },
+  {
+    "name": "Farfetch'd",
+    "desc": "Farfetch’d is always seen with a stalk from a plant of some sort. Apparently, there are good stalks and bad stalks. This Pokémon has been known to fight with others over stalks.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Doduo",
+    "desc": "Doduo’s two heads contain completely identical brains. A scientific study reported that on rare occasions, there will be examples of this Pokémon possessing different sets of brains.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Dodrio",
+    "desc": "Apparently, the heads aren’t the only parts of the body that Dodrio has three of. It has three sets of hearts and lungs as well, so it is capable of running long distances without rest.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Seel",
+    "desc": "Thanks to its thick fat, cold seas don’t bother it at all, but it gets tired pretty easily in warm waters.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Dewgong",
+    "desc": "It sunbathes on the beach after meals. The rise in its body temperature helps its digestion.",
+    "type": "Pokemon: Water, Ice"
+  },
+  {
+    "name": "Grimer",
+    "desc": "The wastewater coming from factories is clean these days, so Grimer have nothing to eat. They’re said to be on the verge of extinction.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Muk",
+    "desc": "Because they scatter germs everywhere, they’ve long been targeted for extermination, leading to a steep decline in their population.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Shellder",
+    "desc": "Even when its shell is closed, its tongue still hangs out. If you give its tongue a good yank, the shock will cause Shellder to open its shell.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Cloyster",
+    "desc": "Slowpoke tails are its favorite food. It has even been known to come up on land to look for Slowpoke from time to time.",
+    "type": "Pokemon: Water, Ice"
+  },
+  {
+    "name": "Gastly",
+    "desc": "Poisonous gas comprises 95% of its body. It’s said that the remaining 5% is made up of the souls of those who died from the gas.",
+    "type": "Pokemon: Ghost, Poison"
+  },
+  {
+    "name": "Haunter",
+    "desc": "It’s dangerous to go outside alone on nights when you’re feeling sad. Haunter will catch you, and you won’t be able to go back home.",
+    "type": "Pokemon: Ghost, Poison"
+  },
+  {
+    "name": "Gengar",
+    "desc": "Even your home isn’t safe. Gengar will lurk in whatever dark corner of a room it can find and wait for its chance to catch its prey.",
+    "type": "Pokemon: Ghost, Poison"
+  },
+  {
+    "name": "Onix",
+    "desc": "Onix has a magnet in its brain. It acts as a compass so that this Pokémon does not lose direction while it is tunneling. As it grows older, its body becomes increasingly rounder and smoother.",
+    "type": "Pokemon: Rock, Ground"
+  },
+  {
+    "name": "Drowzee",
+    "desc": "It puts its prey to sleep and devours their dreams. It seems that bad dreams taste sour, so Drowzee doesn’t particularly like eating them.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Hypno",
+    "desc": "There are some Hypno that assist doctors with patients who can’t sleep at night in hospitals.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Krabby",
+    "desc": "Krabby live on beaches, burrowed inside holes dug into the sand. On sandy beaches with little in the way of food, these Pokémon can be seen squabbling with each other over territory.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Kingler",
+    "desc": "Kingler has an enormous, oversized claw. It waves this huge claw in the air to communicate with others. However, because the claw is so heavy, the Pokémon quickly tires.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Voltorb",
+    "desc": "Voltorb is extremely sensitive—it explodes at the slightest of shocks. It is rumored that it was first created when a Poké Ball was exposed to a powerful pulse of energy.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Electrode",
+    "desc": "One of Electrode’s characteristics is its attraction to electricity. It is a problematical Pokémon that congregates mostly at electrical power plants to feed on electricity that has just been generated.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Exeggcute",
+    "desc": "Although they are the same size as other Exeggcute, the ones produced in Alola are quite heavy. Their shells are packed full.",
+    "type": "Pokemon: Grass, Psychic"
+  },
+  {
+    "name": "Exeggutor",
+    "desc": "Each of its three heads has its own thoughts. When they want to go in different directions, Exeggutor becomes unable to move.",
+    "type": "Pokemon: Grass, Psychic"
+  },
+  {
+    "name": "Cubone",
+    "desc": "It wears its mother’s skull on its head, so no one knows what its bare face looks like. However, it’s clear that it’s always crying.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Marowak",
+    "desc": "They thump their bones rhythmically to communicate among themselves. There are nearly 50 different rhythmic patterns.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Hitmonlee",
+    "desc": "Hitmonlee’s legs freely contract and stretch. Using these springlike legs, it bowls over foes with devastating kicks. After battle, it rubs down its legs and loosens the muscles to overcome fatigue.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Hitmonchan",
+    "desc": "Hitmonchan is said to possess the spirit of a boxer who had been working toward a world championship. This Pokémon has an indomitable spirit and will never give up in the face of adversity.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Lickitung",
+    "desc": "It licks filth clean with its tongue. Whatever it licks always stinks afterward, so whether it’s really clean is...questionable.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Koffing",
+    "desc": "Koffing embodies toxic substances. It mixes the toxins with raw garbage to set off a chemical reaction that results in a terribly powerful poison gas. The higher the temperature, the more gas is concocted by this Pokémon.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Weezing",
+    "desc": "Weezing alternately shrinks and inflates its twin bodies to mix together toxic gases inside. The more the gases are mixed, the more powerful the toxins become. The Pokémon also becomes more putrid.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Rhyhorn",
+    "desc": "Rhyhorn’s brain is very small. It is so dense, while on a run it forgets why it started running in the first place. It apparently remembers sometimes if it demolishes something.",
+    "type": "Pokemon: Ground, Rock"
+  },
+  {
+    "name": "Rhydon",
+    "desc": "Rhydon has a horn that serves as a drill. It is used for destroying rocks and boulders. This Pokémon occasionally rams into streams of magma, but the armor-like hide prevents it from feeling the heat.",
+    "type": "Pokemon: Ground, Rock"
+  },
+  {
+    "name": "Chansey",
+    "desc": "Because the eggs on their bellies have been overharvested by people in the past, the Chansey population remains very small.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Tangela",
+    "desc": "Tangela’s vines snap off easily if they are grabbed. This happens without pain, allowing it to make a quick getaway. The lost vines are replaced by newly grown vines the very next day.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Kangaskhan",
+    "desc": "You shouldn’t get close to the child when it’s playing outside its mother’s pouch. Its mother is always nearby watching over it.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Horsea",
+    "desc": "If Horsea senses danger, it will reflexively spray a dense black ink from its mouth and try to escape. This Pokémon swims by cleverly flapping the fin on its back.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Seadra",
+    "desc": "Seadra generates whirlpools by spinning its body. The whirlpools are strong enough to swallow even fishing boats. This Pokémon weakens prey with these currents, then swallows it whole.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Goldeen",
+    "desc": "The way it swims along fluttering its dress-like fins has earned it the name “princess of the water.”",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Seaking",
+    "desc": "To attract females, males dance on the river’s floor. The females gather around the male that dances most gracefully.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Staryu",
+    "desc": "No number of injuries can bother Staryu. Its amazing regenerative powers return it to its previous state in half a day!",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Starmie",
+    "desc": "It rotates its geometrically shaped body to swim through the water. It always seems to be sending out mysterious radio waves.",
+    "type": "Pokemon: Water, Psychic"
+  },
+  {
+    "name": "Mr. Mime",
+    "desc": "It creates invisible walls with its pantomiming. If you don’t act impressed, it will attack you with a double slap!",
+    "type": "Pokemon: Psychic, Fairy"
+  },
+  {
+    "name": "Scyther",
+    "desc": "Some call it a ninja. Its movements— imperceptibly quick—are sufficient to cleave the air in two. It’s very popular in Alola.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Jynx",
+    "desc": "Its strange cries sound like human language. There are some musicians who compose songs for Jynx to sing.",
+    "type": "Pokemon: Ice, Psychic"
+  },
+  {
+    "name": "Electabuzz",
+    "desc": "While it’s often blamed for power outages, the truth is the cause of outages is more often an error on the part of the electric company.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Magmar",
+    "desc": "The hotter the place, the better they feel. Magmar in Alola are said to be hardier than those in other areas.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Pinsir",
+    "desc": "Although it’s tough, it can’t handle cold well. When night falls, it buries itself in leafage and sleeps.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Tauros",
+    "desc": "The climate seems to be related to the reason Tauros in Alola are a little calmer than those in other regions.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Magikarp",
+    "desc": "Thanks to their strong hold on life, dirty water doesn’t bother them at all. They live in waters all over the world!",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Gyarados",
+    "desc": "The energy from evolution stimulated its brain cells strongly, causing it to become very ferocious.",
+    "type": "Pokemon: Water, Flying"
+  },
+  {
+    "name": "Lapras",
+    "desc": "They’ve been so cherished that there’s now an overabundance. The fish Pokémon population has declined in waters with too many Lapras.",
+    "type": "Pokemon: Water, Ice"
+  },
+  {
+    "name": "Ditto",
+    "desc": "It transforms into whatever it sees. If the thing it’s transforming into isn’t right in front of it, Ditto relies on its memory—so sometimes it fails.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Eevee",
+    "desc": "Its genes are easily influenced by its surroundings. Even its face starts to look like that of its Trainer.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Vaporeon",
+    "desc": "It detects nearby moisture with its fin. When its fin begins trembling rapidly, that means rain will fall in a few hours.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Jolteon",
+    "desc": "Its fur stands on end, becoming like needles it fires at enemies. Once they’re weakened, it finishes them off with a 10,000 volt shock.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Flareon",
+    "desc": "The flame chamber inside its body ignites when Flareon gets agitated, reaching temperatures of up to 1,650 degrees Fahrenheit.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Porygon",
+    "desc": "It was built 20 years ago by scientists who dreamed of exploring space. Their dreams have yet to come true.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Omanyte",
+    "desc": "It was restored from an ancient fossil. Those Helix Fossils are excavated from areas that were once oceans long, long ago.",
+    "type": "Pokemon: Rock, Water"
+  },
+  {
+    "name": "Omastar",
+    "desc": "It wraps its prey in its tentacles to immobilize them and then finishes them off with its sharp fangs.",
+    "type": "Pokemon: Rock, Water"
+  },
+  {
+    "name": "Kabuto",
+    "desc": "This Pokémon became extinct everywhere, except in a few areas. It protects itself with its hard shell.",
+    "type": "Pokemon: Rock, Water"
+  },
+  {
+    "name": "Kabutops",
+    "desc": "It swims at speeds of roughly 29 knots, quickly closing in on its prey and slashing into them with its scythes to finish them off.",
+    "type": "Pokemon: Rock, Water"
+  },
+  {
+    "name": "Aerodactyl",
+    "desc": "It flew through the open skies over the ancient continent as if they were its own. When it touched ground, its walk was weak and slow.",
+    "type": "Pokemon: Rock, Flying"
+  },
+  {
+    "name": "Snorlax",
+    "desc": "It has no interest in anything other than eating. Even if you climb up on its stomach while it’s napping, it doesn’t seem to mind at all!",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Articuno",
+    "desc": "Articuno is a legendary bird Pokémon that can control ice. The flapping of its wings chills the air. As a result, it is said that when this Pokémon flies, snow will fall.",
+    "type": "Pokemon: Ice, Flying"
+  },
+  {
+    "name": "Zapdos",
+    "desc": "Zapdos is a legendary bird Pokémon that has the ability to control electricity. It usually lives in thunderclouds. The Pokémon gains power if it is stricken by lightning bolts.",
+    "type": "Pokemon: Electric, Flying"
+  },
+  {
+    "name": "Moltres",
+    "desc": "Moltres is a legendary bird Pokémon that has the ability to control fire. If this Pokémon is injured, it is said to dip its body in the molten magma of a volcano to burn and heal itself.",
+    "type": "Pokemon: Fire, Flying"
+  },
+  {
+    "name": "Dratini",
+    "desc": "It sheds its skin—almost on a daily basis—and grows larger. Its skin is soft just after it’s been shed.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Dragonair",
+    "desc": "Some say that if you see it at the start of the year, flying through the sky and twisting its body, you’ll be healthy all year long.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Dragonite",
+    "desc": "You’ll often hear tales of this kindhearted Pokémon rescuing people or Pokémon that are drowning.",
+    "type": "Pokemon: Dragon, Flying"
+  },
+  {
+    "name": "Mewtwo",
+    "desc": "Mewtwo is a Pokémon that was created by genetic manipulation. However, even though the scientific power of humans created this Pokémon’s body, they failed to endow Mewtwo with a compassionate heart.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Mew",
+    "desc": "Mew is said to possess the genetic composition of all Pokémon. It is capable of making itself invisible at will, so it entirely avoids notice even if it approaches people.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Chikorita",
+    "desc": "In battle, Chikorita waves its leaf around to keep the foe at bay. However, a sweet fragrance also wafts from the leaf, becalming the battling Pokémon and creating a cozy, friendly atmosphere all around.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Bayleef",
+    "desc": "Bayleef’s neck is ringed by curled-up leaves. Inside each tubular leaf is a small shoot of a tree. The fragrance of this shoot makes people peppy.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Meganium",
+    "desc": "The fragrance of Meganium’s flower soothes and calms emotions. In battle, this Pokémon gives off more of its becalming scent to blunt the foe’s fighting spirit.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Cyndaquil",
+    "desc": "Cyndaquil protects itself by flaring up the flames on its back. The flames are vigorous if the Pokémon is angry. However, if it is tired, the flames splutter fitfully with incomplete combustion.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Quilava",
+    "desc": "Quilava keeps its foes at bay with the intensity of its flames and gusts of superheated air. This Pokémon applies its outstanding nimbleness to dodge attacks even while scorching the foe with flames.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Typhlosion",
+    "desc": "Typhlosion obscures itself behind a shimmering heat haze that it creates using its intensely hot flames. This Pokémon creates blazing explosive blasts that burn everything to cinders.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Totodile",
+    "desc": "Despite the smallness of its body, Totodile’s jaws are very powerful. While the Pokémon may think it is just playfully nipping, its bite has enough power to cause serious injury.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Croconaw",
+    "desc": "Once Croconaw has clamped its jaws on its foe, it will absolutely not let go. Because the tips of its fangs are forked back like barbed fishhooks, they become impossible to remove when they have sunk in.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Feraligatr",
+    "desc": "Feraligatr intimidates its foes by opening its huge mouth. In battle, it will kick the ground hard with its thick and powerful hind legs to charge at the foe at an incredible speed.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Sentret",
+    "desc": "When Sentret sleeps, it does so while another stands guard. The sentry wakes the others at the first sign of danger. When this Pokémon becomes separated from its pack, it becomes incapable of sleep due to fear.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Furret",
+    "desc": "Furret has a very slim build. When under attack, it can slickly squirm through narrow spaces and get away. In spite of its short limbs, this Pokémon is very nimble and fleet.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Hoothoot",
+    "desc": "It cries out at the same time every day. A long time ago, people cherished it and considered it a divine messenger sent to tell the time.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Noctowl",
+    "desc": "When it turns its head entirely upside down, you know it’s troubled by something. If you don’t leave it be, it will peck you.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Ledyba",
+    "desc": "These very cowardly Pokémon join together and use Reflect to protect their nest.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Ledian",
+    "desc": "It flies through the night sky, sprinkling sparkly dust. According to some, if that dust sticks to you, good things will happen to you.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Spinarak",
+    "desc": "Although the poison from its fangs isn’t that strong, it’s potent enough to weaken prey that gets caught in its web.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Ariados",
+    "desc": "It spews threads from its mouth to catch its prey. When night falls, it leaves its web to go hunt aggressively.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Crobat",
+    "desc": "It feeds on the blood of living people and Pokémon. If it can’t drink any blood for even a short while, it becomes weak and unable to fly.",
+    "type": "Pokemon: Poison, Flying"
+  },
+  {
+    "name": "Chinchou",
+    "desc": "Chinchou blink their shining antennae at one another to claim their respective turf.",
+    "type": "Pokemon: Water, Electric"
+  },
+  {
+    "name": "Lanturn",
+    "desc": "It lives far down in the depths of the ocean. It blinds its prey with light, using the moment they’re dazzled to swallow them whole.",
+    "type": "Pokemon: Water, Electric"
+  },
+  {
+    "name": "Pichu",
+    "desc": "It has electric sacs in its cheeks. When they’re fully charged, Pichu plays very energetically.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Cleffa",
+    "desc": "Said to have ridden here on a shooting star, Cleffa seem to appear in places where meteorites have struck in the past.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Igglybuff",
+    "desc": "Left to its own devices, it will constantly practice singing. You should make it take a break so it doesn’t hurt its throat.",
+    "type": "Pokemon: Normal, Fairy"
+  },
+  {
+    "name": "Togepi",
+    "desc": "As its energy, Togepi uses the positive emotions of compassion and pleasure exuded by people and Pokémon. This Pokémon stores up feelings of happiness inside its shell, then shares them with others.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Togetic",
+    "desc": "Togetic is said to be a Pokémon that brings good fortune. When the Pokémon spots someone who is pure of heart, it is said to appear and share its happiness with that person.",
+    "type": "Pokemon: Fairy, Flying"
+  },
+  {
+    "name": "Natu",
+    "desc": "The look in its eyes gives the impression that it’s carefully observing you. If you approach it, Natu will hop away.",
+    "type": "Pokemon: Psychic, Flying"
+  },
+  {
+    "name": "Xatu",
+    "desc": "While it can see the future, it has no desire to change it, which is probably why it remains motionless at all times.",
+    "type": "Pokemon: Psychic, Flying"
+  },
+  {
+    "name": "Mareep",
+    "desc": "Rubbing its fleece generates electricity. You’ll want to pet it because it’s cute, but if you use your bare hand, you’ll get a painful shock.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Flaaffy",
+    "desc": "It stores electricity in its fluffy fleece. If it stores up too much, it will start to go bald in those patches.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Ampharos",
+    "desc": "Its tail shines bright and strong. It has been prized since long ago as a beacon for sailors.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Bellossom",
+    "desc": "A Bellossom grows flowers more beautifully if it has evolved from a smelly Gloom—the more stinky the better. At night, this Pokémon closes its petals and goes to sleep.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Marill",
+    "desc": "When fishing for food at the edge of a fast-running stream, Marill wraps its tail around the trunk of a tree. This Pokémon’s tail is flexible and configured to stretch.",
+    "type": "Pokemon: Water, Fairy"
+  },
+  {
+    "name": "Azumarill",
+    "desc": "Azumarill can make balloons out of air. It makes these air balloons if it spots a drowning Pokémon. The air balloons enable the Pokémon in trouble to breathe.",
+    "type": "Pokemon: Water, Fairy"
+  },
+  {
+    "name": "Sudowoodo",
+    "desc": "The result of its holding the same pose all the time is arms that have become supple yet strong.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Politoed",
+    "desc": "The longer and more luxurious the curled hair on its head, the greater the number of Poliwag and Poliwhirl that will obey it.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Hoppip",
+    "desc": "This Pokémon drifts and floats with the wind. If it senses the approach of strong winds, Hoppip links its leaves with other Hoppip to prepare against being blown away.",
+    "type": "Pokemon: Grass, Flying"
+  },
+  {
+    "name": "Skiploom",
+    "desc": "Skiploom’s flower blossoms when the temperature rises above 64 degrees Fahrenheit. How much the flower opens depends on the temperature. For that reason, this Pokémon is sometimes used as a thermometer.",
+    "type": "Pokemon: Grass, Flying"
+  },
+  {
+    "name": "Jumpluff",
+    "desc": "Jumpluff rides warm southern winds to cross the sea and fly to foreign lands. The Pokémon descends to the ground when it encounters cold air while it is floating.",
+    "type": "Pokemon: Grass, Flying"
+  },
+  {
+    "name": "Aipom",
+    "desc": "It searches for prey from the tops of trees. When it spots its favorite food, Bounsweet, Aipom gets excited and pounces.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Sunkern",
+    "desc": "Sunkern tries to move as little as it possibly can. It does so because it tries to conserve all the nutrients it has stored in its body for its evolution. It will not eat a thing, subsisting only on morning dew.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Sunflora",
+    "desc": "Sunflora converts solar energy into nutrition. It moves around actively in the daytime when it is warm. It stops moving as soon as the sun goes down for the night.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Yanma",
+    "desc": "Yanma is capable of seeing 360 degrees without having to move its eyes. It is a great flier that is adept at making sudden stops and turning midair. This Pokémon uses its flying ability to quickly chase down targeted prey.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Wooper",
+    "desc": "Wooper usually lives in water. However, it occasionally comes out onto land in search of food. On land, it coats its body with a gooey, toxic film.",
+    "type": "Pokemon: Water, Ground"
+  },
+  {
+    "name": "Quagsire",
+    "desc": "Quagsire hunts for food by leaving its mouth wide open in water and waiting for its prey to blunder in unaware. Because the Pokémon does not move, it does not get very hungry.",
+    "type": "Pokemon: Water, Ground"
+  },
+  {
+    "name": "Espeon",
+    "desc": "Psychic power builds up in the orb on its forehead as it bathes in the sunshine. Espeon is not good at battling at night.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Umbreon",
+    "desc": "It lurks in the dark of night looking for prey. At the moment it pounces, the rings on its body glow dimly but ominously.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Murkrow",
+    "desc": "It searches for shiny things for its boss. Murkrow’s presence is said to be unlucky, so many people detest it.",
+    "type": "Pokemon: Dark, Flying"
+  },
+  {
+    "name": "Slowking",
+    "desc": "It’s called “the sage of the sea.” It engages in battles of wits with Oranguru, but the result is usually a draw.",
+    "type": "Pokemon: Water, Psychic"
+  },
+  {
+    "name": "Misdreavus",
+    "desc": "What makes it happy is imitating the voices of weeping people and scaring everyone. It doesn’t deal well with folks who aren’t easily frightened.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Unown",
+    "desc": "This Pokémon is shaped like ancient writing. It is a mystery as to which came first, the ancient writings or the various Unown. Research into this topic is ongoing but nothing is known.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Wobbuffet",
+    "desc": "Wobbuffet does nothing but endure attacks—it won’t attack on its own. However, it won’t endure an attack on its tail. When that happens, the Pokémon will try to take the foe with it using Destiny Bond.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Girafarig",
+    "desc": "Girafarig’s rear head contains a tiny brain that is too small for thinking. However, the rear head doesn’t need to sleep, so it can keep watch over its surroundings 24 hours a day.",
+    "type": "Pokemon: Normal, Psychic"
+  },
+  {
+    "name": "Pineco",
+    "desc": "It sticks tree bark to itself with its saliva, making itself thicker and larger. Elderly Pineco are ridiculously huge.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Forretress",
+    "desc": "In the moment that it gulps down its prey, the inside of its shell is exposed, but to this day, no one has ever seen that sight.",
+    "type": "Pokemon: Bug, Steel"
+  },
+  {
+    "name": "Dunsparce",
+    "desc": "When it sees a person, it digs a hole with its tail to make its escape. If you happen to find one, consider yourself lucky.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Gligar",
+    "desc": "Gligar glides through the air without a sound as if it were sliding. This Pokémon hangs on to the face of its foe using its clawed hind legs and the large pincers on its forelegs, then injects the prey with its poison barb.",
+    "type": "Pokemon: Ground, Flying"
+  },
+  {
+    "name": "Steelix",
+    "desc": "Steelix lives even further underground than Onix. This Pokémon is known to dig toward the earth’s core. There are records of this Pokémon reaching a depth of over six-tenths of a mile underground.",
+    "type": "Pokemon: Steel, Ground"
+  },
+  {
+    "name": "Snubbull",
+    "desc": "In contrast to its appearance, it’s quite timid. When playing with other puppy Pokémon, it sometimes gets bullied.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Granbull",
+    "desc": "Although it’s popular with young people, Granbull is timid and sensitive, so it’s totally incompetent as a watchdog.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Qwilfish",
+    "desc": "Qwilfish sucks in water, inflating itself. This Pokémon uses the pressure of the water it swallowed to shoot toxic quills all at once from all over its body. It finds swimming somewhat challenging.",
+    "type": "Pokemon: Water, Poison"
+  },
+  {
+    "name": "Scizor",
+    "desc": "Once it has identified something as an enemy, it will continue beating them with its steel-hard pincers until there’s nothing left but scraps.",
+    "type": "Pokemon: Bug, Steel"
+  },
+  {
+    "name": "Shuckle",
+    "desc": "Shuckle quietly hides itself under rocks, keeping its body concealed inside its hard shell while eating berries it has stored away. The berries mix with its body fluids to become a juice.",
+    "type": "Pokemon: Bug, Rock"
+  },
+  {
+    "name": "Heracross",
+    "desc": "It roams through forests searching for sweet nectar. Although it boasts fantastic physical strength, it’s not that good at flying.",
+    "type": "Pokemon: Bug, Fighting"
+  },
+  {
+    "name": "Sneasel",
+    "desc": "It blends into the dark of night to ambush its prey. Sneasel will attack Sandshrew, but its hard skin can cause Sneasel’s claws to snap off.",
+    "type": "Pokemon: Dark, Ice"
+  },
+  {
+    "name": "Teddiursa",
+    "desc": "This Pokémon likes to lick its palms that are sweetened by being soaked in honey. Teddiursa concocts its own honey by blending fruits and pollen collected by Beedrill.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Ursaring",
+    "desc": "In the forests inhabited by Ursaring, it is said that there are many streams and towering trees where they gather food. This Pokémon walks through its forest gathering food every day.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Slugma",
+    "desc": "Slugma does not have any blood in its body. Instead, intensely hot magma circulates throughout this Pokémon’s body, carrying essential nutrients and oxygen to its organs.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Magcargo",
+    "desc": "Magcargo’s body temperature is approximately 18,000 degrees Fahrenheit. Water is vaporized on contact. If this Pokémon is caught in the rain, the raindrops instantly turn into steam, cloaking the area in a thick fog.",
+    "type": "Pokemon: Fire, Rock"
+  },
+  {
+    "name": "Swinub",
+    "desc": "Swinub roots for food by rubbing its snout against the ground. Its favorite food is a mushroom that grows under the cover of dead grass. This Pokémon occasionally roots out hot springs.",
+    "type": "Pokemon: Ice, Ground"
+  },
+  {
+    "name": "Piloswine",
+    "desc": "Piloswine is covered by a thick coat of long hair that enables it to endure the freezing cold. This Pokémon uses its tusks to dig up food that has been buried under ice.",
+    "type": "Pokemon: Ice, Ground"
+  },
+  {
+    "name": "Corsola",
+    "desc": "In Alola, where their natural enemies Mareanie are plentiful, many Corsola have stubby branches on their heads.",
+    "type": "Pokemon: Water, Rock"
+  },
+  {
+    "name": "Remoraid",
+    "desc": "Also known as the “sniper of the seas,” its water gun can hit prey without fail from over 300 feet away.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Octillery",
+    "desc": "It usually sleeps in caves. The pitch-black ink that Octillery spits is also used for cooking.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Delibird",
+    "desc": "It wraps food in its tail to carry it around. The Delibird with the biggest tail is the boss of the flock!",
+    "type": "Pokemon: Ice, Flying"
+  },
+  {
+    "name": "Mantine",
+    "desc": "Many people have taken up surfing because they admire how magnificently Mantine swims.",
+    "type": "Pokemon: Water, Flying"
+  },
+  {
+    "name": "Skarmory",
+    "desc": "Its body is draped in steel armor. It looks heavy, but it can fly at speeds of up to 185 miles an hour!",
+    "type": "Pokemon: Steel, Flying"
+  },
+  {
+    "name": "Houndour",
+    "desc": "They make repeated eerie howls before dawn to call attention to their pack.",
+    "type": "Pokemon: Dark, Fire"
+  },
+  {
+    "name": "Houndoom",
+    "desc": "Identifiable by its eerie howls, people a long time ago thought it was the grim reaper and feared it.",
+    "type": "Pokemon: Dark, Fire"
+  },
+  {
+    "name": "Kingdra",
+    "desc": "Kingdra sleeps on the seafloor where it is otherwise devoid of life. When a storm arrives, the Pokémon is said to awaken and wander about in search of prey.",
+    "type": "Pokemon: Water, Dragon"
+  },
+  {
+    "name": "Phanpy",
+    "desc": "Phanpy uses its long nose to shower itself. When others gather around, they thoroughly douse each other with water. These Pokémon can be seen drying their soaking-wet bodies at the edge of water.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Donphan",
+    "desc": "If Donphan were to tackle with its hard body, even a house could be destroyed. Using its massive strength, the Pokémon helps clear rock and mud slides that block mountain trails.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Porygon2",
+    "desc": "Even though it doesn’t die in the vacuum of space, it can’t move around very well in zero gravity.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Stantler",
+    "desc": "Stantler’s magnificent antlers were traded at high prices as works of art. As a result, this Pokémon was hunted close to extinction by those who were after the priceless antlers.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Smeargle",
+    "desc": "It draws symbols with the fluid that oozes from the tip of its tail. Depending on the symbol, Smeargle fanatics will pay big money for them.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Tyrogue",
+    "desc": "Tyrogue becomes stressed out if it does not get to train every day. When raising this Pokémon, the Trainer must establish and uphold various training methods.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Hitmontop",
+    "desc": "Hitmontop spins on its head at high speed, all the while delivering kicks. This technique is a remarkable mix of both offense and defense at the same time. The Pokémon travels faster spinning than it does walking.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Smoochum",
+    "desc": "Highly perceptive sensors, Smoochum’s lips are kept moist by its daily application of tree sap.",
+    "type": "Pokemon: Ice, Psychic"
+  },
+  {
+    "name": "Elekid",
+    "desc": "When its horns shine a bluish white, that’s the sign it’s fully charged. You’ll get a shocking jolt if you touch it!",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Magby",
+    "desc": "Its body temperature is always around 1,100 degrees Fahrenheit. If Magby falls into a small- enough pond, the whole thing will dry up.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Miltank",
+    "desc": "Its milk is delicious and chock-full of nutrients. However, if you drink too much, it could make your stomach hurt, so be careful.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Blissey",
+    "desc": "This Pokémon is overflowing with love. Only Chansey that share a strong bond with their Trainer can evolve, so people say.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Raikou",
+    "desc": "Raikou embodies the speed of lightning. The roars of this Pokémon send shock waves shuddering through the air and shake the ground as if lightning bolts had come crashing down.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Entei",
+    "desc": "Entei embodies the passion of magma. This Pokémon is thought to have been born in the eruption of a volcano. It sends up massive bursts of fire that utterly consume all that they touch.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Suicune",
+    "desc": "Suicune embodies the compassion of a pure spring of water. It runs across the land with gracefulness. This Pokémon has the power to purify dirty water.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Larvitar",
+    "desc": "Raised on nutrients it finds in the dirt, it eats roughly a mountain’s worth of dirt before it becomes a pupa.",
+    "type": "Pokemon: Rock, Ground"
+  },
+  {
+    "name": "Pupitar",
+    "desc": "This dangerous pupa thrashes about. Its shell is as hard as bedrock, containing its gradually forming new body within.",
+    "type": "Pokemon: Rock, Ground"
+  },
+  {
+    "name": "Tyranitar",
+    "desc": "This Pokémon is a mobile disaster, leaving mountains crumbled and houses destroyed in its wake.",
+    "type": "Pokemon: Rock, Dark"
+  },
+  {
+    "name": "Lugia",
+    "desc": "Lugia’s wings pack devastating power—a light fluttering of its wings can blow apart regular houses. As a result, this Pokémon chooses to live out of sight deep under the sea.",
+    "type": "Pokemon: Psychic, Flying"
+  },
+  {
+    "name": "Ho-Oh",
+    "desc": "Ho-Oh’s feathers glow in seven colors depending on the angle at which they are struck by light. These feathers are said to bring happiness to the bearers. This Pokémon is said to live at the foot of a rainbow.",
+    "type": "Pokemon: Fire, Flying"
+  },
+  {
+    "name": "Celebi",
+    "desc": "This Pokémon came from the future by crossing over time. It is thought that so long as Celebi appears, a bright and shining future awaits us.",
+    "type": "Pokemon: Psychic, Grass"
+  },
+  {
+    "name": "Treecko",
+    "desc": "Treecko is cool, calm, and collected—it never panics under any situation. If a bigger foe were to glare at this Pokémon, it would glare right back without conceding an inch of ground.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Grovyle",
+    "desc": "This Pokémon adeptly flies from branch to branch in trees. In a forest, no Pokémon can ever hope to catch a fleeing Grovyle however fast they may be.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Sceptile",
+    "desc": "Sceptile has seeds growing on its back. They are said to be bursting with nutrients that revitalize trees. This Pokémon raises the trees in a forest with loving care.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Torchic",
+    "desc": "Torchic has a place inside its body where it keeps its flame. Give it a hug—it will be glowing with warmth. This Pokémon is covered all over by a fluffy coat of down.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Combusken",
+    "desc": "Combusken battles with the intensely hot flames it spews from its beak and with outstandingly destructive kicks. This Pokémon’s cry is very loud and distracting.",
+    "type": "Pokemon: Fire, Fighting"
+  },
+  {
+    "name": "Blaziken",
+    "desc": "Blaziken has incredibly strong legs—it can easily clear a 30-story building in one leap. This Pokémon’s blazing punches leave its foes scorched and blackened.",
+    "type": "Pokemon: Fire, Fighting"
+  },
+  {
+    "name": "Mudkip",
+    "desc": "In water, Mudkip breathes using the gills on its cheeks. If it is faced with a tight situation in battle, this Pokémon will unleash its amazing power—it can crush rocks bigger than itself.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Marshtomp",
+    "desc": "Marshtomp is much faster at traveling through mud than it is at swimming. This Pokémon’s hindquarters exhibit obvious development, giving it the ability to walk on just its hind legs.",
+    "type": "Pokemon: Water, Ground"
+  },
+  {
+    "name": "Swampert",
+    "desc": "Swampert predicts storms by sensing subtle differences in the sounds of waves and tidal winds with its fins. If a storm is approaching, it piles up boulders to protect itself.",
+    "type": "Pokemon: Water, Ground"
+  },
+  {
+    "name": "Poochyena",
+    "desc": "Poochyena is an omnivore—it will eat anything. A distinguishing feature is how large its fangs are compared to its body. This Pokémon tries to intimidate its foes by making the hair on its tail bristle out.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Mightyena",
+    "desc": "Mightyena travel and act as a pack in the wild. The memory of its life in the wild compels the Pokémon to obey only those Trainers that it recognizes to possess superior skill.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Zigzagoon",
+    "desc": "The hair on Zigzagoon’s back is bristly. It rubs the hard back hair against trees to leave its territorial markings. This Pokémon may play dead to fool foes in battle.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Linoone",
+    "desc": "When hunting, Linoone will make a beeline straight for the prey at a full run. While this Pokémon is capable of topping 60 mph, it has to come to a screeching halt before it can turn.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Wurmple",
+    "desc": "Wurmple is targeted by Swellow as prey. This Pokémon will try to resist by pointing the spikes on its rear at the attacking predator. It will weaken the foe by leaking poison from the spikes.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Silcoon",
+    "desc": "Silcoon was thought to endure hunger and not consume anything before its evolution. However, it is now thought that this Pokémon slakes its thirst by drinking rainwater that collects on its silk.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Beautifly",
+    "desc": "Beautifly has a long mouth like a coiled needle, which is very convenient for collecting pollen from flowers. This Pokémon rides the spring winds as it flits around gathering pollen.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Cascoon",
+    "desc": "If it is attacked, Cascoon remains motionless however badly it may be hurt. It does so because if it were to move, its body would be weak upon evolution. This Pokémon will also not forget the pain it endured.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Dustox",
+    "desc": "When Dustox flaps its wings, a fine dust is scattered all over. This dust is actually a powerful poison that will even make a pro wrestler sick. This Pokémon searches for food using its antennae like radar.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Lotad",
+    "desc": "Lotad is said to have dwelled on land before. However, this Pokémon is thought to have returned to water because the leaf on its head grew large and heavy. It now lives by floating atop the water.",
+    "type": "Pokemon: Water, Grass"
+  },
+  {
+    "name": "Lombre",
+    "desc": "Lombre’s entire body is covered by a slippery, slimy film. It feels horribly unpleasant to be touched by this Pokémon’s hands. Lombre is often mistaken for a human child.",
+    "type": "Pokemon: Water, Grass"
+  },
+  {
+    "name": "Ludicolo",
+    "desc": "Upon hearing an upbeat and cheerful rhythm, the cells in Ludicolo’s body become very energetic and active. Even in battle, this Pokémon will exhibit an amazing amount of power.",
+    "type": "Pokemon: Water, Grass"
+  },
+  {
+    "name": "Seedot",
+    "desc": "Seedot looks exactly like an acorn when it is dangling from a tree branch. It startles other Pokémon by suddenly moving. This Pokémon polishes its body once a day using leaves.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Nuzleaf",
+    "desc": "This Pokémon pulls out the leaf on its head and makes a flute with it. The sound of Nuzleaf’s flute strikes fear and uncertainty in the hearts of people lost in a forest.",
+    "type": "Pokemon: Grass, Dark"
+  },
+  {
+    "name": "Shiftry",
+    "desc": "Shiftry’s large fans generate awesome gusts of wind at a speed close to 100 feet per second. The whipped-up wind blows anything away. This Pokémon chooses to live quietly deep in forests.",
+    "type": "Pokemon: Grass, Dark"
+  },
+  {
+    "name": "Taillow",
+    "desc": "Taillow is young—it has only just left its nest. As a result, it sometimes becomes lonesome and cries at night. This Pokémon feeds on Wurmple that live in forests.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Swellow",
+    "desc": "Swellow is very conscientious about the upkeep of its glossy wings. Once two Swellow are gathered, they diligently take care of cleaning each other’s wings.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Wingull",
+    "desc": "It builds nests in cliffs by the sea. It circles the skies above the ocean looking for its favorite food—Wishiwashi.",
+    "type": "Pokemon: Water, Flying"
+  },
+  {
+    "name": "Pelipper",
+    "desc": "It scoops up Wishiwashi in its huge beak and swallows them whole. It can devour more than 30 at one go!",
+    "type": "Pokemon: Water, Flying"
+  },
+  {
+    "name": "Ralts",
+    "desc": "Ralts has the ability to sense the emotions of people. If its Trainer is in a cheerful mood, this Pokémon grows cheerful and joyous in the same way.",
+    "type": "Pokemon: Psychic, Fairy"
+  },
+  {
+    "name": "Kirlia",
+    "desc": "Kirlia uses the horns on its head to amplify its psychokinetic power. When the Pokémon uses its power, the air around it becomes distorted, creating mirages of nonexistent scenery.",
+    "type": "Pokemon: Psychic, Fairy"
+  },
+  {
+    "name": "Gardevoir",
+    "desc": "Gardevoir has the psychokinetic power to distort the dimensions and create a small black hole. This Pokémon will try to protect its Trainer even at the risk of its own life.",
+    "type": "Pokemon: Psychic, Fairy"
+  },
+  {
+    "name": "Surskit",
+    "desc": "It lives in ponds and marshes that feature lots of plant life. It often fights with Dewpider, whose habitat and diet are similar.",
+    "type": "Pokemon: Bug, Water"
+  },
+  {
+    "name": "Masquerain",
+    "desc": "Its thin, winglike antennae are highly absorbent. It waits out rainy days in tree hollows.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Shroomish",
+    "desc": "If Shroomish senses danger, it shakes its body and scatters spores from the top of its head. This Pokémon’s spores are so toxic, they make trees and weeds wilt.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Breloom",
+    "desc": "The seeds ringing Breloom’s tail are made of hardened toxic spores. It is horrible to eat the seeds. Just taking a bite of this Pokémon’s seed will cause your stomach to rumble.",
+    "type": "Pokemon: Grass, Fighting"
+  },
+  {
+    "name": "Slakoth",
+    "desc": "Slakoth’s heart beats just once a minute. Whatever happens, it is content to loaf around motionless. It is rare to see this Pokémon in motion.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Vigoroth",
+    "desc": "Vigoroth is simply incapable of remaining still. Even when it tries to sleep, the blood in its veins grows agitated, compelling this Pokémon to run wild throughout the jungle before it can settle down.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Slaking",
+    "desc": "Wherever Slaking live, rings of over a yard in diameter appear in grassy fields. They are made by the Pokémon as it eats all the grass within reach while lying prone on the ground.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Nincada",
+    "desc": "Nincada lives underground. It uses its sharp claws to carve the roots of trees and absorb moisture and nutrients. This Pokémon can’t withstand bright sunlight so avoids it.",
+    "type": "Pokemon: Bug, Ground"
+  },
+  {
+    "name": "Ninjask",
+    "desc": "If Ninjask is not trained properly, it will refuse to obey the Trainer and cry loudly continuously. Because of this quality, this Pokémon is said to be one that puts the Trainer’s abilities to the test.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Shedinja",
+    "desc": "Shedinja is a peculiar Pokémon. It seems to appear unsought in a Poké Ball after a Nincada evolves. This bizarre Pokémon is entirely immobile—it doesn’t even breathe.",
+    "type": "Pokemon: Bug, Ghost"
+  },
+  {
+    "name": "Whismur",
+    "desc": "Whismur is very timid. If it starts to cry loudly, it becomes startled by its own crying and cries even harder. When it finally stops crying, the Pokémon goes to sleep, all tired out.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Loudred",
+    "desc": "Loudred shouts while stamping its feet. After it finishes shouting, this Pokémon becomes incapable of hearing anything for a while. This is considered to be a weak point.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Exploud",
+    "desc": "Exploud communicates its feelings to the others by emitting whistle-like sounds from the tubes on its body. This Pokémon only raises its voice when it is in battle.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Makuhita",
+    "desc": "There’s a rumor of a traditional recipe for stew that Trainers can use to raise strong Makuhita.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Hariyama",
+    "desc": "Hariyama that are big and fat aren’t necessarily strong. There are some small ones that move nimbly and use moves skillfully.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Azurill",
+    "desc": "Azurill’s tail is large and bouncy. It is packed full of the nutrients this Pokémon needs to grow. Azurill can be seen bouncing and playing on its big, rubbery tail.",
+    "type": "Pokemon: Normal, Fairy"
+  },
+  {
+    "name": "Nosepass",
+    "desc": "It hunts without twitching a muscle by pulling in its prey with powerful magnetism. But sometimes it pulls natural enemies in close.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Skitty",
+    "desc": "Skitty is known to chase around playfully after its own tail. In the wild, this Pokémon lives in holes in the trees of forests. It is very popular as a pet because of its adorable looks.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Delcatty",
+    "desc": "Delcatty sleeps anywhere it wants without keeping a permanent nest. If other Pokémon approach it as it sleeps, this Pokémon will never fight—it will just move away somewhere else.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Sableye",
+    "desc": "Materials from gems it has eaten float to the surface of its body and can form an infinite number of patterns among individuals.",
+    "type": "Pokemon: Dark, Ghost"
+  },
+  {
+    "name": "Mawile",
+    "desc": "It has two mouths. The big jaws on the back of its head can’t taste anything, so that’s the mouth it uses to eat foods it doesn’t like.",
+    "type": "Pokemon: Steel, Fairy"
+  },
+  {
+    "name": "Aron",
+    "desc": "Aron has a body of steel. With one all-out charge, this Pokémon can demolish even a heavy dump truck. The destroyed dump truck then becomes a handy meal for the Pokémon.",
+    "type": "Pokemon: Steel, Rock"
+  },
+  {
+    "name": "Lairon",
+    "desc": "Lairon feeds on iron contained in rocks and water. It makes its nest on mountains where iron ore is buried. As a result, the Pokémon often clashes with humans mining the iron ore.",
+    "type": "Pokemon: Steel, Rock"
+  },
+  {
+    "name": "Aggron",
+    "desc": "Aggron is protective of its environment. If its mountain is ravaged by a landslide or a fire, this Pokémon will haul topsoil to the area, plant trees, and beautifully restore its own territory.",
+    "type": "Pokemon: Steel, Rock"
+  },
+  {
+    "name": "Meditite",
+    "desc": "Meditite heightens its inner energy through meditation. It survives on just one berry a day. Minimal eating is another aspect of this Pokémon’s training.",
+    "type": "Pokemon: Fighting, Psychic"
+  },
+  {
+    "name": "Medicham",
+    "desc": "Through the power of meditation, Medicham developed its sixth sense. It gained the ability to use psychokinetic powers. This Pokémon is known to meditate for a whole month without eating.",
+    "type": "Pokemon: Fighting, Psychic"
+  },
+  {
+    "name": "Electrike",
+    "desc": "Static electricity builds up all over its body as strands of its long fur rub together. This Pokémon boasts incredible speed.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Manectric",
+    "desc": "It stimulates its own muscles with electricity, so it can move quickly. It eases its soreness with electricity, too, so it can recover quickly as well.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Plusle",
+    "desc": "When Plusle is cheering on its partner, it flashes with electric sparks from all over its body. If its partner loses, this Pokémon cries loudly.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Minun",
+    "desc": "Minun loves to cheer on its partner in battle. It gives off sparks from its body while it is doing so. If its partner is in trouble, this Pokémon gives off increasing amounts of sparks.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Volbeat",
+    "desc": "Volbeat’s tail glows like a lightbulb. With other Volbeat, it uses its tail to draw geometric shapes in the night sky. This Pokémon loves the sweet aroma given off by Illumise.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Illumise",
+    "desc": "Illumise leads a flight of illuminated Volbeat to draw signs in the night sky. This Pokémon is said to earn greater respect from its peers by composing more complex designs in the sky.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Roselia",
+    "desc": "On extremely rare occasions, a Roselia is said to appear with its flowers in unusual colors. The thorns on this Pokémon’s head contain a vicious poison.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Gulpin",
+    "desc": "Most of Gulpin’s body is made up of its stomach—its heart and brain are very small in comparison. This Pokémon’s stomach contains special enzymes that dissolve anything.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Swalot",
+    "desc": "Swalot has no teeth, so what it eats, it swallows whole, no matter what. Its cavernous mouth yawns widely. An automobile tire could easily fit inside this Pokémon’s mouth.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Carvanha",
+    "desc": "With its sturdy jaws and fangs, it can easily chomp wooden boats to splinters. It fights with Basculin over food.",
+    "type": "Pokemon: Water, Dark"
+  },
+  {
+    "name": "Sharpedo",
+    "desc": "It drinks in seawater and jets it from its rear to propel itself. It’s very sensitive to the scent of blood.",
+    "type": "Pokemon: Water, Dark"
+  },
+  {
+    "name": "Wailmer",
+    "desc": "Due to their memories of when they once lived on land, pods of them will, very rarely, wash up on shore.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Wailord",
+    "desc": "When a small Wailmer is attacked by Sharpedo or Dhelmise, its whole pod works together to protect it.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Numel",
+    "desc": "Numel stores magma of almost 2,200 degrees Fahrenheit within its body. If it gets wet, the magma cools and hardens. In that event, the Pokémon’s body grows heavy and its movements become sluggish.",
+    "type": "Pokemon: Fire, Ground"
+  },
+  {
+    "name": "Camerupt",
+    "desc": "The humps on Camerupt’s back are formed by a transformation of its bones. They sometimes blast out molten magma. This Pokémon apparently erupts often when it is enraged.",
+    "type": "Pokemon: Fire, Ground"
+  },
+  {
+    "name": "Torkoal",
+    "desc": "It burns coal to produce energy. When it has burned through all of its coal, it becomes unable to move.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Spoink",
+    "desc": "Spoink keeps a pearl on top of its head. The pearl functions to amplify this Pokémon’s psychokinetic powers. It is therefore on a constant search for a bigger pearl.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Grumpig",
+    "desc": "Grumpig uses the black pearls on its body to wield its fantastic powers. When it is doing so, it dances bizarrely. This Pokémon’s black pearls are valuable as works of art.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Spinda",
+    "desc": "Each Spinda’s spot pattern is different. With its stumbling movements, it evades opponents’ attacks brilliantly!",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Trapinch",
+    "desc": "It builds nests that double as traps, lying in wait for its prey to get caught. When night falls, it digs itself a spot beneath the sand to sleep.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Vibrava",
+    "desc": "It vibrates its wings to send out odd sound waves. Trainers who are with it need earplugs.",
+    "type": "Pokemon: Ground, Dragon"
+  },
+  {
+    "name": "Flygon",
+    "desc": "People continue to have their hearts stolen by its enchanting songs and find themselves stranded in the desert.",
+    "type": "Pokemon: Ground, Dragon"
+  },
+  {
+    "name": "Cacnea",
+    "desc": "The more arid and harsh the environment, the more pretty and fragrant a flower Cacnea grows. This Pokémon battles by wildly swinging its thorny arms.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Cacturne",
+    "desc": "If a traveler is going through a desert in the thick of night, Cacturne will follow in a ragtag group. The Pokémon are biding their time, waiting for the traveler to tire and become incapable of moving.",
+    "type": "Pokemon: Grass, Dark"
+  },
+  {
+    "name": "Swablu",
+    "desc": "Swablu loves to make things clean. If it spots something dirty, it will wipe and polish it with its cottony wings. If its wings become dirty, this Pokémon finds a stream and showers itself.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Altaria",
+    "desc": "Altaria sings in a gorgeous soprano. Its wings are like cotton clouds. This Pokémon catches updrafts with its buoyant wings and soars way up into the wild blue yonder.",
+    "type": "Pokemon: Dragon, Flying"
+  },
+  {
+    "name": "Zangoose",
+    "desc": "Zangoose usually stays on all fours, but when angered, it gets up on its hind legs and extends its claws. This Pokémon shares a bitter rivalry with Seviper that dates back over generations.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Seviper",
+    "desc": "Seviper’s swordlike tail serves two purposes—it slashes foes and douses them with secreted poison. This Pokémon will not give up its long-running blood feud with Zangoose.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Lunatone",
+    "desc": "Lunatone becomes active around the time of the full moon. Instead of walking, it moves by floating in midair. The Pokémon’s intimidating red eyes cause all those who see it to become transfixed with fear.",
+    "type": "Pokemon: Rock, Psychic"
+  },
+  {
+    "name": "Solrock",
+    "desc": "Sunlight is the source of Solrock’s power. It is said to possess the ability to read the emotions of others. This Pokémon gives off intense heat while rotating its body.",
+    "type": "Pokemon: Rock, Psychic"
+  },
+  {
+    "name": "Barboach",
+    "desc": "Its whiskers are filled with nerves. They can sense smells and flavors just as a person’s nose or tongue would.",
+    "type": "Pokemon: Water, Ground"
+  },
+  {
+    "name": "Whiscash",
+    "desc": "Its vision is not that good. It senses vibrations in the water with its whiskers to determine the location of its prey.",
+    "type": "Pokemon: Water, Ground"
+  },
+  {
+    "name": "Corphish",
+    "desc": "It can adapt very well to its environment. Feebas and Corphish are about the only Pokémon to live in stagnant ditches.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Crawdaunt",
+    "desc": "Its pincers often fall off. Unlike with Crabrawler or Clauncher, the meat in its claws is utterly nasty and stinking.",
+    "type": "Pokemon: Water, Dark"
+  },
+  {
+    "name": "Baltoy",
+    "desc": "When they find others of their kind, they cry out loudly and gather together. Large numbers of them can be found in old graveyards.",
+    "type": "Pokemon: Ground, Psychic"
+  },
+  {
+    "name": "Claydol",
+    "desc": "The ancient people who made it apparently modeled it after something that descended from the sky. It fires beams from both arms.",
+    "type": "Pokemon: Ground, Psychic"
+  },
+  {
+    "name": "Lileep",
+    "desc": "It sticks to rocks with its powerful suckers and can’t be washed away no matter how rough the surf gets.",
+    "type": "Pokemon: Rock, Grass"
+  },
+  {
+    "name": "Cradily",
+    "desc": "This carnivorous Pokémon lived in primordial seas. It catches prey in its eight tentacles and dissolves them with digestive fluid as it eats.",
+    "type": "Pokemon: Rock, Grass"
+  },
+  {
+    "name": "Anorith",
+    "desc": "This is one kind of primeval bug Pokémon. With eight wings, it could apparently swim a lot faster than you’d expect.",
+    "type": "Pokemon: Rock, Bug"
+  },
+  {
+    "name": "Armaldo",
+    "desc": "Armaldo adapted from living in water to living on land. It has been determined that it is the ancestor of some bug Pokémon.",
+    "type": "Pokemon: Rock, Bug"
+  },
+  {
+    "name": "Feebas",
+    "desc": "Because of its wretched appearance, most people pay it no attention, but there are some who collect Feebas—and Feebas alone!",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Milotic",
+    "desc": "Its dwelling place is the bottom of big lakes. Those who behold its loveliness are said to have their hearts purified.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Castform",
+    "desc": "Its form changes depending on the weather. The rougher conditions get, the rougher Castform’s disposition!",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Kecleon",
+    "desc": "Its color changes for concealment and also when its mood or health changes. The darker the color, the healthier it is.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Shuppet",
+    "desc": "There’s a proverb that says, “Shun the house where Shuppet gather in the growing dusk.”",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Banette",
+    "desc": "Resentment at being cast off made it spring into being. Some say that treating it well will satisfy it, and it will once more become a stuffed toy.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Duskull",
+    "desc": "Duskull wanders lost among the deep darkness of midnight. There is an oft-told admonishment given to misbehaving children that this Pokémon will spirit away bad children who earn scoldings from their mothers.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Dusclops",
+    "desc": "Dusclops absorbs anything, however large the object may be. This Pokémon hypnotizes its foe by waving its hands in a macabre manner and by bringing its single eye to bear. The hypnotized foe is made to do Dusclops’s bidding.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Tropius",
+    "desc": "Bunches of delicious fruit grow around its neck. In warm areas, many ranches raise Tropius.",
+    "type": "Pokemon: Grass, Flying"
+  },
+  {
+    "name": "Chimecho",
+    "desc": "In high winds, Chimecho cries as it hangs from a tree branch or the eaves of a building using a suction cup on its head. This Pokémon plucks berries with its long tail and eats them.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Absol",
+    "desc": "The elderly call it the disaster Pokémon and detest it, but interest in its power to predict disasters is on the rise.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Wynaut",
+    "desc": "Wynaut gather on moonlit nights to play by squeezing up against each other. By being squeezed, this Pokémon gains endurance and is trained to dole out powerful counterattacks.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Snorunt",
+    "desc": "Rich people from cold areas all share childhood memories of playing with Snorunt.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Glalie",
+    "desc": "Its actual body is a rock that isn’t particularly hard. Glalie absorbs moisture from the air and drapes itself in an armor of ice.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Spheal",
+    "desc": "Spheal always travels by rolling around on its ball-like body. When the season for ice floes arrives, this Pokémon can be seen rolling about on ice and crossing the sea.",
+    "type": "Pokemon: Ice, Water"
+  },
+  {
+    "name": "Sealeo",
+    "desc": "Sealeo often balances and rolls things on the tip of its nose. While the Pokémon is rolling something, it checks the object’s aroma and texture to determine whether it likes the object or not.",
+    "type": "Pokemon: Ice, Water"
+  },
+  {
+    "name": "Walrein",
+    "desc": "Walrein swims all over in frigid seawater while crushing icebergs with its grand, imposing tusks. Its thick layer of blubber makes enemy attacks bounce off harmlessly.",
+    "type": "Pokemon: Ice, Water"
+  },
+  {
+    "name": "Clamperl",
+    "desc": "Clamperl’s pearls are exceedingly precious. They can be more than 10 times as costly as Shellder’s pearls.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Huntail",
+    "desc": "Deep seas are their habitat. According to tradition, when Huntail wash up onshore, something unfortunate will happen.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Gorebyss",
+    "desc": "It sucks bodily fluids out of its prey. The leftover meat sinks to the seafloor, where it becomes food for other Pokémon.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Relicanth",
+    "desc": "The reason it hasn’t changed at all in a hundred million years is that it’s apparently already a perfect life-form.",
+    "type": "Pokemon: Water, Rock"
+  },
+  {
+    "name": "Luvdisc",
+    "desc": "Luvdisc makes its home in coral reefs in warm seas. It especially likes sleeping in the space between Corsola’s branches.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Bagon",
+    "desc": "Some theories suggest that its behavior of forcefully bashing its head into things stimulates cells that affect its evolution.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Shelgon",
+    "desc": "Shelgon lives deep within caves. It stays shut up in its hard shell, dreaming of the day it will be able to fly.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Salamence",
+    "desc": "Thanks to its fervent wishes, the cells in its body finally mutated, and at last it has its heart’s desire—wings.",
+    "type": "Pokemon: Dragon, Flying"
+  },
+  {
+    "name": "Beldum",
+    "desc": "If you anger it, it will do more than rampage. It will also burst out strong magnetism, causing nearby machines to break.",
+    "type": "Pokemon: Steel, Psychic"
+  },
+  {
+    "name": "Metang",
+    "desc": "It flies at high speeds around the skies. When it finds its prey, Metang takes a firm grip with its sharp claws and never lets go.",
+    "type": "Pokemon: Steel, Psychic"
+  },
+  {
+    "name": "Metagross",
+    "desc": "It analyzes its opponents with more accuracy than a supercomputer, which enables it to calmly back them into a corner.",
+    "type": "Pokemon: Steel, Psychic"
+  },
+  {
+    "name": "Regirock",
+    "desc": "Regirock’s body is composed entirely of rocks. Recently, a study made the startling discovery that the rocks were all unearthed from different locations.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Regice",
+    "desc": "Regice cloaks itself with frigid air of -328 degrees Fahrenheit. Things will freeze solid just by going near this Pokémon. Its icy body is so cold, it will not melt even if it is immersed in magma.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Registeel",
+    "desc": "Registeel was imprisoned by people in ancient times. The metal composing its body is thought to be a curious substance that is not of this earth.",
+    "type": "Pokemon: Steel"
+  },
+  {
+    "name": "Latias",
+    "desc": "Latias is highly intelligent and capable of understanding human speech. It is covered with a glass-like down. The Pokémon enfolds its body with its down and refracts light to alter its appearance.",
+    "type": "Pokemon: Dragon, Psychic"
+  },
+  {
+    "name": "Latios",
+    "desc": "Latios will only open its heart to a Trainer with a compassionate spirit. This Pokémon can fly faster than a jet plane by folding its forelegs to minimize air resistance.",
+    "type": "Pokemon: Dragon, Psychic"
+  },
+  {
+    "name": "Kyogre",
+    "desc": "Kyogre is said to be the personification of the sea itself. Legends tell of its many clashes against Groudon, as each sought to gain the power of nature.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Groudon",
+    "desc": "Through Primal Reversion and with nature’s full power, it will take back its true form. It can cause magma to erupt and expand the landmass of the world.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Rayquaza",
+    "desc": "It flies forever through the ozone layer, consuming meteoroids for sustenance. The many meteoroids in its body provide the energy it needs to Mega Evolve.",
+    "type": "Pokemon: Dragon, Flying"
+  },
+  {
+    "name": "Jirachi",
+    "desc": "Jirachi will awaken from its sleep of a thousand years if you sing to it in a voice of purity. It is said to make true any wish that people desire.",
+    "type": "Pokemon: Steel, Psychic"
+  },
+  {
+    "name": "Deoxys",
+    "desc": "Deoxys emerged from a virus that came from space. It is highly intelligent and wields psychokinetic powers. This Pokémon shoots lasers from the crystalline organ on its chest.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Turtwig",
+    "desc": "It undertakes photosynthesis with its body, making oxygen. The leaf on its head wilts if it is thirsty.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Grotle",
+    "desc": "It knows where pure water wells up. It carries fellow Pokémon there on its back.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Torterra",
+    "desc": "Small Pokémon occasionally gather on its unmoving back to begin building their nests.",
+    "type": "Pokemon: Grass, Ground"
+  },
+  {
+    "name": "Chimchar",
+    "desc": "The gas made in its belly burns from its rear end. The fire burns weakly when it feels sick.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Monferno",
+    "desc": "It uses ceilings and walls to launch aerial attacks. Its fiery tail is but one weapon.",
+    "type": "Pokemon: Fire, Fighting"
+  },
+  {
+    "name": "Infernape",
+    "desc": "It tosses its enemies around with agility. It uses all its limbs to fight in its own unique style.",
+    "type": "Pokemon: Fire, Fighting"
+  },
+  {
+    "name": "Piplup",
+    "desc": "Because it is very proud, it hates accepting food from people. Its thick down guards it from cold.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Prinplup",
+    "desc": "It lives a solitary life. Its wings deliver wicked blows that can snap even the thickest of trees.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Empoleon",
+    "desc": "The three horns that extend from its beak attest to its power. The leader has the biggest horns.",
+    "type": "Pokemon: Water, Steel"
+  },
+  {
+    "name": "Starly",
+    "desc": "They flock around mountains and fields, chasing after bug Pokémon. Their singing is noisy and annoying.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Staravia",
+    "desc": "It lives in forests and fields. Squabbles over territory occur when flocks collide.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Staraptor",
+    "desc": "When Staravia evolve into Staraptor, they leave the flock to live alone. They have sturdy wings.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Bidoof",
+    "desc": "It constantly gnaws on logs and rocks to whittle down its front teeth. It nests alongside water.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Bibarel",
+    "desc": "It makes its nest by damming streams with bark and mud. It is known as an industrious worker.",
+    "type": "Pokemon: Normal, Water"
+  },
+  {
+    "name": "Kricketot",
+    "desc": "When its antennae hit each other, it sounds like the music of a xylophone.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Kricketune",
+    "desc": "It signals its emotions with its melodies. Scientists are studying these melodic patterns.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Shinx",
+    "desc": "All of its fur dazzles if danger is sensed. It flees while the foe is momentarily blinded.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Luxio",
+    "desc": "Strong electricity courses through the tips of its sharp claws. A light scratch causes fainting in foes.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Luxray",
+    "desc": "Luxray’s ability to see through objects comes in handy when it’s scouting for danger.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Budew",
+    "desc": "Over the winter, it closes its bud and endures the cold. In spring, the bud opens and releases pollen.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Roserade",
+    "desc": "With the movements of a dancer, it strikes with whips that are densely lined with poison thorns.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Cranidos",
+    "desc": "Its hard skull is its distinguishing feature. It snapped trees by headbutting them, and then it fed on their ripe berries.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Rampardos",
+    "desc": "This ancient Pokémon used headbutts skillfully. Its brain was really small, so some theories suggest that its stupidity led to its extinction.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Shieldon",
+    "desc": "Although its fossils can be found in layers of primeval rock, nothing but its face has ever been discovered.",
+    "type": "Pokemon: Rock, Steel"
+  },
+  {
+    "name": "Bastiodon",
+    "desc": "This Pokémon is from roughly 100 million years ago. Its terrifyingly tough face is harder than steel.",
+    "type": "Pokemon: Rock, Steel"
+  },
+  {
+    "name": "Burmy",
+    "desc": "If its cloak is broken in battle, it quickly remakes the cloak with materials nearby.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Wormadam",
+    "desc": "When Burmy evolved, its cloak became a part of this Pokémon’s body. The cloak is never shed.",
+    "type": "Pokemon: Bug, Grass"
+  },
+  {
+    "name": "Mothim",
+    "desc": "It flutters around at night and steals honey from the Combee hive.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Combee",
+    "desc": "It collects and delivers honey to its colony. At night, they cluster to form a beehive and sleep.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Vespiquen",
+    "desc": "Its abdomen is a honeycomb for grubs. It raises its grubs on honey collected by Combee.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Pachirisu",
+    "desc": "A pair may be seen rubbing their cheek pouches together in an effort to share stored electricity.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Buizel",
+    "desc": "It inflates the flotation sac around its neck and pokes its head out of the water to see what is going on.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Floatzel",
+    "desc": "Its flotation sac developed as a result of pursuing aquatic prey. It can double as a rubber raft.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Cherubi",
+    "desc": "It evolves by sucking the energy out of the small ball where it had been storing nutrients.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Cherrim",
+    "desc": "If it senses strong sunlight, it opens its folded petals to absorb the sun’s rays with its whole body.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Shellos",
+    "desc": "When it senses danger, a purple liquid oozes out of it. The liquid is thought to be something like greasy sweat.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Gastrodon",
+    "desc": "Their shape and color change, depending on their environment and diet. There are many of them at beaches where the waves are calm.",
+    "type": "Pokemon: Water, Ground"
+  },
+  {
+    "name": "Ambipom",
+    "desc": "It uses its tails for everything. If it wraps both of its tails around you and gives you a squeeze, that’s proof it really likes you.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Drifloon",
+    "desc": "Wandering souls gathered together to form this Pokémon. When trying to make friends with children, Drifloon grabs them by the hand.",
+    "type": "Pokemon: Ghost, Flying"
+  },
+  {
+    "name": "Drifblim",
+    "desc": "The raw material for the gas inside its body is souls. When its body starts to deflate, it’s thought to carry away people and Pokémon.",
+    "type": "Pokemon: Ghost, Flying"
+  },
+  {
+    "name": "Buneary",
+    "desc": "The reason it keeps one ear rolled up is so it can launch a swift counterattack if it’s attacked by an enemy.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Lopunny",
+    "desc": "It’s notably wary and has a dislike of fighting, but at the same time, it can deliver powerful kicks with its lithe legs.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Mismagius",
+    "desc": "Its muttered curses can cause awful headaches or terrifying visions that torment others.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Honchkrow",
+    "desc": "Its goons take care of most of the fighting for it. The only time it dirties its own hands is in delivering a final blow to finish off an opponent.",
+    "type": "Pokemon: Dark, Flying"
+  },
+  {
+    "name": "Glameow",
+    "desc": "When it’s happy, Glameow demonstrates beautiful movements of its tail, like a dancing ribbon.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Purugly",
+    "desc": "To make itself appear intimidatingly beefy, it tightly cinches its waist with its twin tails.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Chingling",
+    "desc": "There is an orb inside its mouth. When it hops, the orb bounces all over and makes a ringing sound.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Stunky",
+    "desc": "It protects itself by spraying a noxious fluid from its rear. The stench lingers for 24 hours.",
+    "type": "Pokemon: Poison, Dark"
+  },
+  {
+    "name": "Skuntank",
+    "desc": "It sprays a stinky fluid from its tail. The fluid smells worse the longer it is allowed to fester.",
+    "type": "Pokemon: Poison, Dark"
+  },
+  {
+    "name": "Bronzor",
+    "desc": "Implements shaped like it were discovered in ancient tombs. It is unknown if they are related.",
+    "type": "Pokemon: Steel, Psychic"
+  },
+  {
+    "name": "Bronzong",
+    "desc": "Ancient people believed that petitioning Bronzong for rain was the way to make crops grow.",
+    "type": "Pokemon: Steel, Psychic"
+  },
+  {
+    "name": "Bonsly",
+    "desc": "If its body gets too damp, it will die. So, in a process reminiscent of sweating, its eyes expel moisture.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Mime Jr.",
+    "desc": "When this gifted mimic surprises an opponent, Mime Jr. feels so happy that it ends up forgetting it was imitating something.",
+    "type": "Pokemon: Psychic, Fairy"
+  },
+  {
+    "name": "Happiny",
+    "desc": "When it sees something round and white, Happiny puts it into the pouch on its stomach. It sometimes becomes overloaded and can’t move.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Chatot",
+    "desc": "It can learn and speak human words. If they gather, they all learn the same saying.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Spiritomb",
+    "desc": "It was bound to a fissure in an odd keystone as punishment for misdeeds 500 years ago.",
+    "type": "Pokemon: Ghost, Dark"
+  },
+  {
+    "name": "Gible",
+    "desc": "Its original home is an area much hotter than Alola. If you’re planning to live with one, your heating bill will soar.",
+    "type": "Pokemon: Dragon, Ground"
+  },
+  {
+    "name": "Gabite",
+    "desc": "It sheds its skin and gradually grows larger. Its scales can be ground into a powder and used as raw materials for traditional medicine.",
+    "type": "Pokemon: Dragon, Ground"
+  },
+  {
+    "name": "Garchomp",
+    "desc": "Its fine scales don’t just reduce wind resistance—their sharp edges also cause injury to any opponent who attacks it.",
+    "type": "Pokemon: Dragon, Ground"
+  },
+  {
+    "name": "Munchlax",
+    "desc": "Anything that looks edible, Munchlax will go on and swallow whole. Its stomach is tough enough to handle it even if the food has gone rotten.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Riolu",
+    "desc": "It uses waves called auras to communicate with others of its kind. It doesn’t make any noise during this time, so its enemies can’t detect it.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Lucario",
+    "desc": "Lucario reads its opponent’s feelings with its aura waves. It finds out things it would rather not know, so it gets stressed out easily.",
+    "type": "Pokemon: Fighting, Steel"
+  },
+  {
+    "name": "Hippopotas",
+    "desc": "It enshrouds itself with sand to protect itself from germs. It does not enjoy getting wet.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Hippowdon",
+    "desc": "It blasts internally stored sand from ports on its body to create a towering twister for attack.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Skorupi",
+    "desc": "It burrows under the sand to lie in wait for prey. Its tail claws can inject its prey with a savage poison.",
+    "type": "Pokemon: Poison, Bug"
+  },
+  {
+    "name": "Drapion",
+    "desc": "It has the power in its clawed arms to make scrap of a car. The tips of its claws release poison.",
+    "type": "Pokemon: Poison, Dark"
+  },
+  {
+    "name": "Croagunk",
+    "desc": "Inflating its poison sacs, it fills the area with an odd sound and hits flinching opponents with a poison jab.",
+    "type": "Pokemon: Poison, Fighting"
+  },
+  {
+    "name": "Toxicroak",
+    "desc": "Its knuckle claws secrete a toxin so vile that even a scratch could prove fatal.",
+    "type": "Pokemon: Poison, Fighting"
+  },
+  {
+    "name": "Carnivine",
+    "desc": "It binds itself to trees in marshes. It attracts prey with its sweet-smelling drool and gulps them down.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Finneon",
+    "desc": "It lures in prey with its shining tail fins. It stays near the surface during the day and moves to the depths when night falls.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Lumineon",
+    "desc": "They traverse the deep waters as if crawling over the seafloor. The fantastic lights of its fins shine like stars in the night sky.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Mantyke",
+    "desc": "Mantyke are friendly toward people and will approach boats closely. The patterns on their backs differ depending on their habitat.",
+    "type": "Pokemon: Water, Flying"
+  },
+  {
+    "name": "Snover",
+    "desc": "In the spring, it grows berries with the texture of frozen treats around its belly.",
+    "type": "Pokemon: Grass, Ice"
+  },
+  {
+    "name": "Abomasnow",
+    "desc": "It lives a quiet life on mountains that are perpetually covered in snow. It hides itself by whipping up blizzards.",
+    "type": "Pokemon: Grass, Ice"
+  },
+  {
+    "name": "Weavile",
+    "desc": "Thanks to its increased intelligence, scrapping over food is a thing of the past. A scratch from its claws will give you a case of frostbite!",
+    "type": "Pokemon: Dark, Ice"
+  },
+  {
+    "name": "Magnezone",
+    "desc": "There are still people who believe that this Pokémon came from outer space. It emanates a powerful magnetic field.",
+    "type": "Pokemon: Electric, Steel"
+  },
+  {
+    "name": "Lickilicky",
+    "desc": "It uses its tongue much more skillfully than its hands or its feet. It can deftly pick up a single small bean with its tongue.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Rhyperior",
+    "desc": "It puts rocks in holes in its palms and uses its muscles to shoot them. Geodude are shot at rare times.",
+    "type": "Pokemon: Ground, Rock"
+  },
+  {
+    "name": "Tangrowth",
+    "desc": "Its vines grow so profusely that, in the warm season, you can’t even see its eyes.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Electivire",
+    "desc": "A single Electivire can provide enough electricity for all the buildings in a big city for a year.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Magmortar",
+    "desc": "Magmortar takes down its enemies by shooting fireballs, which burn them to a blackened crisp. It avoids this method when hunting prey.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Togekiss",
+    "desc": "It shares many blessings with people who respect one another’s rights and avoid needless strife.",
+    "type": "Pokemon: Fairy, Flying"
+  },
+  {
+    "name": "Yanmega",
+    "desc": "This six-legged Pokémon is easily capable of transporting an adult in flight. The wings on its tail help it stay balanced.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Leafeon",
+    "desc": "It gets its nutrition from photosynthesis. It lives a quiet life deep in forests where clean rivers flow.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Glaceon",
+    "desc": "It can instantaneously freeze any moisture that’s around it, creating ice pellets to shoot at its prey.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Gliscor",
+    "desc": "Its flight is soundless. It uses its lengthy tail to carry off its prey... Then its elongated fangs do the rest.",
+    "type": "Pokemon: Ground, Flying"
+  },
+  {
+    "name": "Mamoswine",
+    "desc": "Its impressive tusks are made of ice. The population thinned when it turned warm after the ice age.",
+    "type": "Pokemon: Ice, Ground"
+  },
+  {
+    "name": "Porygon-Z",
+    "desc": "A faulty update was added to its programming. Its behavior is noticeably strange, so the experiment may have been a failure.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Gallade",
+    "desc": "A master of courtesy and swordsmanship, it fights using extending swords on its elbows.",
+    "type": "Pokemon: Psychic, Fighting"
+  },
+  {
+    "name": "Probopass",
+    "desc": "It uses three small units to catch prey and battle enemies. The main body mostly just gives orders.",
+    "type": "Pokemon: Rock, Steel"
+  },
+  {
+    "name": "Dusknoir",
+    "desc": "The antenna on its head captures radio waves from the world of spirits that command it to take people there.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Froslass",
+    "desc": "It’s said that on nights of terrible blizzards, it comes down to human settlements. If you hear it knocking at your door, do not open it!",
+    "type": "Pokemon: Ice, Ghost"
+  },
+  {
+    "name": "Rotom",
+    "desc": "Its body is composed of plasma. It is known to infiltrate electronic devices and wreak havoc.",
+    "type": "Pokemon: Electric, Ghost"
+  },
+  {
+    "name": "Uxie",
+    "desc": "It is said that its emergence gave humans the intelligence to improve their quality of life.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Mesprit",
+    "desc": "It sleeps at the bottom of a lake. Its spirit is said to leave its body to fly on the lake’s surface.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Azelf",
+    "desc": "It is thought that Uxie, Mesprit, and Azelf all came from the same egg.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Dialga",
+    "desc": "It has the power to control time. It appears in Sinnoh-region myths as an ancient deity.",
+    "type": "Pokemon: Steel, Dragon"
+  },
+  {
+    "name": "Palkia",
+    "desc": "It has the ability to distort space. It is described as a deity in Sinnoh-region mythology.",
+    "type": "Pokemon: Water, Dragon"
+  },
+  {
+    "name": "Heatran",
+    "desc": "Boiling blood, like magma, circulates through its body. It makes its dwelling place in volcanic caves.",
+    "type": "Pokemon: Fire, Steel"
+  },
+  {
+    "name": "Regigigas",
+    "desc": "There is an enduring legend that states this Pokémon towed continents with ropes.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Giratina",
+    "desc": "It was banished for its violence. It silently gazed upon the old world from the Distortion World.",
+    "type": "Pokemon: Ghost, Dragon"
+  },
+  {
+    "name": "Cresselia",
+    "desc": "Those who sleep holding Cresselia’s feather are assured of joyful dreams. It is said to represent the crescent moon.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Phione",
+    "desc": "It drifts in warm seas. It always returns to where it was born, no matter how far it may have drifted.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Manaphy",
+    "desc": "It starts its life with a wondrous power that permits it to bond with any kind of Pokémon.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Darkrai",
+    "desc": "It can lull people to sleep and make them dream. It is active during nights of the new moon.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Shaymin",
+    "desc": "The blooming of Gracidea flowers confers the power of flight upon it. Feelings of gratitude are the message it delivers.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Arceus",
+    "desc": "It is told in mythology that this Pokémon was born before the universe even existed.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Victini",
+    "desc": "When it shares the infinite energy it creates, that being’s entire body will be overflowing with power.",
+    "type": "Pokemon: Psychic, Fire"
+  },
+  {
+    "name": "Snivy",
+    "desc": "They photosynthesize by bathing their tails in sunlight. When they are not feeling well, their tails droop.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Servine",
+    "desc": "When it gets dirty, its leaves can’t be used in photosynthesis, so it always keeps itself clean.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Serperior",
+    "desc": "It can stop its opponents’ movements with just a glare. It takes in solar energy and boosts it internally.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Tepig",
+    "desc": "It loves to eat roasted berries, but sometimes it gets too excited and burns them to a crisp.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Pignite",
+    "desc": "When its internal fire flares up, its movements grow sharper and faster. When in trouble, it emits smoke.",
+    "type": "Pokemon: Fire, Fighting"
+  },
+  {
+    "name": "Emboar",
+    "desc": "It has mastered fast and powerful fighting moves. It grows a beard of fire.",
+    "type": "Pokemon: Fire, Fighting"
+  },
+  {
+    "name": "Oshawott",
+    "desc": "It fights using the scalchop on its stomach. In response to an attack, it retaliates immediately by slashing.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Dewott",
+    "desc": "As a result of strict training, each Dewott learns different forms for using the scalchops.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Samurott",
+    "desc": "One swing of the sword incorporated in its armor can fell an opponent. A simple glare from one of them quiets everybody.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Patrat",
+    "desc": "Extremely cautious, one of them will always be on the lookout, but it won’t notice a foe coming from behind.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Watchog",
+    "desc": "When they see an enemy, their tails stand high, and they spit the seeds of berries stored in their cheek pouches.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Lillipup",
+    "desc": "This Pokémon is popular with beginners because it’s intelligent, obedient to its Trainer’s commands, and easy to raise.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Herdier",
+    "desc": "It has been living with people for so long that portrayals of it can be found on the walls of caves from long, long ago.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Stoutland",
+    "desc": "Its fur is long and thick. A long time ago in cold regions, every household kept a Stoutland.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Purrloin",
+    "desc": "They steal from people for fun, but their victims can’t help but forgive them. Their deceptively cute act is perfect.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Liepard",
+    "desc": "Stealthily, it sneaks up on its target, striking from behind before its victim has a chance to react.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Pansage",
+    "desc": "It’s good at finding berries and gathers them from all over. It’s kind enough to share them with friends.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Simisage",
+    "desc": "Ill tempered, it fights by swinging its barbed tail around wildly. The leaf growing on its head is very bitter.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Pansear",
+    "desc": "This Pokémon lives in caves in volcanoes. The fire within the tuft on its head can reach 600 degrees Fahrenheit.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Simisear",
+    "desc": "When it gets excited, embers rise from its head and tail and it gets hot. For some reason, it loves sweets.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Panpour",
+    "desc": "The water stored inside the tuft on its head is full of nutrients. Plants that receive its water grow large.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Simipour",
+    "desc": "It prefers places with clean water. When its tuft runs low, it replenishes it by siphoning up water with its tail.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Munna",
+    "desc": "It eats the dreams of people and Pokémon. When it eats a pleasant dream, it expels pink-colored mist.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Musharna",
+    "desc": "The dream mist coming from its forehead changes into many different colors depending on the dream that was eaten.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Pidove",
+    "desc": "These Pokémon live in cities. They are accustomed to people. Flocks often gather in parks and plazas.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Tranquill",
+    "desc": "No matter where in the world it goes, it knows where its nest is, so it never gets separated from its Trainer.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Unfezant",
+    "desc": "Males have plumage on their heads. They will never let themselves feel close to anyone other than their Trainers.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Blitzle",
+    "desc": "Its mane shines when it discharges electricity. They use the frequency and rhythm of these flashes to communicate.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Zebstrika",
+    "desc": "They have lightning-like movements. When Zebstrika run at full speed, the sound of thunder reverberates.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Roggenrola",
+    "desc": "It was found in a fissure in a layer of exposed rock. The material that makes up its body is dirt from several hundred years ago.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Boldore",
+    "desc": "Its orange crystals are lumps of powerful energy. They’re valuable, so Boldore is sometimes targeted for them.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Gigalith",
+    "desc": "It absorbs rays of sunlight and shoots out energy. It’s usually lurking deep beneath the surface.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Woobat",
+    "desc": "The heart-shaped mark left on a body after a Woobat has been attached to it is said to bring good fortune.",
+    "type": "Pokemon: Psychic, Flying"
+  },
+  {
+    "name": "Swoobat",
+    "desc": "Anyone who comes into contact with the ultrasonic waves emitted by a courting male experiences a positive mood shift.",
+    "type": "Pokemon: Psychic, Flying"
+  },
+  {
+    "name": "Drilbur",
+    "desc": "By spinning its body, it can dig straight through the ground at a speed of 30 mph.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Excadrill",
+    "desc": "More than 300 feet below the surface, they build mazelike nests. Their activity can be destructive to subway tunnels.",
+    "type": "Pokemon: Ground, Steel"
+  },
+  {
+    "name": "Audino",
+    "desc": "It touches others with the feelers on its ears, using the sound of their heartbeats to tell how they are feeling.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Timburr",
+    "desc": "Always carrying squared logs, they help out with construction. As they grow, they carry bigger logs.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Gurdurr",
+    "desc": "This Pokémon is so muscular and strongly built that even a group of wrestlers could not make it budge an inch.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Conkeldurr",
+    "desc": "Rather than rely on force, they master moves that utilize the centrifugal force of spinning concrete.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Tympole",
+    "desc": "By vibrating its cheeks, it emits sound waves imperceptible to humans. It uses the rhythm of these sounds to talk.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Palpitoad",
+    "desc": "It lives in the water and on land. It uses its long, sticky tongue to immobilize its opponents.",
+    "type": "Pokemon: Water, Ground"
+  },
+  {
+    "name": "Seismitoad",
+    "desc": "They shoot paralyzing liquid from their head bumps. They use vibration to hurt their opponents.",
+    "type": "Pokemon: Water, Ground"
+  },
+  {
+    "name": "Throh",
+    "desc": "When it encounters a foe bigger than itself, it wants to throw it. It changes belts as it gets stronger.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Sawk",
+    "desc": "Tying their belts gets them pumped and makes their punches more destructive. Disturbing their training angers them.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Sewaddle",
+    "desc": "Since this Pokémon makes its own clothes out of leaves, it is a popular mascot for fashion designers.",
+    "type": "Pokemon: Bug, Grass"
+  },
+  {
+    "name": "Swadloon",
+    "desc": "It protects itself from the cold by wrapping up in leaves. It stays on the move, eating leaves in forests.",
+    "type": "Pokemon: Bug, Grass"
+  },
+  {
+    "name": "Leavanny",
+    "desc": "It keeps its eggs warm with heat from fermenting leaves. It also uses leaves to make warm wrappings for Sewaddle.",
+    "type": "Pokemon: Bug, Grass"
+  },
+  {
+    "name": "Venipede",
+    "desc": "Its bite injects a potent poison, enough to paralyze large bird Pokémon that try to prey on it.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Whirlipede",
+    "desc": "It is usually motionless, but when attacked, it rotates at high speed and then crashes into its opponent.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Scolipede",
+    "desc": "With quick movements, it chases down its foes, attacking relentlessly with its horns until it prevails.",
+    "type": "Pokemon: Bug, Poison"
+  },
+  {
+    "name": "Cottonee",
+    "desc": "When attacked, it expels cotton from its body to create a diversion. The cotton it loses grows back in quickly.",
+    "type": "Pokemon: Grass, Fairy"
+  },
+  {
+    "name": "Whimsicott",
+    "desc": "Whimsicott doesn’t live in a fixed location. It floats around on whirling winds, appearing all over the place to perform its mischief.",
+    "type": "Pokemon: Grass, Fairy"
+  },
+  {
+    "name": "Petilil",
+    "desc": "They prefer clean water and soil. When the environment they live in turns bad, the whole bunch will up and move to a new area.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Lilligant",
+    "desc": "It’s well liked by other Pokémon because of its beauty. The flower on its head needs constant care, or it will soon wither and rot.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Basculin",
+    "desc": "When a school of Basculin appears in a lake, everything else disappears, except for Corphish and Crawdaunt. That’s how violent Basculin are.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Sandile",
+    "desc": "Sandile’s still not good at hunting, so it mostly eats things that have collapsed in the desert. It’s called “the cleaner of the desert.”",
+    "type": "Pokemon: Ground, Dark"
+  },
+  {
+    "name": "Krokorok",
+    "desc": "It buries some of its prey in the sand to use as emergency meals when its hunts are unsuccessful.",
+    "type": "Pokemon: Ground, Dark"
+  },
+  {
+    "name": "Krookodile",
+    "desc": "It conceals itself in sandstorms that Flygon whip up and waits patiently for prey to appear.",
+    "type": "Pokemon: Ground, Dark"
+  },
+  {
+    "name": "Darumaka",
+    "desc": "When it sleeps, it pulls its limbs into its body and its internal fire goes down to 1,100 degrees Fahrenheit.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Darmanitan",
+    "desc": "Its internal fire burns at 2,500 degrees Fahrenheit, making enough power that it can destroy a dump truck with one punch.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Maractus",
+    "desc": "Arid regions are their habitat. They move rhythmically, making a sound similar to maracas.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Dwebble",
+    "desc": "When it finds a stone of a suitable size, it secretes a liquid from its mouth to open up a hole to crawl into.",
+    "type": "Pokemon: Bug, Rock"
+  },
+  {
+    "name": "Crustle",
+    "desc": "Competing for territory, Crustle fight viciously. The one whose boulder is broken is the loser of the battle.",
+    "type": "Pokemon: Bug, Rock"
+  },
+  {
+    "name": "Scraggy",
+    "desc": "It stretches its saggy skin up to its neck to protect itself. The saggier their skin, the more respect they garner.",
+    "type": "Pokemon: Dark, Fighting"
+  },
+  {
+    "name": "Scrafty",
+    "desc": "It taunts its opponents by spitting. It has a certain territory that it never leaves its whole life long.",
+    "type": "Pokemon: Dark, Fighting"
+  },
+  {
+    "name": "Sigilyph",
+    "desc": "The guardians of an ancient city, they always fly the same route while keeping watch for invaders.",
+    "type": "Pokemon: Psychic, Flying"
+  },
+  {
+    "name": "Yamask",
+    "desc": "Each of them carries a mask that used to be its face when it was human. Sometimes they look at it and cry.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Cofagrigus",
+    "desc": "Grave robbers who mistake them for real coffins and get too close end up trapped inside their bodies.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Tirtouga",
+    "desc": "Its hunting grounds encompassed a broad area, from the land to more than half a mile deep in the ocean.",
+    "type": "Pokemon: Water, Rock"
+  },
+  {
+    "name": "Carracosta",
+    "desc": "Carracosta eats every last bit of the prey it catches, even the shells and bones, to further strengthen its sturdy shell.",
+    "type": "Pokemon: Water, Rock"
+  },
+  {
+    "name": "Archen",
+    "desc": "Restored from a fossil, this ancient bird Pokémon has wings but can’t yet fly.",
+    "type": "Pokemon: Rock, Flying"
+  },
+  {
+    "name": "Archeops",
+    "desc": "Said to be an ancestor of bird Pokémon, the muscles it uses to flap its wings are still weak, so it needs a long runway in order to take off.",
+    "type": "Pokemon: Rock, Flying"
+  },
+  {
+    "name": "Trubbish",
+    "desc": "If a young Pokémon or child breathes in the toxic gas that Trubbish belches out, it could be a life-threatening situation.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Garbodor",
+    "desc": "Some say the reason Garbodor in Alola are a little stronger than their counterparts elsewhere is the presence of Muk, their natural enemy.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Zorua",
+    "desc": "If a normally talkative child suddenly stops talking, it may have been replaced by Zorua.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Zoroark",
+    "desc": "If it thinks humans are going to discover its den, Zoroark shows them visions that make them wander around in the woods.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Minccino",
+    "desc": "When its tail has gotten dirty from self-cleaning or from cleaning its nest, Minccino spends a whole day washing its tail in clean spring water.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Cinccino",
+    "desc": "The oil that seeps from its body is really smooth. For people troubled by bad skin, this oil is an effective treatment.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Gothita",
+    "desc": "They intently observe both Trainers and Pokémon. Apparently, they are looking at something that only Gothita can see.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Gothorita",
+    "desc": "According to many old tales, it creates friends for itself by controlling sleeping children on starry nights.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Gothitelle",
+    "desc": "They can predict the future from the placement and movement of the stars. They can see Trainers’ life spans.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Solosis",
+    "desc": "They drive away attackers by unleashing psychic power. They can use telepathy to talk with others.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Duosion",
+    "desc": "When their two divided brains think the same thoughts, their psychic power is maximized.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Reuniclus",
+    "desc": "When Reuniclus shake hands, a network forms between their brains, increasing their psychic power.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Ducklett",
+    "desc": "They are better at swimming than flying, and they happily eat their favorite food, peat moss, as they dive underwater.",
+    "type": "Pokemon: Water, Flying"
+  },
+  {
+    "name": "Swanna",
+    "desc": "Swanna start to dance at dusk. The one dancing in the middle is the leader of the flock.",
+    "type": "Pokemon: Water, Flying"
+  },
+  {
+    "name": "Vanillite",
+    "desc": "When the morning sun hit an icicle, it wished not to melt, and thus Vanillite was born. At night, it buries itself in snow to sleep.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Vanillish",
+    "desc": "This hearty Pokémon survived the Ice Age. It’s incredibly popular in very hot regions.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Vanilluxe",
+    "desc": "Vanilluxe is born when two Vanillish, half-melted by the day’s light, stick to each other and freeze together in the cold return of night.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Deerling",
+    "desc": "The turning of the seasons changes the color and scent of this Pokémon’s fur. People use it to mark the seasons.",
+    "type": "Pokemon: Normal, Grass"
+  },
+  {
+    "name": "Sawsbuck",
+    "desc": "They migrate according to the seasons, so some people call Sawsbuck the harbingers of spring.",
+    "type": "Pokemon: Normal, Grass"
+  },
+  {
+    "name": "Emolga",
+    "desc": "As it flies, it scatters electricity around, so bird Pokémon keep their distance. That’s why Emolga can keep all its food to itself.",
+    "type": "Pokemon: Electric, Flying"
+  },
+  {
+    "name": "Karrablast",
+    "desc": "For some reason they evolve when they receive electrical energy while they are attacking Shelmet.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Escavalier",
+    "desc": "These Pokémon evolve by wearing the shell covering of a Shelmet. The steel armor protects their whole body.",
+    "type": "Pokemon: Bug, Steel"
+  },
+  {
+    "name": "Foongus",
+    "desc": "It lures Pokémon with its pattern that looks just like a Poké Ball, then releases poison spores.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Amoonguss",
+    "desc": "It lures prey close by dancing and waving its arm caps, which resemble Poké Balls, in a swaying motion.",
+    "type": "Pokemon: Grass, Poison"
+  },
+  {
+    "name": "Frillish",
+    "desc": "Using the invisible poison spikes on its veillike arms and legs, it paralyzes its enemies and causes them to drown.",
+    "type": "Pokemon: Water, Ghost"
+  },
+  {
+    "name": "Jellicent",
+    "desc": "Fishermen are terrified of Jellicent. It’s rumored to drag them into the sea and steal their lives away.",
+    "type": "Pokemon: Water, Ghost"
+  },
+  {
+    "name": "Alomomola",
+    "desc": "The reason it helps Pokémon in a weakened condition is that any Pokémon coming after them may also attack Alomomola.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Joltik",
+    "desc": "They attach themselves to large-bodied Pokémon and absorb static electricity, which they store in an electric pouch.",
+    "type": "Pokemon: Bug, Electric"
+  },
+  {
+    "name": "Galvantula",
+    "desc": "When attacked, they create an electric barrier by spitting out many electrically charged threads.",
+    "type": "Pokemon: Bug, Electric"
+  },
+  {
+    "name": "Ferroseed",
+    "desc": "It absorbs the iron it finds in the rock while clinging to the ceiling. It shoots spikes when in danger.",
+    "type": "Pokemon: Grass, Steel"
+  },
+  {
+    "name": "Ferrothorn",
+    "desc": "They attach themselves to cave ceilings, firing steel spikes at targets passing beneath them.",
+    "type": "Pokemon: Grass, Steel"
+  },
+  {
+    "name": "Klink",
+    "desc": "The two minigears that mesh together are predetermined. Each will rebound from other minigears without meshing.",
+    "type": "Pokemon: Steel"
+  },
+  {
+    "name": "Klang",
+    "desc": "A minigear and big gear comprise its body. If the minigear it launches at a foe doesn’t return, it will die.",
+    "type": "Pokemon: Steel"
+  },
+  {
+    "name": "Klinklang",
+    "desc": "Its red core functions as an energy tank. It fires the charged energy through its spikes into an area.",
+    "type": "Pokemon: Steel"
+  },
+  {
+    "name": "Tynamo",
+    "desc": "One alone can emit only a trickle of electricity, so a group of them gathers to unleash a powerful electric shock.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Eelektrik",
+    "desc": "These Pokémon have a big appetite. When they spot their prey, they attack it and paralyze it with electricity.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Eelektross",
+    "desc": "They crawl out of the ocean using their arms. They will attack prey on shore and immediately drag it into the ocean.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Elgyem",
+    "desc": "This Pokémon is shrouded in mystery. It’s said to have appeared from a UFO that fell from the sky about 50 years ago.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Beheeyem",
+    "desc": "It has strong psychic powers. Using its fingers that flash three different colors, it controls its opponents and rewrites their memories.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Litwick",
+    "desc": "Litwick shines a light that absorbs the life energy of people and Pokémon, which becomes the fuel that it burns.",
+    "type": "Pokemon: Ghost, Fire"
+  },
+  {
+    "name": "Lampent",
+    "desc": "It arrives near the moment of death and steals spirit from the body.",
+    "type": "Pokemon: Ghost, Fire"
+  },
+  {
+    "name": "Chandelure",
+    "desc": "The spirits burned up in its ominous flame lose their way and wander this world forever.",
+    "type": "Pokemon: Ghost, Fire"
+  },
+  {
+    "name": "Axew",
+    "desc": "They mark their territory by leaving gashes in trees with their tusks. If a tusk breaks, a new one grows in quickly.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Fraxure",
+    "desc": "A broken tusk will not grow back, so it diligently sharpens its tusks on river rocks after the end of a battle.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Haxorus",
+    "desc": "Their sturdy tusks will stay sharp even if used to cut steel beams. These Pokémon are covered in hard armor.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Cubchoo",
+    "desc": "Their snot is a barometer of health. When healthy, their snot is sticky and the power of their ice moves increases.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Beartic",
+    "desc": "It freezes its breath to create fangs and claws of ice to fight with. Cold northern areas are its habitat.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Cryogonal",
+    "desc": "They are composed of ice crystals. They capture prey with chains of ice, freezing the prey at -148 degrees Fahrenheit.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Shelmet",
+    "desc": "It evolves when bathed in an electric-like energy along with Karrablast. The reason is still unknown.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Accelgor",
+    "desc": "When its body dries out, it weakens. So, to prevent dehydration, it wraps itself in many layers of thin membrane.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Stunfisk",
+    "desc": "It conceals itself in the mud of the seashore. Then it waits. When prey touch it, it delivers a jolt of electricity.",
+    "type": "Pokemon: Ground, Electric"
+  },
+  {
+    "name": "Mienfoo",
+    "desc": "They seclude themselves in the mountains and devote themselves to training. The form of their kicks and chops differs from pack to pack.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Mienshao",
+    "desc": "When Mienshao lets out a bizarre wail, you’re in danger. A flurry of kicks and chops too fast to see is about to be unleashed!",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Druddigon",
+    "desc": "It infiltrates tunnels that Pokémon like Diglett and Dugtrio have dug and quietly waits for prey to pass through.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Golett",
+    "desc": "Although ancient people apparently built it by working with clay, the source of its energy is unclear.",
+    "type": "Pokemon: Ground, Ghost"
+  },
+  {
+    "name": "Golurk",
+    "desc": "When the seal on its chest is removed, it rages indiscriminately, turning the whole town around it into a mountain of rubble.",
+    "type": "Pokemon: Ground, Ghost"
+  },
+  {
+    "name": "Pawniard",
+    "desc": "It follows Bisharp’s orders to a tee when it attacks enemies. After slashing an opponent, Pawniard clangs both of its blades together.",
+    "type": "Pokemon: Dark, Steel"
+  },
+  {
+    "name": "Bisharp",
+    "desc": "It leads a group of Pawniard. Bisharp doesn’t even change its expression when it deals the finishing blow to an opponent.",
+    "type": "Pokemon: Dark, Steel"
+  },
+  {
+    "name": "Bouffalant",
+    "desc": "Their fluffy fur absorbs damage, even if they strike foes with a fierce headbutt.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Rufflet",
+    "desc": "Known as a natural-born warrior, soon after its hatching, it will challenge its parent to a fight in order to gain their acceptance.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Braviary",
+    "desc": "Known as “the hero of the skies,” this Pokémon is so proud and so brave that it will never retreat, even when it’s injured.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Vullaby",
+    "desc": "Its healthy appetite leads to visible growth spurts. It often has to replace the bones it wears as its size increases.",
+    "type": "Pokemon: Dark, Flying"
+  },
+  {
+    "name": "Mandibuzz",
+    "desc": "It’s always searching for food for Vullaby. When it finds a weak Pokémon, Mandibuzz swoops it right off to its nest.",
+    "type": "Pokemon: Dark, Flying"
+  },
+  {
+    "name": "Heatmor",
+    "desc": "It draws in air through its tail, transforms it into fire, and uses it like a tongue. It melts Durant and eats them.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Durant",
+    "desc": "They attack in groups, covering themselves in steel armor to protect themselves from Heatmor.",
+    "type": "Pokemon: Bug, Steel"
+  },
+  {
+    "name": "Deino",
+    "desc": "Lacking sight, it’s unaware of its surroundings, so it bumps into things and eats anything that moves.",
+    "type": "Pokemon: Dark, Dragon"
+  },
+  {
+    "name": "Zweilous",
+    "desc": "After it has eaten up all the food in its territory, it moves to another area. Its two heads do not get along.",
+    "type": "Pokemon: Dark, Dragon"
+  },
+  {
+    "name": "Hydreigon",
+    "desc": "It responds to movement by attacking. This scary, three-headed Pokémon devours everything in its path!",
+    "type": "Pokemon: Dark, Dragon"
+  },
+  {
+    "name": "Larvesta",
+    "desc": "It protects itself with flame. Long years ago, people believed Larvesta had a nest on the sun.",
+    "type": "Pokemon: Bug, Fire"
+  },
+  {
+    "name": "Volcarona",
+    "desc": "According to legends, it was hatched from a flaming cocoon to save people and Pokémon that were suffering from the cold.",
+    "type": "Pokemon: Bug, Fire"
+  },
+  {
+    "name": "Cobalion",
+    "desc": "It has a body and heart of steel. It worked with its allies to punish people when they hurt Pokémon.",
+    "type": "Pokemon: Steel, Fighting"
+  },
+  {
+    "name": "Terrakion",
+    "desc": "Spoken of in legend, this Pokémon used its phenomenal power to destroy a castle in its effort to protect Pokémon.",
+    "type": "Pokemon: Rock, Fighting"
+  },
+  {
+    "name": "Virizion",
+    "desc": "Legends say this Pokémon confounded opponents with its swift movements.",
+    "type": "Pokemon: Grass, Fighting"
+  },
+  {
+    "name": "Tornadus",
+    "desc": "Tornadus expels massive energy from its tail, causing severe storms. Its power is great enough to blow houses away.",
+    "type": "Pokemon: Flying"
+  },
+  {
+    "name": "Thundurus",
+    "desc": "As it flies around, it shoots lightning all over the place and causes forest fires. It is therefore disliked.",
+    "type": "Pokemon: Electric, Flying"
+  },
+  {
+    "name": "Reshiram",
+    "desc": "When Reshiram’s tail flares, the heat energy moves the atmosphere and changes the world’s weather.",
+    "type": "Pokemon: Dragon, Fire"
+  },
+  {
+    "name": "Zekrom",
+    "desc": "Concealing itself in lightning clouds, it flies throughout the Unova region. It creates electricity in its tail.",
+    "type": "Pokemon: Dragon, Electric"
+  },
+  {
+    "name": "Landorus",
+    "desc": "From the forces of lightning and wind, it creates energy to give nutrients to the soil and make the land abundant.",
+    "type": "Pokemon: Ground, Flying"
+  },
+  {
+    "name": "Kyurem",
+    "desc": "It generates a powerful, freezing energy inside itself, but its body became frozen when the energy leaked out.",
+    "type": "Pokemon: Dragon, Ice"
+  },
+  {
+    "name": "Keldeo",
+    "desc": "When it is resolute, its body fills with power and it becomes swifter. Its jumps are then too fast to follow.",
+    "type": "Pokemon: Water, Fighting"
+  },
+  {
+    "name": "Meloetta",
+    "desc": "Its melodies are sung with a special vocalization method that can control the feelings of those who hear it.",
+    "type": "Pokemon: Normal, Psychic"
+  },
+  {
+    "name": "Genesect",
+    "desc": "This Pokémon existed 300 million years ago. Team Plasma altered it and attached a cannon to its back.",
+    "type": "Pokemon: Bug, Steel"
+  },
+  {
+    "name": "Chespin",
+    "desc": "Such a thick shell of wood covers its head and back that even a direct hit from a truck wouldn’t faze it.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Quilladin",
+    "desc": "They strengthen their lower bodies by running into one another. They are very kind and won’t start fights.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Chesnaught",
+    "desc": "When it takes a defensive posture with its fists guarding its face, it could withstand a bomb blast.",
+    "type": "Pokemon: Grass, Fighting"
+  },
+  {
+    "name": "Fennekin",
+    "desc": "As it walks, it munches on a twig in place of a snack. It intimidates opponents by puffing hot air out of its ears.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Braixen",
+    "desc": "When the twig is plucked from its tail, friction sets the twig alight. The flame is used to send signals to its allies.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Delphox",
+    "desc": "Using psychic power, it generates a fiery vortex of 5,400 degrees Fahrenheit, incinerating foes swept into this whirl of flame.",
+    "type": "Pokemon: Fire, Psychic"
+  },
+  {
+    "name": "Froakie",
+    "desc": "It protects its skin by covering its body in delicate bubbles. Beneath its happy-go-lucky air, it keeps a watchful eye on its surroundings.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Frogadier",
+    "desc": "Its swiftness is unparalleled. It can scale a tower of more than 2,000 feet in a minute’s time.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Greninja",
+    "desc": "It appears and vanishes with a ninja’s grace. It toys with its enemies using swift movements, while slicing them with throwing stars of sharpest water.",
+    "type": "Pokemon: Water, Dark"
+  },
+  {
+    "name": "Bunnelby",
+    "desc": "It has ears like shovels. Digging holes strengthens its ears so much that they can sever thick roots effortlessly.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Diggersby",
+    "desc": "As powerful as an excavator, its ears can reduce dense bedrock to rubble. When it’s finished digging, it lounges lazily.",
+    "type": "Pokemon: Normal, Ground"
+  },
+  {
+    "name": "Fletchling",
+    "desc": "Its body is always warm. Trainers who live in cold areas apparently sleep with it in their bed.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Fletchinder",
+    "desc": "Its speed right after takeoff already puts it in the top speed class of all bird Pokémon.",
+    "type": "Pokemon: Fire, Flying"
+  },
+  {
+    "name": "Talonflame",
+    "desc": "Bird Pokémon make up most of its diet. It approaches at high speeds and smacks them down to the ground with its powerful kick.",
+    "type": "Pokemon: Fire, Flying"
+  },
+  {
+    "name": "Scatterbug",
+    "desc": "The powder that covers its body regulates its temperature, so it can live in any region or climate.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Spewpa",
+    "desc": "The beaks of bird Pokémon can’t begin to scratch its stalwart body. To defend itself, it spews powder.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Vivillon",
+    "desc": "The patterns on this Pokémon’s wings depend on the climate and topography of its habitat. It scatters colorful scales.",
+    "type": "Pokemon: Bug, Flying"
+  },
+  {
+    "name": "Litleo",
+    "desc": "This hot-blooded Pokémon is filled with curiosity. When it gets angry or starts fighting, its short mane gets hot.",
+    "type": "Pokemon: Fire, Normal"
+  },
+  {
+    "name": "Pyroar",
+    "desc": "The temperature of its breath is over 10,000 degrees Fahrenheit, but Pyroar doesn’t use it on its prey. This Pokémon prefers to eat raw meat.",
+    "type": "Pokemon: Fire, Normal"
+  },
+  {
+    "name": "Flabébé",
+    "desc": "Flabébé wears a crown made from pollen it’s collected from its flower. The crown has hidden healing properties.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Floette",
+    "desc": "It gives its own power to flowers, pouring its heart into caring for them. Floette never forgives anyone who messes up a flower bed.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Florges",
+    "desc": "Its life can span several hundred years. It’s said to devote its entire life to protecting gardens.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Skiddo",
+    "desc": "If it has sunshine and water, it doesn’t need to eat, because it can generate energy from the leaves on its back.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Gogoat",
+    "desc": "They inhabit mountainous regions. The leader of the herd is decided by a battle of clashing horns.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Pancham",
+    "desc": "It’s desperate to intimidate its opponents. Be nice and pretend to be scared if you catch it glaring at you intensely.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Pangoro",
+    "desc": "Pangoro is the type to talk with its fists. It doesn’t say much as it pummels opponents with enough force to send a dump truck flying.",
+    "type": "Pokemon: Fighting, Dark"
+  },
+  {
+    "name": "Furfrou",
+    "desc": "Left alone, its fur will grow longer and longer, but it will only allow someone it trusts to cut it.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Espurr",
+    "desc": "It has enough psychic energy to blast everything within 300 feet of itself, but it has no control over its power.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Meowstic",
+    "desc": "The eyeball patterns on the interior of its ears emit psychic energy. It keeps the patterns tightly covered because that power is too immense.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Honedge",
+    "desc": "If anyone dares to grab its hilt, it wraps a blue cloth around that person’s arm and drains that person’s life energy completely.",
+    "type": "Pokemon: Steel, Ghost"
+  },
+  {
+    "name": "Doublade",
+    "desc": "The complex attack patterns of its two swords are unstoppable, even for an opponent greatly accomplished at swordplay.",
+    "type": "Pokemon: Steel, Ghost"
+  },
+  {
+    "name": "Aegislash",
+    "desc": "Apparently, it can detect the innate qualities of leadership. According to legend, whoever it recognizes is destined to become king.",
+    "type": "Pokemon: Steel, Ghost"
+  },
+  {
+    "name": "Spritzee",
+    "desc": "In the past, rather than using perfume, royal ladies carried a Spritzee that would waft a fragrance they liked.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Aromatisse",
+    "desc": "Its scent is so overpowering that, unless a Trainer happens to really enjoy the smell, he or she will have a hard time walking alongside it.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Swirlix",
+    "desc": "Because it eats nothing but sweets, its fur is as sticky sweet as cotton candy.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Slurpuff",
+    "desc": "Its sense of smell is 100 million times better than a human’s, so even the faintest scent tells it about everything in the area. It’s like it can see with its nose!",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Inkay",
+    "desc": "When exchanging information with others of its kind, it flashes the light-emitting spots on its body in a complex rhythm.",
+    "type": "Pokemon: Dark, Psychic"
+  },
+  {
+    "name": "Malamar",
+    "desc": "It flashes the pattern on its torso to control its prey and draw them in. The edges of its fins are supremely sharp.",
+    "type": "Pokemon: Dark, Psychic"
+  },
+  {
+    "name": "Binacle",
+    "desc": "They stretch and then contract, yanking their rocks along with them in bold hops. They eat seaweed that washes up on the shoreline.",
+    "type": "Pokemon: Rock, Water"
+  },
+  {
+    "name": "Barbaracle",
+    "desc": "Barbaracle’s legs and hands have minds of their own, and they will move independently. But they usually follow the head’s orders.",
+    "type": "Pokemon: Rock, Water"
+  },
+  {
+    "name": "Skrelp",
+    "desc": "It’s not good at swimming, so it clings to the seaweed. In the Alola region, it’s often found near Dhelmise.",
+    "type": "Pokemon: Poison, Water"
+  },
+  {
+    "name": "Dragalge",
+    "desc": "It blends in with seaweed to ambush its prey and then takes them down with a poisonous liquid strong enough to melt metal.",
+    "type": "Pokemon: Poison, Dragon"
+  },
+  {
+    "name": "Clauncher",
+    "desc": "It moves around by jetting water from its right pincer. It has a poor sense of balance, so it’s terrible at swimming straight.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Clawitzer",
+    "desc": "Its right arm is packed with meat. When its pincer falls off, it’s exported to be used as a cooking ingredient.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Helioptile",
+    "desc": "The frills on either side of its head have cells that generate electricity when exposed to sunlight.",
+    "type": "Pokemon: Electric, Normal"
+  },
+  {
+    "name": "Heliolisk",
+    "desc": "It stimulates its muscles with electricity, boosting the strength in its legs and enabling it to run 100 yards in five seconds.",
+    "type": "Pokemon: Electric, Normal"
+  },
+  {
+    "name": "Tyrunt",
+    "desc": "Tyrunt is spoiled and selfish. It may just be trying to frolic, but sometimes the ones it’s trying to frolic with are gravely injured.",
+    "type": "Pokemon: Rock, Dragon"
+  },
+  {
+    "name": "Tyrantrum",
+    "desc": "The king of the ancient world, it can easily crunch a car with the devastating strength of its enormous jaws.",
+    "type": "Pokemon: Rock, Dragon"
+  },
+  {
+    "name": "Amaura",
+    "desc": "Amaura was restored successfully, but it’s not expected to live long because of the heat of the current environment.",
+    "type": "Pokemon: Rock, Ice"
+  },
+  {
+    "name": "Aurorus",
+    "desc": "This usually quiet and kindly Pokémon has a surface temperature of around –240 degrees Fahrenheit.",
+    "type": "Pokemon: Rock, Ice"
+  },
+  {
+    "name": "Sylveon",
+    "desc": "Sylveon wraps its ribbonlike feelers around its Trainer’s arm because this touch enables it to read its Trainer’s feelings.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Hawlucha",
+    "desc": "In combat, Hawlucha leaps nimbly about, taking advantage of its opponents’ blind spots. It’s also skilled at using superb submission holds.",
+    "type": "Pokemon: Fighting, Flying"
+  },
+  {
+    "name": "Dedenne",
+    "desc": "Its upper whiskers are sensors that survey its surroundings. Its lower whiskers are organs that shoot electricity.",
+    "type": "Pokemon: Electric, Fairy"
+  },
+  {
+    "name": "Carbink",
+    "desc": "To keep the jewels on their bodies free of tarnish, packs of Carbink use their soft manes to polish one another’s jewels.",
+    "type": "Pokemon: Rock, Fairy"
+  },
+  {
+    "name": "Goomy",
+    "desc": "Its body is mostly water. If it dries out, it will die, so it’s always sitting with perfect stillness in the shade.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Sliggoo",
+    "desc": "Its entire body is covered with gooey mucus that can dissolve anything. Be sure to put gloves on if you’re going to touch it.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Goodra",
+    "desc": "Underneath its slimy skin is a thick layer of fat, and the combination of the two makes enemies’ attacks slide right off.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Klefki",
+    "desc": "Long ago it lived in mines, but once the minerals that make up its diet became scarcer, Klefki began appearing in human settlements.",
+    "type": "Pokemon: Steel, Fairy"
+  },
+  {
+    "name": "Phantump",
+    "desc": "An unknown spirit came to lodge in a tree stump, creating this Pokémon. A cure-all can be made from an infusion of its green leaves.",
+    "type": "Pokemon: Ghost, Grass"
+  },
+  {
+    "name": "Trevenant",
+    "desc": "This Pokémon controls trees via roots stretching from its feet, and it will attack anyone that dares to ravage the forest.",
+    "type": "Pokemon: Ghost, Grass"
+  },
+  {
+    "name": "Pumpkaboo",
+    "desc": "It is said to carry wandering spirits to the place where they belong so they can move on.",
+    "type": "Pokemon: Ghost, Grass"
+  },
+  {
+    "name": "Gourgeist",
+    "desc": "It enwraps its prey in its hairlike arms. It sings joyfully as it observes the suffering of its prey.",
+    "type": "Pokemon: Ghost, Grass"
+  },
+  {
+    "name": "Bergmite",
+    "desc": "Using air of -150 degrees Fahrenheit, they freeze opponents solid. They live in herds above the snow line on mountains.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Avalugg",
+    "desc": "The way several Bergmite huddle on its back makes it look like an aircraft carrier made of ice.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Noibat",
+    "desc": "It flies around in search of fruit to eat. It uses ultrasonic waves to detect which fruits are ripe.",
+    "type": "Pokemon: Flying, Dragon"
+  },
+  {
+    "name": "Noivern",
+    "desc": "This hot-blooded Pokémon attacks anything it sees with ultrasonic waves that can crush boulders.",
+    "type": "Pokemon: Flying, Dragon"
+  },
+  {
+    "name": "Xerneas",
+    "desc": "When the horns on its head shine in seven colors, it is said to be sharing everlasting life.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Yveltal",
+    "desc": "When its life comes to an end, it absorbs the life energy of every living thing and turns into a cocoon once more.",
+    "type": "Pokemon: Dark, Flying"
+  },
+  {
+    "name": "Zygarde",
+    "desc": "Some say it can change to an even more powerful form when battling those who threaten the ecosystem.",
+    "type": "Pokemon: Dragon, Ground"
+  },
+  {
+    "name": "Diancie",
+    "desc": "It can instantly create many diamonds by compressing the carbon in the air between its hands.",
+    "type": "Pokemon: Rock, Fairy"
+  },
+  {
+    "name": "Hoopa",
+    "desc": "It is said to be able to seize anything it desires with its six rings and six huge arms. With its power sealed, it is transformed into a much smaller form.",
+    "type": "Pokemon: Psychic, Ghost"
+  },
+  {
+    "name": "Volcanion",
+    "desc": "It expels its internal steam from the arms on its back. It has enough power to blow away a mountain.",
+    "type": "Pokemon: Fire, Water"
+  },
+  {
+    "name": "Rowlet",
+    "desc": "It feels relaxed in tight, dark places and has been known to use its Trainer’s pocket or bag as a nest.",
+    "type": "Pokemon: Grass, Flying"
+  },
+  {
+    "name": "Dartrix",
+    "desc": "Supremely sensitive to the presence of others, it can detect opponents standing behind it, flinging its sharp feathers to take them out.",
+    "type": "Pokemon: Grass, Flying"
+  },
+  {
+    "name": "Decidueye",
+    "desc": "Decidueye can nock and fire an arrow at an enemy in a tenth of a second, so its battles are decided in the blink of an eye.",
+    "type": "Pokemon: Grass, Ghost"
+  },
+  {
+    "name": "Litten",
+    "desc": "Its coat regrows twice a year. When the time comes, Litten sets its own body on fire and burns away the old fur.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Torracat",
+    "desc": "When its mane is standing on end, you can tell it’s feeling good. When it isn’t feeling well, its fur will lie down flat.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Incineroar",
+    "desc": "When its fighting spirit is set alight, the flames around its waist become especially intense.",
+    "type": "Pokemon: Fire, Dark"
+  },
+  {
+    "name": "Popplio",
+    "desc": "Popplio gets on top of its bouncy water balloons to jump higher. It’s quite the acrobatic fighter!",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Brionne",
+    "desc": "It attacks by smacking its enemies with the exploding water balloons that it creates.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Primarina",
+    "desc": "Also known as a songstress, it has a fantastical look on moonlit nights when it leads its colony in song.",
+    "type": "Pokemon: Water, Fairy"
+  },
+  {
+    "name": "Pikipek",
+    "desc": "It may look spindly, but its neck muscles are heavy-duty. It can peck at a tree 16 times per second!",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Trumbeak",
+    "desc": "From its mouth, it fires the seeds of berries it has eaten. The scattered seeds give rise to new plants.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Toucannon",
+    "desc": "Known for forming harmonious couples, this Pokémon is brought to wedding ceremonies as a good luck charm.",
+    "type": "Pokemon: Normal, Flying"
+  },
+  {
+    "name": "Yungoos",
+    "desc": "Although it will eat anything, it prefers fresh living things, so it marches down streets in search of prey.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Gumshoos",
+    "desc": "Patient by nature, this Pokémon loses control of itself and pounces when it spots its favorite meal—Rattata!",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Grubbin",
+    "desc": "It spits a sticky thread to stop opponents in their tracks, and then it grabs them in its sharp, sturdy mandibles to take them down.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Charjabug",
+    "desc": "Its stout shell provides excellent defense from attacks. It uses electricity on persistent opponents.",
+    "type": "Pokemon: Bug, Electric"
+  },
+  {
+    "name": "Vikavolt",
+    "desc": "Vikavolt flusters opponents with acrobatic flying maneuvers. This creates an opening for it to deliver an electric beam attack.",
+    "type": "Pokemon: Bug, Electric"
+  },
+  {
+    "name": "Crabrawler",
+    "desc": "Crabrawler has been known to mistake Exeggutor for a coconut tree and climb it. The enraged Exeggutor shakes it off and stomps it.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Crabominable",
+    "desc": "Before it stops to think, it just starts pummeling. There are records of its turning back avalanches with a flurry of punches.",
+    "type": "Pokemon: Fighting, Ice"
+  },
+  {
+    "name": "Oricorio",
+    "desc": "This Oricorio has drunk red nectar. If its Trainer gives the wrong order, this passionate Pokémon becomes fiercely angry.",
+    "type": "Pokemon: Fire, Flying"
+  },
+  {
+    "name": "Cutiefly",
+    "desc": "Cutiefly can pick up the auras of living things. It skillfully reads those auras to predict its foes’ movements and make fools of them.",
+    "type": "Pokemon: Bug, Fairy"
+  },
+  {
+    "name": "Ribombee",
+    "desc": "It can predict the weather from moisture levels and wind direction. Ribombee only reveals itself when there are a few clear days in a row.",
+    "type": "Pokemon: Bug, Fairy"
+  },
+  {
+    "name": "Rockruff",
+    "desc": "When it rubs the rocks on its neck against you, that’s proof of its love for you. However, the rocks are sharp, so the gesture is quite painful!",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Lycanroc",
+    "desc": "The rocks in its mane are sharper than a knife. Fragments that break off are treasured as good luck charms.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Wishiwashi",
+    "desc": "When it’s in a jam, its shining eyes attract others of its kind. The light from its eyes is visible almost 25 miles away.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Mareanie",
+    "desc": "Aside from its head, its body parts regenerate quickly if they’re cut off. After a good night’s sleep, Mareanie is back to normal.",
+    "type": "Pokemon: Poison, Water"
+  },
+  {
+    "name": "Toxapex",
+    "desc": "With its 12 legs, it creates a dome to shelter within. The flow of the tides doesn’t affect Toxapex in there, so it’s very comfortable.",
+    "type": "Pokemon: Poison, Water"
+  },
+  {
+    "name": "Mudbray",
+    "desc": "Possessing mighty power, Mudbray can be loaded with 50 times its own body weight and will be totally fine.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Mudsdale",
+    "desc": "It can trudge mountain roads without rest for three days and three nights, all the while dragging a 10-ton load.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Dewpider",
+    "desc": "It can only breathe oxygen that has dissolved in water, so it wears a water bubble on its head when it walks around on land.",
+    "type": "Pokemon: Water, Bug"
+  },
+  {
+    "name": "Araquanid",
+    "desc": "It has a habit of storing things it values in its water bubble. If its Trainer doesn’t watch out, Araquanid will try to put them in its bubble!",
+    "type": "Pokemon: Water, Bug"
+  },
+  {
+    "name": "Fomantis",
+    "desc": "It loves the sunshine. When it basks in the sunlight regularly, it grows up with vivid coloration.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Lurantis",
+    "desc": "As it slashes into its enemies, it looks like it’s dancing. Its elegant appearance has led some to call it the most glamorous Grass Pokémon.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Morelull",
+    "desc": "It likes damp dark places. When night falls, the spores filling the caps of its mushrooms glow.",
+    "type": "Pokemon: Grass, Fairy"
+  },
+  {
+    "name": "Shiinotic",
+    "desc": "When it starts fighting for territory with Parasect, the entire area gets completely coated in spores!",
+    "type": "Pokemon: Grass, Fairy"
+  },
+  {
+    "name": "Salandit",
+    "desc": "It weakens opponents and sends them reeling with its poisonous gas. Salandit doesn’t deal well with Spinda, since it’s always reeling.",
+    "type": "Pokemon: Poison, Fire"
+  },
+  {
+    "name": "Salazzle",
+    "desc": "It punishes Salandit that couldn’t bring it food with a fierce slap of its flame-spewing palm.",
+    "type": "Pokemon: Poison, Fire"
+  },
+  {
+    "name": "Stufful",
+    "desc": "Stufful hates to be hugged or touched in any way. It will squirm, thrash, and resist with amazing power.",
+    "type": "Pokemon: Normal, Fighting"
+  },
+  {
+    "name": "Bewear",
+    "desc": "It boasts tremendous physical strength. Many people call it the most dangerous Pokémon in the Alola region.",
+    "type": "Pokemon: Normal, Fighting"
+  },
+  {
+    "name": "Bounsweet",
+    "desc": "It tries to resist being swallowed by a bird Pokémon by spinning the sepals on its head. It’s usually a fruitless attempt.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Steenee",
+    "desc": "It bounces around, swinging the sepals on its head with abandon. They’re quite painful when they smack you!",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Tsareena",
+    "desc": "A Pokémon with an aggressive personality and a mastery of kicking, it cackles every time it kicks an opponent.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Comfey",
+    "desc": "It picks flowers and sticks them to its body with fluids it produces. The aroma that wafts from its petals has a healing effect.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Oranguru",
+    "desc": "Oranguru don’t get along with each other, so they’re always engaging in battles of wits to decide which one is superior.",
+    "type": "Pokemon: Normal, Psychic"
+  },
+  {
+    "name": "Passimian",
+    "desc": "Berries are its weapons as well as the staple of its diet. The one that can throw a berry the farthest is the boss of the troop.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Wimpod",
+    "desc": "An astonishingly cowardly Pokémon, Wimpod will whir its legs at high speeds to run away if anything comes near it.",
+    "type": "Pokemon: Bug, Water"
+  },
+  {
+    "name": "Golisopod",
+    "desc": "Its claws, which it can extend and retract at will, are its greatest weapons. Golisopod is sometimes accompanied by Wimpod.",
+    "type": "Pokemon: Bug, Water"
+  },
+  {
+    "name": "Sandygast",
+    "desc": "If you build sand mounds when you’re playing, destroy them before you go home, or they may get possessed and become Sandygast.",
+    "type": "Pokemon: Ghost, Ground"
+  },
+  {
+    "name": "Palossand",
+    "desc": "Once it has whipped up a sandstorm to halt its opponents in their tracks, this terrifying Pokémon snatches away their vitality.",
+    "type": "Pokemon: Ghost, Ground"
+  },
+  {
+    "name": "Pyukumuku",
+    "desc": "Its entire body is covered in its own slime. If you accidentally step on one, you’ll slip, and it will get mad and smack you!",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Type: Null",
+    "desc": "There’s danger of its going on a rampage, so its true power is sealed away beneath its control mask.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Silvally",
+    "desc": "Through the bond it formed with its Trainer, its will was strengthened, and it was able to destroy its control mask.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Minior",
+    "desc": "Although its outer shell is uncommonly durable, the shock of falling to the ground smashes the shell to smithereens.",
+    "type": "Pokemon: Rock, Flying"
+  },
+  {
+    "name": "Komala",
+    "desc": "It remains asleep from birth to death as a result of the sedative properties of the leaves that form its diet.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Turtonator",
+    "desc": "Its exploding shell poses a real danger but is sensitive to moisture. On rainy days, Turtonator takes silent refuge in caves.",
+    "type": "Pokemon: Fire, Dragon"
+  },
+  {
+    "name": "Togedemaru",
+    "desc": "Its capacity to produce electricity is somewhat limited, so it gets charged up by letting lightning strike it!",
+    "type": "Pokemon: Electric, Steel"
+  },
+  {
+    "name": "Mimikyu",
+    "desc": "A gust of wind revealed what hides under this Pokémon’s rag to a passing Trainer, who went home and died painfully that very night.",
+    "type": "Pokemon: Ghost, Fairy"
+  },
+  {
+    "name": "Bruxish",
+    "desc": "Its skin is thick enough to fend off Mareanie’s spikes. With its robust teeth, Bruxish crunches up the spikes and eats them.",
+    "type": "Pokemon: Water, Psychic"
+  },
+  {
+    "name": "Drampa",
+    "desc": "It appears in towns and plays with the children. Drampa will protect kids when they’re in danger, so their moms don’t have to worry.",
+    "type": "Pokemon: Normal, Dragon"
+  },
+  {
+    "name": "Dhelmise",
+    "desc": "Its chain-like green seaweed can stretch outward for hundreds of yards. For some reason, it gets along well with Skrelp.",
+    "type": "Pokemon: Ghost, Grass"
+  },
+  {
+    "name": "Jangmo-o",
+    "desc": "It will never show an enemy its back in battle. Ancient warriors liked Jangmo-o for its valiant disposition and made it one of their own.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Hakamo-o",
+    "desc": "The scales it sheds can be molded and processed to make pots and pans. They conduct heat well, so they’re a popular item.",
+    "type": "Pokemon: Dragon, Fighting"
+  },
+  {
+    "name": "Kommo-o",
+    "desc": "It battles valiantly with its fists, which are armored in steel scales. Kommo-o specializes in uppercuts.",
+    "type": "Pokemon: Dragon, Fighting"
+  },
+  {
+    "name": "Tapu Koko",
+    "desc": "The lightning-wielding guardian deity of Melemele, Tapu Koko is brimming with curiosity and appears before people from time to time.",
+    "type": "Pokemon: Electric, Fairy"
+  },
+  {
+    "name": "Tapu Lele",
+    "desc": "Although called a guardian deity, Tapu Lele is devoid of guilt about its cruel disposition and can be described as nature incarnate.",
+    "type": "Pokemon: Psychic, Fairy"
+  },
+  {
+    "name": "Tapu Bulu",
+    "desc": "It makes ringing sounds with its tail to let others know where it is, avoiding unneeded conflicts. This guardian deity of Ula’ula controls plants.",
+    "type": "Pokemon: Grass, Fairy"
+  },
+  {
+    "name": "Tapu Fini",
+    "desc": "Although it’s called a guardian deity, terrible calamities sometimes befall those who recklessly approach Tapu Fini.",
+    "type": "Pokemon: Water, Fairy"
+  },
+  {
+    "name": "Cosmog",
+    "desc": "Whether or not it’s a Pokémon from this world is a mystery. When it’s in a jam, it warps away to a safe place to hide.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Cosmoem",
+    "desc": "As it absorbs light, Cosmoem continues to grow. Its golden shell is surprisingly solid.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Solgaleo",
+    "desc": "In writings from the distant past, it’s called by the name “the beast that devours the sun.”",
+    "type": "Pokemon: Psychic, Steel"
+  },
+  {
+    "name": "Lunala",
+    "desc": "It sometimes summons unknown powers and life-forms here to this world from holes that lead to other worlds.",
+    "type": "Pokemon: Psychic, Ghost"
+  },
+  {
+    "name": "Nihilego",
+    "desc": "It appeared in this world from an Ultra Wormhole. Nihilego appears to be a parasite that lives by feeding on people and Pokémon.",
+    "type": "Pokemon: Rock, Poison"
+  },
+  {
+    "name": "Buzzwole",
+    "desc": "Buzzwole goes around showing off its abnormally swollen muscles. It is one kind of Ultra Beast.",
+    "type": "Pokemon: Bug, Fighting"
+  },
+  {
+    "name": "Pheromosa",
+    "desc": "Although it’s alien to this world and a danger here, it’s apparently a common organism in the world where it normally lives.",
+    "type": "Pokemon: Bug, Fighting"
+  },
+  {
+    "name": "Xurkitree",
+    "desc": "They’ve been dubbed Ultra Beasts. Some of them stand unmoving, like trees, with their arms and legs stuck into the ground.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Celesteela",
+    "desc": "Although it’s alien to this world and a danger here, it’s apparently a common organism in the world where it normally lives.",
+    "type": "Pokemon: Steel, Flying"
+  },
+  {
+    "name": "Kartana",
+    "desc": "Although it’s alien to this world and a danger here, it’s apparently a common organism in the world where it normally lives.",
+    "type": "Pokemon: Grass, Steel"
+  },
+  {
+    "name": "Guzzlord",
+    "desc": "An unknown life-form called a UB. It may be constantly hungry—it is certainly always devouring something.",
+    "type": "Pokemon: Dark, Dragon"
+  },
+  {
+    "name": "Necrozma",
+    "desc": "Light is the source of its energy. If it isn’t devouring light, impurities build up in it and on it, and Necrozma darkens and stops moving.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Magearna",
+    "desc": "Built roughly 500 years ago by a scientist, the part called the Soul-Heart is the actual life-form.",
+    "type": "Pokemon: Steel, Fairy"
+  },
+  {
+    "name": "Marshadow",
+    "desc": "It sinks into the shadows of people and Pokémon, where it can understand their feelings and copy their capabilities.",
+    "type": "Pokemon: Fighting, Ghost"
+  },
+  {
+    "name": "Poipole",
+    "desc": "An Ultra Beast that lives in a different world, it cackles wildly as it sprays its opponents with poison from the needles on its head.",
+    "type": "Pokemon: Poison"
+  },
+  {
+    "name": "Naganadel",
+    "desc": "One kind of Ultra Beast, it fires a glowing, venomous liquid from its needles. This liquid is also immensely adhesive.",
+    "type": "Pokemon: Poison, Dragon"
+  },
+  {
+    "name": "Stakataka",
+    "desc": "When stone walls started moving and attacking, the brute’s true identity was this mysterious life-form, which brings to mind an Ultra Beast.",
+    "type": "Pokemon: Rock, Steel"
+  },
+  {
+    "name": "Blacephalon",
+    "desc": "A UB that appeared from an Ultra Wormhole, it causes explosions, then takes advantage of opponents’ surprise to rob them of their vitality.",
+    "type": "Pokemon: Fire, Ghost"
+  },
+  {
+    "name": "Zeraora",
+    "desc": "It approaches its enemies at the speed of lightning, then tears them limb from limb with its sharp claws.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Meltan",
+    "desc": "They live as a group, but when the time comes, one strong Meltan will absorb all the others and evolve.",
+    "type": "Pokemon: Steel"
+  },
+  {
+    "name": "Melmetal",
+    "desc": "Centrifugal force is behind the punches of Melmetal's heavy hex-nut arms. Melmetal is said to deliver the strongest punches of all Pokémon.",
+    "type": "Pokemon: Steel"
+  },
+  {
+    "name": "Grookey",
+    "desc": "It attacks with rapid beats of its stick. As it strikes with amazing speed, it gets more and more pumped.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Thwackey",
+    "desc": "When it’s drumming out rapid beats in battle, it gets so caught up in the rhythm that it won’t even notice that it’s already knocked out its opponent.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Rillaboom",
+    "desc": "The one with the best drumming techniques becomes the boss of the troop. It has a gentle disposition and values harmony among its group.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Scorbunny",
+    "desc": "It has special pads on the backs of its feet, and one on its nose. Once it’s raring to fight, these pads radiate tremendous heat.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Raboot",
+    "desc": "It kicks berries right off the branches of trees and then juggles them with its feet, practicing its footwork.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Cinderace",
+    "desc": "It’s skilled at both offense and defense, and it gets pumped up when cheered on. But if it starts showboating, it could put itself in a tough spot.",
+    "type": "Pokemon: Fire"
+  },
+  {
+    "name": "Sobble",
+    "desc": "When it gets wet, its skin changes color, and this Pokémon becomes invisible as if it were camouflaged.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Drizzile",
+    "desc": "Highly intelligent but also very lazy, it keeps enemies out of its territory by laying traps everywhere.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Inteleon",
+    "desc": "Its nictitating membranes let it pick out foes’ weak points so it can precisely blast them with water that shoots from its fingertips at Mach 3.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Skwovet",
+    "desc": "It eats berries nonstop—a habit that has made it more resilient than it looks. It’ll show up on farms, searching for yet more berries.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Greedent",
+    "desc": "Common throughout the Galar region, this Pokémon has strong teeth and can chew through the toughest of berry shells.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Rookidee",
+    "desc": "Jumping nimbly about, this small-bodied Pokémon takes advantage of even the slightest opportunity to disorient larger opponents.",
+    "type": "Pokemon: Flying"
+  },
+  {
+    "name": "Corvisquire",
+    "desc": "The lessons of many harsh battles have taught it how to accurately judge an opponent’s strength.",
+    "type": "Pokemon: Flying"
+  },
+  {
+    "name": "Corviknight",
+    "desc": "With their great intellect and flying skills, these Pokémon very successfully act as the Galar region’s airborne taxi service.",
+    "type": "Pokemon: Flying, Steel"
+  },
+  {
+    "name": "Blipbug",
+    "desc": "Often found in gardens, this Pokémon has hairs on its body that it uses to assess its surroundings.",
+    "type": "Pokemon: Bug"
+  },
+  {
+    "name": "Dottler",
+    "desc": "As it grows inside its shell, it uses its psychic abilities to monitor the outside world and prepare for evolution.",
+    "type": "Pokemon: Bug, Psychic"
+  },
+  {
+    "name": "Orbeetle",
+    "desc": "It emits psychic energy to observe and study what’s around it—and what’s around it can include things over six miles away.",
+    "type": "Pokemon: Bug, Psychic"
+  },
+  {
+    "name": "Nickit",
+    "desc": "Cunning and cautious, this Pokémon survives by stealing food from others. It erases its tracks with swipes of its tail as it makes off with its plunder.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Thievul",
+    "desc": "With a lithe body and sharp claws, it goes around stealing food and eggs. Boltund is its natural enemy.",
+    "type": "Pokemon: Dark"
+  },
+  {
+    "name": "Gossifleur",
+    "desc": "It whirls around in the wind while singing a joyous song. This delightful display has charmed many into raising this Pokémon.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Eldegoss",
+    "desc": "The cotton on the head of this Pokémon can be spun into a glossy, gorgeous yarn—a Galar regional specialty.",
+    "type": "Pokemon: Grass"
+  },
+  {
+    "name": "Wooloo",
+    "desc": "If its fleece grows too long, Wooloo won’t be able to move. Cloth made with the wool of this Pokémon is surprisingly strong.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Dubwool",
+    "desc": "Its majestic horns are meant only to impress the opposite gender. They never see use in battle.",
+    "type": "Pokemon: Normal"
+  },
+  {
+    "name": "Chewtle",
+    "desc": "It starts off battles by attacking with its rock-hard horn, but as soon as the opponent flinches, this Pokémon bites down and never lets go.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Drednaw",
+    "desc": "This Pokémon rapidly extends its retractable neck to sink its sharp fangs into distant enemies and take them down.",
+    "type": "Pokemon: Water, Rock"
+  },
+  {
+    "name": "Yamper",
+    "desc": "This gluttonous Pokémon only assists people with their work because it wants treats. As it runs, it crackles with electricity.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Boltund",
+    "desc": "It sends electricity through its legs to boost their strength. Running at top speed, it easily breaks 50 mph.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Rolycoly",
+    "desc": "It can race around like a unicycle, even on rough, rocky terrain. Burning coal sustains it.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Carkol",
+    "desc": "By rapidly rolling its legs, it can travel at over 18 mph. The temperature of the flames it breathes exceeds 1,800 degrees Fahrenheit.",
+    "type": "Pokemon: Rock, Fire"
+  },
+  {
+    "name": "Coalossal",
+    "desc": "While it’s engaged in battle, its mountain of coal will burn bright red, sending off sparks that scorch the surrounding area.",
+    "type": "Pokemon: Rock, Fire"
+  },
+  {
+    "name": "Applin",
+    "desc": "As soon as it’s born, it burrows into an apple. Not only does the apple serve as its food source, but the flavor of the fruit determines its evolution.",
+    "type": "Pokemon: Grass, Dragon"
+  },
+  {
+    "name": "Flapple",
+    "desc": "It flies on wings of apple skin and spits a powerful acid. It can also change its shape into that of an apple.",
+    "type": "Pokemon: Grass, Dragon"
+  },
+  {
+    "name": "Appletun",
+    "desc": "Its body is covered in sweet nectar, and the skin on its back is especially yummy. Children used to have it as a snack.",
+    "type": "Pokemon: Grass, Dragon"
+  },
+  {
+    "name": "Silicobra",
+    "desc": "It spews sand from its nostrils. While the enemy is blinded, it burrows into the ground to hide.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Sandaconda",
+    "desc": "Its unique style of coiling allows it to blast sand out of its sand sac more efficiently.",
+    "type": "Pokemon: Ground"
+  },
+  {
+    "name": "Cramorant",
+    "desc": "This hungry Pokémon swallows Arrokuda whole. Occasionally, it makes a mistake and tries to swallow a Pokémon other than its preferred prey.",
+    "type": "Pokemon: Flying, Water"
+  },
+  {
+    "name": "Arrokuda",
+    "desc": "After it’s eaten its fill, its movements become extremely sluggish. That’s when Cramorant swallows it up.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Barraskewda",
+    "desc": "It spins its tail fins to propel itself, surging forward at speeds of over 100 knots before ramming prey and spearing into them.",
+    "type": "Pokemon: Water"
+  },
+  {
+    "name": "Toxel",
+    "desc": "It manipulates the chemical makeup of its poison to produce electricity. The voltage is weak, but it can cause a tingling paralysis.",
+    "type": "Pokemon: Electric, Poison"
+  },
+  {
+    "name": "Toxtricity",
+    "desc": "This short-tempered and aggressive Pokémon chugs stagnant water to absorb any toxins it might contain.",
+    "type": "Pokemon: Electric, Poison"
+  },
+  {
+    "name": "Sizzlipede",
+    "desc": "It wraps prey up with its heated body, cooking them in its coils. Once they’re well-done, it will voraciously nibble them down to the last morsel.",
+    "type": "Pokemon: Fire, Bug"
+  },
+  {
+    "name": "Centiskorch",
+    "desc": "While its burning body is already dangerous on its own, this excessively hostile Pokémon also has large and very sharp fangs.",
+    "type": "Pokemon: Fire, Bug"
+  },
+  {
+    "name": "Clobbopus",
+    "desc": "Its tentacles tear off easily, but it isn’t alarmed when that happens—it knows they’ll grow back. It’s about as smart as a three-year-old.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Grapploct",
+    "desc": "Searching for an opponent to test its skills against, it emerges onto land. Once the battle is over, it returns to the sea.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Sinistea",
+    "desc": "The teacup in which this Pokémon makes its home is a famous piece of antique tableware. Many forgeries are in circulation.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Polteageist",
+    "desc": "Leaving leftover black tea unattended is asking for this Pokémon to come along and pour itself into it, turning the tea into a new Polteageist.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Hatenna",
+    "desc": "If this Pokémon senses a strong emotion, it will run away as fast as it can. It prefers areas without people.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Hattrem",
+    "desc": "Using the braids on its head, it pummels foes to get them to quiet down. One blow from those braids would knock out a professional boxer.",
+    "type": "Pokemon: Psychic"
+  },
+  {
+    "name": "Hatterene",
+    "desc": "If you’re too loud around it, you risk being torn apart by the claws on its tentacle. This Pokémon is also known as the Forest Witch.",
+    "type": "Pokemon: Psychic, Fairy"
+  },
+  {
+    "name": "Impidimp",
+    "desc": "It sneaks into people’s homes, stealing things and feasting on the negative energy of the frustrated occupants.",
+    "type": "Pokemon: Dark, Fairy"
+  },
+  {
+    "name": "Morgrem",
+    "desc": "With sly cunning, it tries to lure people into the woods. Some believe it to have the power to make crops grow.",
+    "type": "Pokemon: Dark, Fairy"
+  },
+  {
+    "name": "Grimmsnarl",
+    "desc": "Its hairs work like muscle fibers. When its hairs unfurl, they latch on to opponents, ensnaring them as tentacles would.",
+    "type": "Pokemon: Dark, Fairy"
+  },
+  {
+    "name": "Obstagoon",
+    "desc": "It evolved after experiencing numerous fights. While crossing its arms, it lets out a shout that would make any opponent flinch.",
+    "type": "Pokemon: Dark, Normal"
+  },
+  {
+    "name": "Perrserker",
+    "desc": "After many battles, it evolved dangerous claws that come together to form daggers when extended.",
+    "type": "Pokemon: Steel"
+  },
+  {
+    "name": "Cursola",
+    "desc": "Be cautious of the ectoplasmic body surrounding its soul. You’ll become stiff as stone if you touch it.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Sirfetch'd",
+    "desc": "After deflecting attacks with its hard leaf shield, it strikes back with its sharp leek stalk. The leek stalk is both weapon and food.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Mr. Rime",
+    "desc": "Its amusing movements make it very popular. It releases its psychic power from the pattern on its belly.",
+    "type": "Pokemon: Ice, Psychic"
+  },
+  {
+    "name": "Runerigus",
+    "desc": "Never touch its shadowlike body, or you’ll be shown the horrific memories behind the picture carved into it.",
+    "type": "Pokemon: Ground, Ghost"
+  },
+  {
+    "name": "Milcery",
+    "desc": "They say that any patisserie visited by Milcery is guaranteed success and good fortune.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Alcremie",
+    "desc": "When Alcremie is content, the cream it secretes from its hands becomes sweeter and richer.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Falinks",
+    "desc": "The six of them work together as one Pokémon. Teamwork is also their battle strategy, and they constantly change their formation as they fight.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Pincurchin",
+    "desc": "It stores electricity in each spine. Even if one gets broken off, it still continues to emit electricity for at least three hours.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Snom",
+    "desc": "It eats snow that piles up on the ground. The more snow it eats, the bigger and more impressive the spikes on its back grow.",
+    "type": "Pokemon: Ice, Bug"
+  },
+  {
+    "name": "Frosmoth",
+    "desc": "It shows no mercy to any who desecrate fields and mountains. It will fly around on its icy wings, causing a blizzard to chase offenders away.",
+    "type": "Pokemon: Ice, Bug"
+  },
+  {
+    "name": "Stonjourner",
+    "desc": "Once a year, on a specific date and at a specific time, they gather out of nowhere and form up in a circle.",
+    "type": "Pokemon: Rock"
+  },
+  {
+    "name": "Eiscue",
+    "desc": "This Pokémon keeps its heat-sensitive head cool with ice. It fishes for its food, dangling its single hair into the sea to lure in prey.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Indeedee",
+    "desc": "Through its horns, it can pick up on the emotions of creatures around it. Positive emotions are the source of its strength.",
+    "type": "Pokemon: Psychic, Normal"
+  },
+  {
+    "name": "Morpeko",
+    "desc": "It carries electrically roasted seeds with it as if they’re precious treasures. No matter how much it eats, it always gets hungry again in short order.",
+    "type": "Pokemon: Electric, Dark"
+  },
+  {
+    "name": "Cufant",
+    "desc": "If a job requires serious strength, this Pokémon will excel at it. Its copper body tarnishes in the rain, turning a vibrant green color.",
+    "type": "Pokemon: Steel"
+  },
+  {
+    "name": "Copperajah",
+    "desc": "These Pokémon live in herds. Their trunks have incredible grip strength, strong enough to crush giant rocks into powder.",
+    "type": "Pokemon: Steel"
+  },
+  {
+    "name": "Dracozolt",
+    "desc": "The powerful muscles in its tail generate its electricity. Compared to its lower body, its upper half is entirely too small.",
+    "type": "Pokemon: Electric, Dragon"
+  },
+  {
+    "name": "Arctozolt",
+    "desc": "This Pokémon lived on prehistoric seashores and was able to preserve food with the ice on its body. It went extinct because it moved so slowly.",
+    "type": "Pokemon: Electric, Ice"
+  },
+  {
+    "name": "Dracovish",
+    "desc": "Its mighty legs are capable of running at speeds exceeding 40 mph, but this Pokémon can’t breathe unless it’s underwater.",
+    "type": "Pokemon: Water, Dragon"
+  },
+  {
+    "name": "Arctovish",
+    "desc": "The skin on its face is impervious to attack, but breathing difficulties made this Pokémon go extinct anyway.",
+    "type": "Pokemon: Water, Ice"
+  },
+  {
+    "name": "Duraludon",
+    "desc": "The special metal that composes its body is very light, so this Pokémon has considerable agility. It lives in caves because it dislikes the rain.",
+    "type": "Pokemon: Steel, Dragon"
+  },
+  {
+    "name": "Dreepy",
+    "desc": "If this weak Pokémon is by itself, a mere child could defeat it. But if Dreepy has friends to help it train, it can evolve and become much stronger.",
+    "type": "Pokemon: Dragon, Ghost"
+  },
+  {
+    "name": "Drakloak",
+    "desc": "Without a Dreepy to place on its head and care for, it gets so uneasy it’ll try to substitute any Pokémon it finds for the missing Dreepy.",
+    "type": "Pokemon: Dragon, Ghost"
+  },
+  {
+    "name": "Dragapult",
+    "desc": "Apparently the Dreepy inside Dragapult’s horns eagerly look forward to being launched out at Mach speeds.",
+    "type": "Pokemon: Dragon, Ghost"
+  },
+  {
+    "name": "Zacian",
+    "desc": "This Pokémon has slumbered for many years. Some say it’s Zamazenta’s elder sister—others say the two Pokémon are rivals.",
+    "type": "Pokemon: Fairy"
+  },
+  {
+    "name": "Zamazenta",
+    "desc": "This Pokémon slept for aeons while in the form of a statue. It was asleep for so long, people forgot that it ever existed.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Eternatus",
+    "desc": "It was inside a meteorite that fell 20,000 years ago. There seems to be a connection between this Pokémon and the Dynamax phenomenon.",
+    "type": "Pokemon: Poison, Dragon"
+  },
+  {
+    "name": "Kubfu",
+    "desc": "If Kubfu pulls the long white hair on its head, its fighting spirit heightens and power wells up from the depths of its belly.",
+    "type": "Pokemon: Fighting"
+  },
+  {
+    "name": "Urshifu",
+    "desc": "Inhabiting the mountains of a distant region, this Pokémon races across sheer cliffs, training its legs and refining its moves.",
+    "type": "Pokemon: Fighting, Dark"
+  },
+  {
+    "name": "Zarude",
+    "desc": "Once the vines on Zarude’s body tear off, they become nutrients in the soil. This helps the plants of the forest grow.",
+    "type": "Pokemon: Dark, Grass"
+  },
+  {
+    "name": "Regieleki",
+    "desc": "Its entire body is made up of a single organ that generates electrical energy. Regieleki is capable of creating all Galar’s electricity.",
+    "type": "Pokemon: Electric"
+  },
+  {
+    "name": "Regidrago",
+    "desc": "Its body is composed of crystallized dragon energy. Regidrago is said to have the powers of every dragon Pokémon.",
+    "type": "Pokemon: Dragon"
+  },
+  {
+    "name": "Glastrier",
+    "desc": "Glastrier has tremendous physical strength, and the mask of ice covering its face is 100 times harder than diamond.",
+    "type": "Pokemon: Ice"
+  },
+  {
+    "name": "Spectrier",
+    "desc": "As it dashes through the night, Spectrier absorbs the life-force of sleeping creatures. It craves silence and solitude.",
+    "type": "Pokemon: Ghost"
+  },
+  {
+    "name": "Calyrex",
+    "desc": "Calyrex is known in legend as a king that ruled over Galar in ancient times. It has the power to cause hearts to mend and plants to spring forth.",
+    "type": "Pokemon: Psychic, Grass"
+  },
+  {
+    "name": "Master Ball",
+    "desc": "The best Ball with the ultimate level of performance. It will catch any wild Pokémon without fail.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Ultra Ball",
+    "desc": "An ultra-performance Ball that provides a higher Pokémon catch rate than a Great Ball.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Great Ball",
+    "desc": "A good, high-performance Ball that provides a higher Pokémon catch rate than a standard Poké Ball.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Poké Ball",
+    "desc": "A device for catching wild Pokémon. It is thrown like a ball at the target. It is designed as a capsule system.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Safari Ball",
+    "desc": "A special Poké Ball that is used only in the Great Marsh. It is decorated in a camouflage pattern.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Net Ball",
+    "desc": "A somewhat different Poké Ball that works especially well on Water- and Bug-type Pokémon.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Dive Ball",
+    "desc": "A somewhat different Poké Ball that works especially well on Pokémon that live underwater.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Nest Ball",
+    "desc": "A somewhat different Poké Ball that works especially well on weaker Pokémon in the wild.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Repeat Ball",
+    "desc": "A somewhat different Poké Ball that works especially well on Pokémon species that were previously caught.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Timer Ball",
+    "desc": "A somewhat different BALL that becomes progressively better the more turns there are in a battle.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Luxury Ball",
+    "desc": "A comfortable Poké Ball that makes a caught wild Pokémon quickly grow friendly.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Premier Ball",
+    "desc": "A somewhat rare Poké Ball that has been specially made to commemorate an event of some sort.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Dusk Ball",
+    "desc": "A somewhat different Poké Ball that makes it easier to catch wild Pokémon at night or in dark places like caves.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Heal Ball",
+    "desc": "A remedial Poké Ball that restores the caught Pokémon's HP and eliminates any status problem.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Quick Ball",
+    "desc": "A somewhat different Poké Ball that provides a better catch rate if it is used at the start of a wild encounter.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Cherish Ball",
+    "desc": "A quite rare Poké Ball that has been specially crafted to commemorate an occasion of some sort.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Potion",
+    "desc": "Restores 20 HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Antidote",
+    "desc": "A spray-type medicine. It lifts the effect of poison from one Pokémon.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Burn Heal",
+    "desc": "A spray-type medicine. It heals a single Pokémon that is suffering from a burn.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Ice Heal",
+    "desc": "A spray-type medicine. It defrosts a Pokémon that has been frozen solid.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Awakening",
+    "desc": "A spray-type medicine. It awakens a Pokémon from the clutches of sleep.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Paralyze Heal",
+    "desc": "A spray-type medicine. It eliminates paralysis from a single Pokémon.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Full Restore",
+    "desc": "A medicine that fully restores the HP and heals any status problems of a single Pokémon.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Max Potion",
+    "desc": "Fully restores HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Hyper Potion",
+    "desc": "Restores 120 HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Super Potion",
+    "desc": "Restores 60 HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Full Heal",
+    "desc": "A spray-type medicine. It heals all the status problems of a single Pokémon.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Revive",
+    "desc": "A medicine that revives a fainted Pokémon. It restores half the Pokémon's maximum HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Max Revive",
+    "desc": "A medicine that revives a fainted Pokémon. It fully restores the Pokémon's HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Fresh Water",
+    "desc": "Restores 30 HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Soda Pop",
+    "desc": "Restores 50 HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Lemonade",
+    "desc": "Restores 70 HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Moomoo Milk",
+    "desc": "Milk with a very high nutrition content. It restores the HP of one Pokémon by 100 points.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Energy Powder",
+    "desc": "Restores 60 HP but lowers Friendship.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Energy Root",
+    "desc": "Restores 120 HP but lowers Friendship.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Heal Powder",
+    "desc": "Heals all status problems, but lowers Friendship.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Revival Herb",
+    "desc": "Revives a Pokémon to max HP, but lowers Friendship.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Ether",
+    "desc": "It restores the PP of a Pokémon's selected move by a maximum of 10 points.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Max Ether",
+    "desc": "It fully restores the PP of a single selected move that has been learned by the target Pokémon.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Elixir",
+    "desc": "It restores the PP of all the moves learned by the targeted Pokémon by 10 points each.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Max Elixir",
+    "desc": "It fully restores the PP of all the moves learned by the targeted Pokémon.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Lava Cookie",
+    "desc": "Heals all major status conditions.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Berry Juice",
+    "desc": "A 100% pure juice made of Berries. It restores the HP of one Pokémon by just 20 points.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Sacred Ash",
+    "desc": "It revives all fainted Pokémon. In doing so, it also fully restores their HP.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "HP Up",
+    "desc": "Increases HP EVs by 10.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Protein",
+    "desc": "Increases Attack EVs by 10.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Iron",
+    "desc": "Increases Defense EVs by 10.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Carbos",
+    "desc": "Increases Speed EVs by 10.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Calcium",
+    "desc": "Increases Special Attack EVs by 10.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Rare Candy",
+    "desc": "A candy that is packed with energy. It raises the level of a single Pokémon by one.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "PP Up",
+    "desc": "It slightly raises the maximum PP of a selected move that has been learned by the target Pokémon.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Zinc",
+    "desc": "Increases Special Defense EVs by 10.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "PP Max",
+    "desc": "It maximally raises the top PP of a selected move that has been learned by the target Pokémon.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Old Gateau",
+    "desc": "Heals all major status conditions.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Guard Spec.",
+    "desc": "Prevents stat reduction for five turns.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Dire Hit",
+    "desc": "Raises critical-hit ratio of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Attack",
+    "desc": "Raises Attack of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Defense",
+    "desc": "Raises Defense of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Speed",
+    "desc": "Raises Speed of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Accuracy",
+    "desc": "Raises Accuracy of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Sp. Atk",
+    "desc": "Raises Special Attack of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Sp. Def",
+    "desc": "Raises Special Defense of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Poké Doll",
+    "desc": "A doll that attracts Pokémon. Use it to flee from any battle with a wild Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Fluffy Tail",
+    "desc": "An item that attracts Pokémon. Use it to flee from any battle with a wild Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Blue Flute",
+    "desc": "A toy flute made from blue glass. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Yellow Flute",
+    "desc": "A toy flute made from yellow glass. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Red Flute",
+    "desc": "A toy flute made from red glass. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Black Flute",
+    "desc": "A toy flute made from black glass. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "White Flute",
+    "desc": "A toy flute made from white glass. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Shoal Salt",
+    "desc": "Pure salt that can be discovered deep inside the Shoal Cave. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Shoal Shell",
+    "desc": "A pretty seashell that can be found deep inside the Shoal Cave. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Red Shard",
+    "desc": "A small red shard. It appears to be from some sort of implement made long ago.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Blue Shard",
+    "desc": "A small blue shard. It appears to be from some sort of implement made long ago.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Yellow Shard",
+    "desc": "A small yellow shard. It appears to be from some sort of implement made long ago.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Green Shard",
+    "desc": "A small green shard. It appears to be from some sort of implement made long ago.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Super Repel",
+    "desc": "An item that prevents weak wild Pokémon from appearing for 200 steps after its use.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Max Repel",
+    "desc": "An item that prevents weak wild Pokémon from appearing for 250 steps after its use.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Escape Rope",
+    "desc": "A long, durable rope. Use it to escape instantly from a cave or a dungeon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Repel",
+    "desc": "An item that prevents weak wild Pokémon from appearing for 100 steps after its use.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Sun Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Moon Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Fire Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Thunder Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Water Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Leaf Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Tiny Mushroom",
+    "desc": "A small and rare mushroom. It is sought after by collectors.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Big Mushroom",
+    "desc": "A large and rare mushroom. It is sought after by collectors.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Pearl",
+    "desc": "A somewhat-small pearl that sparkles in a pretty silver color. It can be sold cheaply to shops.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Big Pearl",
+    "desc": "A quite-large pearl that sparkles in a pretty silver color. It can be sold at a high price to shops.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Stardust",
+    "desc": "Lovely, red-colored sand with a loose, silky feel. It can be sold at a high price to shops.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Star Piece",
+    "desc": "A shard of a pretty gem that sparkles in a red color. It can be sold at a high price to shops.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Nugget",
+    "desc": "A nugget of pure gold that gives off a lustrous gleam. It can be sold at a high price to shops.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Heart Scale",
+    "desc": "A pretty, heart-shaped scale that is extremely rare. It glows faintly in the colors of the rainbow.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Honey",
+    "desc": "A sweet honey with a lush aroma that attracts wild Pokémon when it is used in grass, caves, or on special trees.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Growth Mulch",
+    "desc": "A fertilizer to be spread on soft soil in regions where Berries are grown. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Damp Mulch",
+    "desc": "A fertilizer to be spread on soft soil in regions where Berries are grown. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Stable Mulch",
+    "desc": "A fertilizer to be spread on soft soil in regions where Berries are grown. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Gooey Mulch",
+    "desc": "A fertilizer to be spread on soft soil in regions where Berries are grown. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Root Fossil",
+    "desc": "A fossil of an ancient Pokémon that lived in the sea. It appears to be part of a plant root.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Claw Fossil",
+    "desc": "A fossil of an ancient Pokémon that lived in the sea. It appears to be part of a claw.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Dome Fossil",
+    "desc": "A fossil of an ancient Pokémon that lived in the sea. It appears to be part of a shell.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Old Amber",
+    "desc": "A piece of amber that contains the genetic material of an ancient Pokémon. It is clear with a reddish tint.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Armor Fossil",
+    "desc": "A fossil from a prehistoric Pokémon that lived on the land. It appears to be part of a collar.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Skull Fossil",
+    "desc": "A fossil from a prehistoric Pokémon that lived on the land. It appears to be part of a head.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Rare Bone",
+    "desc": "A bone that is extremely valuable for Pokémon archeology. It can be sold for a high price to shops.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Shiny Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Dusk Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Dawn Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Oval Stone",
+    "desc": "Evolves Happiny when held.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Odd Keystone",
+    "desc": "A vital item that is needed to keep a stone tower from collapsing. Voices can be heard from it occasionally.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Griseous Orb",
+    "desc": "Increases the power of Dragon- and Ghost-type moves when held by Giratina, and changes it to Origin Forme.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Tea",
+    "desc": "An aromatic tea prepared by an old lady. It will slake even the worst thirst.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Autograph",
+    "desc": "The autograph you got from the Vermilion City Gym Leader, Lt. Surge. He wrote, \"Good luck!\"",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Douse Drive",
+    "desc": "Changes Techno Blast to a Water-type move when held by Genesect.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Shock Drive",
+    "desc": "Changes Techno Blast to an Electric-type move when held by Genesect.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Burn Drive",
+    "desc": "Changes Techno Blast to a Fire-type move when held by Genesect.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Chill Drive",
+    "desc": "Changes Techno Blast to an Ice-type move when held by Genesect.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "TM Case",
+    "desc": "A case that holds TMs and HMs. It is attached to the BAG's compartment for important items.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Sweet Heart",
+    "desc": "Very sweet chocolate. It restores the HP of one Pokémon by only 20 points.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Adamant Orb",
+    "desc": "Increases the power of Dragon- and Steel-type moves when held by Dialga.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Lustrous Orb",
+    "desc": "Increases the power of Dragon- and Water-type moves when held by Palkia.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Cheri Berry",
+    "desc": "If held by a Pokémon, it recovers from paralysis.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Chesto Berry",
+    "desc": "If held by a Pokémon, it recovers from sleep.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Pecha Berry",
+    "desc": "If held by a Pokémon, it recovers from poison.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Rawst Berry",
+    "desc": "If held by a Pokémon, it recovers from a burn.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Aspear Berry",
+    "desc": "If held by a Pokémon, it defrosts it.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Leppa Berry",
+    "desc": "If held by a Pokémon, it restores a move's PP by 10.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Oran Berry",
+    "desc": "If held by a Pokémon, it heals the user by just 10 HP.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Persim Berry",
+    "desc": "If held by a Pokémon, it recovers from confusion.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Lum Berry",
+    "desc": "If held by a Pokémon, it recovers from any status problem.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Sitrus Berry",
+    "desc": "If held by a Pokémon, it heals the user's HP a little.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Figy Berry",
+    "desc": "Restores HP if it's low, but may cause confusion.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Wiki Berry",
+    "desc": "Restores HP if it's low, but may cause confusion.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Mago Berry",
+    "desc": "Restores HP if it's low, but may cause confusion.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Aguav Berry",
+    "desc": "Restores HP if it's low, but may cause confusion.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Iapapa Berry",
+    "desc": "Restores HP if it's low, but may cause confusion.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Razz Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Bluk Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Nanab Berry",
+    "desc": "A Berry to be used in cooking. Calms a Pokémon in battle, in Let's Go Pikachu/Eevee.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Wepear Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Pinap Berry",
+    "desc": "A Berry to be used in cooking. Increases chances of getting items when a Pokémon is caught, in Pokémon Let's Go.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Kelpsy Berry",
+    "desc": "Increases Friendship but lowers Attack EVs.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Qualot Berry",
+    "desc": "Increases Friendship but lowers Defense EVs.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Hondew Berry",
+    "desc": "Increases Friendship but lowers Special Attack EVs.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Grepa Berry",
+    "desc": "Increases Friendship but lowers Special Defense EVs.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Tamato Berry",
+    "desc": "Increases Friendship but lowers Speed EVs.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Cornn Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Magost Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Rabuta Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Nomel Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Spelon Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Pamtre Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Watmel Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Durin Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Belue Berry",
+    "desc": "A Berry which is very rare in the Unova region. A maniac will buy it for a high price.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Occa Berry",
+    "desc": "Weakens a supereffective Fire-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Passho Berry",
+    "desc": "Weakens a supereffective Water-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Wacan Berry",
+    "desc": "Weakens a supereffective Electric-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Rindo Berry",
+    "desc": "Weakens a supereffective Grass-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Yache Berry",
+    "desc": "Weakens a supereffective Ice-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Chople Berry",
+    "desc": "Weakens a supereffective Fighting-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Kebia Berry",
+    "desc": "Weakens a supereffective Poison-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Shuca Berry",
+    "desc": "Weakens a supereffective Ground-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Coba Berry",
+    "desc": "Weakens a supereffective Flying-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Payapa Berry",
+    "desc": "Weakens a supereffective Psychic-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Tanga Berry",
+    "desc": "Weakens a supereffective Bug-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Charti Berry",
+    "desc": "Weakens a supereffective Rock-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Kasib Berry",
+    "desc": "Weakens a supereffective Ghost-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Haban Berry",
+    "desc": "Weakens a supereffective Dragon-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Colbur Berry",
+    "desc": "Weakens a supereffective Dark-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Babiri Berry",
+    "desc": "Weakens a supereffective Steel-type attack against the holding Pokémon.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Chilan Berry",
+    "desc": "Weakens a Normal-type attack against the Pokémon holding this berry.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Liechi Berry",
+    "desc": "Raises Attack when HP is low.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Ganlon Berry",
+    "desc": "Raises Defense when HP is low.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Salac Berry",
+    "desc": "Raises Speed when HP is low.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Petaya Berry",
+    "desc": "Raises Special Attack when HP is low.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Apicot Berry",
+    "desc": "Raises Special Defense when HP is low.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Lansat Berry",
+    "desc": "Increases critical-hit ratio when HP is low.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Starf Berry",
+    "desc": "Sharply raises a random stat when HP is low.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Enigma Berry",
+    "desc": "If held by a Pokémon, it restores its HP if it is hit by any supereffective attack.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Micle Berry",
+    "desc": "Increases a move's accuracy when HP is low.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Custap Berry",
+    "desc": "Holder can move first when HP is low.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Jaboca Berry",
+    "desc": "If held by a Pokémon and a physical attack lands, the attacker also takes damage.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Rowap Berry",
+    "desc": "If held by a Pokémon and a special attack lands, the attacker also takes damage.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Bright Powder",
+    "desc": "Lowers the opponent's accuracy.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "White Herb",
+    "desc": "An item to be held by a POKéMON. It restores any lowered stat in battle. It can be used only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Macho Brace",
+    "desc": "An item to be held by a Pokémon. It is a stiff and heavy brace that promotes strong growth but lowers Speed.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Exp. Share",
+    "desc": "An item to be held by a Pokémon. The holder gets a share of a battle's Exp. Points without battling.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Quick Claw",
+    "desc": "An item to be held by a Pokémon. A light, sharp claw that lets the bearer move first occasionally.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Soothe Bell",
+    "desc": "An item to be held by a Pokémon. It is a bell with a comforting chime that calms the holder and makes it friendly.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Mental Herb",
+    "desc": "An item to be held by a Pokémon. It snaps the holder out of infatuation. It can be used only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Choice Band",
+    "desc": "Raises Attack, but only one move can be used.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "King's Rock",
+    "desc": "May cause opponent to flinch. Evolves Poliwhirl and Slowpoke when traded holding the item.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Silver Powder",
+    "desc": "Increases the power of Bug-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Amulet Coin",
+    "desc": "Doubles prize money if held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Cleanse Tag",
+    "desc": "An item to be held by a Pokémon. It helps keep wild Pokémon away if the holder is the first one in the party.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Soul Dew",
+    "desc": "Increases the power of Psychic- and Dragon-type moves when held by Latios or Latias. Increases Sp.Atk/Sp.Def prior to Gen 7.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Deep Sea Tooth",
+    "desc": "Increases Special Attack when held by Clamperl. Evolves Clamperl when traded holding the item.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Deep Sea Scale",
+    "desc": "Increases Special Defense when held by Clamperl. Evolves Clamperl when traded holding the item.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Smoke Ball",
+    "desc": "An item to be held by a Pokémon. It enables the holder to flee from any wild Pokémon without fail.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Everstone",
+    "desc": "An item to be held by a Pokémon. The Pokémon holding this peculiar stone is prevented from evolving.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Focus Band",
+    "desc": "An item to be held by a Pokémon. The holder may endure a potential KO attack, leaving it with just 1 HP.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Lucky Egg",
+    "desc": "An item to be held by a Pokémon. It is an egg filled with happiness that earns extra Exp. Points in battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Scope Lens",
+    "desc": "Increases critical-hit ratio.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Metal Coat",
+    "desc": "Increases the power of Steel-type moves. Evolves Onix and Scyther when traded holding the item.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Leftovers",
+    "desc": "An item to be held by a Pokémon. The holder's HP is gradually restored during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dragon Scale",
+    "desc": "Evolves Seadra when traded holding the item.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Light Ball",
+    "desc": "An item to be held by PIKACHU. It is a puzzling orb that raises the Attack and Sp. Atk stat.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Soft Sand",
+    "desc": "Increases the power of Ground-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Hard Stone",
+    "desc": "Increases the power of Rock-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Miracle Seed",
+    "desc": "Increases the power of Grass-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Black Glasses",
+    "desc": "Increases the power of Dark-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Black Belt",
+    "desc": "Increases the power of Fighting-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Magnet",
+    "desc": "Increases the power of Electric-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Mystic Water",
+    "desc": "Increases the power of Water-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Sharp Beak",
+    "desc": "Increases the power of Flying-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Poison Barb",
+    "desc": "Increases the power of Poison-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Never-Melt Ice",
+    "desc": "Increases the power of Ice-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Spell Tag",
+    "desc": "Increases the power of Ghost-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Twisted Spoon",
+    "desc": "Increases the power of Psychic-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Charcoal",
+    "desc": "Increases the power of Fire-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dragon Fang",
+    "desc": "Increases the power of Dragon-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Silk Scarf",
+    "desc": "Increases the power of Normal-type moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Upgrade",
+    "desc": "Evolves Porygon when traded holding the item.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Shell Bell",
+    "desc": "An item to be held by a Pokémon. The holder's HP is restored a little every time it inflicts damage.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Sea Incense",
+    "desc": "Increases the power of Water-type moves. Breeding Marill or Azumarill produces Azurill when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Lax Incense",
+    "desc": "Lowers the opponent's accuracy. Breeding Wobbuffet produces Wynaut when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Lucky Punch",
+    "desc": "Increases critical-hit ratio when held by Chansey.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Metal Powder",
+    "desc": "Increases Defense when held by Ditto.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Thick Club",
+    "desc": "Increases Attack when held by Cubone or Marowak.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Leek",
+    "desc": "Increases critical-hit ratio when held by Farfetch'd.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Red Scarf",
+    "desc": "Raises holder's Cool aspect in a Contest.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Blue Scarf",
+    "desc": "Raises holder's Beauty aspect in a Contest.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Pink Scarf",
+    "desc": "Raises holder's Cute aspect in a Contest.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Green Scarf",
+    "desc": "Raises holder's Smart aspect in a Contest.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Yellow Scarf",
+    "desc": "Raises holder's Tough aspect in a Contest.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Wide Lens",
+    "desc": "Increases the accuracy of moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Muscle Band",
+    "desc": "Increases the power of Physical-category moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Wise Glasses",
+    "desc": "Increases the power of Special-category moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Expert Belt",
+    "desc": "Increases the power of super-effective moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Light Clay",
+    "desc": "A Pokémon held item that extends the duration of barrier moves like Light Screen and Reflect used by the holder.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Life Orb",
+    "desc": "Increases the power of moves, but loses HP each turn.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Power Herb",
+    "desc": "A single-use item to be held by a Pokémon. It allows the immediate use of a move that charges on the first turn.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Toxic Orb",
+    "desc": "An item to be held by a Pokémon. It is a bizarre orb that badly poisons the holder in battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Flame Orb",
+    "desc": "An item to be held by a Pokémon. It is a bizarre orb that inflicts a burn on the holder in battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Quick Powder",
+    "desc": "Increases Speed when held by Ditto.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Focus Sash",
+    "desc": "An item to be held by a Pokémon. If it has full HP, the holder will endure one potential KO attack, leaving 1 HP.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Zoom Lens",
+    "desc": "Raises a move's accuracy if the holder moves after its target.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Metronome",
+    "desc": "Increases the power of moves used consecutively.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Iron Ball",
+    "desc": "A Pokémon held item that cuts Speed. It makes Flying-type and levitating holders susceptible to Ground moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Lagging Tail",
+    "desc": "Holder always attacks last.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Destiny Knot",
+    "desc": "A long, thin, bright-red string to be held by a Pokémon. If the holder becomes infatuated, the foe does too.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Black Sludge",
+    "desc": "A held item that gradually restores the HP of Poison-type Pokémon. It inflicts damage on all other types.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Icy Rock",
+    "desc": "A Pokémon held item that extends the duration of the move Hail used by the holder.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Smooth Rock",
+    "desc": "A Pokémon held item that extends the duration of the move Sandstorm used by the holder.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Heat Rock",
+    "desc": "A Pokémon held item that extends the duration of the move Sunny Day used by the holder.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Damp Rock",
+    "desc": "A Pokémon held item that extends the duration of the move Rain Dance used by the holder.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Grip Claw",
+    "desc": "A Pokémon held item that extends the duration of multiturn attacks like Bind and Wrap.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Choice Scarf",
+    "desc": "Raises Speed, but only one move can be used.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Sticky Barb",
+    "desc": "A held item that damages the holder on every turn. It may latch on to foes and allies that touch the holder.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Power Bracer",
+    "desc": "A Pokémon held item that promotes Attack gain on leveling, but reduces the Speed stat.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Power Belt",
+    "desc": "A Pokémon held item that promotes Defense gain on leveling, but reduces the Speed stat.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Power Lens",
+    "desc": "A Pokémon held item that promotes Sp. Atk gain on leveling, but reduces the Speed stat.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Power Band",
+    "desc": "A Pokémon held item that promotes Sp. Def gain on leveling, but reduces the Speed stat.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Power Anklet",
+    "desc": "A Pokémon held item that promotes Speed gain on leveling, but reduces the Speed stat.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Power Weight",
+    "desc": "A Pokémon held item that promotes HP gain on leveling, but reduces the Speed stat.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Shed Shell",
+    "desc": "A tough, discarded carapace to be held by a Pokémon. It enables the holder to switch with a waiting Pokémon in battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Big Root",
+    "desc": "Recovers more HP from HP-stealing moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Choice Specs",
+    "desc": "Raises Special Attack, but only one move can be used.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Flame Plate",
+    "desc": "Increases power of Fire-type moves. Changes Arceus' type to Fire.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Splash Plate",
+    "desc": "Increases power of Water-type moves. Changes Arceus' type to Water.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Zap Plate",
+    "desc": "Increases power of Electric-type moves. Changes Arceus' type to Electric.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Meadow Plate",
+    "desc": "Increases power of Grass-type moves. Changes Arceus' type to Grass.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Icicle Plate",
+    "desc": "Increases power of Ice-type moves. Changes Arceus' type to Ice.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Fist Plate",
+    "desc": "Increases power of Fighting-type moves. Changes Arceus' type to Fighting.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Toxic Plate",
+    "desc": "Increases power of Poison-type moves. Changes Arceus' type to Poison.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Earth Plate",
+    "desc": "Increases power of Ground-type moves. Changes Arceus' type to Ground.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Sky Plate",
+    "desc": "Increases power of Flying-type moves. Changes Arceus' type to Flying.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Mind Plate",
+    "desc": "Increases power of Psychic-type moves. Changes Arceus' type to Psychic.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Insect Plate",
+    "desc": "Increases power of Bug-type moves. Changes Arceus' type to Bug.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Stone Plate",
+    "desc": "Increases power of Rock-type moves. Changes Arceus' type to Rock.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Spooky Plate",
+    "desc": "Increases power of Ghost-type moves. Changes Arceus' type to Ghost.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Draco Plate",
+    "desc": "Increases power of Dragon-type moves. Changes Arceus' type to Dragon.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dread Plate",
+    "desc": "Increases power of Dark-type moves. Changes Arceus' type to Dark.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Iron Plate",
+    "desc": "Increases power of Steel-type moves. Changes Arceus' type to Steel.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Odd Incense",
+    "desc": "Increases the power of Psychic-type moves. Breeding Mr. Mime produces Mime Jr. when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Rock Incense",
+    "desc": "Increases the power of Rock-type moves. Breeding Sudowoodo produces Bonsly when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Full Incense",
+    "desc": "Holder always attacks last. Breeding Snorlax produces Munchlax when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Wave Incense",
+    "desc": "Increases the power of Water-type moves. Breeding Mantine produces Mantyke when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Rose Incense",
+    "desc": "Increases the power of Grass-type moves. Breeding Roselia or Roserade produces Budew when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Luck Incense",
+    "desc": "Doubles prize money if held. Breeding Chansey or Blissey produces Happiny when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Pure Incense",
+    "desc": "Descreases the likelihood of meeting wild Pokémon. Breeding Chimecho produces Chingling when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Protector",
+    "desc": "Evolves Rhydon when traded holding the item.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Electirizer",
+    "desc": "Evolves Electabuzz when traded holding the item.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Magmarizer",
+    "desc": "Evolves Magmar when traded holding the item.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Dubious Disc",
+    "desc": "Evolves Porygon2 when traded holding the item.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Reaper Cloth",
+    "desc": "Evolves Dusclops when traded holding the item.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Razor Claw",
+    "desc": "Increases critical-hit ratio. Evolves Sneasel when held at night.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Razor Fang",
+    "desc": "May cause opponent to flinch. Evolves Gligar when held at night.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "TM01",
+    "desc": "Teaches the move Mega Punch/Dynamic Punch/Focus Punch/Hone Claws/Work Up/Headbutt.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM02",
+    "desc": "Teaches the move Razor Wind/Headbutt/Dragon Claw/Taunt.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM03",
+    "desc": "Teaches the move Swords Dance/Curse/Water Pulse/Psyshock/Helping Hand.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM04",
+    "desc": "Teaches the move Whirlwind/Rollout/Calm Mind/Teleport.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM05",
+    "desc": "Teaches the move Mega Kick/Roar/Rest.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM06",
+    "desc": "Teaches the move Toxic/Light Screen.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM07",
+    "desc": "Teaches the move Horn Drill/Zap Cannon/Hail/Protect.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM08",
+    "desc": "Teaches the move Body Slam/Rock Smash/Bulk Up/Substitute.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM09",
+    "desc": "Teaches the move Take Down/Psych Up/Bullet Seed/Venoshock/Reflect.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM10",
+    "desc": "Teaches the move Double-Edge/Hidden Power/Dig.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM11",
+    "desc": "Teaches the move BubbleBeam/Sunny Day/Will-O-Wisp.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM12",
+    "desc": "Teaches the move Water Gun/Sweet Scent/Taunt/Facade.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM13",
+    "desc": "Teaches the move Snore/Ice Beam/Brick Break.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM14",
+    "desc": "Teaches the move Blizzard/Fly.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM15",
+    "desc": "Teaches the move Hyper Beam/Seismic Toss.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM16",
+    "desc": "Teaches the move Pay Day/Icy Wind/Light Screen/Thunder Wave.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM17",
+    "desc": "Teaches the move Submission/Protect/Dragon Tail.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM18",
+    "desc": "Teaches the move Counter/Rain Dance/U-turn.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM19",
+    "desc": "Teaches the move Seismic Toss/Giga Drain/Telekinesis/Roost/Iron Tail.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM20",
+    "desc": "Teaches the move Rage/Endure/Safeguard/Dark Pulse.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM21",
+    "desc": "Teaches the move Mega Drain/Frustration/Foul Play.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM22",
+    "desc": "Teaches the move SolarBeam/Rock Slide.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM23",
+    "desc": "Teaches the move Dragon Rage/Iron Tail/Smack Down/Thunder Punch.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM24",
+    "desc": "Teaches the move Thunderbolt/DragonBreath/X-Scissor.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM25",
+    "desc": "Teaches the move Thunder/Waterfall.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM26",
+    "desc": "Teaches the move Earthquake/Poison Jab.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM27",
+    "desc": "Teaches the move Fissure/Return/Toxic.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM28",
+    "desc": "Teaches the move Dig/Leech Life/Tri Attack.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM29",
+    "desc": "Teaches the move Psychic/Scald.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM30",
+    "desc": "Teaches the move Teleport/Shadow Ball/Bulk Up.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM31",
+    "desc": "Teaches the move Mimic/Mud-Slap/Brick Break/Fire Punch.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM32",
+    "desc": "Teaches the move Double Team/Dazzling Gleam.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM33",
+    "desc": "Teaches the move Ice Punch/Reflect/Calm Mind.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM34",
+    "desc": "Teaches the move Bide/Swagger/Shock Wave/Sludge Wave/Dragon Pulse.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM35",
+    "desc": "Teaches the move Metronome/Sleep Talk/Flamethrower/Ice Punch.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM36",
+    "desc": "Teaches the move Selfdestruct/Sludge Bomb/Thunderbolt.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM37",
+    "desc": "Teaches the move Egg Bomb/Sandstorm/Flamethrower.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM38",
+    "desc": "Teaches the move Fire Blast/Thunder.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM39",
+    "desc": "Teaches the move Swift/Rock Tomb/Outrage.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM40",
+    "desc": "Teaches the move Skull Bash/Defense Curl/Aerial Ace/Psychic.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM41",
+    "desc": "Teaches the move Softboiled/ThunderPunch/Torment/Earthquake.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM42",
+    "desc": "Teaches the move Dream Eater/Facade/Self-Destruct.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM43",
+    "desc": "Teaches the move Sky Attack/Detect/Secret Power/Flame Charge/Shadow Ball.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM44",
+    "desc": "Teaches the move Rest/Play Rough.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM45",
+    "desc": "Teaches the move Thunder Wave/Attract/Solar Beam.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM46",
+    "desc": "Teaches the move Psywave/Thief/Fire Blast.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM47",
+    "desc": "Teaches the move Explosion/Steel Wing/Low Sweep/Surf.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM48",
+    "desc": "Teaches the move Rock Slide/Fire Punch/Skill Swap/Round/Hyper Beam.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM49",
+    "desc": "Teaches the move Tri Attack/Fury Cutter/Snatch/Echoed Voice/Superpower.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM50",
+    "desc": "Teaches the move Substitute/Nightmare/Overheat/Roost.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM51",
+    "desc": "Teaches the move Roost/Ally Switch/Steel Wing/Blizzard.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM52",
+    "desc": "Teaches the move Focus Blast/Sludge Bomb.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM53",
+    "desc": "Teaches the move Energy Ball/Mega Drain.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM54",
+    "desc": "Teaches the move False Swipe/Flash Cannon.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM55",
+    "desc": "Teaches the move Brine/Scald/Ice Beam.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM56",
+    "desc": "Teaches the move Fling/Stealth Rock.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM57",
+    "desc": "Teaches the move Charge Beam/Pay Day.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM58",
+    "desc": "Teaches the move Endure/Sky Drop/Drill Run.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM59",
+    "desc": "Teaches the move Dragon Pulse/Incinerate/Brutal Swing/Dream Eater.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM60",
+    "desc": "Teaches the move Drain Punch/Quash/Megahorn.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM61",
+    "desc": "Teaches the move Will-O-Wisp.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM62",
+    "desc": "Teaches the move Silver Wind/Acrobatics.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM63",
+    "desc": "Teaches the move Embargo.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM64",
+    "desc": "Teaches the move Explosion.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM65",
+    "desc": "Teaches the move Shadow Claw.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM66",
+    "desc": "Teaches the move Payback.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM67",
+    "desc": "Teaches the move Recycle/Retaliate/Smart Strike.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM68",
+    "desc": "Teaches the move Giga Impact.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM69",
+    "desc": "Teaches the move Rock Polish.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM70",
+    "desc": "Teaches the move Flash/Aurora Veil.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM71",
+    "desc": "Teaches the move Stone Edge.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM72",
+    "desc": "Teaches the move Avalanche/Volt Switch.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM73",
+    "desc": "Teaches the move Thunder Wave.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM74",
+    "desc": "Teaches the move Gyro Ball.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM75",
+    "desc": "Teaches the move Swords Dance.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM76",
+    "desc": "Teaches the move Stealth Rock/Struggle Bug/Fly.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM77",
+    "desc": "Teaches the move Psych Up.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM78",
+    "desc": "Teaches the move Captivate/Bulldoze.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM79",
+    "desc": "Teaches the move Dark Pulse/Frost Breath.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM80",
+    "desc": "Teaches the move Rock Slide.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM81",
+    "desc": "Teaches the move X-Scissor.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM82",
+    "desc": "Teaches the move Sleep Talk/Dragon Tail.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM83",
+    "desc": "Teaches the move Natural Gift/Work Up/Infestation.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM84",
+    "desc": "Teaches the move Poison Jab.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM85",
+    "desc": "Teaches the move Dream Eater.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM86",
+    "desc": "Teaches the move Grass Knot.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM87",
+    "desc": "Teaches the move Swagger.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM88",
+    "desc": "Teaches the move Pluck/Sleep Talk.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM89",
+    "desc": "Teaches the move U-turn.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM90",
+    "desc": "Teaches the move Substitute.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM91",
+    "desc": "Teaches the move Flash Cannon.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM92",
+    "desc": "Teaches the move Trick Room.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "HM01",
+    "desc": "Teaches the move Cut.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "HM02",
+    "desc": "Teaches the move Fly.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "HM03",
+    "desc": "Teaches the move Surf.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "HM04",
+    "desc": "Teaches the move Strength.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "HM05",
+    "desc": "Teaches the move Flash/Defog/Whirlpool/Waterfall.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "HM06",
+    "desc": "Teaches the move Whirlpool/Rock Smash/Dive.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "Explorer Kit",
+    "desc": "A bag filled with convenient tools for exploring. It provides access to the Underground.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Loot Sack",
+    "desc": "A sturdy, spacious bag that is used to carry loot obtained in the coal mine.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Rule Book",
+    "desc": "It lists the rules for holding battles. For linked battles, you may choose which set of rules you wish to use.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Poké Radar",
+    "desc": "A tool that can search out Pokémon that are hiding in grass. Its battery is recharged as you walk.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Point Card",
+    "desc": "A card that lists the Battle Points you have earned. ",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Journal",
+    "desc": "A notebook that keeps a day-to-day record of your adventure so far. ",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Seal Case",
+    "desc": "A case for storing Seals that can be applied to the capsule cases of Poké Balls.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Fashion Case",
+    "desc": "A lovely case to store colorful Props for your Pokémon to wear in a musical.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Seal Bag",
+    "desc": "A tiny bag that can hold ten Seals for decorating Poké Balls.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Pal Pad",
+    "desc": "A convenient notepad that is used for registering your friends, Friend Codes, and keeping a record of game play.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Works Key",
+    "desc": "A large key for operating the doors of the Valley Windworks in the canyon. It was held by a Team Galactic Grunt.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Old Charm",
+    "desc": "An ancient good-luck charm made of Pokémon bones to be taken to the elder of Celestic Town.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Galactic Key",
+    "desc": "A card key for disengaging security systems in the Galactic HQ. Losing it can result in punishment, apparently.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Red Chain",
+    "desc": "A mythical chain that is said to link the legendary Pokémon that created the Sinnoh region.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Town Map",
+    "desc": "A very convenient map that can be viewed anytime. It even shows your present location.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Vs. Seeker",
+    "desc": "A device that indicates Trainers who want to battle. Its battery charges while you walk.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Coin Case",
+    "desc": "A case for holding Coins obtained at the Game Corner. It holds up to 50,000 Coins.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Old Rod",
+    "desc": "An old and beat-up fishing rod. Use it by any body of water to fish for wild aquatic Pokémon.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Good Rod",
+    "desc": "A new, good-quality fishing rod. Use it by any body of water to fish for wild aquatic Pokémon.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Super Rod",
+    "desc": "An awesome, high-tech fishing rod. Use it by any body of water to fish for wild aquatic Pokémon.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Sprayduck",
+    "desc": "A watering can shaped like a PSYDUCK. It helps promote healthy growth of Berries planted in soft soil.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Poffin Case",
+    "desc": "A case for storing Poffin cooked from Berries. ",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Suite Key",
+    "desc": "A key to one of the suites at the luxury hotel by a lake. For some odd reason, it often disappears.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Oak's Letter",
+    "desc": "A letter from Prof. Oak. Written in it is a request for you to go to Rt. 224.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Lunar Wing",
+    "desc": "A feather that glows like the moon. It is said to possess the power to dispel nightmares.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Member Card",
+    "desc": "A card needed for entering the inn in Canalave City. Oddly, the last date marked on it was 50 years ago.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Azure Flute",
+    "desc": "A flute that puts out echoing sounds that do not seem to be of this world. It is unknown who made it.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Contest Pass",
+    "desc": "The pass required for entering POKéMON CONTESTS. It has a drawing of an award ribbon on it.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Magma Stone",
+    "desc": "A stone formed when boulders melted in intensely hot magma, then hardened. Magma remains sealed inside.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Coupon 1",
+    "desc": "A coupon to be exchanged for a Pokémon Watch (Pokétch for short). Three coupons are needed.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Coupon 2",
+    "desc": "A coupon to be exchanged for a Pokémon Watch (Pokétch for short). Three coupons are needed.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Coupon 3",
+    "desc": "A coupon to be exchanged for a Pokémon Watch (Pokétch for short). Three coupons are needed.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Secret Potion",
+    "desc": "A fantastic medicine dispensed by the pharmacy in Cianwood City. It fully heals a Pokémon of any ailment.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Vs. Recorder",
+    "desc": "An amazing device that can record a battle either between friends or at a special battle facility.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Gracidea",
+    "desc": "A flower sometimes bundled in bouquets to convey gratitude on special occasions like birthdays.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Apricorn Box",
+    "desc": "A handy box where you can store up to 99 Apricorns of each kind.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Unown Report",
+    "desc": "A report of all the discovered kinds of UNOWN.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Berry Pots",
+    "desc": "Handy containers for cultivating Berries wherever you go.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Dowsing Machine",
+    "desc": "Searches for hidden items on the ground.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Blue Card",
+    "desc": "A card to save points for the Buena's Password show.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Slowpoke Tail",
+    "desc": "A very tasty tail of something. It sells for a high price.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Clear Bell",
+    "desc": "A very old-fashioned bell that makes a gentle ringing.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Squirt Bottle",
+    "desc": "A bottle used for watering plants in the Berry Pots.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Red Scale",
+    "desc": "A scale from the red GYARADOS. It glows red like a flame.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Lost Item",
+    "desc": "The Mime Jr. doll that was lost by the Copycat.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Pass",
+    "desc": "A ticket required for riding the Magnet Train. It allows you to ride whenever and however much you'd like.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Machine Part",
+    "desc": "An important machine part for the Power Plant that was stolen.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Silver Wing",
+    "desc": "A strange, silvery feather that sparkles.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Rainbow Wing",
+    "desc": "A mystical rainbow feather that sparkles.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Mystery Egg",
+    "desc": "A mysterious Egg obtained from Mr. Pokémon. What's in the Egg is unknown.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Red Apricorn",
+    "desc": "A red Apricorn. It assails your nostrils.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Blue Apricorn",
+    "desc": "A blue Apricorn. It smells a bit like grass.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Yellow Apricorn",
+    "desc": "A yellow Apricorn. It has an invigorating scent.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Green Apricorn",
+    "desc": "A green Apricorn. It has a mysterious, aromatic scent.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Pink Apricorn",
+    "desc": "A pink Apricorn. It has a nice, sweet scent.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "White Apricorn",
+    "desc": "A white Apricorn. It doesn't smell like anything.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Black Apricorn",
+    "desc": "A black Apricorn It has an indescribable scent.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Fast Ball",
+    "desc": "A Poké Ball that makes it easier to catch Pokémon which are quick to run away.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Level Ball",
+    "desc": "A Poké Ball for catching Pokémon that are a lower level than your own.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Lure Ball",
+    "desc": "A Poké Ball for catching Pokémon hooked by a Rod when fishing.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Heavy Ball",
+    "desc": "A Poké Ball for catching very heavy Pokémon.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Love Ball",
+    "desc": "Poké Ball for catching Pokémon that are the opposite gender of your Pokémon.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Friend Ball",
+    "desc": "A Poké Ball that makes caught Pokémon more friendly.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Moon Ball",
+    "desc": "A Poké Ball for catching Pokémon that evolve using the Moon Stone.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Sport Ball",
+    "desc": "A special Poké Ball for the Bug-Catching Contest.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Park Ball",
+    "desc": "A special Poké Ball for the Pal Park.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Photo Album",
+    "desc": "A nice photo album for storing all the photos taken along your adventure.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "GB Sounds",
+    "desc": "A music player that allows you to listen to nostalgic songs. It's operated with a single switch.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Tidal Bell",
+    "desc": "A very old-fashioned bell that makes a gentle ringing.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Rage Candy Bar",
+    "desc": "Heals all major status conditions.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Data Card 01",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many victories you've had.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 02",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many losses you've had.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 03",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times your Pokémon have dashed.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 04",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times your Pokémon have jumped.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 05",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won the Hurdle Dash.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 06",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won the Relay Run.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 07",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won Pennant Capture.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 08",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won Block Smash.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 09",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won Disc Catch.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 10",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won Snow Throw.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 11",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many points your Pokémon scored.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 12",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times your Pokémon have failed.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 13",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times your Pokémon impeded themselves.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 14",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times your Pokémon have tackled.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 15",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times your Pokémon have fallen down.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 16",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won Ring Drop.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 17",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won Lamp Jump.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 18",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won Circle Push.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 19",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many Link Pokéathlon wins you've had.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 20",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many Link Pokéathlon losses you've had.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 21",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won an event.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 22",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've lost an event.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 23",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've switched Pokémon.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 24",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've won Goal Roll.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 25",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times your Pokémon won individual prizes.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 26",
+    "desc": "It holds Pokéathlon records. It's a card that shows how many times you've instructed your Pokémon.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Data Card 27",
+    "desc": "It holds Pokéathlon records. It's a card that shows how much time you've spent in the Pokéathlon.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Jade Orb",
+    "desc": " A shiny green orb that is said to have a legend and has a deep connection with the Hoenn region.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Lock Capsule",
+    "desc": "A sturdy Capsule that can only be opened with a special key.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Red Orb",
+    "desc": "A shiny red orb that is said to have a legend and has a deep connection with the Hoenn region.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Blue Orb",
+    "desc": "A shiny blue orb that is said to have a legend and has a deep connection with the Hoenn region.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Enigma Stone",
+    "desc": "A crystal ball that was excavated from the ground. A very beautiful stone that is covered with bits of rock and earth.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Eviolite",
+    "desc": "A mysterious evolutionary lump. When held, it raises the Defense and Sp. Def of a Pokémon that can still evolve.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Float Stone",
+    "desc": "A very light stone. It reduces the weight of a Pokémon when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Rocky Helmet",
+    "desc": "If the holder of this item takes damage, the attacker will also be damaged upon contact.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Air Balloon",
+    "desc": "When held by a Pokémon, the Pokémon will float into the air. When the holder is attacked, this item will burst.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Red Card",
+    "desc": "A card with a mysterious power. When the holder is struck by a foe, the attacker is removed from battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ring Target",
+    "desc": "Moves that would otherwise have no effect will land on the Pokémon that holds it.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Binding Band",
+    "desc": "A band that increases the power of binding moves when held.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Absorb Bulb",
+    "desc": "A consumable bulb. If the holder is hit by a Water-type move, its Sp. Atk will rise.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Cell Battery",
+    "desc": "A consumable battery. If the holder is hit by an Electric-type move, its Attack will rise.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Eject Button",
+    "desc": "If the holder is hit by an attack, it will switch with another Pokémon in your party.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Fire Gem",
+    "desc": "Increases the power of a Fire-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Water Gem",
+    "desc": "Increases the power of a Water-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Electric Gem",
+    "desc": "Increases the power of an Electric-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Grass Gem",
+    "desc": "Increases the power of a Grass-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ice Gem",
+    "desc": "Increases the power of an Ice-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Fighting Gem",
+    "desc": "Increases the power of a Fighting-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Poison Gem",
+    "desc": "Increases the power of a Poison-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ground Gem",
+    "desc": "Increases the power of a Ground-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Flying Gem",
+    "desc": "Increases the power of a Flying-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Psychic Gem",
+    "desc": "Increases the power of a Psychic-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Rock Gem",
+    "desc": "Increases the power of a Rock-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ghost Gem",
+    "desc": "Increases the power of a Ghost-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dragon Gem",
+    "desc": "Increases the power of a Dragon-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dark Gem",
+    "desc": "Increases the power of a Dark-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Steel Gem",
+    "desc": "Increases the power of a Steel-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Normal Gem",
+    "desc": "Increases the power of a Normal-type move only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Cover Fossil",
+    "desc": "A fossil of an ancient Pokémon that lived in the sea in ancient times. It appears to be part of its back.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Plume Fossil",
+    "desc": "A fossil of an ancient Pokémon that flew in the sky in ancient times. It appears to be part of its wing.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Liberty Pass",
+    "desc": "A special pass to go to Liberty Garden. Board the ship in Castelia City.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Pass Orb",
+    "desc": "A mysterious orb containing the power of the Unova region, to be used when generating Pass Power.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dream Ball",
+    "desc": "A special Poké Ball that appears out of nowhere in a bag at the Entree Forest. It can catch any Pokémon.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Poké Toy",
+    "desc": "An item that attracts Pokémon. Use it to flee from any battle with a wild Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Prop Case",
+    "desc": "A lovely case to store colorful Props for your Pokémon to wear in a musical.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Dragon Skull",
+    "desc": "A skull of a Pokémon which was said to have braved the angry waters to fly around the world.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Balm Mushroom",
+    "desc": "A rare mushroom which gives off a nice fragrance. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Big Nugget",
+    "desc": "A big nugget of pure gold that gives off a lustrous gleam. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Pearl String",
+    "desc": "Very large pearls that sparkle in a pretty silver color. A maniac will buy them for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Comet Shard",
+    "desc": "A shard which fell to the ground when a comet approached. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Relic Copper",
+    "desc": "A copper coin used in a civilization about 3,000 years ago. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Relic Silver",
+    "desc": "A silver coin used in a civilization about 3,000 years ago. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Relic Gold",
+    "desc": "A gold coin used in a civilization about 3,000 years ago. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Relic Vase",
+    "desc": "A vase made in a civilization about 3,000 years ago. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Relic Band",
+    "desc": "A bracelet made in a civilization about 3,000 years ago. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Relic Statue",
+    "desc": "A stone figure made in a civilization about 3,000 years ago. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Relic Crown",
+    "desc": "A crown made in a civilization about 3,000 years ago. A maniac will buy it for a high price.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Casteliacone",
+    "desc": "Heals all major status conditions.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Dire Hit 2",
+    "desc": "Raises a Pokémon's critical-hit ratio in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Speed 2",
+    "desc": "Sharply raises Speed of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Sp. Atk 2",
+    "desc": "Sharply raises Special Attack of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Sp. Def 2",
+    "desc": "Sharply raises Special Defense of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Defense 2",
+    "desc": "Sharply raises Defense of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Attack 2",
+    "desc": "Sharply raises Attack of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Accuracy 2",
+    "desc": "Sharply raises Accuracy of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Speed 3",
+    "desc": "Drastically raises Speed of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Sp. Atk 3",
+    "desc": "Drastically raises Special Attack of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Sp. Def 3",
+    "desc": "Drastically raises Special Defense of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Defense 3",
+    "desc": "Drastically raises Defense of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Attack 3",
+    "desc": "Drastically raises Attack of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Accuracy 3",
+    "desc": "Drastically raises Accuracy of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Speed 6",
+    "desc": "Immensely raises Speed of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Sp. Def 6",
+    "desc": "Immensely raises Special Defense of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Defense 6",
+    "desc": "Immensely raises Defense of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Attack 6",
+    "desc": "Immensely raises Attack of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "X Accuracy 6",
+    "desc": "Immensely raises Accuracy of a Pokémon in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Ability Urge",
+    "desc": "When used, it activates the Ability of an ally Pokémon.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Item Drop",
+    "desc": "When used, it causes an ally Pokémon to drop a held item.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Item Urge",
+    "desc": "When used, it causes an ally Pokémon to use its held item.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Reset Urge",
+    "desc": "When used, it restores any stat changes of an ally Pokémon.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Dire Hit 3",
+    "desc": "Greatly raises a Pokémon's critical-hit ratio in battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Light Stone",
+    "desc": "Reshiram's body was destroyed and changed into this stone. It is said to be waiting for the emergence of a hero.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Dark Stone",
+    "desc": "Zekrom's body was destroyed and changed into this stone. It is said to be waiting for the emergence of a hero.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "TM93",
+    "desc": "Teaches the move Wild Charge.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM94",
+    "desc": "Teaches the move Rock Smash/Surf.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM95",
+    "desc": "Teaches the move Snarl.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "Gram 1",
+    "desc": "An important letter which Wingull delivers.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Gram 2",
+    "desc": "An important letter which Wingull delivers.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Gram 3",
+    "desc": "An important letter which Wingull delivers.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Xtransceiver",
+    "desc": "A high-tech transceiver with a camera function. It allows up to four-way calls.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Medal Box",
+    "desc": "A box-shaped machine that stores Medals and Medal information.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "DNA Splicers",
+    "desc": "A splicer that fuses Kyurem and a certain Pokémon. They are said to have been one in the beginning.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Permit",
+    "desc": "A permit that is needed to enter the Nature Preserve. Not many know about it.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Oval Charm",
+    "desc": "An oval charm said to increase the chance of Pokémon Eggs being found at the Day Care.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Shiny Charm",
+    "desc": "A shiny charm said to increase the chance of finding a Shiny Pokémon in the wild.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Plasma Card",
+    "desc": "A card key needed to enter the password inside the Plasma Frigate.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Grubby Hanky",
+    "desc": "A handkerchief dropped by a regular at Café Warehouse. It smells faintly like a Pokémon.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Colress Machine",
+    "desc": "A special device that wrings out the potential of Pokémon. It is an imperfect prototype.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dropped Item",
+    "desc": "The Xtransceiver found at the Nimbasa City amusement park. It seems it belongs to a boy.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Reveal Glass",
+    "desc": "A looking glass that reveals the truth. It's a mysterious glass that returns a Pokémon to its original shape.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Weakness Policy",
+    "desc": "Sharply raises Attack and Special Attack if hit by a super-effective move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Assault Vest",
+    "desc": "Raises Special Defense but prevents the use of status moves.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Prof's Letter",
+    "desc": "A letter that Professor Sycamore wrote to your mother. A faint but pleasant perfume seems to cling to the paper.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Roller Skates",
+    "desc": "Attaches roller skates to the bottom of your shoes, allowing you to glide quickly around and perform tricks.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Pixie Plate",
+    "desc": "Increases power of Fairy-type moves. Changes Arceus' type to Fairy.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ability Capsule",
+    "desc": "A capsule that allows a Pokémon with two Abilities to switch between these Abilities when it is used.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Whipped Dream",
+    "desc": "Evolves Swirlix when traded holding the item.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Sachet",
+    "desc": "Evolves Spritzee when traded holding the item.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Luminous Moss",
+    "desc": "Raises Special Defense if hit by a Water-type move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Snowball",
+    "desc": "Raises Attack if hit by an Ice-type move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Safety Goggles",
+    "desc": "Prevents damage from weather and powder.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Poké Flute",
+    "desc": "A flute that is said to instantly awaken any POKéMON. It has a lovely tone.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Rich Mulch",
+    "desc": "Mulch to be used in a Berry field. It increases the Berry harvest without the need for particularly diligent care.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Surprise Mulch",
+    "desc": "Mulch to be used in a Berry field. It causes strange, sudden mutations based on the combination of Berries.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Boost Mulch",
+    "desc": "Mulch to be used in a Berry field. It increases the Berry harvest that can be grown by diligent watering.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Amaze Mulch",
+    "desc": "Mulch to be used in a Berry field. An amazing Mulch with the effects of Rich, Surprise, and Boost Mulch.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Gengarite",
+    "desc": "Enables Gengar to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Gardevoirite",
+    "desc": "Enables Gardevoir to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ampharosite",
+    "desc": "Enables Ampharos to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Venusaurite",
+    "desc": "Enables Venusaur to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Charizardite X",
+    "desc": "Enables Charizard to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Blastoisinite",
+    "desc": "Enables Blastoise to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Mewtwonite X",
+    "desc": "Enables Mewtwo to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Mewtwonite Y",
+    "desc": "Enables Mewtwo to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Blazikenite",
+    "desc": "Enables Blaziken to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Medichamite",
+    "desc": "Enables Medicham to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Houndoominite",
+    "desc": "Enables Houndoom to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Aggronite",
+    "desc": "Enables Aggron to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Banettite",
+    "desc": "Enables Banette to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Tyranitarite",
+    "desc": "Enables Tyranitar to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Scizorite",
+    "desc": "Enables Scizor to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Pinsirite",
+    "desc": "Enables Pinsir to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Aerodactylite",
+    "desc": "Enables Aerodactyl to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Lucarionite",
+    "desc": "Enables Lucario to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Abomasite",
+    "desc": "Enables Abomasnow to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Kangaskhanite",
+    "desc": "Enables Kangaskhan to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Gyaradosite",
+    "desc": "Enables Gyarados to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Absolite",
+    "desc": "Enables Absol to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Charizardite Y",
+    "desc": "Enables Charizard to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Alakazite",
+    "desc": "Enables Alakazam to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Heracronite",
+    "desc": "Enables Heracross to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Mawilite",
+    "desc": "Enables Mawile to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Manectite",
+    "desc": "Enables Manectric to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Garchompite",
+    "desc": "Enables Garchomp to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Latiasite",
+    "desc": "Enables Latias to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Latiosite",
+    "desc": "Enables Latios to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Roseli Berry",
+    "desc": "If held by a Pokémon, this Berry will lessen the damage taken from one supereffective Fairy-type attack.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Kee Berry",
+    "desc": "If held by a Pokémon, this Berry will increase the holder's Defense if it's hit with a physical move.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Maranga Berry",
+    "desc": "If held by a Pokémon, this Berry will increase the holder's Sp. Def if it's hit with a special move.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Sprinklotad",
+    "desc": "A watering can shaped like a Lotad. It helps promote the healthy growth of any Berries planted in good, soft soil.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "TM96",
+    "desc": "Teaches the move Nature Power.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM97",
+    "desc": "Teaches the move Dark Pulse.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM98",
+    "desc": "Teaches the move Power-Up Punch/Waterfall.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM99",
+    "desc": "Teaches the move Dazzling Gleam.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM100",
+    "desc": "Teaches the move Confide.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "Power Plant Pass",
+    "desc": "This pass serves as an ID card for gaining access to the power plant that lies along Route 13.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Mega Ring",
+    "desc": "Enables Pokémon carrying Mega Stones to Mega Evolve in battle.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Intriguing Stone",
+    "desc": "A rather curious stone that might appear to be valuable to some. It's all in the eye of the beholder.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Discount Coupon",
+    "desc": "This special coupon allows you to buy items at a discount when you are shopping at a boutique.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Elevator Key",
+    "desc": "A card key that activates the elevator in Lysandre Labs. It is emblazoned with Team Flare's logo.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "TMV Pass",
+    "desc": "A commuter pass that allows the holder to ride the TMV between Lumiose City and Kiloude City at any time.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Strange Souvenir",
+    "desc": "An ornament depicting a Pokémon that is venerated as a protector in some region far from Kalos.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Lens Case",
+    "desc": "A rather chic-looking case for carrying contact lenses.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Makeup Bag",
+    "desc": "A rather chic-looking case for carrying lipsticks.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Lumiose Galette",
+    "desc": "Heals all major status conditions.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Shalour Sable",
+    "desc": "Heals all major status conditions.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Looker Ticket",
+    "desc": "A ticket that was handmade by Looker. It's decorated with a liberal amount of glittery paint.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Bike",
+    "desc": "A folding Bike that enables a rider to get around much faster than with Running Shoes.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Holo Caster",
+    "desc": "A device that allows users to receive and view hologram clips at any time. It is also used to chat with others.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Fairy Gem",
+    "desc": "Increases the power of a Fairy-type move only once.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Mach Bike",
+    "desc": "A folding bicycle that is at least twice as fast as walking.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Acro Bike",
+    "desc": "A folding bicycle that is capable of stunts like jumps and wheelies.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Wailmer Pail",
+    "desc": "A nifty watering pail. Use it to promote strong growth in BERRIES planted in soft soil.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Devon Parts",
+    "desc": "A case that contains mechanical parts of some sort made by the Devon Corporation.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Soot Sack",
+    "desc": "A sack used to collect volcanic ash automatically during walks over deep ash.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Basement Key",
+    "desc": "A key that opens a door in the Goldenrod Tunnel.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Pokéblock Kit",
+    "desc": "A set containing a Berry Blender for making Pokéblocks and a Pokéblock Case for storing Pokéblocks.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Letter",
+    "desc": "An extremely important letter to STEVEN from the PRESIDENT of the DEVON CORPORATION.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Eon Ticket",
+    "desc": "The ticket required for sailing on a ferry to a distant southern island. It features a drawing of an island.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Scanner",
+    "desc": "A device used to search for life-forms in water. It looks too difficult to use.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Go-Goggles",
+    "desc": "A pair of protective goggles. They enable a TRAINER to travel through even desert sandstorms.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Key to Room 1",
+    "desc": "Unlocks Room 1 in Abandoned Ship/Sea Mauville.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Key to Room 2",
+    "desc": "Unlocks Room 2 in Abandoned Ship/Sea Mauville.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Key to Room 4",
+    "desc": "Unlocks Room 4 in Abandoned Ship/Sea Mauville.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Key to Room 6",
+    "desc": "Unlocks Room 6 in Abandoned Ship/Sea Mauville.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Storage Key",
+    "desc": "The key to Team Galactic's sinister warehouse located at the edge of Veilstone City.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Devon Scope",
+    "desc": "A scope that signals the presence of any unseeable POKéMON. It is made by the DEVON CORP.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "HM07",
+    "desc": "Teaches the move Waterfall.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "Devon Scuba Gear",
+    "desc": "A device made by Devon Corporation that provides oxygen to users during the use of Dive.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Contest Costume",
+    "desc": "A very cool suit to be worn during the Contest Spectacular.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Magma Suit",
+    "desc": "A suit made with the collective technological know-how of Team Magma. It can withstand any impact.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Aqua Suit",
+    "desc": "A suit made with the collective technological know-how of Team Aqua. It can withstand any impact.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Pair of Tickets",
+    "desc": "Tickets for two to the astronomical show being held at the Mossdeep Space Center.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Mega Bracelet",
+    "desc": "This cuff contains an untold power that somehow enables Pokémon carrying a Mega Stone to Mega Evolve in battle.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Swampertite",
+    "desc": "Enables Swampert to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Sceptilite",
+    "desc": "Enables Sceptile to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Sablenite",
+    "desc": "Enables Sableye to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Altarianite",
+    "desc": "Enables Altaria to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Galladite",
+    "desc": "Enables Gallade to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Audinite",
+    "desc": "Enables Audino to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Metagrossite",
+    "desc": "Enables Metagross to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Sharpedonite",
+    "desc": "Enables Sharpedo to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Slowbronite",
+    "desc": "Enables Slowbro to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Steelixite",
+    "desc": "Enables Steelix to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Pidgeotite",
+    "desc": "Enables Pidgeot to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Glalitite",
+    "desc": "Enables Glalie to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Diancite",
+    "desc": "Enables Diancie to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Prison Bottle",
+    "desc": "Transforms Hoopa Confined to Hoopa Unbound.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Cameruptite",
+    "desc": "Enables Camerupt to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Lopunnite",
+    "desc": "Enables Lopunny to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Salamencite",
+    "desc": "Enables Salamence to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Beedrillite",
+    "desc": "Enables Beedrill to Mega Evolve during battle.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Meteorite",
+    "desc": "A meteorite that fell from space onto MT. MOON long ago. It is very lumpy and hard.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Key Stone",
+    "desc": "A stone filled with an unexplained power. It makes Pokémon that battle with a Mega Stone Mega Evolve.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Meteorite Shard",
+    "desc": "One of the fragments of a Meteorite from Granite Cave. It's faintly warm to the touch.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Eon Flute",
+    "desc": "A flute that can be used to summon Latios or Latias no matter where you are.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Bottle Cap",
+    "desc": "Maximizes one IV stat in Hyper Training.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Gold Bottle Cap",
+    "desc": "Maximizes all of a Pokémon's IV stats in Hyper Training.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Z-Ring",
+    "desc": "A mysterious ring that enables Pokémon to use Z-Power. It requires both the willpower and the physical power of the Trainer wearing it.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Normalium Z",
+    "desc": "Allows the use of Breakneck Blitz, the Normal type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Firium Z",
+    "desc": "Allows the use of Inferno Overdrive, the Fire type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Waterium Z",
+    "desc": "Allows the use of Hydro Vortex, the Water type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Electrium Z",
+    "desc": "Allows the use of Gigavolt Havoc, the Electric type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Grassium Z",
+    "desc": "Allows the use of Bloom Doom, the Grass type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Icium Z",
+    "desc": "Allows the use of Subzero Slammer, the Ice type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Fightinium Z",
+    "desc": "Allows the use of All-Out Pummeling, the Fighting type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Poisonium Z",
+    "desc": "Allows the use of Acid Downpour, the Poison type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Groundium Z",
+    "desc": "Allows the use of Tectonic Rage, the Ground type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Flyinium Z",
+    "desc": "Allows the use of Supersonic Skystrike, the Flying type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Psychium Z",
+    "desc": "Allows the use of Shattered Psyche, the Psychic type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Buginium Z",
+    "desc": "Allows the use of Savage Spin-Out, the Bug type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Rockium Z",
+    "desc": "Allows the use of Continental Crush, the Rock type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ghostium Z",
+    "desc": "Allows the use of Never-Ending Nightmare, the Ghost type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dragonium Z",
+    "desc": "Allows the use of Devastating Drake, the Dragon type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Darkinium Z",
+    "desc": "Allows the use of Black Hole Eclipse, the Dark type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Steelium Z",
+    "desc": "Allows the use of Corkscrew Crash, the Steel type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Fairium Z",
+    "desc": "Allows the use of Twinkle Tackle, the Fairy type Z-Move.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Pikanium Z",
+    "desc": "Allows Pikachu to upgrade Volt Tackle to a Z-Move, Catastropika.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Decidium Z",
+    "desc": "Allows Decidueye to upgrade Spirit Shackle to a Z-Move, Sinister Arrow Raid.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Incinium Z",
+    "desc": "Allows Incineroar to upgrade Darkest Lariat to a Z-Move, Malicious Moonsault.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Primarium Z",
+    "desc": "Allows Primarina to upgrade Sparkling Aria to a Z-Move, Oceanic Operetta.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Tapunium Z",
+    "desc": "Allows the Tapus to upgrade Nature's Madness to a Z-Move, Guardian of Alola.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Marshadium Z",
+    "desc": "Allows Marshadow to upgrade Spectral Thief to a Z-Move, Soul-Stealing 7-Star Strike.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Aloraichium Z",
+    "desc": "Allows Alolan Raichu to upgrade Thunderbolt to a Z-Move, Stoked Sparksurfer.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Snorlium Z",
+    "desc": "Allows Snorlax to upgrade Giga Impact to a Z-Move, Pulverizing Pancake.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Eevium Z",
+    "desc": "Allows Eevee to upgrade Last Resort to a Z-Move, Extreme Evoboost.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Mewnium Z",
+    "desc": "Allows Mew to upgrade Psychic to a Z-Move, Genesis Supernova.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Pikashunium Z",
+    "desc": "Allows Pikachu in a cap to upgrade Thunderbolt to a Z-Move, 10,000,000 Volt Thunderbolt.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Forage Bag",
+    "desc": "A bag to carry ingredients gathered during Mallow's trial in the jungle.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Professor's Mask",
+    "desc": "The mask that belongs to The Masked Royal. This pro wrestler apparently sews his mask on a machine himself.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Festival Ticket",
+    "desc": "A ticket that allows you to host a mission in Festival Plaza.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Sparkling Stone",
+    "desc": "A stone entrusted by a Pokémon that has been venerated as a guardian deity in the Alola region. There is said to be some secret in how it sparkles.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Adrenaline Orb",
+    "desc": "Using it makes wild Pokémon more likely to call for help. If held by a Pokémon, it boosts Speed when intimidated. It can be used only once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Zygarde Cube",
+    "desc": "An item to store Zygarde Cores and Cells. You can also use it to teach Zygarde moves.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Ice Stone",
+    "desc": "Evolves certain species of Pokémon.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Ride Pager",
+    "desc": "By entering certain numbers on this pager, you can summon Ride Pokémon in an instant.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Beast Ball",
+    "desc": "A special Poké Ball designed to catch Ultra Beasts. It has a low success rate for catching others.",
+    "type": "Item: Pokeballs"
+  },
+  {
+    "name": "Big Malasada",
+    "desc": "Heals all major status conditions.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Red Nectar",
+    "desc": "A flower nectar obtained at Ula'ula Meadow. It changes the form of certain species of Pokémon.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Yellow Nectar",
+    "desc": "A flower nectar obtained at Melemele Meadow. It changes the form of certain species of Pokémon.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Pink Nectar",
+    "desc": "The flower nectar obtained at the flowering shrubs on Royal Avenue. It changes the form of certain species of Pokémon.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Purple Nectar",
+    "desc": "A flower nectar obtained at Poni Meadow. It changes the form of certain species of Pokémon.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Sun Flute",
+    "desc": "It is said that the tones it produces were offered up as an expression of gratitude to the Legendary Pokémon of the sun.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Moon Flute",
+    "desc": "It is said that the tones it produces were offered up as an expression of gratitude to the Legendary Pokémon of the moon.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Enigmatic Card",
+    "desc": "A mysterious card. Written on it is a request for you to go to a guest room in an Akala motel on Route 8.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Silver Razz Berry",
+    "desc": "Makes a Pokémon easier to catch in Pokémon Let's Go.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Golden Razz Berry",
+    "desc": "Makes a Pokémon easier to catch in Pokémon Let's Go.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Silver Nanab Berry",
+    "desc": "Greatly calms a Pokémon in battle, in Let's Go Pikachu/Eevee.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Golden Nanab Berry",
+    "desc": "Drastically calms a Pokémon in battle, in Let's Go Pikachu/Eevee.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Silver Pinap Berry",
+    "desc": "Greatly increases chance of getting items when a Pokémon is caught, in Pokémon Let's Go.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Golden Pinap Berry",
+    "desc": "Drastically increases chance of getting items when a Pokémon is caught, in Pokémon Let's Go.",
+    "type": "Item: Berries"
+  },
+  {
+    "name": "Secret Key",
+    "desc": "A high-tech key that has to be used at a specific location. It emits a special electric signal to open a door.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "S.S. Ticket",
+    "desc": "The ticket required for sailing on the ferry S.S. Aqua. It has a drawing of a ship on it.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Silph Scope",
+    "desc": "A scope that makes unseeable POKéMON visible. It is made by SILPH CO.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Parcel",
+    "desc": "A parcel entrusted in your care. You are supposed to deliver it to your childhood friend who left Twinleaf Town.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Card Key",
+    "desc": "A card key that opens a shutter in the Radio Tower.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Gold Teeth",
+    "desc": "A set of false teeth lost by the SAFARI ZONE'S WARDEN. It makes his smile sparkle.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Lift Key",
+    "desc": "A key that operates the elevator in TEAM ROCKET's HIDEOUT. It bears the TEAM ROCKET logo.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Terrain Extender",
+    "desc": "An item to be held by a Pokémon. It extends the duration of the terrain caused by the holder's move or Ability.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Protective Pads",
+    "desc": "An item to be held by a Pokémon. These pads protect the holder from effects caused by making direct contact with the target.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Electric Seed",
+    "desc": "An item to be held by a Pokémon. It boosts Defense on Electric Terrain. It can only be used once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Psychic Seed",
+    "desc": "An item to be held by a Pokémon. It boosts Sp. Def on Psychic Terrain. It can only be used once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Misty Seed",
+    "desc": "An item to be held by a Pokémon. It boosts Sp. Def on Misty Terrain. It can only be used once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Grassy Seed",
+    "desc": "An item to be held by a Pokémon. It boosts Defense on Grassy Terrain. It can only be used once.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Stretchy Spring",
+    "desc": "A thin small spring. It’s totally stretched out, and what it’s used for is unknown.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Chalky Stone",
+    "desc": "A small whitish stone picked up at the edge of the road.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Marble",
+    "desc": "A round glass marble. You can see colored glass inside the transparent marble.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Lone Earring",
+    "desc": "A single earring that somebody dropped.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Beach Glass",
+    "desc": "A piece of colored glass. Waves have rounded its edges. It's slightly rough to the touch.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Gold Leaf",
+    "desc": "A mysterious gold leaf. No trees with this leaf have been found yet.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Silver Leaf",
+    "desc": "A mysterious silver leaf. No trees with this leaf have been found yet.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Polished Mud Ball",
+    "desc": "A ball made of mud. It had been polished for such a long time that the surface is very shiny.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Tropical Shell",
+    "desc": "A beautiful white shell that may have drifted from a sea in a warm region.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Leaf Letter",
+    "desc": "A letter written on a leaf. Something is written using Eevee's footprints.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Small Bouquet",
+    "desc": "A small bouquet that was made with heart and soul for a single Trainer.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Lure",
+    "desc": "Attracts Pokémon in the wild.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Super Lure",
+    "desc": "Attracts Pokémon in the wild.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Max Lure",
+    "desc": "Attracts Pokémon in the wild.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Pewter Crunchies",
+    "desc": "Heals all major status conditions.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Fighting Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Fighting type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Flying Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Flying type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Poison Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Poison type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ground Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Ground type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Rock Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Rock type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Bug Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Bug type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ghost Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Ghost type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Steel Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Steel type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Fire Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Fire type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Water Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Water type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Grass Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Grass type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Electric Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Electric type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Psychic Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Psychic type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ice Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Ice type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dragon Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Dragon type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Dark Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Dark type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Fairy Memory",
+    "desc": "Changes Silvally and its move Multi-Attack to Fairy type.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Solganium Z",
+    "desc": "Allows Solgaleo to upgrade Sunsteel Strike to a Z-Move, Searing Sunraze Smash.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Lunalium Z",
+    "desc": "Allows Lunala to upgrade Moongeist Beam to a Z-Move, Menacing Moonraze Maelstrom.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ultranecrozium Z",
+    "desc": "Allows Ultra Necrozma to upgrade Photon Geyser to a Z-Move, Light That Burns the Sky.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Mimikium Z",
+    "desc": "Allows Mimikyu to upgrade Play Rough to a Z-Move, Let's Snuggle Forever.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Lycanium Z",
+    "desc": "Allows Lycanroc to upgrade Stone Edge to a Z-Move, Splintered Stormshards.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Kommonium Z",
+    "desc": "Allows Kommo-o to upgrade Clanging Scales to a Z-Move, Clangorous Soulblaze.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Pink Petal",
+    "desc": "Petal received from Mina during Mina's trial.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Orange Petal",
+    "desc": "Petal received from Ilima during Mina's trial.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Blue Petal",
+    "desc": "Petal received from Lana during Mina's trial.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Red Petal",
+    "desc": "Petal received from Kiawe during Mina's trial.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Green Petal",
+    "desc": "Petal received from Mallow during Mina's trial.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Yellow Petal",
+    "desc": "Petal received from Sophocles during Mina's trial.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Purple Petal",
+    "desc": "Petal received from Nanu during Mina's trial.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Rainbow Flower",
+    "desc": "Flower made of the petals received from captains.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Surge Badge",
+    "desc": "Novelty badge from the Kantonian Gym.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "N-Solarizer",
+    "desc": "A machine to fuse/separate Necrozma and Solgaleo.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "N-Lunarizer",
+    "desc": " A machine to fuse/separate Necrozma and Lunala.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Left Poké Ball",
+    "desc": "A Poké Ball with a Pokémon that lost its Trainer inside.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Roto Hatch",
+    "desc": "Helps Eggs hatch faster.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto Bargain",
+    "desc": "Reduces the prices of products at Poké Marts by half.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto Prize Money",
+    "desc": "Triples the prize money you receive after battle.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto Exp. Points",
+    "desc": "Increases the Exp. Points your Pokémon receive after battle a little.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto Friendship",
+    "desc": "Helps Pokémon in your party grow friendly faster.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto Encounter",
+    "desc": "Increases the chance of encountering high-level wild Pokémon a lot for a certain period of time.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto Stealth",
+    "desc": "Prevents you from encountering wild Pokémon for a certain period of time.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto HP Restore",
+    "desc": "Fully restores the HP of your battling Pokémon.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto PP Restore",
+    "desc": "Fully restores the PP of your battling Pokémon.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto Boost",
+    "desc": "Raises all stats of your battling Pokémon.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Roto Catch",
+    "desc": "Increases the chance to catch Pokémon a lot.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Health Candy",
+    "desc": "Increases a Pokémon's HP stat by 1.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Mighty Candy",
+    "desc": "Increases a Pokémon's Attack stat by 1.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Tough Candy",
+    "desc": "Increases a Pokémon's Defense stat by 1.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Smart Candy",
+    "desc": "Increases a Pokémon's Special Attack stat by 1.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Courage Candy",
+    "desc": "Increases a Pokémon's Special Defense stat by 1.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Quick Candy",
+    "desc": "Increases a Pokémon's Speed stat by 1.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Health Candy L",
+    "desc": "Increases a Pokémon's HP stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Mighty Candy L",
+    "desc": "Increases a Pokémon's Attack stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Tough Candy L",
+    "desc": "Increases a Pokémon's Defense stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Smart Candy L",
+    "desc": "Increases a Pokémon's Special Attack stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Courage Candy L",
+    "desc": "Increases a Pokémon's Special Defense stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Quick Candy L",
+    "desc": "Increases a Pokémon's Speed stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Health Candy XL",
+    "desc": "Increases a Pokémon's HP stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Mighty Candy XL",
+    "desc": "Increases a Pokémon's Attack stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Tough Candy XL",
+    "desc": "Increases a Pokémon's Defense stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Smart Candy XL",
+    "desc": "Increases a Pokémon's Special Attack stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Courage Candy XL",
+    "desc": "Increases a Pokémon's Special Defense stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Quick Candy XL",
+    "desc": "Increases a Pokémon's Speed stat.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Pokémon Box Link",
+    "desc": "A device that allows you to access the Pokémon storage system. There are some places where it won’t work.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Wishing Star",
+    "desc": "A stone found in the Galar region with a mysterious power. It’s said that your dreams come true if you find one.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Dynamax Band",
+    "desc": "A Wishing Star has been affixed to it. It lets out a light that allows Pokémon to Dynamax when at a Power Spot.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Fishing Rod",
+    "desc": "A Fishing Rod made by Captain Lana. Cast a line over piles of underwater rocks to fish for wild aquatic Pokémon.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Sausages",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. These sausages should be boiled before eating.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Bob's Food Tin",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. The tinned food that Bob sells is curiously popular in Galar.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Bach's Food Tin",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. The tinned food that Bach sells is curiously popular in Galar.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Tin of Beans",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. When simmered, the beans suffuse a dish with their mild flavor.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Bread",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. An indispensable tool for mopping up that extra curry left on your plate.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Pasta",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. These flour noodles make for a surprisingly good match with curry.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Mixed Mushrooms",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. The chewy texture of the mushrooms transforms any dish they’re added to.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Smoke-Poke Tail",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. When a Slowpoke’s tail falls off, it grows back quickly.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Large Leek",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. Whether this is the kind of vegetable stalk that Farfetch’d like is unknown.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Fancy Apple",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. An apple chosen above others. It has spectacular form and a brilliant sheen.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Brittle Bones",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. The taste boiled off from the bones is sure to give a dish a light umami taste.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Pack of Potatoes",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. Potatoes help mellow out a spicy taste, to make a dish more mild.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Pungent Root",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. Though carelessly picked, these herbs can add a fragrant accent to a dish.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Salad Mix",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. The assortment of vegetables looks quite appealing and healthy.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Fried Food",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. It’s been a while since it was fried, so it’s gotten greasy.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Boiled Egg",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. Even just one boiled egg can really enhance a dish.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Camping Gear",
+    "desc": "Everything you need to set up a tent and get cooking in a Wild Area or at a camping spot.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Rusted Sword",
+    "desc": "It is said that a hero used this sword to halt a terrible disaster in ancient times. But it’s grown rusty and worn.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Rusted Shield",
+    "desc": "It is said that a hero used this shield to halt a terrible disaster in ancient times. But it’s grown rusty and worn.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Fossilized Bird",
+    "desc": "The fossil of an ancient Pokémon that once soared through the sky. What it looked like is a mystery.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Fossilized Fish",
+    "desc": "The fossil of an ancient Pokémon that once lived in the sea. What it looked like is a mystery.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Fossilized Drake",
+    "desc": "The fossil of an ancient Pokémon that once roamed the land. What it looked like is a mystery.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Fossilized Dino",
+    "desc": "The fossil of an ancient Pokémon that once lived in the sea. What it looked like is a mystery.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Strawberry Sweet",
+    "desc": "Evolves Milcery into Strawberry Flavor Alcremie.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Love Sweet",
+    "desc": "Evolves Milcery into Heart Flavor Alcremie.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Berry Sweet",
+    "desc": "Evolves Milcery into Blueberry Flavor Alcremie.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Clover Sweet",
+    "desc": "Evolves Milcery into Clover Flavor Alcremie.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Flower Sweet",
+    "desc": "Evolves Milcery into Flower Flavor Alcremie.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Star Sweet",
+    "desc": "Evolves Milcery into Star Flavor Alcremie.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Ribbon Sweet",
+    "desc": "Evolves Milcery into Ribbon Flavor Alcremie.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Sweet Apple",
+    "desc": "Evolves Applin into Appletun.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Tart Apple",
+    "desc": "Evolves Applin into Flapple.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Throat Spray",
+    "desc": "Raises Sp. Atk when a sound-based move is used.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Eject Pack",
+    "desc": "The Pokémon switches out if its stats are lowered.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Heavy-Duty Boots",
+    "desc": "Protects the holder from traps set on the battlefield.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Blunder Policy",
+    "desc": "Raises Speed sharply if its attack misses.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Room Service",
+    "desc": "Lowers the Pokémon's speed during Trick Room.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Utility Umbrella",
+    "desc": "An item to be held by a Pokémon. This sturdy umbrella protects the holder from the effects of weather.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Exp. Candy XS",
+    "desc": "A candy that is packed with energy. If consumed, it grants a Pokémon a very small number of Exp. Points.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Exp. Candy S",
+    "desc": "A candy that is packed with energy. If consumed, it grants a Pokémon a small number of Exp. Points.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Exp. Candy M",
+    "desc": "A candy that is packed with energy. If consumed, it grants a Pokémon a moderate number of Exp. Points.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Exp. Candy L",
+    "desc": "A candy that is packed with energy. If consumed, it grants a Pokémon a large number of Exp. Points.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Exp. Candy XL",
+    "desc": "Increases the Pokémon's Exp points by 30,000.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "Dynamax Candy",
+    "desc": "Raises Dynamax Level.",
+    "type": "Item: Medicine"
+  },
+  {
+    "name": "TR00",
+    "desc": "Teaches the move Swords Dance.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR01",
+    "desc": "The user drops onto the target with its full body weight. This may also leave the target with paralysis.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR02",
+    "desc": "The target is scorched with an intense blast of fire. This may also leave the target with a burn.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR03",
+    "desc": "The target is blasted by a huge volume of water launched under great pressure.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR04",
+    "desc": "The user attacks everything around it by swamping its surroundings with a giant wave.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR05",
+    "desc": "The target is struck with an icy-cold beam of energy. This may also leave the target frozen.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR06",
+    "desc": "A howling blizzard is summoned to strike opposing Pokémon. This may also leave the opposing Pokémon frozen.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR07",
+    "desc": "A powerful low kick that makes the target fall over. The heavier the target, the greater the move’s power.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR08",
+    "desc": "A strong electric blast crashes down on the target. This may also leave the target with paralysis.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR09",
+    "desc": "A wicked thunderbolt is dropped on the target to inflict damage. This may also leave the target with paralysis.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR10",
+    "desc": "The user sets off an earthquake that strikes every Pokémon around it.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR11",
+    "desc": "The target is hit by a strong telekinetic force. This may also lower the target’s Sp. Def stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR12",
+    "desc": "The user relaxes and lightens its body to move faster. This sharply raises the Speed stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR13",
+    "desc": "The user takes a deep breath and focuses so that critical hits land more easily.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR14",
+    "desc": "The user waggles a finger and stimulates its brain into randomly using nearly any move.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR15",
+    "desc": "The target is attacked with an intense blast of all-consuming fire. This may also leave the target with a burn.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR16",
+    "desc": "The user charges at the target and may make it flinch.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR17",
+    "desc": "The user temporarily empties its mind to forget its concerns. This sharply raises the user’s Sp. Def stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR18",
+    "desc": "The user drains the target’s blood. The user’s HP is restored by half the damage taken by the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR19",
+    "desc": "The user strikes with a simultaneous three-beam attack. This may also burn, freeze, or paralyze the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR20",
+    "desc": "The user creates a substitute for itself using some of its own HP. The substitute serves as the user’s decoy.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR21",
+    "desc": "An all-out attack that becomes more powerful the less HP the user has.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR22",
+    "desc": "Unsanitary sludge is hurled at the target. This may also poison the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR23",
+    "desc": "The user lays a trap of spikes at the opposing team’s feet. The trap hurts Pokémon that switch into battle.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR24",
+    "desc": "The user rampages and attacks for two to three turns. The user then becomes confused.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR25",
+    "desc": "The user materializes an odd psychic wave to attack the target. This attack does physical damage.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR26",
+    "desc": "The user endures any attack with at least 1 HP. Its chance of failing rises if it is used in succession.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR27",
+    "desc": "While it is asleep, the user randomly uses one of the moves it knows.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR28",
+    "desc": "Using its tough and impressive horn, the user rams into the target with no letup.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR29",
+    "desc": "The user switches places with a party Pokémon in waiting and passes along any stat changes.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR30",
+    "desc": "The user compels the target to keep using the move it encored for three turns.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR31",
+    "desc": "The target is slammed with a steel-hard tail. This may also lower the target’s Defense stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR32",
+    "desc": "The user crunches up the target with sharp fangs. This may also lower the target’s Defense stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR33",
+    "desc": "The user hurls a shadowy blob at the target. This may also lower the target’s Sp. Def stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR34",
+    "desc": "Two turns after this move is used, a hunk of psychic energy attacks the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR35",
+    "desc": "The user attacks in an uproar for three turns. During that time, no Pokémon can fall asleep.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR36",
+    "desc": "The user attacks by exhaling hot breath on opposing Pokémon. This may also leave those Pokémon with a burn.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR37",
+    "desc": "The target is taunted into a rage that allows it to use only attack moves for three turns.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR38",
+    "desc": "The user catches the target off guard and swaps its held item with its own.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR39",
+    "desc": "The user attacks the target with great power. However, this also lowers the user’s Attack and Defense stats.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR40",
+    "desc": "The user employs its psychic power to exchange Abilities with the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR41",
+    "desc": "The user launches a kick that lands a critical hit more easily. This may also leave the target with a burn.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR42",
+    "desc": "The user lets loose a horribly echoing shout with the power to inflict damage.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR43",
+    "desc": "The user attacks the target at full power. The attack’s recoil harshly lowers the user’s Sp. Atk stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR44",
+    "desc": "The user absorbs a mystical power from space to raise its Defense and Sp. Def stats.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR45",
+    "desc": "The user attacks by shooting muddy water at opposing Pokémon. This may also lower their accuracy.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR46",
+    "desc": "The user hardens its body’s surface like iron, sharply raising its Defense stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR47",
+    "desc": "The user slashes the target with huge sharp claws.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR48",
+    "desc": "The user tenses its muscles to bulk up its body, raising both its Attack and Defense stats.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR49",
+    "desc": "The user quietly focuses its mind and calms its spirit to raise its Sp. Atk and Sp. Def stats.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR50",
+    "desc": "The user handles a sharp leaf like a sword and attacks by cutting its target. Critical hits land more easily.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR51",
+    "desc": "Teaches the move Dragon Dance.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR52",
+    "desc": "The user tackles the target with a high-speed spin. The slower the user compared to the target, the greater the move’s power.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR53",
+    "desc": "The user fights the target up close without guarding itself. This also lowers the user’s Defense and Sp. Def stats.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR54",
+    "desc": "The user lays a trap of poison spikes at the feet of the opposing team. The spikes will poison opposing Pokémon that switch into battle.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR55",
+    "desc": "The user cloaks itself in fire and charges the target. This also damages the user quite a lot. This attack may leave the target with a burn.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR56",
+    "desc": "The user lets loose a blast of aura power from deep within its body at the target. This attack never misses.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR57",
+    "desc": "The target is stabbed with a tentacle, arm, or the like steeped in poison. This may also poison the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR58",
+    "desc": "The user releases a horrible aura imbued with dark thoughts. This may also make the target flinch.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR59",
+    "desc": "The user slams a barrage of hard-shelled seeds down on the target from above.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR60",
+    "desc": "The user slashes at the target by crossing its scythes or claws as if they were a pair of scissors.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR61",
+    "desc": "The user generates a damaging sound wave by vibration. This may also lower the target’s Sp. Def stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR62",
+    "desc": "The target is attacked with a shock wave generated by the user’s gaping mouth.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR63",
+    "desc": "The user attacks with a ray of light that sparkles as if it were made of gemstones.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR64",
+    "desc": "The user heightens its mental focus and unleashes its power. This may also lower the target’s Sp. Def stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR65",
+    "desc": "The user draws power from nature and fires it at the target. This may also lower the target’s Sp. Def stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR66",
+    "desc": "The user tucks in its wings and charges from a low altitude. This also damages the user quite a lot.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR67",
+    "desc": "The user makes the ground under the target erupt with power. This may also lower the target’s Sp. Def stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR68",
+    "desc": "The user stimulates its brain by thinking bad thoughts. This sharply raises the user’s Sp. Atk stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR69",
+    "desc": "The user focuses its willpower to its head and attacks the target. This may also make the target flinch.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR70",
+    "desc": "The user gathers all its light energy and releases it all at once. This may also lower the target’s Sp. Def stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR71",
+    "desc": "The user whips up a storm of leaves around the target. The attack’s recoil harshly lowers the user’s Sp. Atk stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR72",
+    "desc": "The user violently whirls its vines, tentacles, or the like to harshly lash the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR73",
+    "desc": "The user shoots filthy garbage at the target to attack. This may also poison the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR74",
+    "desc": "The user slams the target with its steel-hard head. This may also make the target flinch.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR75",
+    "desc": "The user stabs the target from below with sharpened stones. Critical hits land more easily.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR76",
+    "desc": "The user lays a trap of levitating stones around the opposing team. The trap hurts opposing Pokémon that switch into battle.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR77",
+    "desc": "The user snares the target with grass and trips it. The heavier the target, the greater the move’s power.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR78",
+    "desc": "The user strikes everything around it by swamping the area with a giant sludge wave. This may also poison those hit.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR79",
+    "desc": "The user slams into the target with its heavy body. The more the user outweighs the target, the greater the move’s power.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR80",
+    "desc": "The user hurls an electric orb at the target. The faster the user is than the target, the greater the move’s power.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR81",
+    "desc": "Teaches the move Foul Play.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR82",
+    "desc": "The user attacks the target with stored power. The more the user’s stats are raised, the greater the move’s power.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR83",
+    "desc": "The user teleports using a strange power and switches places with one of its allies.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR84",
+    "desc": "Teaches the move Scald.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR85",
+    "desc": "The user is roused, and its Attack and Sp. Atk stats increase.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR86",
+    "desc": "The user shrouds itself in electricity and smashes into its target. This also damages the user a little.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR87",
+    "desc": "The user crashes into its target while rotating its body like a drill. Critical hits land more easily.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR88",
+    "desc": "The user slams its target with its flame-covered body. The more the user outweighs the target, the greater the move’s power.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR89",
+    "desc": "The user attacks by wrapping its opponent in a fierce wind that flies up into the sky. This may also confuse the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR90",
+    "desc": "The user plays rough with the target and attacks it. This may also lower the target’s Attack stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR91",
+    "desc": "Opposing Pokémon are drenched in an odd poisonous liquid. This lowers the Attack, Sp. Atk, and Speed stats of a poisoned target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR92",
+    "desc": "The user damages opposing Pokémon by emitting a powerful flash.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR93",
+    "desc": "The user swings both arms and hits the target. The target’s stat changes don’t affect this attack’s damage.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR94",
+    "desc": "The user fiercely attacks the target using its entire body.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR95",
+    "desc": "The user attacks the target’s throat, and the resultant suffering prevents the target from using moves that emit sound for two turns.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR97",
+    "desc": "The user bites the target with its psychic capabilities. This can also destroy Light Screen and Reflect.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR98",
+    "desc": "The user slams into the target using a full-force blast of water. This may also lower the target’s Defense stat.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TR99",
+    "desc": "The user attacks by slamming its body into the target. The higher the user’s Defense, the more damage it can inflict on the target.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "TM00",
+    "desc": "Teaches a move.",
+    "type": "Item: Machines"
+  },
+  {
+    "name": "Lonely Mint",
+    "desc": "Changes the Pokémon's stats to match the Lonely nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Adamant Mint",
+    "desc": "Changes the Pokémon's stats to match the Adamant nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Naughty Mint",
+    "desc": "Changes the Pokémon's stats to match the Naughty nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Brave Mint",
+    "desc": "Changes the Pokémon's stats to match the Brave nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Bold Mint",
+    "desc": "Changes the Pokémon's stats to match the Bold nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Impish Mint",
+    "desc": "Changes the Pokémon's stats to match the Impish nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Lax Mint",
+    "desc": "Changes the Pokémon's stats to match the Lax nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Relaxed Mint",
+    "desc": "Changes the Pokémon's stats to match the Relaxed nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Modest Mint",
+    "desc": "Changes the Pokémon's stats to match the Modest nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Mild Mint",
+    "desc": "Changes the Pokémon's stats to match the Mild nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Rash Mint",
+    "desc": "Changes the Pokémon's stats to match the Rash nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Quiet Mint",
+    "desc": "Changes the Pokémon's stats to match the Quiet nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Calm Mint",
+    "desc": "Changes the Pokémon's stats to match the Calm nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Gentle Mint",
+    "desc": "Changes the Pokémon's stats to match the Gentle nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Careful Mint",
+    "desc": "Changes the Pokémon's stats to match the Careful nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Sassy Mint",
+    "desc": "Changes the Pokémon's stats to match the Sassy nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Timid Mint",
+    "desc": "Changes the Pokémon's stats to match the Timid nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Hasty Mint",
+    "desc": "Changes the Pokémon's stats to match the Hasty nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Jolly Mint",
+    "desc": "Changes the Pokémon's stats to match the Jolly nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Naive Mint",
+    "desc": "Changes the Pokémon's stats to match the Naive nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Serious Mint",
+    "desc": "Changes the Pokémon's stats to match a neutral nature.",
+    "type": "Item: Battle items"
+  },
+  {
+    "name": "Wishing Piece",
+    "desc": "Activates a Pokémon Den for a Max Raid Battle.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Cracked Pot",
+    "desc": "Evolves Sinistea into Polteageist.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Chipped Pot",
+    "desc": "Evolves Sinistea into Polteageist.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Hi-tech Earbuds",
+    "desc": "Strange earbuds that allow you to freely control the volume of various sounds.",
+    "type": "Item: Hold items"
+  },
+  {
+    "name": "Fruit Bunch",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. The syrupy fruits give off a strong tropical feel.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Moomoo Cheese",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. Melted cheese can really give a curry some richness.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Spice Mix",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. There are over fifty spices contained within this ingredient’s hot flavor.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Fresh Cream",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. Add some whipped cream to a spicy curry to give it some sweetness.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Packaged Curry",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. Using packaged curry helps make sure there are no slipups when cooking.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Coconut Milk",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. The refined sweetness of this coconut milk makes it quite popular.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Instant Noodles",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. It has a junk-food sort of taste, but it goes well with curry.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Precooked Burger",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. If you’re unsure about what to cook, you can’t go wrong with some burger.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Gigantamix",
+    "desc": "One of the many ingredients that can be used for cooking at your camp. A mysterious spice. Even a tiny sprinkle is sure to make a curry gigantic.",
+    "type": "Item: General items"
+  },
+  {
+    "name": "Wishing Chip",
+    "desc": "Toss a number of them into a Pokémon Den for the chance to attract a wild Dynamax Pokémon.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Rotom Bike",
+    "desc": "This bike can be combined with the Pokémon Rotom to not only do a turbo boost but also run on the water.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Catching Charm",
+    "desc": "Holding it is said to increase the chance of getting a critical catch. Curiously, the charm doesn’t shake much.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Old Letter",
+    "desc": "A letter entrusted to you by a girl, to be delivered to a boy. Strangely, it looks old to you.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Band Autograph",
+    "desc": "It’s signed by all members of the Galar region’s most charismatic band, the Maximizers.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Sonia's Book",
+    "desc": "Professor Sonia’s published writings. Her new discoveries about the Galar region’s legends are recorded in this enjoyable read.",
+    "type": "Item: Key Items"
+  },
+  {
+    "name": "Rotom Catalog",
+    "desc": "A catalog of devices that Rotom like. Use the catalog to have Rotom hop in and out of the various devices listed within.",
+    "type": "Item: Key Items"
+  },
+
+  {
+    "name": "Pound",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 35.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Karate Chop",
+    "desc": "Physical move. Power: 50. Accuracy: 100%. PP: 25.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Double Slap",
+    "desc": "Physical move. Power: 15. Accuracy: 85%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Comet Punch",
+    "desc": "Physical move. Power: 18. Accuracy: 85%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Mega Punch",
+    "desc": "Physical move. Power: 80. Accuracy: 85%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Pay Day",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Fire Punch",
+    "desc": "Physical move. Power: 75. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Ice Punch",
+    "desc": "Physical move. Power: 75. Accuracy: 100%. PP: 15.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Thunder Punch",
+    "desc": "Physical move. Power: 75. Accuracy: 100%. PP: 15.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Scratch",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 35.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Vice Grip",
+    "desc": "Physical move. Power: 55. Accuracy: 100%. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Guillotine",
+    "desc": "Physical move. Power: —. Accuracy: 30%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Razor Wind",
+    "desc": "Special move. Power: 80. Accuracy: 100%*. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Swords Dance",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20*.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Cut",
+    "desc": "Physical move. Power: 50. Accuracy: 95%. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Gust",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 35.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Wing Attack",
+    "desc": "Physical move. Power: 60*. Accuracy: 100%. PP: 35.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Whirlwind",
+    "desc": "Status move. Power: —. Accuracy: —*. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Fly",
+    "desc": "Physical move. Power: 90*. Accuracy: 95%. PP: 15.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Bind",
+    "desc": "Physical move. Power: 15. Accuracy: 85%*. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Slam",
+    "desc": "Physical move. Power: 80. Accuracy: 75%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Vine Whip",
+    "desc": "Physical move. Power: 45*. Accuracy: 100%. PP: 25*.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Stomp",
+    "desc": "Physical move. Power: 65. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Double Kick",
+    "desc": "Physical move. Power: 30. Accuracy: 100%. PP: 30.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Mega Kick",
+    "desc": "Physical move. Power: 120. Accuracy: 75%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Jump Kick",
+    "desc": "Physical move. Power: 100*. Accuracy: 95%. PP: 10*.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Rolling Kick",
+    "desc": "Physical move. Power: 60. Accuracy: 85%. PP: 15.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Sand Attack",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Headbutt",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Horn Attack",
+    "desc": "Physical move. Power: 65. Accuracy: 100%. PP: 25.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Fury Attack",
+    "desc": "Physical move. Power: 15. Accuracy: 85%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Horn Drill",
+    "desc": "Physical move. Power: —. Accuracy: 30%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Tackle",
+    "desc": "Physical move. Power: 40*. Accuracy: 100%*. PP: 35.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Body Slam",
+    "desc": "Physical move. Power: 85. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Wrap",
+    "desc": "Physical move. Power: 15. Accuracy: 90%*. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Take Down",
+    "desc": "Physical move. Power: 90. Accuracy: 85%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Thrash",
+    "desc": "Physical move. Power: 120*. Accuracy: 100%. PP: 10*.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Double-Edge",
+    "desc": "Physical move. Power: 120*. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Tail Whip",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Poison Sting",
+    "desc": "Physical move. Power: 15. Accuracy: 100%. PP: 35.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Twineedle",
+    "desc": "Physical move. Power: 25. Accuracy: 100%. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Pin Missile",
+    "desc": "Physical move. Power: 25*. Accuracy: 95%*. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Leer",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Bite",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 25.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Growl",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Roar",
+    "desc": "Status move. Power: —. Accuracy: —*. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Sing",
+    "desc": "Status move. Power: —. Accuracy: 55%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Supersonic",
+    "desc": "Status move. Power: —. Accuracy: 55%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Sonic Boom",
+    "desc": "Special move. Power: —*. Accuracy: 90%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Disable",
+    "desc": "Status move. Power: —. Accuracy: 100%*. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Acid",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 30.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Ember",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 25.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Flamethrower",
+    "desc": "Special move. Power: 90*. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Mist",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Water Gun",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 25.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Hydro Pump",
+    "desc": "Special move. Power: 110*. Accuracy: 80%. PP: 5.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Surf",
+    "desc": "Special move. Power: 90*. Accuracy: 100%. PP: 15.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Ice Beam",
+    "desc": "Special move. Power: 90*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Blizzard",
+    "desc": "Special move. Power: 110*. Accuracy: 70%*. PP: 5.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Psybeam",
+    "desc": "Special move. Power: 65. Accuracy: 100%. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Bubble Beam",
+    "desc": "Special move. Power: 65. Accuracy: 100%. PP: 20.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Aurora Beam",
+    "desc": "Special move. Power: 65. Accuracy: 100%. PP: 20.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Hyper Beam",
+    "desc": "Special move. Power: 150. Accuracy: 90%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Peck",
+    "desc": "Physical move. Power: 35. Accuracy: 100%. PP: 35.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Drill Peck",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 20.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Submission",
+    "desc": "Physical move. Power: 80. Accuracy: 80%. PP: 20*.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Low Kick",
+    "desc": "Physical move. Power: —*. Accuracy: 100%*. PP: 20.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Counter",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Seismic Toss",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Strength",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Absorb",
+    "desc": "Special move. Power: 20*. Accuracy: 100%. PP: 25*.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Mega Drain",
+    "desc": "Special move. Power: 40*. Accuracy: 100%. PP: 15*.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Leech Seed",
+    "desc": "Status move. Power: —. Accuracy: 90%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Growth",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20*.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Razor Leaf",
+    "desc": "Physical move. Power: 55. Accuracy: 95%. PP: 25.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Solar Beam",
+    "desc": "Special move. Power: 120*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Poison Powder",
+    "desc": "Status move. Power: —. Accuracy: 75%. PP: 35.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Stun Spore",
+    "desc": "Status move. Power: —. Accuracy: 75%. PP: 30.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Sleep Powder",
+    "desc": "Status move. Power: —. Accuracy: 75%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Petal Dance",
+    "desc": "Special move. Power: 120*. Accuracy: 100%. PP: 10*.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "String Shot",
+    "desc": "Status move. Power: —. Accuracy: 95%. PP: 40.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Dragon Rage",
+    "desc": "Special move. Power: —*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Fire Spin",
+    "desc": "Special move. Power: 35*. Accuracy: 85%*. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Thunder Shock",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 30.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Thunderbolt",
+    "desc": "Special move. Power: 90*. Accuracy: 100%. PP: 15.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Thunder Wave",
+    "desc": "Status move. Power: —. Accuracy: 90%*. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Thunder",
+    "desc": "Special move. Power: 110*. Accuracy: 70%. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Rock Throw",
+    "desc": "Physical move. Power: 50. Accuracy: 90%*. PP: 15.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Earthquake",
+    "desc": "Physical move. Power: 100. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Fissure",
+    "desc": "Physical move. Power: —. Accuracy: 30%. PP: 5.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Dig",
+    "desc": "Physical move. Power: 80*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Toxic",
+    "desc": "Status move. Power: —. Accuracy: 90%*. PP: 10.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Confusion",
+    "desc": "Special move. Power: 50. Accuracy: 100%. PP: 25.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Psychic",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Hypnosis",
+    "desc": "Status move. Power: —. Accuracy: 60%*. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Meditate",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 40.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Agility",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Quick Attack",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Rage",
+    "desc": "Physical move. Power: 20. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Teleport",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Night Shade",
+    "desc": "Special move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Mimic",
+    "desc": "Status move. Power: —. Accuracy: —*. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Screech",
+    "desc": "Status move. Power: —. Accuracy: 85%. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Double Team",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Recover",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10*.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Harden",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Minimize",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10*.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Smokescreen",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Confuse Ray",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Withdraw",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 40.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Defense Curl",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Barrier",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20*.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Light Screen",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Haze",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Reflect",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Focus Energy",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Bide",
+    "desc": "Physical move. Power: —. Accuracy: —*. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Metronome",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Mirror Move",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Self-Destruct",
+    "desc": "Physical move. Power: 200*. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Egg Bomb",
+    "desc": "Physical move. Power: 100. Accuracy: 75%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Lick",
+    "desc": "Physical move. Power: 30*. Accuracy: 100%. PP: 30.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Smog",
+    "desc": "Special move. Power: 30*. Accuracy: 70%. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Sludge",
+    "desc": "Special move. Power: 65. Accuracy: 100%. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Bone Club",
+    "desc": "Physical move. Power: 65. Accuracy: 85%. PP: 20.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Fire Blast",
+    "desc": "Special move. Power: 110*. Accuracy: 85%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Waterfall",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Clamp",
+    "desc": "Physical move. Power: 35. Accuracy: 85%*. PP: 15*.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Swift",
+    "desc": "Special move. Power: 60. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Skull Bash",
+    "desc": "Physical move. Power: 130*. Accuracy: 100%. PP: 10*.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Spike Cannon",
+    "desc": "Physical move. Power: 20. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Constrict",
+    "desc": "Physical move. Power: 10. Accuracy: 100%. PP: 35.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Amnesia",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Kinesis",
+    "desc": "Status move. Power: —. Accuracy: 80%. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Soft-Boiled",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "High Jump Kick",
+    "desc": "Physical move. Power: 130*. Accuracy: 90%. PP: 10*.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Glare",
+    "desc": "Status move. Power: —. Accuracy: 100%*. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Dream Eater",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Poison Gas",
+    "desc": "Status move. Power: —. Accuracy: 90%*. PP: 40.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Barrage",
+    "desc": "Physical move. Power: 15. Accuracy: 85%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Leech Life",
+    "desc": "Physical move. Power: 80*. Accuracy: 100%. PP: 10*.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Lovely Kiss",
+    "desc": "Status move. Power: —. Accuracy: 75%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Sky Attack",
+    "desc": "Physical move. Power: 140*. Accuracy: 90%. PP: 5.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Transform",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Bubble",
+    "desc": "Special move. Power: 40*. Accuracy: 100%. PP: 30.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Dizzy Punch",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Spore",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Flash",
+    "desc": "Status move. Power: —. Accuracy: 100%*. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Psywave",
+    "desc": "Special move. Power: —. Accuracy: 100%*. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Splash",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Acid Armor",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20*.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Crabhammer",
+    "desc": "Physical move. Power: 100*. Accuracy: 90%*. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Explosion",
+    "desc": "Physical move. Power: 250*. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Fury Swipes",
+    "desc": "Physical move. Power: 18. Accuracy: 80%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Bonemerang",
+    "desc": "Physical move. Power: 50. Accuracy: 90%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Rest",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Rock Slide",
+    "desc": "Physical move. Power: 75. Accuracy: 90%. PP: 10.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Hyper Fang",
+    "desc": "Physical move. Power: 80. Accuracy: 90%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Sharpen",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Conversion",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Tri Attack",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Super Fang",
+    "desc": "Physical move. Power: —. Accuracy: 90%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Slash",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Substitute",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Struggle",
+    "desc": "Physical move. Power: 50. Accuracy: —*. PP: 1*.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Sketch",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Triple Kick",
+    "desc": "Physical move. Power: 10. Accuracy: 90%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Thief",
+    "desc": "Physical move. Power: 60*. Accuracy: 100%. PP: 25*.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Spider Web",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Mind Reader",
+    "desc": "Status move. Power: —. Accuracy: —*. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Nightmare",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Flame Wheel",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 25.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Snore",
+    "desc": "Special move. Power: 50*. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Curse",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Flail",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Conversion 2",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Aeroblast",
+    "desc": "Special move. Power: 100. Accuracy: 95%. PP: 5.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Cotton Spore",
+    "desc": "Status move. Power: —. Accuracy: 100%*. PP: 40.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Reversal",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Spite",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Powder Snow",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 25.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Protect",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Mach Punch",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 30.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Scary Face",
+    "desc": "Status move. Power: —. Accuracy: 100%*. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Feint Attack",
+    "desc": "Physical move. Power: 60. Accuracy: —. PP: 20.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Sweet Kiss",
+    "desc": "Status move. Power: —. Accuracy: 75%. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Belly Drum",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Sludge Bomb",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Mud-Slap",
+    "desc": "Special move. Power: 20. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Octazooka",
+    "desc": "Special move. Power: 65. Accuracy: 85%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Spikes",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Zap Cannon",
+    "desc": "Special move. Power: 120*. Accuracy: 50%. PP: 5.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Foresight",
+    "desc": "Status move. Power: —. Accuracy: —*. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Destiny Bond",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Perish Song",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Icy Wind",
+    "desc": "Special move. Power: 55. Accuracy: 95%. PP: 15.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Detect",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Bone Rush",
+    "desc": "Physical move. Power: 25. Accuracy: 90%*. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Lock-On",
+    "desc": "Status move. Power: —. Accuracy: —*. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Outrage",
+    "desc": "Physical move. Power: 120*. Accuracy: 100%. PP: 10*.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Sandstorm",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Giga Drain",
+    "desc": "Special move. Power: 75*. Accuracy: 100%. PP: 10*.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Endure",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Charm",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Rollout",
+    "desc": "Physical move. Power: 30. Accuracy: 90%. PP: 20.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "False Swipe",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Swagger",
+    "desc": "Status move. Power: —. Accuracy: 85%*. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Milk Drink",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Spark",
+    "desc": "Physical move. Power: 65. Accuracy: 100%. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Fury Cutter",
+    "desc": "Physical move. Power: 40*. Accuracy: 95%. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Steel Wing",
+    "desc": "Physical move. Power: 70. Accuracy: 90%. PP: 25.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Mean Look",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Attract",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Sleep Talk",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Heal Bell",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Return",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Present",
+    "desc": "Physical move. Power: —. Accuracy: 90%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Frustration",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Safeguard",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 25.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Pain Split",
+    "desc": "Status move. Power: —. Accuracy: —*. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Sacred Fire",
+    "desc": "Physical move. Power: 100. Accuracy: 95%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Magnitude",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 30.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Dynamic Punch",
+    "desc": "Physical move. Power: 100. Accuracy: 50%. PP: 5.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Megahorn",
+    "desc": "Physical move. Power: 120. Accuracy: 85%. PP: 10.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Dragon Breath",
+    "desc": "Special move. Power: 60. Accuracy: 100%. PP: 20.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Baton Pass",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Encore",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Pursuit",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 20.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Rapid Spin",
+    "desc": "Physical move. Power: 50*. Accuracy: 100%. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Sweet Scent",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Iron Tail",
+    "desc": "Physical move. Power: 100. Accuracy: 75%. PP: 15.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Metal Claw",
+    "desc": "Physical move. Power: 50. Accuracy: 95%. PP: 35.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Vital Throw",
+    "desc": "Physical move. Power: 70. Accuracy: —. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Morning Sun",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Synthesis",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Moonlight",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Hidden Power",
+    "desc": "Special move. Power: 60*. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Cross Chop",
+    "desc": "Physical move. Power: 100. Accuracy: 80%. PP: 5.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Twister",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 20.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Rain Dance",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Sunny Day",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Crunch",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Mirror Coat",
+    "desc": "Special move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Psych Up",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Extreme Speed",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Ancient Power",
+    "desc": "Special move. Power: 60. Accuracy: 100%. PP: 5.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Shadow Ball",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Future Sight",
+    "desc": "Special move. Power: 120*. Accuracy: 100%*. PP: 10*.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Rock Smash",
+    "desc": "Physical move. Power: 40*. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Whirlpool",
+    "desc": "Special move. Power: 35*. Accuracy: 85%*. PP: 15.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Beat Up",
+    "desc": "Physical move. Power: —*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Fake Out",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Uproar",
+    "desc": "Special move. Power: 90*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Stockpile",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20*.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Spit Up",
+    "desc": "Special move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Swallow",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Heat Wave",
+    "desc": "Special move. Power: 95*. Accuracy: 90%. PP: 10.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Hail",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Torment",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Flatter",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Will-O-Wisp",
+    "desc": "Status move. Power: —. Accuracy: 85%*. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Memento",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Facade",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Focus Punch",
+    "desc": "Physical move. Power: 150. Accuracy: 100%. PP: 20.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Smelling Salts",
+    "desc": "Physical move. Power: 70*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Follow Me",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Nature Power",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Charge",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Taunt",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Helping Hand",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Trick",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Role Play",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Wish",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Assist",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Ingrain",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Superpower",
+    "desc": "Physical move. Power: 120. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Magic Coat",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Recycle",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Revenge",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Brick Break",
+    "desc": "Physical move. Power: 75. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Yawn",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Knock Off",
+    "desc": "Physical move. Power: 65*. Accuracy: 100%. PP: 20.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Endeavor",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Eruption",
+    "desc": "Special move. Power: 150. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Skill Swap",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Imprison",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Refresh",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Grudge",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Snatch",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Secret Power",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Dive",
+    "desc": "Physical move. Power: 80*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Arm Thrust",
+    "desc": "Physical move. Power: 15. Accuracy: 100%. PP: 20.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Camouflage",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Tail Glow",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Luster Purge",
+    "desc": "Special move. Power: 70. Accuracy: 100%. PP: 5.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Mist Ball",
+    "desc": "Special move. Power: 70. Accuracy: 100%. PP: 5.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Feather Dance",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Teeter Dance",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Blaze Kick",
+    "desc": "Physical move. Power: 85. Accuracy: 90%. PP: 10.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Mud Sport",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Ice Ball",
+    "desc": "Physical move. Power: 30. Accuracy: 90%. PP: 20.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Needle Arm",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Slack Off",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Hyper Voice",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Poison Fang",
+    "desc": "Physical move. Power: 50. Accuracy: 100%. PP: 15.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Crush Claw",
+    "desc": "Physical move. Power: 75. Accuracy: 95%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Blast Burn",
+    "desc": "Special move. Power: 150. Accuracy: 90%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Hydro Cannon",
+    "desc": "Special move. Power: 150. Accuracy: 90%. PP: 5.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Meteor Mash",
+    "desc": "Physical move. Power: 90*. Accuracy: 90%*. PP: 10.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Astonish",
+    "desc": "Physical move. Power: 30. Accuracy: 100%. PP: 15.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Weather Ball",
+    "desc": "Special move. Power: 50. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Aromatherapy",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Fake Tears",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Air Cutter",
+    "desc": "Special move. Power: 60*. Accuracy: 95%. PP: 25.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Overheat",
+    "desc": "Special move. Power: 130*. Accuracy: 90%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Odor Sleuth",
+    "desc": "Status move. Power: —. Accuracy: —*. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Rock Tomb",
+    "desc": "Physical move. Power: 60*. Accuracy: 95%*. PP: 15*.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Silver Wind",
+    "desc": "Special move. Power: 60. Accuracy: 100%. PP: 5.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Metal Sound",
+    "desc": "Status move. Power: —. Accuracy: 85%. PP: 40.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Grass Whistle",
+    "desc": "Status move. Power: —. Accuracy: 55%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Tickle",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Cosmic Power",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Water Spout",
+    "desc": "Special move. Power: 150. Accuracy: 100%. PP: 5.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Signal Beam",
+    "desc": "Special move. Power: 75. Accuracy: 100%. PP: 15.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Shadow Punch",
+    "desc": "Physical move. Power: 60. Accuracy: —. PP: 20.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Extrasensory",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 20*.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Sky Uppercut",
+    "desc": "Physical move. Power: 85. Accuracy: 90%. PP: 15.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Sand Tomb",
+    "desc": "Physical move. Power: 35*. Accuracy: 85%*. PP: 15.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Sheer Cold",
+    "desc": "Special move. Power: —. Accuracy: 30%. PP: 5.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Muddy Water",
+    "desc": "Special move. Power: 90*. Accuracy: 85%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Bullet Seed",
+    "desc": "Physical move. Power: 25*. Accuracy: 100%. PP: 30.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Aerial Ace",
+    "desc": "Physical move. Power: 60. Accuracy: —. PP: 20.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Icicle Spear",
+    "desc": "Physical move. Power: 25*. Accuracy: 100%. PP: 30.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Iron Defense",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Block",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Howl",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Dragon Claw",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Frenzy Plant",
+    "desc": "Special move. Power: 150. Accuracy: 90%. PP: 5.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Bulk Up",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Bounce",
+    "desc": "Physical move. Power: 85. Accuracy: 85%. PP: 5.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Mud Shot",
+    "desc": "Special move. Power: 55. Accuracy: 95%. PP: 15.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Poison Tail",
+    "desc": "Physical move. Power: 50. Accuracy: 100%. PP: 25.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Covet",
+    "desc": "Physical move. Power: 60*. Accuracy: 100%. PP: 25*.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Volt Tackle",
+    "desc": "Physical move. Power: 120. Accuracy: 100%. PP: 15.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Magical Leaf",
+    "desc": "Special move. Power: 60. Accuracy: —. PP: 20.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Water Sport",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Calm Mind",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Leaf Blade",
+    "desc": "Physical move. Power: 90*. Accuracy: 100%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Dragon Dance",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Rock Blast",
+    "desc": "Physical move. Power: 25. Accuracy: 90%*. PP: 10.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Shock Wave",
+    "desc": "Special move. Power: 60. Accuracy: —. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Water Pulse",
+    "desc": "Special move. Power: 60. Accuracy: 100%. PP: 20.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Doom Desire",
+    "desc": "Special move. Power: 140*. Accuracy: 100%*. PP: 5.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Psycho Boost",
+    "desc": "Special move. Power: 140. Accuracy: 90%. PP: 5.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Roost",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Gravity",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Miracle Eye",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 40.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Wake-Up Slap",
+    "desc": "Physical move. Power: 70*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Hammer Arm",
+    "desc": "Physical move. Power: 100. Accuracy: 90%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Gyro Ball",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 5.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Healing Wish",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Brine",
+    "desc": "Special move. Power: 65. Accuracy: 100%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Natural Gift",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Feint",
+    "desc": "Physical move. Power: 30*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Pluck",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 20.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Tailwind",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15*.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Acupressure",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Metal Burst",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "U-turn",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Close Combat",
+    "desc": "Physical move. Power: 120. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Payback",
+    "desc": "Physical move. Power: 50. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Assurance",
+    "desc": "Physical move. Power: 60*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Embargo",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Fling",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Psycho Shift",
+    "desc": "Status move. Power: —. Accuracy: 100%*. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Trump Card",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Heal Block",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Wring Out",
+    "desc": "Special move. Power: —. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Power Trick",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Gastro Acid",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Lucky Chant",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Me First",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Copycat",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Power Swap",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Guard Swap",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Punishment",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 5.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Last Resort",
+    "desc": "Physical move. Power: 140*. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Worry Seed",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Sucker Punch",
+    "desc": "Physical move. Power: 70*. Accuracy: 100%. PP: 5.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Toxic Spikes",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Heart Swap",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Aqua Ring",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Magnet Rise",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Flare Blitz",
+    "desc": "Physical move. Power: 120. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Force Palm",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Aura Sphere",
+    "desc": "Special move. Power: 80*. Accuracy: —. PP: 20.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Rock Polish",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Poison Jab",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Dark Pulse",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Night Slash",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Aqua Tail",
+    "desc": "Physical move. Power: 90. Accuracy: 90%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Seed Bomb",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Air Slash",
+    "desc": "Special move. Power: 75. Accuracy: 95%. PP: 15*.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "X-Scissor",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Bug Buzz",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Dragon Pulse",
+    "desc": "Special move. Power: 85*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Dragon Rush",
+    "desc": "Physical move. Power: 100. Accuracy: 75%. PP: 10.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Power Gem",
+    "desc": "Special move. Power: 80*. Accuracy: 100%. PP: 20.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Drain Punch",
+    "desc": "Physical move. Power: 75*. Accuracy: 100%. PP: 10*.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Vacuum Wave",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 30.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Focus Blast",
+    "desc": "Special move. Power: 120. Accuracy: 70%. PP: 5.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Energy Ball",
+    "desc": "Special move. Power: 90*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Brave Bird",
+    "desc": "Physical move. Power: 120. Accuracy: 100%. PP: 15.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Earth Power",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Switcheroo",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Giga Impact",
+    "desc": "Physical move. Power: 150. Accuracy: 90%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Nasty Plot",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Bullet Punch",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 30.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Avalanche",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Ice Shard",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 30.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Shadow Claw",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 15.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Thunder Fang",
+    "desc": "Physical move. Power: 65. Accuracy: 95%. PP: 15.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Ice Fang",
+    "desc": "Physical move. Power: 65. Accuracy: 95%. PP: 15.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Fire Fang",
+    "desc": "Physical move. Power: 65. Accuracy: 95%. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Shadow Sneak",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 30.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Mud Bomb",
+    "desc": "Special move. Power: 65. Accuracy: 85%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Psycho Cut",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Zen Headbutt",
+    "desc": "Physical move. Power: 80. Accuracy: 90%. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Mirror Shot",
+    "desc": "Special move. Power: 65. Accuracy: 85%. PP: 10.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Flash Cannon",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Rock Climb",
+    "desc": "Physical move. Power: 90. Accuracy: 85%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Defog",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Trick Room",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Draco Meteor",
+    "desc": "Special move. Power: 130*. Accuracy: 90%. PP: 5.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Discharge",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Lava Plume",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Leaf Storm",
+    "desc": "Special move. Power: 130*. Accuracy: 90%. PP: 5.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Power Whip",
+    "desc": "Physical move. Power: 120. Accuracy: 85%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Rock Wrecker",
+    "desc": "Physical move. Power: 150. Accuracy: 90%. PP: 5.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Cross Poison",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Gunk Shot",
+    "desc": "Physical move. Power: 120. Accuracy: 80%*. PP: 5.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Iron Head",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Magnet Bomb",
+    "desc": "Physical move. Power: 60. Accuracy: —. PP: 20.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Stone Edge",
+    "desc": "Physical move. Power: 100. Accuracy: 80%. PP: 5.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Captivate",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Stealth Rock",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Grass Knot",
+    "desc": "Special move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Chatter",
+    "desc": "Special move. Power: 65*. Accuracy: 100%. PP: 20.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Judgment",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Bug Bite",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Charge Beam",
+    "desc": "Special move. Power: 50. Accuracy: 90%. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Wood Hammer",
+    "desc": "Physical move. Power: 120. Accuracy: 100%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Aqua Jet",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 20.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Attack Order",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 15.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Defend Order",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Heal Order",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Head Smash",
+    "desc": "Physical move. Power: 150. Accuracy: 80%. PP: 5.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Double Hit",
+    "desc": "Physical move. Power: 35. Accuracy: 90%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Roar of Time",
+    "desc": "Special move. Power: 150. Accuracy: 90%. PP: 5.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Spacial Rend",
+    "desc": "Special move. Power: 100. Accuracy: 95%. PP: 5.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Lunar Dance",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Crush Grip",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Magma Storm",
+    "desc": "Special move. Power: 100*. Accuracy: 75%*. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Dark Void",
+    "desc": "Status move. Power: —. Accuracy: 50%*. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Seed Flare",
+    "desc": "Special move. Power: 120. Accuracy: 85%. PP: 5.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Ominous Wind",
+    "desc": "Special move. Power: 60. Accuracy: 100%. PP: 5.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Shadow Force",
+    "desc": "Physical move. Power: 120. Accuracy: 100%. PP: 5.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Hone Claws",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Wide Guard",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Guard Split",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Power Split",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Wonder Room",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Psyshock",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Venoshock",
+    "desc": "Special move. Power: 65. Accuracy: 100%. PP: 10.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Autotomize",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Rage Powder",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Telekinesis",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Magic Room",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Smack Down",
+    "desc": "Physical move. Power: 50. Accuracy: 100%. PP: 15.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Storm Throw",
+    "desc": "Physical move. Power: 60*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Flame Burst",
+    "desc": "Special move. Power: 70. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Sludge Wave",
+    "desc": "Special move. Power: 95. Accuracy: 100%. PP: 10.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Quiver Dance",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Heavy Slam",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Synchronoise",
+    "desc": "Special move. Power: 120*. Accuracy: 100%. PP: 10*.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Electro Ball",
+    "desc": "Special move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Soak",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Flame Charge",
+    "desc": "Physical move. Power: 50. Accuracy: 100%. PP: 20.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Coil",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Low Sweep",
+    "desc": "Physical move. Power: 65*. Accuracy: 100%. PP: 20.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Acid Spray",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Foul Play",
+    "desc": "Physical move. Power: 95. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Simple Beam",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Entrainment",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "After You",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Round",
+    "desc": "Special move. Power: 60. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Echoed Voice",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Chip Away",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Clear Smog",
+    "desc": "Special move. Power: 50. Accuracy: —. PP: 15.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Stored Power",
+    "desc": "Special move. Power: 20. Accuracy: 100%. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Quick Guard",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Ally Switch",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Scald",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Shell Smash",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Heal Pulse",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Hex",
+    "desc": "Special move. Power: 65*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Sky Drop",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 10.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Shift Gear",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Circle Throw",
+    "desc": "Physical move. Power: 60. Accuracy: 90%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Incinerate",
+    "desc": "Special move. Power: 60*. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Quash",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Acrobatics",
+    "desc": "Physical move. Power: 55. Accuracy: 100%. PP: 15.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Reflect Type",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Retaliate",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Final Gambit",
+    "desc": "Special move. Power: —. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Bestow",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Inferno",
+    "desc": "Special move. Power: 100. Accuracy: 50%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Water Pledge",
+    "desc": "Special move. Power: 80*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Fire Pledge",
+    "desc": "Special move. Power: 80*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Grass Pledge",
+    "desc": "Special move. Power: 80*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Volt Switch",
+    "desc": "Special move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Struggle Bug",
+    "desc": "Special move. Power: 50*. Accuracy: 100%. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Bulldoze",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 20.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Frost Breath",
+    "desc": "Special move. Power: 60*. Accuracy: 90%. PP: 10.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Dragon Tail",
+    "desc": "Physical move. Power: 60. Accuracy: 90%. PP: 10.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Work Up",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Electroweb",
+    "desc": "Special move. Power: 55. Accuracy: 95%. PP: 15.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Wild Charge",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 15.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Drill Run",
+    "desc": "Physical move. Power: 80. Accuracy: 95%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Dual Chop",
+    "desc": "Physical move. Power: 40. Accuracy: 90%. PP: 15.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Heart Stamp",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 25.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Horn Leech",
+    "desc": "Physical move. Power: 75. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Sacred Sword",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 15*.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Razor Shell",
+    "desc": "Physical move. Power: 75. Accuracy: 95%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Heat Crash",
+    "desc": "Physical move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Leaf Tornado",
+    "desc": "Special move. Power: 65. Accuracy: 90%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Steamroller",
+    "desc": "Physical move. Power: 65. Accuracy: 100%. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Cotton Guard",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Night Daze",
+    "desc": "Special move. Power: 85. Accuracy: 95%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Psystrike",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Tail Slap",
+    "desc": "Physical move. Power: 25. Accuracy: 85%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Hurricane",
+    "desc": "Special move. Power: 110*. Accuracy: 70%. PP: 10.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Head Charge",
+    "desc": "Physical move. Power: 120. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Gear Grind",
+    "desc": "Physical move. Power: 50. Accuracy: 85%. PP: 15.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Searing Shot",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Techno Blast",
+    "desc": "Special move. Power: 120*. Accuracy: 100%. PP: 5.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Relic Song",
+    "desc": "Special move. Power: 75. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Secret Sword",
+    "desc": "Special move. Power: 85. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Glaciate",
+    "desc": "Special move. Power: 65. Accuracy: 95%. PP: 10.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Bolt Strike",
+    "desc": "Physical move. Power: 130. Accuracy: 85%. PP: 5.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Blue Flare",
+    "desc": "Special move. Power: 130. Accuracy: 85%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Fiery Dance",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Freeze Shock",
+    "desc": "Physical move. Power: 140. Accuracy: 90%. PP: 5.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Ice Burn",
+    "desc": "Special move. Power: 140. Accuracy: 90%. PP: 5.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Snarl",
+    "desc": "Special move. Power: 55. Accuracy: 95%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Icicle Crash",
+    "desc": "Physical move. Power: 85. Accuracy: 90%. PP: 10.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "V-create",
+    "desc": "Physical move. Power: 180. Accuracy: 95%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Fusion Flare",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Fusion Bolt",
+    "desc": "Physical move. Power: 100. Accuracy: 100%. PP: 5.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Flying Press",
+    "desc": "Physical move. Power: 100*. Accuracy: 95%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Mat Block",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Belch",
+    "desc": "Special move. Power: 120. Accuracy: 90%. PP: 10.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Rototiller",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Sticky Web",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Fell Stinger",
+    "desc": "Physical move. Power: 50*. Accuracy: 100%. PP: 25.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Phantom Force",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Trick-or-Treat",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Noble Roar",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Ion Deluge",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 25.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Parabolic Charge",
+    "desc": "Special move. Power: 65*. Accuracy: 100%. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Forest's Curse",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Petal Blizzard",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Freeze-Dry",
+    "desc": "Special move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Disarming Voice",
+    "desc": "Special move. Power: 40. Accuracy: —. PP: 15.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Parting Shot",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Topsy-Turvy",
+    "desc": "Status move. Power: —. Accuracy: —*. PP: 20.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Draining Kiss",
+    "desc": "Special move. Power: 50. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Crafty Shield",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Flower Shield",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Grassy Terrain",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Misty Terrain",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Electrify",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Play Rough",
+    "desc": "Physical move. Power: 90. Accuracy: 90%. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Fairy Wind",
+    "desc": "Special move. Power: 40. Accuracy: 100%. PP: 30.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Moonblast",
+    "desc": "Special move. Power: 95. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Boomburst",
+    "desc": "Special move. Power: 140. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Fairy Lock",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "King's Shield",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Play Nice",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Confide",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Diamond Storm",
+    "desc": "Physical move. Power: 100. Accuracy: 95%. PP: 5.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Steam Eruption",
+    "desc": "Special move. Power: 110. Accuracy: 95%. PP: 5.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Hyperspace Hole",
+    "desc": "Special move. Power: 80. Accuracy: —. PP: 5.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Water Shuriken",
+    "desc": "Special move. Power: 15. Accuracy: 100%. PP: 20.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Mystical Fire",
+    "desc": "Special move. Power: 75*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Spiky Shield",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Aromatic Mist",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Eerie Impulse",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Venom Drench",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Powder",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Geomancy",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Magnetic Flux",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Happy Hour",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Electric Terrain",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Dazzling Gleam",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Celebrate",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Hold Hands",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Baby-Doll Eyes",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 30.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Nuzzle",
+    "desc": "Physical move. Power: 20. Accuracy: 100%. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Hold Back",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 40.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Infestation",
+    "desc": "Special move. Power: 20. Accuracy: 100%. PP: 20.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Power-Up Punch",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 20.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Oblivion Wing",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Thousand Arrows",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Thousand Waves",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Land's Wrath",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Light of Ruin",
+    "desc": "Special move. Power: 140. Accuracy: 90%. PP: 5.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Origin Pulse",
+    "desc": "Special move. Power: 110. Accuracy: 85%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Precipice Blades",
+    "desc": "Physical move. Power: 120. Accuracy: 85%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Dragon Ascent",
+    "desc": "Physical move. Power: 120. Accuracy: 100%. PP: 5.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Hyperspace Fury",
+    "desc": "Physical move. Power: 100. Accuracy: —. PP: 5.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Breakneck Blitz",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Breakneck Blitz",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "All-Out Pummeling",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "All-Out Pummeling",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Supersonic Skystrike",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Supersonic Skystrike",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Acid Downpour",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Acid Downpour",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Tectonic Rage",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Tectonic Rage",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Continental Crush",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Continental Crush",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Savage Spin-Out",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Savage Spin-Out",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Never-Ending Nightmare",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Never-Ending Nightmare",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Corkscrew Crash",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Corkscrew Crash",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Inferno Overdrive",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Inferno Overdrive",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Hydro Vortex",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Hydro Vortex",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Bloom Doom",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Bloom Doom",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Gigavolt Havoc",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Gigavolt Havoc",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Shattered Psyche",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Shattered Psyche",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Subzero Slammer",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Subzero Slammer",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Devastating Drake",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Devastating Drake",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Black Hole Eclipse",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Black Hole Eclipse",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Twinkle Tackle",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Twinkle Tackle",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Catastropika",
+    "desc": "Physical move. Power: 210. Accuracy: —. PP: 1.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Shore Up",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "First Impression",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Baneful Bunker",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Spirit Shackle",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Darkest Lariat",
+    "desc": "Physical move. Power: 85. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Sparkling Aria",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Ice Hammer",
+    "desc": "Physical move. Power: 100. Accuracy: 90%. PP: 10.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Floral Healing",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "High Horsepower",
+    "desc": "Physical move. Power: 95. Accuracy: 95%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Strength Sap",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Solar Blade",
+    "desc": "Physical move. Power: 125. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Leafage",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 40.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Spotlight",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Toxic Thread",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Laser Focus",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 30.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Gear Up",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Throat Chop",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Pollen Puff",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 15.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Anchor Shot",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 20.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Psychic Terrain",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Lunge",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Fire Lash",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Power Trip",
+    "desc": "Physical move. Power: 20. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Burn Up",
+    "desc": "Special move. Power: 130. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Speed Swap",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Smart Strike",
+    "desc": "Physical move. Power: 70. Accuracy: —. PP: 10.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Purify",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Revelation Dance",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 15.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Core Enforcer",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Trop Kick",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Instruct",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Beak Blast",
+    "desc": "Physical move. Power: 100. Accuracy: 100%. PP: 15.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Clanging Scales",
+    "desc": "Special move. Power: 110. Accuracy: 100%. PP: 5.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Dragon Hammer",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Brutal Swing",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 20.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Aurora Veil",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Sinister Arrow Raid",
+    "desc": "Physical move. Power: 180. Accuracy: —. PP: 1.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Malicious Moonsault",
+    "desc": "Physical move. Power: 180. Accuracy: —. PP: 1.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Oceanic Operetta",
+    "desc": "Special move. Power: 195. Accuracy: —. PP: 1.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Guardian of Alola",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Soul-Stealing 7-Star Strike",
+    "desc": "Physical move. Power: 195. Accuracy: —. PP: 1.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Stoked Sparksurfer",
+    "desc": "Special move. Power: 175. Accuracy: —. PP: 1.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Pulverizing Pancake",
+    "desc": "Physical move. Power: 210. Accuracy: —. PP: 1.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Extreme Evoboost",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 1.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Genesis Supernova",
+    "desc": "Special move. Power: 185. Accuracy: —. PP: 1.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Shell Trap",
+    "desc": "Special move. Power: 150. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Fleur Cannon",
+    "desc": "Special move. Power: 130. Accuracy: 90%. PP: 5.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Psychic Fangs",
+    "desc": "Physical move. Power: 85. Accuracy: 100%. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Stomping Tantrum",
+    "desc": "Physical move. Power: 75. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Shadow Bone",
+    "desc": "Physical move. Power: 85. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Accelerock",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 20.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Liquidation",
+    "desc": "Physical move. Power: 85. Accuracy: 100%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Prismatic Laser",
+    "desc": "Special move. Power: 160. Accuracy: 100%. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Spectral Thief",
+    "desc": "Physical move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Sunsteel Strike",
+    "desc": "Physical move. Power: 100. Accuracy: 100%. PP: 5.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Moongeist Beam",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 5.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Tearful Look",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Zing Zap",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Nature's Madness",
+    "desc": "Special move. Power: —. Accuracy: 90%. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Multi-Attack",
+    "desc": "Physical move. Power: 120*. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "10,000,000 Volt Thunderbolt",
+    "desc": "Special move. Power: 195. Accuracy: —. PP: 1.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Mind Blown",
+    "desc": "Special move. Power: 150. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Plasma Fists",
+    "desc": "Physical move. Power: 100. Accuracy: 100%. PP: 15.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Photon Geyser",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 5.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Light That Burns the Sky",
+    "desc": "Special move. Power: 200. Accuracy: —. PP: 1.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Searing Sunraze Smash",
+    "desc": "Physical move. Power: 200. Accuracy: —. PP: 1.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Menacing Moonraze Maelstrom",
+    "desc": "Special move. Power: 200. Accuracy: —. PP: 1.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Let's Snuggle Forever",
+    "desc": "Physical move. Power: 190. Accuracy: —. PP: 1.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Splintered Stormshards",
+    "desc": "Physical move. Power: 190. Accuracy: —. PP: 1.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Clangorous Soulblaze",
+    "desc": "Special move. Power: 185. Accuracy: —. PP: 1.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Zippy Zap",
+    "desc": "Physical move. Power: 50*. Accuracy: 100%. PP: 15*.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Splishy Splash",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 15.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Floaty Fall",
+    "desc": "Physical move. Power: 90. Accuracy: 95%. PP: 15.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Pika Papow",
+    "desc": "Special move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Bouncy Bubble",
+    "desc": "Special move. Power: 90*. Accuracy: 100%. PP: 15*.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Buzzy Buzz",
+    "desc": "Special move. Power: 90*. Accuracy: 100%. PP: 15*.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Sizzly Slide",
+    "desc": "Physical move. Power: 90*. Accuracy: 100%. PP: 15*.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Glitzy Glow",
+    "desc": "Special move. Power: 90*. Accuracy: 100%*. PP: 15.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Baddy Bad",
+    "desc": "Special move. Power: 90*. Accuracy: 100%*. PP: 15.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Sappy Seed",
+    "desc": "Physical move. Power: 90*. Accuracy: 100%*. PP: 15*.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Freezy Frost",
+    "desc": "Special move. Power: 90*. Accuracy: 100%*. PP: 15*.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Sparkly Swirl",
+    "desc": "Special move. Power: 90*. Accuracy: 100%*. PP: 15*.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Veevee Volley",
+    "desc": "Physical move. Power: —. Accuracy: —. PP: 20.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Double Iron Bash",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 5.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Max Guard",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Dynamax Cannon",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 5.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Snipe Shot",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 15.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Jaw Lock",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Stuff Cheeks",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "No Retreat",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 5.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Tar Shot",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Magic Powder",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 20.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Dragon Darts",
+    "desc": "Physical move. Power: 50. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Teatime",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Octolock",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Bolt Beak",
+    "desc": "Physical move. Power: 85. Accuracy: 100%. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Fishious Rend",
+    "desc": "Physical move. Power: 85. Accuracy: 100%. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Court Change",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Max Flare",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Max Flutterby",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Max Lightning",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Max Strike",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Max Knuckle",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Max Phantasm",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Max Hailstorm",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Max Ooze",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Max Geyser",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Max Airstream",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Max Starfall",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Max Wyrmwind",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Max Mindstorm",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Max Rockfall",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Max Quake",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Max Darkness",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Max Overgrowth",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Max Steelspike",
+    "desc": "??? move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Clangorous Soul",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 5.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Body Press",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Decorate",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 15.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Drum Beating",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Snap Trap",
+    "desc": "Physical move. Power: 35. Accuracy: 100%. PP: 15.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Pyro Ball",
+    "desc": "Physical move. Power: 120. Accuracy: 90%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Behemoth Blade",
+    "desc": "Physical move. Power: 100. Accuracy: 100%. PP: 5.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Aura Wheel",
+    "desc": "Physical move. Power: 100. Accuracy: 100%. PP: 5.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Aura Wheel",
+    "desc": "Physical move. Power: 110. Accuracy: 100%. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Breaking Swipe",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 15.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Branch Poke",
+    "desc": "Physical move. Power: 40. Accuracy: 100%. PP: 40.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Overdrive",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Apple Acid",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Grav Apple",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Spirit Break",
+    "desc": "Physical move. Power: 75. Accuracy: 100%. PP: 15.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Strange Steam",
+    "desc": "Special move. Power: 90. Accuracy: 95%. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Life Dew",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Obstruct",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "False Surrender",
+    "desc": "Physical move. Power: 80. Accuracy: —. PP: 10.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Meteor Assault",
+    "desc": "Physical move. Power: 150. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Eternabeam",
+    "desc": "Special move. Power: 160. Accuracy: 90%. PP: 5.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Steel Beam",
+    "desc": "Special move. Power: 140. Accuracy: 95%. PP: 5.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Expanding Force",
+    "desc": "Special move. Power: 80. Accuracy: 100%. PP: 10.",
+    "type": "Move: Psychic"
+  },
+  {
+    "name": "Steel Roller",
+    "desc": "Physical move. Power: 130. Accuracy: 100%. PP: 5.",
+    "type": "Move: Steel"
+  },
+  {
+    "name": "Scale Shot",
+    "desc": "Physical move. Power: 25. Accuracy: 90%. PP: 20.",
+    "type": "Move: Dragon"
+  },
+  {
+    "name": "Meteor Beam",
+    "desc": "Special move. Power: 120. Accuracy: 90%. PP: 10.",
+    "type": "Move: Rock"
+  },
+  {
+    "name": "Shell Side Arm",
+    "desc": "Special move. Power: 90. Accuracy: 100%. PP: 10.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Misty Explosion",
+    "desc": "Special move. Power: 100. Accuracy: 100%. PP: 10.",
+    "type": "Move: Fairy"
+  },
+  {
+    "name": "Grassy Glide",
+    "desc": "Physical move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Rising Voltage",
+    "desc": "Special move. Power: 70. Accuracy: 100%. PP: 20.",
+    "type": "Move: Electric"
+  },
+  {
+    "name": "Terrain Pulse",
+    "desc": "Special move. Power: 50. Accuracy: 100%. PP: 10.",
+    "type": "Move: Normal"
+  },
+  {
+    "name": "Skitter Smack",
+    "desc": "Physical move. Power: 70. Accuracy: 90%. PP: 10.",
+    "type": "Move: Bug"
+  },
+  {
+    "name": "Burning Jealousy",
+    "desc": "Special move. Power: 70. Accuracy: 100%. PP: 5.",
+    "type": "Move: Fire"
+  },
+  {
+    "name": "Lash Out",
+    "desc": "Physical move. Power: 75. Accuracy: 100%. PP: 5.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Poltergeist",
+    "desc": "Physical move. Power: 110. Accuracy: 90%. PP: 5.",
+    "type": "Move: Ghost"
+  },
+  {
+    "name": "Corrosive Gas",
+    "desc": "Status move. Power: —. Accuracy: 100%. PP: 40.",
+    "type": "Move: Poison"
+  },
+  {
+    "name": "Coaching",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Fighting"
+  },
+  {
+    "name": "Flip Turn",
+    "desc": "Physical move. Power: 60. Accuracy: 100%. PP: 20.",
+    "type": "Move: Water"
+  },
+  {
+    "name": "Triple Axel",
+    "desc": "Physical move. Power: 20. Accuracy: 90%. PP: 10.",
+    "type": "Move: Ice"
+  },
+  {
+    "name": "Dual Wingbeat",
+    "desc": "Physical move. Power: 40. Accuracy: 90%. PP: 10.",
+    "type": "Move: Flying"
+  },
+  {
+    "name": "Scorching Sands",
+    "desc": "Special move. Power: 70. Accuracy: 100%. PP: 10.",
+    "type": "Move: Ground"
+  },
+  {
+    "name": "Jungle Healing",
+    "desc": "Status move. Power: —. Accuracy: —. PP: 10.",
+    "type": "Move: Grass"
+  },
+  {
+    "name": "Wicked Blow",
+    "desc": "Physical move. Power: 80. Accuracy: 100%. PP: 5.",
+    "type": "Move: Dark"
+  },
+  {
+    "name": "Surging Strikes",
+    "desc": "Physical move. Power: 25. Accuracy: 100%. PP: 5.",
+    "type": "Move: Water"
+  }
+    ],
 
     urls_and_titles: [
         {title: "fuzzysort", url: "https://github.com/farzher/fuzzysort"},
@@ -302,9 +14079,6 @@ const testdata = {
         {title: "QuicKey – The quick tab switcher - Chrome Web Store", url: "https://chrome.google.com/webstore/detail/quickey-%E2%80%93-the-quick-tab-s/ldlghkoiihaelfnggonhjnfiabmaficg"},
         {title: "QuicKey | Jump between recent tabs in Chrome via keyboard or menu", url: "https://fwextensions.github.io/QuicKey/"},
     ],
-
-
-
 
     "steam_games" : [
   "Color Lim",
@@ -183271,7 +197045,8 @@ const testdata = {
   "Pioneers of Pagonia",
   "Ritual Night Demo",
   "Clicker Heroes"
-],
+    ],
+
     "wordlist_58k" : [
         "aardvark",
         "aardwolf",
@@ -241384,6 +255159,7 @@ const testdata = {
         "zulu",
         "zulus"
     ],
+
     "hearthstone" : [
         "Abomination",
         "Abusive Sergeant",
@@ -242129,6 +255905,7 @@ const testdata = {
         "Ysera",
         "Zombie Chow"
     ],
+
     "mtg" : [
         "Air Elemental",
         "Ancestral Recall",
@@ -258024,6 +271801,7 @@ const testdata = {
         "Human",
         "Zombie"
     ],
+
     "ue4_files" : [
         "UE4Client.Target.cs",
         "UE4Editor.Target.cs",
@@ -271189,7 +284967,7 @@ const testdata = {
         "XmlFile.h",
         "XmlNode.h",
         "XmlParser.h"
-    ]
+    ],
 }
 
 // // Simulate a game catalog with two searchable fields while keeping the size
