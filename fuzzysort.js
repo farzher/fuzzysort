@@ -984,6 +984,7 @@ class SnapshotTargets {
 
     let current = history[history.length - 1]
     let value = query._lower
+    if(current.query === value && current.limit === limit && current.results) return copyResults(current.results)
     if(value.length >= current.query.length || !current.query.startsWith(value)) return null
 
     let i = history.length - 2
@@ -1009,7 +1010,7 @@ class SnapshotTargets {
     let last = history[history.length - 1]
     if(last && !value.startsWith(last.query)) history.length = 0
     else if(last?.query === value && last.limit === limit) history.pop()
-    history.push({query:value, limit, results:value.length <= 12 ? copyResults(results) : null})
+    history.push({query:value, limit, results:value.length <= 24 ? copyResults(results) : null})
   }
 
   _resetSearch() {
