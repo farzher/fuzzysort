@@ -974,43 +974,38 @@ class SnapshotTargets {
     return offsetsLen
   }
 
-  _countRows(bitflags, stop = INF) {
-    let offsetsLen = this._bitOffsets(bitflags)
-    if(!offsetsLen) return this._rowCount
-    let bits = this._rowBits
-    let words = this._rowWords
-    let count = 0
-    for(let word = 0; word < words; word++) {
-      let matches = bits[candidateBitOffsets[0] + word]
-      for(let i = 1; i < offsetsLen && matches; i++) matches &= bits[candidateBitOffsets[i] + word]
-      count += bitCount(matches)
-      if(count >= stop) return count
-    }
-    return count
-  }
-
-  _fillRows(bitflags) {
+  _matchRows(bitflags, fill = false, stop = INF) {
     let offsetsLen = this._bitOffsets(bitflags)
     if(!offsetsLen) {
-      this._candidateRows = null
-      this._candidateLength = this._rowCount
-      return
+      if(fill) {
+        this._candidateRows = null
+        this._candidateLength = this._rowCount
+      }
+      return this._rowCount
     }
+
     let bits = this._rowBits
     let words = this._rowWords
-    let rows = this._rows
     let rowsLen = 0
     for(let word = 0; word < words; word++) {
       let matches = bits[candidateBitOffsets[0] + word]
       for(let i = 1; i < offsetsLen && matches; i++) matches &= bits[candidateBitOffsets[i] + word]
+      if(!fill) {
+        rowsLen += bitCount(matches)
+        if(rowsLen >= stop) return rowsLen
+        continue
+      }
       while(matches) {
         let lowest = matches & -matches
-        rows[rowsLen++] = (word << 5) + 31 - Math.clz32(lowest)
+        this._rows[rowsLen++] = (word << 5) + 31 - Math.clz32(lowest)
         matches = (matches & matches - 1) >>> 0
       }
     }
-    this._candidateRows = rows
-    this._candidateLength = rowsLen
+    if(fill) {
+      this._candidateRows = this._rows
+      this._candidateLength = rowsLen
+    }
+    return rowsLen
   }
 
   _beginSearch(query) {
@@ -1021,14 +1016,14 @@ class SnapshotTargets {
     let bitflags = query.bitflags >>> 0
 
     if(previousQuery !== null && query._lower.startsWith(previousQuery)) {
-      let staticCount = this._countRows(bitflags, previousLength)
+      let staticCount = this._matchRows(bitflags, false, previousLength)
       if(previousLength <= staticCount) {
         this._candidateRows = this._rows
         this._candidateLength = previousLength
         return
       }
     }
-    this._fillRows(bitflags)
+    this._matchRows(bitflags, true)
   }
 
   _endSearch(query) {
@@ -1101,8 +1096,7 @@ class SnapshotTargets {
 function copyResult(result) {
   if(result === noTarget) return noTarget
   if(result instanceof KeysResult) {
-    let copy = new KeysResult(result.length)
-    for(let i = 0; i < result.length; i++) copy[i] = copyResult(result[i])
+    let copy = result.map(copyResult)
     copy.obj = result.obj
     copy._score = result._score
     if(result._partWinners) copy._partWinners = true
@@ -1117,8 +1111,7 @@ function copyResult(result) {
 }
 
 function copyResults(results) {
-  let copies = new Array(results.length)
-  for(let i = 0; i < results.length; i++) copies[i] = copyResult(results[i])
+  let copies = results.map(copyResult)
   copies.total = results.total
   return copies
 }
