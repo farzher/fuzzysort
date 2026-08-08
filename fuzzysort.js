@@ -110,6 +110,7 @@ export function cleanup() {
   simpleMatch = []; strictMatch = []
   seen = []; seenAt = []
   changes = []; partials = []; spaceScores = []
+  partIndexes = []; winnerIndexes = []; winnerScores = []; winnerKeys = []
   keyTargets = []; keyResults = []; candidateBitOffsets = []
   seenGeneration = 0
 }
@@ -250,7 +251,10 @@ function goKeys(query, objects, options, snapshot) {
       }
       if((searchBitflags & keysBitflags) !== searchBitflags) continue
     }
-    if(hasSpace) for(let s = 0; s < spaceCount; s++) spaceScores[s] = -INF
+    if(hasSpace) for(let s = 0; s < spaceCount; s++) {
+      spaceScores[s] = winnerScores[s] = -INF
+      winnerKeys[s] = -1
+    }
 
     for(let k = 0; k < keysLength; k++) {
       let target = indexed ? targets[row + k] : keyTargets[k]
@@ -299,7 +303,23 @@ function goKeys(query, objects, options, snapshot) {
         continue
       }
       keyResults[k] = deferMaterialization ? match : materialize(match)
-      if(hasSpace) mergePartScores(spaceCount)
+      if(hasSpace) {
+        mergePartScores(spaceCount)
+        for(let s = 0; s < spaceCount; s++) {
+          let partScore = partials[s]
+          if(partScore <= winnerScores[s]) continue
+          winnerScores[s] = partScore
+          winnerKeys[s] = k
+          let source = partIndexes[s]
+          let winner = winnerIndexes[s] ||= []
+          winner.length = source.length
+          for(let j = 0; j < source.length; j++) winner[j] = source[j]
+        }
+      }
+    }
+
+    if(hasSpace) for(let s = 0; s < spaceCount; s++) if(winnerKeys[s] !== -1) {
+      appendIndexes(keyResults[winnerKeys[s]]._indexes, winnerIndexes[s])
     }
 
     let resultScore
@@ -316,7 +336,7 @@ function goKeys(query, objects, options, snapshot) {
     }
     if(indexed) matchedRows[matchedCount++] = i
 
-    let result = deferMaterialization ? null : captureKeysResult(keyResults, keysLength, objects[i], resultScore)
+    let result = deferMaterialization ? null : captureKeysResult(keyResults, keysLength, objects[i], resultScore, hasSpace)
     if(scoreFn) {
       resultScore = scoreFn(result)
       if(!resultScore) continue
@@ -330,7 +350,7 @@ function goKeys(query, objects, options, snapshot) {
       limited++
       if(resultScore <= heap.peek()._score) continue
     }
-    if(result === null) result = captureKeysResult(keyResults, keysLength, objects[i], resultScore)
+    if(result === null) result = captureKeysResult(keyResults, keysLength, objects[i], resultScore, hasSpace)
     room ? heap.add(result) : heap.replaceTop(result)
   }
   if(indexed) snapshot._matchedRowsLen = matchedCount
@@ -408,7 +428,7 @@ function finishResults(length, limited, transform) {
   for(let i = length - 1; i >= 0; i--) {
     let result = heap.poll()
     if(transform) result = transform(result)
-    if(result instanceof KeysResult) markBestKeyScore(result)
+    if(result instanceof KeysResult && !result._partWinners) markBestKeyScore(result)
     results[i] = result
   }
   results.total = length + limited
@@ -676,6 +696,16 @@ function mergePartScores(length) {
   }
 }
 
+function appendIndexes(indexes, additions) {
+  let length = indexes.len
+  outer: for(let i = 0; i < additions.length; i++) {
+    let index = additions[i]
+    for(let j = 0; j < length; j++) if(indexes[j] === index) continue outer
+    indexes[length++] = index
+  }
+  indexes.len = length
+}
+
 function mergeScores(results, length) {
   let total = -INF
   for(let i = 0; i < length; i++) {
@@ -720,6 +750,7 @@ function algorithmSpaces(search, target, partial) {
 
   for(let i = 0; i < searches.length; i++) {
     partials[i] = -INF
+    if(partial) (partIndexes[i] ||= []).length = 0
     result = algorithm(searches[i], target, false, false, changesLen !== 0, false)
     if(result === null) {
       if(partial) continue
@@ -747,13 +778,18 @@ function algorithmSpaces(search, target, partial) {
       }
     }
 
+    if(partial) {
+      let indexes = partIndexes[i]
+      indexes.length = result._indexes.len
+      for(let j = 0; j < indexes.length; j++) indexes[j] = result._indexes[j]
+    }
     let partScore = result._score / searches.length
     score += partScore
     partials[i] = partScore
     if(result._indexes[0] < previousFirst) score -= (previousFirst - result._indexes[0]) * 2
     previousFirst = result._indexes[0]
 
-    for(let j = 0; j < result._indexes.len; j++) {
+    if(!partial) for(let j = 0; j < result._indexes.len; j++) {
       let index = result._indexes[j]
       if(seenAt[index] === generation) continue
       seenAt[index] = generation
@@ -767,15 +803,49 @@ function algorithmSpaces(search, target, partial) {
   if(target._bitflags & SPACE_BIT) {
     let spacedResult = algorithm(search, target, true)
     if(spacedResult !== null && spacedResult._score > score) {
-      if(partial) for(let i = 0; i < searches.length; i++) partials[i] = spacedResult._score / searches.length
+      if(partial) {
+        let searchFrom = 0
+        for(let i = 0; i < searches.length; i++) {
+          partials[i] = spacedResult._score / searches.length
+          let part = searches[i]._lower
+          let searchI = search._lower.indexOf(part, searchFrom)
+          let indexes = partIndexes[i]
+          indexes.length = part.length
+          for(let j = 0; j < part.length; j++) indexes[j] = spacedResult._indexes[searchI + j]
+          searchFrom = searchI + part.length
+        }
+        if(spacedResult._score < GOOD_PART_SCORE) spacedResult._indexes.len = 0
+      }
       return spacedResult
     }
   }
 
-  if(partial) result = target
+  if(partial) {
+    result = target
+    let targetLower = target._targetLower
+    for(let i = 1; i < searches.length; i++) {
+      let previous = partIndexes[i - 1]
+      if(!previous.length || !partIndexes[i].length) continue
+      let previousEnd = previous[previous.length - 1] + 1
+      let at = previousEnd
+      let code
+      while((code = targetLower.charCodeAt(at)) === 32 || code >= 9 && code <= 13) at++
+      let part = searches[i]._lower
+      if(!targetLower.startsWith(part, at)) continue
+      for(let j = previousEnd; j < at; j++) previous.push(j)
+      let indexes = partIndexes[i]
+      indexes.length = part.length
+      for(let j = 0; j < part.length; j++) indexes[j] = at + j
+    }
+    result._indexes.len = 0
+    for(let i = 0; i < searches.length; i++) if(partials[i] * searches.length >= GOOD_PART_SCORE) {
+      appendIndexes(result._indexes, partIndexes[i])
+    }
+  } else {
+    for(let i = 0; i < seenLen; i++) result._indexes[i] = seen[i]
+    result._indexes.len = seenLen
+  }
   result._score = score
-  for(let i = 0; i < seenLen; i++) result._indexes[i] = seen[i]
-  result._indexes.len = seenLen
   return result
 }
 
@@ -1054,6 +1124,7 @@ function copyResult(result) {
     for(let i = 0; i < result.length; i++) copy[i] = copyResult(result[i])
     copy.obj = result.obj
     copy._score = result._score
+    if(result._partWinners) copy._partWinners = true
     return copy
   }
   let copy = new Result()
@@ -1294,16 +1365,18 @@ function markBestKeyScore(result) {
   return result
 }
 
-function captureKeysResult(matches, keysLength, obj, score) {
+function captureKeysResult(matches, keysLength, obj, score, partWinners = false) {
   let result = new KeysResult(keysLength)
   for(let k = 0; k < keysLength; k++) result[k] = matches[k]
   result.obj = obj
   result._score = score
+  if(partWinners) result._partWinners = true
   return result
 }
 
 let normalizeScore = value => value === -INF ? 0 : value > 1 ? value : Math.E ** (((-value + 1) ** .04307 - 1) * -2)
 let denormalizeScore = value => value === 0 ? -INF : value > 1 ? value : 1 - Math.pow(Math.log(value) / -2 + 1, 1 / .04307)
+let GOOD_PART_SCORE = denormalizeScore(.5)
 let isPrepared = value => typeof value === 'object' && typeof value?._bitflags === 'number'
 
 function makeGetter(key) {
@@ -1410,6 +1483,7 @@ let targetCache = new Map(), searchCache = new Map()
 let simpleMatch = [], strictMatch = []
 let seen = [], seenAt = []
 let changes = [], partials = [], spaceScores = []
+let partIndexes = [], winnerIndexes = [], winnerScores = [], winnerKeys = []
 let keyTargets = [], keyResults = []
 let candidateBitOffsets = []
 let seenGeneration = 0

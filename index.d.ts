@@ -10,7 +10,7 @@ declare namespace Fuzzysort {
     /** Original target string */
     readonly target: string
 
-    highlight(highlightOpen?: string, highlightClose?: string): string
+    highlight(highlightOpen?: string, highlightClose?: string, threshold?: number): string
     highlight<T>(callback: HighlightCallback<T>): (string | T)[]
 
     /** Matched character indexes */
@@ -105,7 +105,7 @@ declare namespace Fuzzysort {
     snapshot<T>(targets: ReadonlyArray<T>, options: SnapshotKeysOptions<T>): SnapshotKeys<T>
 
     /** Highlight a result, including a structured clone */
-    highlight(result: Result, highlightOpen?: string, highlightClose?: string): string
+    highlight(result: Result, highlightOpen?: string, highlightClose?: string, threshold?: number): string
     highlight<T>(result: Result, callback: HighlightCallback<T>): (string | T)[]
 
     /** Read a result's score, including from a structured clone */
