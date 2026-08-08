@@ -754,10 +754,12 @@ function algorithmSpaces(search, target, partial) {
   if(partial && !matched) return null
   resetBeginnings(target, changesLen)
 
-  let spacedResult = algorithm(search, target, true)
-  if(spacedResult !== null && spacedResult._score > score) {
-    if(partial) for(let i = 0; i < searches.length; i++) partials[i] = spacedResult._score / searches.length
-    return spacedResult
+  if(target._bitflags & SPACE_BIT) {
+    let spacedResult = algorithm(search, target, true)
+    if(spacedResult !== null && spacedResult._score > score) {
+      if(partial) for(let i = 0; i < searches.length; i++) partials[i] = spacedResult._score / searches.length
+      return spacedResult
+    }
   }
 
   if(partial) result = target
@@ -1010,7 +1012,7 @@ class SnapshotTargets {
     let last = history[history.length - 1]
     if(last && !value.startsWith(last.query)) history.length = 0
     else if(last?.query === value && last.limit === limit) history.pop()
-    history.push({query:value, limit, results:value.length <= 24 ? copyResults(results) : null})
+    history.push({query:value, limit, results:value.length <= 64 ? copyResults(results) : null})
   }
 
   _resetSearch() {
@@ -1073,6 +1075,7 @@ function prepQuery(search) {
   else if(typeof search !== 'string') search = ''
   search = search.trim()
   let info = lowerInfo(search)
+  info.bitflags &= ~SPACE_BIT
   info.parts = info.hasSpace ? [...new Set(search.split(/\s+/))].map(prepQuery) : []
   return info
 }
@@ -1222,6 +1225,7 @@ function lowerInfo(value) {
     let code = lowerCodes[i] = lower.charCodeAt(i)
     if(code === 32) {
       hasSpace = true
+      bitflags |= SPACE_BIT
       continue
     }
     let bit = code >= 97 && code <= 122 ? code - 97
@@ -1378,6 +1382,7 @@ function createHeap() {
 
 
 let INF = Infinity
+let SPACE_BIT = 1 << 27
 let noResults = []
 noResults.total = 0
 
