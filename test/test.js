@@ -34,7 +34,14 @@ const testdata = Object.fromEntries(await Promise.all(
 ))
 
 const useMinified = isNode && process.argv[2] === 'min'
-const {default: fuzzysort} = await import(useMinified ? '../fuzzysort.min.js' : '../fuzzysort.js')
+const {default: fuzzysortApi} = await import(useMinified ? '../fuzzysort.min.js' : '../fuzzysort.js')
+// Most regression tests predate the filtering defaults and need every match.
+const fuzzysort = {
+  ...fuzzysortApi,
+  go(search, targets, options) {
+    return fuzzysortApi.go(search, targets, {threshold: 0, limit: 0, ...options})
+  },
+}
 
 // config
 const config = {
@@ -80,6 +87,20 @@ setTimeout(async function() {
 
 
 async function tests() {
+
+  { // defaults filter weak matches and cap results
+    var exactTargets = Array(12).fill('a')
+    var defaultResults = fuzzysortApi.go('a', exactTargets)
+    assert(defaultResults.length === 10 && defaultResults.total === 12, 'default limit')
+    assert(fuzzysortApi.go('', exactTargets, {all:true}).length === 10, 'default limit with all')
+
+    var defaultSnapshotResults = fuzzysortApi.go('a', fuzzysortApi.snapshot(exactTargets))
+    assert(defaultSnapshotResults.length === 10 && defaultSnapshotResults.total === 12, 'snapshot default limit')
+
+    var weakTargets = [{a:'the wordsup is in here but not well'}]
+    assert(fuzzysortApi.go('sup', weakTargets, {key:'a'}).length === 0, 'default threshold')
+    assert(fuzzysortApi.go('sup', weakTargets, {key:'a', threshold:0, limit:0}).length === 1, 'default overrides')
+  }
 
   { // urls with garbage ids in them match everything too well
     var targets = ['jQuery Zoom', 'aBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYz']

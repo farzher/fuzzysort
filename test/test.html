@@ -241,16 +241,19 @@
         samples: [
           'frankly',
           'wrench',
+          'spoon',
+          'chopper',
           'back',
           'walkin',
-          'talking',
-          'chopper',
+          'talkin',
           'unladen',
           'chocolates',
-          'big boat',
-          'show money',
+          'talon',
+          'cook',
+          'bboat',
+          'showm',
+          'hackp',
           'your mom',
-          'hack planet',
         ],
       },
       ue4_files: {
@@ -262,27 +265,15 @@
           'aic',
           'gmode',
           'rendthr',
-          'mrenderh',
-          'chmanc',
-          'hicusc',
+          'hicu',
           'led',
           'physass',
+          'xy',
         ],
       },
       urls_and_titles: {
         file: './urls_and_titles.json',
         keys: ['title', 'url'],
-        // samples: [
-        //   'fuzzysort',
-        //   'javascript cropper',
-        //   'django deadlines',
-        //   'keyboard shortcuts',
-        //   'jquery lightbox',
-        //   'twitter emoji',
-        //   'chrome tab switcher',
-        //   'react shortcuts',
-        //   'image video gif',
-        // ],
       },
       emoji: {
         file: './emoji.json',
@@ -291,52 +282,22 @@
           {keys: ['char', 'name'], separator: ' '},
           {keys: ['search']},
         ],
-        // samples: [
-        //   'chef kiss',
-        //   'mind blown',
-        //   'happy tears',
-        //   'good luck',
-        //   'love you',
-        //   'facepalm',
-        //   'shrug',
-        //   'suspicious',
-        //   'celebration',
-        //   'sleepy',
-        // ],
       },
       pokemon: {
         file: './pokemon.json',
         keys: ['name', 'desc', 'type'],
-        // samples: [
-        //   'sleep electricity cheeks',
-        //   'melts anything',
-        //   'genetic manipulation',
-        //   'songs shouting',
-        //   'climb stomach napping',
-        //   'eats dreams',
-        //   'catch without fail',
-        //   'tail flame emotions',
-        //   'grass poison seed',
-        // ],
       },
       steam_games: {
         file: './steam_games.json',
-        // samples: [
-        //   'stardew',
-        //   'half-life',
-        //   'goat simulator',
-        //   'untitled goose',
-        //   'elden ring',
-        //   'baldur gate',
-        //   'vampire survivors',
-        //   'keep talking',
-        //   'papers please',
-        //   'powerwash',
-        //   'cult lamb',
-        //   'human fall',
-        //   'short hike',
-        //   'disco elysium',
-        // ],
+        samples: [
+          'L4D',
+          'TF2',
+          'DMC',
+          'HL2',
+          'DBDa',
+          'RDRe2',
+          'TeMNT',
+        ],
       },
     }
 
@@ -544,6 +505,7 @@
       const results = fuzzysort.go($input.value, data.prepared, {
         all: true,
         limit: visibleLimit,
+        threshold: 0,
       })
       const duration = Math.floor((performance.now() - start) * 1000) / 1000
 
@@ -567,8 +529,7 @@
         const result = results[resultIndex]
         const item = document.createElement('li')
         const wrapper = document.createElement('span')
-        const shade = resultShade(result.score)
-        wrapper.style.color = `rgb(${shade},${shade},${shade})`
+        wrapper.style.opacity = resultOpacity(result.score)
         wrapper.append(`${formatScore(result.score)} - `)
 
         if(display) {
@@ -615,10 +576,9 @@
       return (Math.floor(Math.abs(score) * 1000) / 1000).toFixed(3)
     }
 
-    function resultShade(score) {
-      let value = mapNumber(score, 0, 1, 66, 200, 2)
-      if(score > .5) value += 30
-      return value
+    function resultOpacity(score) {
+      if(score >= .5) return 1
+      return mapNumber(score, 0, 1, .2, .6, 3)
     }
 
     function mapNumber(value, inMin, inMax, outMin, outMax, exponent) {

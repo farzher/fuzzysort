@@ -57,12 +57,12 @@ const results = fuzzysort.go('a', files, {key: 'file'})
 
 ```js
 fuzzysort.go(search, targets, {
-  key: null,       // Search one property
-  keys: null,      // Search multiple properties
-  limit: 0,        // Max results; 0 = unlimited
-  threshold: 0,    // Minimum score; 0 = any match
-  all: false,      // Return all targets when search is empty
-  scoreFn: null,   // Override result scoring
+  key       : null,  // Search one property
+  keys      : null,  // Search multiple properties
+  limit     : 10,    // Max results; 0 = unlimited
+  threshold : .5,    // Minimum score; 0 = any match
+  all       : false, // Return all targets when search is empty
+  scoreFn   : null,  // Override result scoring
 })
 ```
 
@@ -163,6 +163,7 @@ fuzzysort.remap({',': '.'}) // 12,5 = 12.5
 - Added `fuzzysort.score()` and `fuzzysort.highlight()` for Web Worker support
 - Added `fuzzysort.remap()` for custom normalization
 - Automatically remaps common lookalike characters
+- Added default `threshold` and `limit`
 - Changed `highlight()` to only highlight `keys` with a good match
 - Changed scoring: substring matches are even more relevant
 - `scoreFn` now works with all search modes

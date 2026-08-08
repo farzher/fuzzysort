@@ -20,8 +20,8 @@ export function go(search, targets, options) {
 
   let searchBitflags = query.bitflags
   let twoChar = !query.hasSpace && query.lowerCodes.length === 2
-  let threshold = denormalizeScore(options?.threshold || 0)
-  let limit = options?.limit || INF
+  let threshold = denormalizeScore(options?.threshold ?? .5)
+  let limit = options?.limit === undefined ? 10 : options.limit || INF
   let scoreFn = options?.scoreFn
   let resultCount = 0
   let limited = 0
@@ -119,8 +119,8 @@ export function cleanup() {
 function goSnapshotValues(search, snapshot, options, singleChar) {
   let targets = snapshot._targets
   let objects = snapshot._objects
-  let threshold = denormalizeScore(options?.threshold || 0)
-  let limit = options?.limit || INF
+  let threshold = denormalizeScore(options?.threshold ?? .5)
+  let limit = options?.limit === undefined ? 10 : options.limit || INF
   let scoreFn = options?.scoreFn
   let searchLen = search.lowerCodes.length
   let shortSearch = !search.hasSpace && searchLen <= 3
@@ -218,8 +218,8 @@ function goKeys(query, objects, options, snapshot) {
   let searchBitflags = query.bitflags
   let hasSpace = query.hasSpace
   let spaceCount = query.parts.length
-  let threshold = denormalizeScore(options?.threshold || 0)
-  let limit = options?.limit || INF
+  let threshold = denormalizeScore(options?.threshold ?? .5)
+  let limit = options?.limit === undefined ? 10 : options.limit || INF
   let searchLen = query.lowerCodes.length
   let short = indexed && !hasSpace && searchLen <= 3
   let twoChar = !hasSpace && searchLen === 2
@@ -365,7 +365,8 @@ function allSnapshot(snapshot, options) {
   let total = keysLength === undefined ? targets.length : objects.length
   results.total = total
 
-  for(let i = 0, length = Math.min(total, options?.limit || INF); i < length; i++) {
+  let limit = options?.limit === undefined ? 10 : options.limit || INF
+  for(let i = 0, length = Math.min(total, limit); i < length; i++) {
     if(keysLength === undefined) {
       results.push(newResult(targets[i].target, -INF, objects?.[i]))
       continue
@@ -383,7 +384,7 @@ function allSnapshot(snapshot, options) {
 function all(targets, options) {
   let results = []
   results.total = targets.length
-  let limit = options?.limit || INF
+  let limit = options?.limit === undefined ? 10 : options.limit || INF
   let key = options?.key
   let keys = !key && options?.keys
 
@@ -1060,8 +1061,8 @@ class SnapshotTargets {
 
   _backtrack(query, options) {
     let history = this._history
-    if(history.length < 2 || options?.scoreFn || options?.threshold) return null
-    let limit = options?.limit || INF
+    if(history.length < 2 || options?.scoreFn || options?.threshold !== undefined) return null
+    let limit = options?.limit === undefined ? 10 : options.limit || INF
     if(limit === INF) return null
 
     let current = history[history.length - 1]
@@ -1082,8 +1083,8 @@ class SnapshotTargets {
 
   _remember(query, results, options) {
     let history = this._history
-    let limit = options?.limit || INF
-    if(options?.scoreFn || options?.threshold || limit === INF || results.length > 256) {
+    let limit = options?.limit === undefined ? 10 : options.limit || INF
+    if(options?.scoreFn || options?.threshold !== undefined || limit === INF || results.length > 256) {
       history.length = 0
       return
     }

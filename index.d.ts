@@ -60,10 +60,10 @@ declare namespace Fuzzysort {
   }
 
   interface Options<R = Result> {
-    /** Max results; 0 = unlimited */
+    /** Max results; defaults to 10; 0 = unlimited */
     limit?: number
 
-    /** Minimum score; 0 = any match */
+    /** Minimum score; defaults to .5; 0 = any match */
     threshold?: number
 
     /** Return all targets when search is empty */
