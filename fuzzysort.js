@@ -21,7 +21,7 @@ export function go(search, targets, options) {
   let searchBitflags = query.bitflags
   let twoChar = !query.hasSpace && query.lowerCodes.length === 2
   let threshold = denormalizeScore(options?.threshold ?? .5)
-  let limit = options?.limit === undefined ? 10 : options.limit || INF
+  let limit = getLimit(options)
   let scoreFn = options?.scoreFn
   let resultCount = 0
   let limited = 0
@@ -120,7 +120,7 @@ function goSnapshotValues(search, snapshot, options, singleChar) {
   let targets = snapshot._targets
   let objects = snapshot._objects
   let threshold = denormalizeScore(options?.threshold ?? .5)
-  let limit = options?.limit === undefined ? 10 : options.limit || INF
+  let limit = getLimit(options)
   let scoreFn = options?.scoreFn
   let searchLen = search.lowerCodes.length
   let shortSearch = !search.hasSpace && searchLen <= 3
@@ -216,7 +216,7 @@ function goKeys(query, objects, options, snapshot) {
   let hasSpace = query.hasSpace
   let spaceCount = query.parts.length
   let threshold = denormalizeScore(options?.threshold ?? .5)
-  let limit = options?.limit === undefined ? 10 : options.limit || INF
+  let limit = getLimit(options)
   let searchLen = query.lowerCodes.length
   let short = indexed && !hasSpace && searchLen <= 3
   let twoChar = !hasSpace && searchLen === 2
@@ -362,7 +362,7 @@ function allSnapshot(snapshot, options) {
   let total = keysLength === undefined ? targets.length : objects.length
   results.total = total
 
-  let limit = options?.limit === undefined ? 10 : options.limit || INF
+  let limit = getLimit(options)
   for(let i = 0, length = Math.min(total, limit); i < length; i++) {
     if(keysLength === undefined) {
       results.push(newResult(targets[i].target, -INF, objects?.[i]))
@@ -381,7 +381,7 @@ function allSnapshot(snapshot, options) {
 function all(targets, options) {
   let results = []
   results.total = targets.length
-  let limit = options?.limit === undefined ? 10 : options.limit || INF
+  let limit = getLimit(options)
   let key = options?.key
   let keys = !key && options?.keys
 
@@ -862,7 +862,6 @@ class SnapshotTargets {
     this._index = 0
     this._done = false
     this._error = null
-    this._initialized = false
     this._scheduled = null
 
     if(targets.length === 0) this._finish()
@@ -871,35 +870,19 @@ class SnapshotTargets {
 
   _schedule() {
     if(this._scheduled !== null) return
-    let run = deadline => {
+    this._scheduled = scheduleTask(deadline => {
       this._scheduled = null
       this._run(deadline)
-    }
-    if(typeof requestIdleCallback === 'function') {
-      this._scheduler = 1
-      this._scheduled = requestIdleCallback(run, {timeout:100})
-    } else if(typeof setImmediate === 'function') {
-      this._scheduler = 2
-      this._scheduled = setImmediate(run)
-    } else {
-      this._scheduler = 3
-      this._scheduled = setTimeout(run)
-    }
+    })
   }
 
   _cancel() {
-    if(this._scheduled === null) return
-    if(this._scheduler === 1) {
-      if(typeof cancelIdleCallback === 'function') cancelIdleCallback(this._scheduled)
-    } else if(this._scheduler === 2) {
-      if(typeof clearImmediate === 'function') clearImmediate(this._scheduled)
-    } else clearTimeout(this._scheduled)
+    if(this._scheduled !== null) this._scheduled()
     this._scheduled = null
   }
 
   _initialize() {
-    if(this._initialized) return
-    this._initialized = true
+    if(this._targets) return
     let keysLength = this._mode === 2 ? this._keys.length : 1
     let valueCount = this._input.length * keysLength
     let rowCount = this._input.length
@@ -1059,7 +1042,7 @@ class SnapshotTargets {
   _backtrack(query, options) {
     let history = this._history
     if(history.length < 2 || options?.scoreFn || options?.threshold !== undefined) return null
-    let limit = options?.limit === undefined ? 10 : options.limit || INF
+    let limit = getLimit(options)
     if(limit === INF) return null
 
     let current = history[history.length - 1]
@@ -1080,7 +1063,7 @@ class SnapshotTargets {
 
   _remember(query, results, options) {
     let history = this._history
-    let limit = options?.limit === undefined ? 10 : options.limit || INF
+    let limit = getLimit(options)
     if(options?.scoreFn || options?.threshold !== undefined || limit === INF || results.length > 256) {
       history.length = 0
       return
@@ -1125,10 +1108,7 @@ function copyResult(result) {
     if(result._partWinners) copy._partWinners = true
     return copy
   }
-  let copy = new Result()
-  copy.target = result.target
-  copy.obj = result.obj
-  copy._score = result._score
+  let copy = materialize(result, result.obj)
   if(result._bestKeyScore !== undefined) copy._bestKeyScore = result._bestKeyScore
   let indexes = result._indexes
   copy._indexes = indexes.slice(0, indexes.len ?? indexes.length)
@@ -1177,107 +1157,83 @@ function getQuery(search) {
   return prepared
 }
 
-function indexBeginnings(prepared, firstTable, row, packed) {
-  if(prepared.target.length >= 65535) return prepared
+function scanBeginnings(prepared, visit) {
   let target = remapChars(prepared.target)
-  let lowerCodes = prepared._targetLowerCodes
-  let offset = row * 26
-  let count = 0
   let wasUpper = false
   let wasAlnum = false
+  let count = 0
 
   for(let i = 0; i < target.length; i++) {
     let code = target.charCodeAt(i)
-    let isUpper = code >= 65 && code <= 90
-    let isAlnum = isUpper || code >= 97 && code <= 122 || code >= 48 && code <= 57
-    let isBeginning = isUpper && !wasUpper || !wasAlnum || !isAlnum
-    wasUpper = isUpper
-    wasAlnum = isAlnum
-    if(!isBeginning) continue
+    let upper = code >= 65 && code <= 90
+    let alnum = upper || code >= 97 && code <= 122 || code >= 48 && code <= 57
+    let beginning = upper && !wasUpper || !wasAlnum || !alnum
+    wasUpper = upper
+    wasAlnum = alnum
+    if(beginning) {
+      count++
+      visit(i)
+    }
+  }
+  prepared._beginningsLen = count
+}
+
+function indexBeginnings(prepared, firstTable, row, packed) {
+  if(prepared.target.length >= 65535) return
+  let target = remapChars(prepared.target)
+  let lowerCodes = prepared._targetLowerCodes
+  let offset = row * 26
+  let wasUpper = false
+  let wasAlnum = false
+  let count = 0
+
+  for(let i = 0; i < target.length; i++) {
+    let code = target.charCodeAt(i)
+    let upper = code >= 65 && code <= 90
+    let alnum = upper || code >= 97 && code <= 122 || code >= 48 && code <= 57
+    let beginning = upper && !wasUpper || !wasAlnum || !alnum
+    wasUpper = upper
+    wasAlnum = alnum
+    if(!beginning) continue
 
     count++
     packed.push(i)
-    let lowerCode = lowerCodes[i]
-    if(lowerCode >= 97 && lowerCode <= 122) {
-      let slot = offset + lowerCode - 97
+    code = lowerCodes[i]
+    if(code >= 97 && code <= 122) {
+      let slot = offset + code - 97
       if(firstTable[slot] === 0) firstTable[slot] = i + 1
     }
   }
   prepared._beginningsLen = count
-  return prepared
 }
 
 function prepareSingleMatch(prepared, searchCode, fallbackIndex) {
-  let target = remapChars(prepared.target)
-  let lowerCodes = prepared._targetLowerCodes
   let matchI = fallbackIndex
   let strict = false
-  let beginnings = 0
-  let wasUpper = false
-  let wasAlnum = false
-
-  for(let i = 0; i < target.length; i++) {
-    let code = target.charCodeAt(i)
-    let isUpper = code >= 65 && code <= 90
-    let isAlnum = isUpper || code >= 97 && code <= 122 || code >= 48 && code <= 57
-    let isBeginning = isUpper && !wasUpper || !wasAlnum || !isAlnum
-    wasUpper = isUpper
-    wasAlnum = isAlnum
-    if(!isBeginning) continue
-
-    beginnings++
-    if(!strict && searchCode === lowerCodes[i]) {
+  scanBeginnings(prepared, i => {
+    if(!strict && searchCode === prepared._targetLowerCodes[i]) {
       matchI = i
       strict = true
     }
-  }
-  prepared._beginningsLen = beginnings
+  })
   prepared._singleMatchCode = searchCode
   prepared._singleMatchIndex = matchI
   prepared._singleMatchStrict = strict
 }
 
 function makeBeginnings(prepared) {
-  let target = remapChars(prepared.target)
   let beginnings = []
-  let wasUpper = false
-  let wasAlnum = false
-
-  for(let i = 0; i < target.length; i++) {
-    let code = target.charCodeAt(i)
-    let isUpper = code >= 65 && code <= 90
-    let isAlnum = isUpper || code >= 97 && code <= 122 || code >= 48 && code <= 57
-    let isBeginning = isUpper && !wasUpper || !wasAlnum || !isAlnum
-    wasUpper = isUpper
-    wasAlnum = isAlnum
-    if(isBeginning) beginnings.push(i)
-  }
-  prepared._beginningsLen = beginnings.length
+  scanBeginnings(prepared, i => beginnings.push(i))
   return beginnings
 }
 
 function makeNextBeginnings(prepared) {
-  let target = remapChars(prepared.target)
   let next = []
   let fill = 0
-  let beginnings = 0
-  let wasUpper = false
-  let wasAlnum = false
-
-  for(let i = 0; i < target.length; i++) {
-    let code = target.charCodeAt(i)
-    let isUpper = code >= 65 && code <= 90
-    let isAlnum = isUpper || code >= 97 && code <= 122 || code >= 48 && code <= 57
-    let isBeginning = isUpper && !wasUpper || !wasAlnum || !isAlnum
-    wasUpper = isUpper
-    wasAlnum = isAlnum
-    if(!isBeginning) continue
-
-    beginnings++
+  scanBeginnings(prepared, i => {
     for(; fill < i; fill++) next[fill] = i
-  }
-  for(; fill < target.length; fill++) next[fill] = target.length
-  prepared._beginningsLen = beginnings
+  })
+  for(; fill < prepared.target.length; fill++) next[fill] = prepared.target.length
   return next
 }
 
@@ -1405,23 +1361,41 @@ function bitCount(value) {
   return ((value + (value >>> 4) & 0x0F0F0F0F) * 0x01010101 >>> 24)
 }
 
-function lowerBound(values, start, end, value, after = false) {
+function lowerBound(values, start, end, value) {
   while(start < end) {
     let middle = start + end >> 1
-    if(values[middle] < value || after && values[middle] === value) start = middle + 1
+    if(values[middle] < value) start = middle + 1
     else end = middle
   }
   return start
 }
 
 function nextBeginning(indexes, start, end, index, targetLen) {
-  let next = lowerBound(indexes, start, end, index, true)
+  let next = lowerBound(indexes, start, end, index + 1)
   return next < end ? indexes[next] : targetLen
 }
 
 function isBeginning(indexes, start, end, index) {
   let found = lowerBound(indexes, start, end, index)
   return found < end && indexes[found] === index
+}
+
+function getLimit(options) {
+  return (options?.limit ?? 10) || INF
+}
+
+function scheduleTask(run) {
+  let id
+  if(typeof requestIdleCallback === 'function') {
+    id = requestIdleCallback(run, {timeout: 100})
+    return () => typeof cancelIdleCallback === 'function' && cancelIdleCallback(id)
+  }
+  if(typeof setImmediate === 'function') {
+    id = setImmediate(run)
+    return () => typeof clearImmediate === 'function' && clearImmediate(id)
+  }
+  id = setTimeout(run)
+  return () => clearTimeout(id)
 }
 
 function createHeap() {
