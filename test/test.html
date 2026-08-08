@@ -1,134 +1,634 @@
-<!DOCTYPE html> <head> <meta charset="UTF-8"> </head>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fuzzysort demo</title>
+  <style>
+    :root {
+      --dark: rgb(26, 26, 26);
+      --dark-gray: rgb(52, 52, 52);
+      --gray: rgb(173, 174, 178);
+      --red2: rgb(255, 67, 119);
+    }
 
+    *, ::before, ::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
 
-<link rel="stylesheet" href="https://farzher.com/assets/bootstrap4.css">
-<link rel="stylesheet" href="https://farzher.com/assets/farzher.css">
-<style>
-  b { color: #dc3545; }
-  html { overflow-y: scroll; }
-</style>
+    html {
+      overflow-y: scroll;
+      font-family: sans-serif;
+      line-height: 1.15;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      color-scheme: dark;
+    }
 
+    body {
+      min-width: 0;
+      margin: 0;
+      overflow-y: scroll;
+      background: var(--dark);
+      color: var(--gray);
+      text-align: left;
+      font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+    }
 
-<!-- ES modules require serving this page over HTTP rather than opening it via file://. -->
-<script src="https://unpkg.com/vue@3.2.35/dist/vue.global.prod.js"></script>
+    ::selection { color: white; background-color: var(--red2); }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: var(--dark); }
+    ::-webkit-scrollbar-thumb { background: var(--dark-gray); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--red2); }
 
+    .jumbotron {
+      margin-bottom: 2rem;
+      padding: 4rem 2rem;
+      border-radius: .3rem;
+      background: none;
+    }
 
+    .container {
+      width: 100%;
+      max-width: 720px;
+      margin-right: auto;
+      margin-left: auto;
+      padding-right: 15px;
+      padding-left: 15px;
+    }
 
-<div id="vue" class="jumbotron" style="background:none">
-  <div class="container" style="max-width: 720px;">
+    .dataset-row { margin-bottom: 2rem; }
 
-    <!-- testdatakeys -->
-    <div class="btn-group">
-      <label v-for="key of testdatakeys" class="btn btn-outline-secondary" :class="{active: key===testdatakey}">
-        <input type="radio" @change="search" style="display:none" v-model="testdatakey" :value="key"> {{key}}
-      </label>
+    .btn-group {
+      position: relative;
+      display: inline-flex;
+      vertical-align: middle;
+    }
+
+    .samples {
+      min-height: 1.5rem;
+      margin-bottom: .35rem;
+      color: #6c757d;
+      font-size: .8rem;
+    }
+
+    .samples:empty { display: none; }
+
+    .sample-btn {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #6c757d;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .sample-btn:hover,
+    .sample-btn:focus-visible {
+      color: var(--red2);
+      text-decoration: underline;
+    }
+
+    .btn {
+      position: relative;
+      display: inline-block;
+      flex: 1 1 auto;
+      margin-bottom: 0;
+      padding: .375rem .75rem;
+      border: 1px solid transparent;
+      border-radius: .25rem;
+      background-color: transparent;
+      color: #212529;
+      text-align: center;
+      vertical-align: middle;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      cursor: pointer;
+      user-select: none;
+      transition: color .15s ease-in-out, background-color .15s ease-in-out,
+        border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .btn-group > .btn:not(:first-child) {
+      margin-left: -1px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    .btn-group > .btn:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .btn-outline-secondary { color: #6c757d; border-color: #6c757d; }
+
+    .btn-outline-secondary:hover,
+    .btn-outline-secondary.active {
+      z-index: 1;
+      border-color: #6c757d;
+      background-color: #6c757d;
+      color: #fff;
+    }
+
+    .btn:focus-visible {
+      z-index: 2;
+      outline: 0;
+      box-shadow: 0 0 0 .2rem rgba(108, 117, 125, .5);
+    }
+
+    .my-input-div {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .my-input {
+      width: 100%;
+      padding: 10px 0 5px 9px;
+      border: none;
+      border-radius: .25rem;
+      outline: none;
+      background: #111;
+      color: var(--gray);
+      font: inherit;
+    }
+
+    .my-input::placeholder { color: #757575; opacity: 1; }
+    .my-input[disabled] { background: none; }
+
+    .my-input-hr {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      margin: 0;
+      border-style: none none solid;
+      border-color: var(--red2);
+      border-bottom-width: 2px;
+      opacity: 0;
+      transform: scaleX(0);
+      transform-origin: 0 0;
+      transition: 100ms cubic-bezier(.23, 1, .32, 1);
+    }
+
+    .my-input:focus + .my-input-hr {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    p { margin-top: 0; margin-bottom: 1rem; }
+    ul { margin-top: 0; margin-bottom: 1rem; padding-left: 40px; }
+    strong { font-weight: bolder; }
+    b, mark { padding: 0; background: transparent; color: #dc3545; font-weight: bolder; }
+
+    .loading, .error { margin-top: 1rem; }
+
+    .show-more {
+      margin: 0 0 1rem 40px;
+    }
+
+    .retry {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #6c9fd2;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    @media (max-width: 575px) {
+      .jumbotron { padding: 2rem 1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn, .my-input-hr { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="jumbotron">
+    <div class="container">
+      <div id="datasets" class="btn-group dataset-row" aria-label="Choose a dataset"></div>
+
+      <div id="samples" class="samples" aria-label="Sample searches"></div>
+      <div class="my-input-div">
+        <input id="input" class="my-input" autocomplete="off" spellcheck="false" autofocus disabled>
+        <hr class="my-input-hr">
+      </div>
+
+      <div id="results" aria-live="polite">
+        <p id="summary" class="loading">Loading movie_quotes…</p>
+        <ul id="result-list" style="list-style:none"></ul>
+        <button id="show-more" class="btn btn-outline-secondary show-more" type="button" hidden>show more</button>
+      </div>
     </div>
-    <br> <br>
+  </main>
 
-    <!-- input -->
-    <div class="my-input-div" style="width:100%">
-      <input id="input" class="my-input" autofocus style="width:100%" v-model="input" :placeholder="testdatakey" :data-empty="!input" @input="search" />
-      <hr class="my-input-hr">
-    </div>
+  <script type="module">
+    import fuzzysort from '../fuzzysort.min.js'
 
-    <!-- results -->
-    <div id="results">
-      <p v-if="results.length">{{results.total}} matches in {{duration}}ms</p>
-      <ul style="list-style:none">
-        <li v-for="result of results" v-html="renderResult(result)"></li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-
-
-<script type="module">
-import './test.js'
-
-// Keep large, browser-only datasets separate from testdata.js. This can become
-// an on-demand loader when testdata.js is split into lightweight/heavy data.
-const [emoji, movieQuotes] = await Promise.all([
-  fetch('./emoji.json').then(response => response.json()),
-  fetch('./movie_quotes.json').then(response => response.json()),
-])
-
-for(const [key, targets] of Object.entries({emoji, movie_quotes: movieQuotes})) {
-  testdata[key] = targets
-  testdata_prepared[key] = fuzzysort.snapshot(targets, {keys: Object.keys(targets[0])})
-}
-
-// // Keep the normal steam_games collection beside raw and mutable-array versions.
-// const rawSteamKey = 'steam_games_raw'
-// testdata[rawSteamKey] = testdata.steam_games
-// testdata_prepared[rawSteamKey] = testdata.steam_games
-
-// const targetPreparedSteamKey = 'steam_games_target_prepared'
-// testdata[targetPreparedSteamKey] = testdata.steam_games
-// testdata_prepared[targetPreparedSteamKey] = testdata.steam_games.map(target => fuzzysort.prepare(target))
-
-;(function() {
-  var vue = window.vue = Vue.createApp({
-
-    data() {
-      return {
-        testdatakeys : Object.keys(testdata_prepared),
-        testdatakey  : 'urls_and_titles',
-
-        input        : '',
-        results      : [],
-        duration     : 0,
-        keys         : [],
-      }
-    },
-
-    methods: {
-      renderResult: result => {
-        let x = mapnumber(result.score, 0, 1, 66, 200, {ex:2})
-        if(result.score > .5) x += 30
-        return `<span style="color: rgb(${x},${x},${x})">${doit()}</span>`
-
-        function doit() {
-          if(!vue.keys.length) return `${formatscore(result.score)} - ${result.highlight()}`
-
-          let str = `${formatscore(result.score)} - `
-          for(let i=0; i<vue.keys.length; i++) {
-            if(result[i].target === '') str += result.obj[vue.keys[i]]
-            if(i === 0) str += '<strong>'
-            str += result[i].highlight()
-            if(i === 0) str += '</strong>'
-            str += `<br>&nbsp;&nbsp;&nbsp;${'&nbsp;'.repeat(formatscore(result.score).toString().length)}`
-          }
-          str += '<br>'
-          return str
-        }
+    const datasets = {
+      movie_quotes: {
+        file: './movie_quotes.json',
+        keys: ['quote', 'movie', 'year'],
+        display: [
+          {keys: ['quote']},
+          {keys: ['movie', 'year'], separator: ' - '},
+        ],
+        samples: [
+          'frankly',
+          'wrench',
+          'back',
+          'walkin',
+          'talking',
+          'chopper',
+          'unladen',
+          'chocolates',
+          'big boat',
+          'show money',
+          'your mom',
+          'hack planet',
+        ],
       },
-      search() {
-        document.getElementById('input').focus()
+      ue4_files: {
+        file: './ue4_files.json',
+        samples: [
+          'chmov',
+          'skm',
+          'psys',
+          'aic',
+          'gmode',
+          'rendthr',
+          'mrenderh',
+          'chmanc',
+          'hicusc',
+          'led',
+          'physass',
+        ],
+      },
+      urls_and_titles: {
+        file: './urls_and_titles.json',
+        keys: ['title', 'url'],
+        // samples: [
+        //   'fuzzysort',
+        //   'javascript cropper',
+        //   'django deadlines',
+        //   'keyboard shortcuts',
+        //   'jquery lightbox',
+        //   'twitter emoji',
+        //   'chrome tab switcher',
+        //   'react shortcuts',
+        //   'image video gif',
+        // ],
+      },
+      emoji: {
+        file: './emoji.json',
+        keys: ['char', 'name', 'search'],
+        display: [
+          {keys: ['char', 'name'], separator: ' '},
+          {keys: ['search']},
+        ],
+        // samples: [
+        //   'chef kiss',
+        //   'mind blown',
+        //   'happy tears',
+        //   'good luck',
+        //   'love you',
+        //   'facepalm',
+        //   'shrug',
+        //   'suspicious',
+        //   'celebration',
+        //   'sleepy',
+        // ],
+      },
+      pokemon: {
+        file: './pokemon.json',
+        keys: ['name', 'desc', 'type'],
+        // samples: [
+        //   'sleep electricity cheeks',
+        //   'melts anything',
+        //   'genetic manipulation',
+        //   'songs shouting',
+        //   'climb stomach napping',
+        //   'eats dreams',
+        //   'catch without fail',
+        //   'tail flame emotions',
+        //   'grass poison seed',
+        // ],
+      },
+      steam_games: {
+        file: './steam_games.json',
+        // samples: [
+        //   'stardew',
+        //   'half-life',
+        //   'goat simulator',
+        //   'untitled goose',
+        //   'elden ring',
+        //   'baldur gate',
+        //   'vampire survivors',
+        //   'keep talking',
+        //   'papers please',
+        //   'powerwash',
+        //   'cult lamb',
+        //   'human fall',
+        //   'short hike',
+        //   'disco elysium',
+        // ],
+      },
+    }
 
-        const startms = getms()
+    const cache = new Map()
+    const pendingLoads = new Map()
+    const pageSize = 20
+    let activeKey = 'movie_quotes'
+    let visibleLimit = pageSize
+    let loadVersion = 0
+    let searchFrame = 0
+    let preloadingStarted = false
 
-        const targets_are_strings = typeof testdata[vue.testdatakey][0] === 'string'
-        vue.keys = targets_are_strings ? [] : Object.keys(testdata[vue.testdatakey][0])
-        vue.results = fuzzysort.go(vue.input, testdata_prepared[vue.testdatakey], {
-          all: !targets_are_strings,
-          limit: 100,
-          // keys: vue.keys,
+    const $datasets = document.querySelector('#datasets')
+    const $samples = document.querySelector('#samples')
+    const $input = document.querySelector('#input')
+    const $summary = document.querySelector('#summary')
+    const $resultList = document.querySelector('#result-list')
+    const $showMore = document.querySelector('#show-more')
+
+    for(const key of Object.keys(datasets)) {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'btn btn-outline-secondary'
+      button.textContent = key
+      button.dataset.key = key
+      button.setAttribute('aria-pressed', key === activeKey)
+      button.classList.toggle('active', key === activeKey)
+      button.addEventListener('click', () => selectDataset(key))
+      $datasets.append(button)
+    }
+
+    $input.addEventListener('input', () => {
+      visibleLimit = pageSize
+      cancelAnimationFrame(searchFrame)
+      searchFrame = requestAnimationFrame(() => search())
+    })
+
+    $showMore.addEventListener('click', () => {
+      const scrollTop = window.scrollY
+      visibleLimit += pageSize
+      search(true)
+      // Keep the first newly-added results in view instead of letting scroll
+      // anchoring follow the button to its new position farther down the page.
+      window.scrollTo(0, scrollTop)
+    })
+
+    document.addEventListener('keyup', event => {
+      if(event.key === 'Escape' && document.activeElement === $input) $input.select()
+    })
+
+    // Preserve the old type-anywhere shortcut without stealing focus from
+    // buttons, keyboard shortcuts, or selected text being copied.
+    document.addEventListener('keydown', event => {
+      if($input.disabled || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
+      if(event.key.length !== 1) return
+      if(event.target.closest('input, button, textarea, select, a')) return
+      $input.focus({preventScroll:true})
+    })
+
+    function renderSamples() {
+      const samples = datasets[activeKey].samples || []
+      $samples.replaceChildren()
+      if(samples.length === 0) return
+
+      $samples.append('try: ')
+      for(const [index, query] of samples.entries()) {
+        if(index) $samples.append(' · ')
+        const button = document.createElement('button')
+        button.type = 'button'
+        button.className = 'sample-btn'
+        button.textContent = query
+        button.addEventListener('click', () => {
+          $input.value = query
+          visibleLimit = pageSize
+          search()
+          $input.focus({preventScroll:true})
+          $input.select()
         })
+        $samples.append(button)
+      }
+    }
 
-        vue.duration = Math.floor((getms()-startms)*1000)/1000
-      },
-    },
+    async function selectDataset(key) {
+      if(key === activeKey && cache.has(key)) {
+        $input.focus({preventScroll:true})
+        $input.select()
+        return
+      }
 
-  }).mount('#vue')
+      activeKey = key
+      visibleLimit = pageSize
+      renderSamples()
+      for(const button of $datasets.children) {
+        const selected = button.dataset.key === key
+        button.classList.toggle('active', selected)
+        button.setAttribute('aria-pressed', selected)
+      }
+      await loadDataset(key)
+      if(key === activeKey && !$input.disabled) {
+        $input.focus({preventScroll:true})
+        $input.select()
+      }
+    }
 
-  function formatscore(score) { return (Math.floor(Math.abs(score)*1000)/1000).toFixed(3) }
-  function getms() { return performance.now() }
-  function mapnumber(e,n,r,a,t,u){var b,m,o,p;b=r-n,m=t-a,o=(e-n)/b,u?.ex&&(p=o<0,o=Math.pow(Math.abs(o),u.ex),p&&(o=-o));let x=m*o+a;return x}
+    async function loadDataset(key, force = false) {
+      const version = ++loadVersion
+      const dataset = datasets[key]
+      $input.placeholder = key
 
-  const $input = document.getElementById('input')
-  document.onkeyup   = e => { if(e.key == 'Escape') $input.select() }
-  document.onkeydown = e => $input.focus()
-  vue.search()
+      if(!force && cache.has(key)) {
+        $input.disabled = false
+        search()
+        return
+      }
 
-})()</script>
+      $input.disabled = true
+      $summary.className = 'loading'
+      $summary.textContent = `Loading ${key}…`
+      $resultList.replaceChildren()
+      $showMore.hidden = true
+
+      try {
+        await fetchDataset(key, {force})
+        if(version !== loadVersion || key !== activeKey) return
+        $input.disabled = false
+        search()
+        $input.focus({preventScroll:true})
+        startPreloading()
+      } catch(error) {
+        if(version !== loadVersion || key !== activeKey) return
+        console.error(`Could not load ${dataset.file}`, error)
+        $summary.className = 'error'
+        $summary.textContent = `Could not load ${key}. `
+        const retry = document.createElement('button')
+        retry.type = 'button'
+        retry.className = 'retry'
+        retry.textContent = 'Try again'
+        retry.addEventListener('click', () => loadDataset(activeKey, true))
+        $summary.append(retry)
+      }
+    }
+
+    function fetchDataset(key, {force = false, priority = 'auto'} = {}) {
+      if(!force && cache.has(key)) return Promise.resolve(cache.get(key))
+      if(!force && pendingLoads.has(key)) return pendingLoads.get(key)
+
+      const dataset = datasets[key]
+      const promise = (async () => {
+        const response = await fetch(dataset.file, {priority})
+        if(!response.ok) throw new Error(`${response.status} ${response.statusText}`)
+        const targets = await response.json()
+        if(!Array.isArray(targets)) throw new Error('Dataset is not an array')
+
+        const data = {
+          targets,
+          prepared: dataset.keys
+            ? fuzzysort.snapshot(targets, {keys: dataset.keys})
+            : fuzzysort.snapshot(targets),
+        }
+        cache.set(key, data)
+        return data
+      })()
+
+      pendingLoads.set(key, promise)
+      promise.finally(() => {
+        if(pendingLoads.get(key) === promise) pendingLoads.delete(key)
+      }).catch(() => {})
+      return promise
+    }
+
+    function startPreloading() {
+      if(preloadingStarted) return
+      preloadingStarted = true
+
+      ;(async () => {
+        await idle()
+        await Promise.all(Object.keys(datasets).map(async key => {
+          if(cache.has(key)) return
+          try {
+            const data = await fetchDataset(key, {priority: 'low'})
+            await idle()
+            // An empty search finishes any snapshot work that did not already
+            // run in idle time. Using the public API matters here: private
+            // snapshot fields are renamed in fuzzysort.min.js.
+            fuzzysort.go('', data.prepared)
+          } catch(error) {
+            console.debug(`Could not preload ${datasets[key].file}`, error)
+          }
+        }))
+      })()
+    }
+
+    function idle() {
+      return new Promise(resolve => {
+        if(typeof requestIdleCallback === 'function') requestIdleCallback(resolve, {timeout: 500})
+        else setTimeout(resolve, 50)
+      })
+    }
+
+    function search(append = false) {
+      const data = cache.get(activeKey)
+      if(!data) return
+
+      const start = performance.now()
+      const results = fuzzysort.go($input.value, data.prepared, {
+        all: true,
+        limit: visibleLimit,
+      })
+      const duration = Math.floor((performance.now() - start) * 1000) / 1000
+
+      $summary.className = ''
+      $summary.textContent = `${results.total} matches in ${duration}ms`
+      $summary.hidden = results.length === 0
+      renderResults(results, datasets[activeKey], append)
+      $showMore.hidden = results.length >= results.total
+      if(!$showMore.hidden) {
+        $showMore.textContent = `show more (${results.total - results.length} remaining)`
+      }
+    }
+
+    function renderResults(results, dataset, append) {
+      const fragment = document.createDocumentFragment()
+      const start = append ? $resultList.children.length : 0
+      const keys = dataset.keys
+      const display = dataset.display || keys?.map(key => ({keys: [key]}))
+
+      for(let resultIndex = start; resultIndex < results.length; resultIndex++) {
+        const result = results[resultIndex]
+        const item = document.createElement('li')
+        const wrapper = document.createElement('span')
+        const shade = resultShade(result.score)
+        wrapper.style.color = `rgb(${shade},${shade},${shade})`
+        wrapper.append(`${formatScore(result.score)} - `)
+
+        if(display) {
+          for(let lineIndex = 0; lineIndex < display.length; lineIndex++) {
+            const displayLine = display[lineIndex]
+            const line = lineIndex === 0 ? document.createElement('strong') : document.createDocumentFragment()
+            for(let i = 0; i < displayLine.keys.length; i++) {
+              if(i) line.append(displayLine.separator || ' ')
+              const key = displayLine.keys[i]
+              const keyIndex = keys.indexOf(key)
+              const value = String(result.obj[key] ?? '')
+              appendHighlighted(line, result[keyIndex], value)
+            }
+            wrapper.append(line, document.createElement('br'))
+            wrapper.append('\u00a0\u00a0\u00a0' + '\u00a0'.repeat(formatScore(result.score).length))
+          }
+          wrapper.append(document.createElement('br'))
+        } else {
+          appendHighlighted(wrapper, result, result.target)
+        }
+        item.append(wrapper)
+        fragment.append(item)
+      }
+
+      if(append) $resultList.append(fragment)
+      else $resultList.replaceChildren(fragment)
+    }
+
+    function appendHighlighted(parent, result, fallback) {
+      if(!result || result.target === '') {
+        parent.append(fallback)
+        return
+      }
+
+      const parts = result.highlight(match => {
+        const bold = document.createElement('b')
+        bold.textContent = match
+        return bold
+      })
+      for(const part of parts) parent.append(part)
+    }
+
+    function formatScore(score) {
+      return (Math.floor(Math.abs(score) * 1000) / 1000).toFixed(3)
+    }
+
+    function resultShade(score) {
+      let value = mapNumber(score, 0, 1, 66, 200, 2)
+      if(score > .5) value += 30
+      return value
+    }
+
+    function mapNumber(value, inMin, inMax, outMin, outMax, exponent) {
+      let progress = (value - inMin) / (inMax - inMin)
+      progress = Math.pow(Math.abs(progress), exponent)
+      return (outMax - outMin) * progress + outMin
+    }
+
+    renderSamples()
+    loadDataset(activeKey)
+  </script>
+</body>
+</html>

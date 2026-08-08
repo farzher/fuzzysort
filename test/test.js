@@ -14,9 +14,25 @@ HOW TO WRITE TESTS:
 */
 
 // import / setup
-import testdata from './testdata.js'
-
 const isNode = typeof window === 'undefined'
+const testdataFiles = {
+  pokemon: './pokemon.json',
+  urls_and_titles: './urls_and_titles.json',
+  steam_games: './steam_games.json',
+  ue4_files: './ue4_files.json',
+}
+const readFile = isNode ? (await import('node:fs/promises')).readFile : null
+const testdata = Object.fromEntries(await Promise.all(
+  Object.entries(testdataFiles).map(async ([key, file]) => {
+    const url = new URL(file, import.meta.url)
+    if(isNode) return [key, JSON.parse(await readFile(url, 'utf8'))]
+
+    const response = await fetch(url)
+    if(!response.ok) throw new Error(`Could not load ${file}: ${response.status} ${response.statusText}`)
+    return [key, await response.json()]
+  })
+))
+
 const useMinified = isNode && process.argv[2] === 'min'
 const {default: fuzzysort} = await import(useMinified ? '../fuzzysort.min.js' : '../fuzzysort.js')
 
@@ -83,6 +99,14 @@ async function tests() {
   { // sorting
     testSorting1('adio', 'Audio.h', 'AsyncTaskDownloadImage.h')
     testSorting1('note', 'node/noTe', 'not one that evening')
+
+    var substringBoundaryResults = fuzzysort.go('your mom', [
+      'Seize your moment.',
+      'Your mom goes to college.',
+    ])
+    assert(substringBoundaryResults[0].target === 'Your mom goes to college.', 'substring ending at word boundary')
+    assert(fuzzysort.single('foo', 'x foo! end').score > fuzzysort.single('foo', 'x food end').score, 'substring ending before punctuation')
+    assert(fuzzysort.single('ab', 'x abC').score > fuzzysort.single('ab', 'x abc').score, 'substring ending at camel-case boundary')
 
     // https://github.com/home-assistant/frontend/discussions/12590#discussioncomment-2694018
     testSorting1('er.life360', 'device-tracker.life360_iphone_6', 'sendor.battery_life360_iphone_6')
@@ -357,6 +381,8 @@ async function tests() {
     assert(results[0] !== undefined, 'threshold high')
 
     assert(fuzzysort.single('soup time ifs', 'time for soup').highlight((m, i) => `*${m}(${i})*`).join('') === '*time(0)* *f(1)*or *soup(2)*', 'highlight callback')
+    var allResult = fuzzysort.go('', ['unmatched target'], {all:true})[0]
+    assert(allResult.highlight(match => `*${match}*`).join('') === 'unmatched target', 'highlight callback preserves target without match indexes')
 
     // Top-level helpers work with live and structured-cloned Worker results.
     var result = fuzzysort.single('fb', 'foo bar')
@@ -491,6 +517,36 @@ async function tests() {
     assert(preparedKeysResults[0].score === rawKeys[0].score, 'prepared multiple keys preserves score')
     assert(preparedKeysResults[0][0].highlight() === rawKeys[0][0].highlight(), 'prepared multiple keys preserves first key match')
     assert(preparedKeysResults[0][1].highlight() === rawKeys[0][1].highlight(), 'prepared multiple keys preserves second key match')
+
+    // Highlight good matches in every key, plus the best match for any query
+    // part that has no good match. This explains every part without noise.
+    var pokemon = {
+      description:'Bulbasaur can be seen napping in bright sunlight. There is a seed on its back. By soaking up the sun’s rays, the seed grows progressively larger.',
+      type:'Pokemon: Grass, Poison',
+    }
+    var pokemonResult = fuzzysort.go('grass poison seed', [pokemon], {keys:['description', 'type']})[0]
+    assert(pokemonResult[0].highlight() === 'Bulbasaur can be seen napping in bright sunlight. There is a <b>seed</b> on its back. By soaking up the sun’s rays, the seed grows progressively larger.', 'multi-key highlight keeps only strong part matches')
+    assert(pokemonResult[1].highlight() === 'Pokemon: <b>Grass</b>, <b>Poison</b>', 'multi-key highlight keeps strong multi-part match')
+
+    var preparedPokemon = fuzzysort.snapshot([pokemon], {keys:['description', 'type']})
+    var preparedPokemonResult = fuzzysort.go('grass poison seed', preparedPokemon)[0]
+    assert(preparedPokemonResult[0].highlight() === pokemonResult[0].highlight() && preparedPokemonResult[1].highlight() === pokemonResult[1].highlight(), 'prepared multi-key part-quality highlighting')
+
+    var noisyHighlight = fuzzysort.go('alpha abc', [{exact:'alpha', noisy:'xxxxxxxxxxa xxxxxxxxxxb xxxxxxxxxxc'}], {keys:['exact', 'noisy']})[0]
+    assert(noisyHighlight[0].highlight() === '<b>alpha</b>', 'multi-key highlight keeps exact match')
+    assert(noisyHighlight[1].highlight() === 'xxxxxxxxxx<b>a</b> xxxxxxxxxx<b>b</b> xxxxxxxxxx<b>c</b>', 'multi-key highlight explains a weak part when it is the only match')
+
+    var winningKeys = fuzzysort.go('alpha beta', [{both:'prefix alpha beta', exact:'alpha'}], {keys:['both', 'exact']})[0]
+    assert(winningKeys[0].highlight() === 'prefix <b>alpha beta</b>' && winningKeys[1].highlight() === '<b>alpha</b>', 'multi-key highlight keeps good matches in other keys')
+
+    var phraseTarget = 'While sleeping, it generates electricity in the sacs in its cheeks. If it’s not getting enough sleep'
+    var phraseResult = fuzzysort.go('enough sleep', [{description:phraseTarget, other:'value'}], {keys:['description', 'other']})[0]
+    assert(phraseResult[0].highlight() === 'While sleeping, it generates electricity in the sacs in its cheeks. If it’s not getting <b>enough sleep</b>', 'multi-key highlight preserves the better whole-query match')
+    var partialPhraseResult = fuzzysort.go('enough sleep p', [{description:phraseTarget, other:'Pokemon'}], {keys:['description', 'other']})[0]
+    assert(partialPhraseResult[0].highlight() === 'While sleeping, it generates electricity in the sacs in its cheeks. If it’s not getting <b>enough sleep</b>' && partialPhraseResult[1].highlight() === '<b>P</b>okemon', 'multi-key highlight preserves an exact adjacent subset')
+
+    var singleKeyHighlight = fuzzysort.single('alpha beta', 'alpha and beta')
+    assert(singleKeyHighlight.highlight() === '<b>alpha</b> and <b>beta</b>', 'single-key multi-word highlighting remains unchanged')
 
     // Prepared multi-word matching must preserve raw matching behavior across
     // word joins, backtracking, out-of-order terms, and long targets.
