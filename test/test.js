@@ -930,15 +930,6 @@ async function benchmarks() {
     fuzzysort.cleanup()
     return finishSnapshot(fuzzysort.snapshot(steamRaw))
   }, typeShortQuery, coldSamples)
-  benchCold('cold type "eld" ready Steam object key', function() {
-    fuzzysort.cleanup()
-    return finishSnapshot(fuzzysort.snapshot(testdata.steam_games_2_keys, {key:'name'}))
-  }, typeShortQuery, coldSamples)
-  benchCold('cold type "eld" ready Steam object keys', function() {
-    fuzzysort.cleanup()
-    return finishSnapshot(fuzzysort.snapshot(testdata.steam_games_2_keys, {keys:['name', 'description']}))
-  }, typeShortQuery, coldSamples)
-
   bench('go prepared limit 1', function() {
     fuzzysort.go('render', focusedPrepared, {limit:1})
   }, config)

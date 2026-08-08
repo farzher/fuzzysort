@@ -284970,18 +284970,4 @@ const testdata = {
     ],
 }
 
-// Simulate a game catalog with two searchable fields while keeping the size
-// and variety of the real Steam-name dataset.
-testdata.steam_games_2_keys = testdata.steam_games.map((name, index) => {
-    const words = name.trim().split(/\s+/)
-    const variation = index % 2
-        ? words.reverse().join(' ')
-        : words.join('-').toLowerCase()
-
-    return {
-        name,
-        description: `Discover ${variation} in this simulated Steam game.`,
-    }
-})
-
 export default testdata
