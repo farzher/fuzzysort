@@ -304,6 +304,7 @@
     const cache = new Map()
     const pendingLoads = new Map()
     const pageSize = 20
+    const showMoreSize = 100
     let activeKey = 'movie_quotes'
     let visibleLimit = pageSize
     let loadVersion = 0
@@ -337,7 +338,7 @@
 
     $showMore.addEventListener('click', () => {
       const scrollTop = window.scrollY
-      visibleLimit += pageSize
+      visibleLimit += showMoreSize
       search(true)
       // Keep the first newly-added results in view instead of letting scroll
       // anchoring follow the button to its new position farther down the page.
