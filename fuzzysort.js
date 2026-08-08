@@ -11,7 +11,7 @@ export function single(search, target) {
 
 export function go(search, targets, options) {
   if(targets instanceof SnapshotTargets) return goSnapshot(search, targets, options)
-  if(!search) return options?.all ? all(targets, options) : noResults
+  if(!search) return all(targets, options)
 
   let query = getQuery(search)
   let key = options?.key
@@ -182,10 +182,7 @@ function goSnapshot(search, snapshot, options) {
   if(options?.key || options?.keys) throw new Error('fuzzysort: key/keys must be provided to snapshot(), not go()')
   snapshot._finish()
 
-  if(!search) {
-    if(!options?.all) return noResults
-    return allSnapshot(snapshot, options)
-  }
+  if(!search) return allSnapshot(snapshot, options)
 
   let query = getQuery(search)
   let backtrack = snapshot._backtrack(query, options)

@@ -92,7 +92,7 @@ async function tests() {
     var exactTargets = Array(12).fill('a')
     var defaultResults = fuzzysortApi.go('a', exactTargets)
     assert(defaultResults.length === 10 && defaultResults.total === 12, 'default limit')
-    assert(fuzzysortApi.go('', exactTargets, {all:true}).length === 10, 'default limit with all')
+    assert(fuzzysortApi.go('', exactTargets).length === 10, 'default limit with empty search')
 
     var defaultSnapshotResults = fuzzysortApi.go('a', fuzzysortApi.snapshot(exactTargets))
     assert(defaultSnapshotResults.length === 10 && defaultSnapshotResults.total === 12, 'snapshot default limit')
@@ -198,25 +198,22 @@ async function tests() {
     testNomatch(' ', '')
   }
 
-  { // options.all
-    var tmp = fuzzysort.go('', ['pants', 's', ''], {all: true})
-    assert(tmp.length==3, 'all 1')
+  { // empty searches return all targets
+    var tmp = fuzzysort.go('', ['pants', 's', ''])
+    assert(tmp.length==3, 'empty search returns all strings')
 
-    var tmp = fuzzysort.go('pants', ['pants', 's', ''], {all: true})
-    assert(tmp.length==1, 'all 2')
+    var tmp = fuzzysort.go('pants', ['pants', 's', ''])
+    assert(tmp.length==1, 'non-empty search still filters')
 
-    var tmp = fuzzysort.go('', ['pants'])
-    assert(tmp.length==0, 'all 3')
-
-    var tmp = fuzzysort.go('', [{a:'pants', b:'noodles'}, {a:'suit', b:'tie'}], {keys:['a', 'b'], all: true})
-    assert(tmp[1][1].target === 'tie', 'all 5')
+    var tmp = fuzzysort.go('', [{a:'pants', b:'noodles'}, {a:'suit', b:'tie'}], {keys:['a', 'b']})
+    assert(tmp[1][1].target === 'tie', 'empty search returns all multi-key targets')
 
     var targets = [{a:1}, {a:2}]
-    var tmp = fuzzysort.go('', targets, {key:'a', all: true})
-    assert(tmp[0].obj === targets[0], 'options.all with key https://github.com/farzher/fuzzysort/issues/134')
+    var tmp = fuzzysort.go('', targets, {key:'a'})
+    assert(tmp[0].obj === targets[0], 'empty search with key https://github.com/farzher/fuzzysort/issues/134')
 
-    var tmp = fuzzysort.go('', targets, {keys:['a'], all: true})
-    assert(tmp[0].obj === targets[0], 'options.all with keys')
+    var tmp = fuzzysort.go('', targets, {keys:['a']})
+    assert(tmp[0].obj === targets[0], 'empty search with keys')
   }
 
 
@@ -402,7 +399,7 @@ async function tests() {
     assert(results[0] !== undefined, 'threshold high')
 
     assert(fuzzysort.single('soup time ifs', 'time for soup').highlight((m, i) => `*${m}(${i})*`).join('') === '*time(0)* *f(1)*or *soup(2)*', 'highlight callback')
-    var allResult = fuzzysort.go('', ['unmatched target'], {all:true})[0]
+    var allResult = fuzzysort.go('', ['unmatched target'])[0]
     assert(allResult.highlight(match => `*${match}*`).join('') === 'unmatched target', 'highlight callback preserves target without match indexes')
 
     // Top-level helpers work with live and structured-cloned Worker results.
@@ -524,7 +521,7 @@ async function tests() {
     assert(fuzzysort.go('beta', preparedKey)[0].obj === keyPaths[0], 'prepared key preserves object')
     var preparedKeys = fuzzysort.snapshot(keyPaths, {keys:['direct', 'nested.value']})
     assert(fuzzysort.go('alpha beta', preparedKeys)[0].obj === keyPaths[0], 'prepared keys preserve object')
-    assert(fuzzysort.go('', preparedKey, {all:true})[0].obj === keyPaths[0], 'prepared key all')
+    assert(fuzzysort.go('', preparedKey)[0].obj === keyPaths[0], 'prepared key empty search')
 
     var multiKeyTargets = [
       {name:'Elder Scrolls', description:'Fantasy role-playing game'},
@@ -625,10 +622,10 @@ async function tests() {
     var preparedStrideResult = fuzzysort.go('needle', preparedStrides)
     assert(preparedStrideResult.length === 1 && preparedStrideResult[0].obj === preparedStrideTargets[1], 'prepared flattened keys preserve row identity and key stride')
     assert(preparedStrideResult[0][0].target === '' && preparedStrideResult[0][1].target === '' && preparedStrideResult[0][2].target === 'needle', 'prepared flattened keys preserve unmatched, missing, and trailing values')
-    var preparedStrideAll = fuzzysort.go('', preparedStrides, {all:true})
+    var preparedStrideAll = fuzzysort.go('', preparedStrides)
     assert(preparedStrideAll.total === 3 && preparedStrideAll[2].obj === preparedStrideTargets[2] && preparedStrideAll[2][2].target === 'omega', 'prepared flattened keys preserve empty-search rows')
     var preparedNoKeys = fuzzysort.snapshot(preparedStrideTargets, {keys:[]})
-    var preparedNoKeysAll = fuzzysort.go('', preparedNoKeys, {all:true, limit:2})
+    var preparedNoKeysAll = fuzzysort.go('', preparedNoKeys, {limit:2})
     assert(preparedNoKeysAll.length === 2 && preparedNoKeysAll.total === 3 && preparedNoKeysAll[0].length === 0 && preparedNoKeysAll[1].obj === preparedStrideTargets[1], 'prepared empty key lists preserve all results')
 
     var preparedShortKeys = fuzzysort.snapshot([{name:'foobar baz', description:'other value'}], {keys:['name', 'description']})
@@ -901,11 +898,11 @@ async function benchmarks() {
   }, config)
   bench('snapshot + go ascii target', function() {
     var prepared = fuzzysort.snapshot(['C:/Project/Renderer/RenderTarget.cpp'])
-    fuzzysort.go('', prepared, {all:true, limit:1})
+    fuzzysort.go('', prepared, {limit:1})
   }, config)
   bench('snapshot + go unicode target', function() {
     var prepared = fuzzysort.snapshot(['Café/レンダラー/RenderTarget.cpp'])
-    fuzzysort.go('', prepared, {all:true, limit:1})
+    fuzzysort.go('', prepared, {limit:1})
   }, config)
 
   const focusedPrepared = testdata_prepared.ue4_files
@@ -921,7 +918,7 @@ async function benchmarks() {
     return focusedRaw
   }, function(targets) {
     var prepared = fuzzysort.snapshot(targets)
-    fuzzysort.go('', prepared, {all:true, limit:1})
+    fuzzysort.go('', prepared, {limit:1})
   })
   benchCold('first go raw UE4 targets', function() {
     fuzzysort.cleanup()
@@ -950,7 +947,7 @@ async function benchmarks() {
     return steamRaw
   }, function(targets) {
     var prepared = fuzzysort.snapshot(targets)
-    fuzzysort.go('', prepared, {all:true, limit:1})
+    fuzzysort.go('', prepared, {limit:1})
   }, {samplecount:15})
   benchCold('first "e" raw Steam targets', function() {
     fuzzysort.cleanup()
@@ -983,7 +980,7 @@ async function benchmarks() {
     fuzzysort.go('eld', targets, {limit:10})
   }
   const finishSnapshot = targets => {
-    fuzzysort.go('', targets, {all:true, limit:1})
+    fuzzysort.go('', targets, {limit:1})
     return targets
   }
   const coldSamples = {samplecount:7}

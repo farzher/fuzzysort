@@ -61,7 +61,6 @@ fuzzysort.go(search, targets, {
   keys      : null,  // Search multiple properties
   limit     : 10,    // Max results; 0 = unlimited
   threshold : .5,    // Minimum score; 0 = any match
-  all       : false, // Return all targets when search is empty
   scoreFn   : null,  // Override result scoring
 })
 ```
@@ -166,6 +165,7 @@ fuzzysort.remap({',': '.'}) // 12,5 = 12.5
 - Added default `threshold` and `limit`
 - Changed `highlight()` to only highlight `keys` with a good match
 - Changed scoring: substring matches are even more relevant
+- Removed `options.all`; empty search now always returns all results
 - `scoreFn` now works with all search modes
 
 #### v3.1.0

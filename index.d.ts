@@ -66,9 +66,6 @@ declare namespace Fuzzysort {
     /** Minimum score; defaults to .5; 0 = any match */
     threshold?: number
 
-    /** Return all targets when search is empty */
-    all?: boolean
-
     /** Override result scoring */
     scoreFn?: (result: R) => number
   }
