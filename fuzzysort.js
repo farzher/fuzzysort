@@ -11,11 +11,15 @@ export function single(search, target) {
 
 export function go(search, targets, options) {
   if(targets instanceof SnapshotTargets) return goSnapshot(search, targets, options)
+  let key = options?.key
+  let keys = !key && options?.keys
+  let firstTarget = targets[0]
+  if(!key && !keys && typeof firstTarget === 'object' && firstTarget !== null && !isPrepared(firstTarget)) {
+    throw new Error('fuzzysort: key or keys is required when searching object targets')
+  }
   if(!search) return all(targets, options)
 
   let query = getQuery(search)
-  let key = options?.key
-  let keys = !key && options?.keys
   if(keys) return goKeys(query, targets, options)
 
   let searchBitflags = query.bitflags

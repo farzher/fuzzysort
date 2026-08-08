@@ -355,6 +355,15 @@ async function tests() {
     var results = fuzzysort.go('typography', targets, {key: 'name'})
     var results = fuzzysort.go('typography', targets, {keys: ['name']})
 
+    // Object collections need a key, but validation stays coarse and outside target loops.
+    var missingKeyError
+    try { fuzzysort.go('typography', [{name: 'Typography'}]) } catch(error) { missingKeyError = error }
+    assert(missingKeyError?.message.includes('key or keys'), 'object targets without key throw')
+    var mixedTargets = fuzzysort.go('typography', ['Typography', {}])
+    assert(mixedTargets.length === 1, 'a malformed item in string targets does not throw')
+    var bothKeyOptions = fuzzysort.go('typography', [{name: 'Typography', other: 'no'}], {key: 'name', keys: ['other']})
+    assert(bothKeyOptions.length === 1, 'key and keys together remain valid at runtime')
+
     // key/keys can be a Symbol and targets can contain empty strings
     var s = Symbol()
     var symbolTargets = ['value', ''].map(v => ({target: v, [s]: v}))
@@ -1240,61 +1249,66 @@ async function bench(name, code, {benchtime=2000}={}) {
 function bench_speeddiff(name, hz) {
   // fuzzysort 3.0
   var baseline = `
-    single raw cached target x 11,189,295 ops/sec -2.94% | 19 runs sampled
-    single successful non-substring x 7,264,297 ops/sec +0.72% | 15 runs sampled
-    single unsuccessful bitflags x 95,570,997 ops/sec -8.08% | 20 runs sampled
-    single unsuccessful scan x 20,601,262 ops/sec +6.51% | 11 runs sampled
-    single character x 38,984,620 ops/sec -3.87% | 15 runs sampled
-    prepare ascii target x 2,222,390 ops/sec +18.77% | 31 runs sampled
-    prepare unicode target x 393,097 ops/sec -1.17% | 11 runs sampled
-    prepare all UE4 targets | 4.95 ms | 202 ops/sec +6.03% | 25 cold samples
-    first go raw UE4 targets | 4.29 ms | 233 ops/sec +7.75% | 25 cold samples
-    first go prepared UE4 targets | 0.79 ms | 1,265 ops/sec +2.47% | 25 cold samples
-    second go prepared UE4 targets | 0.58 ms | 1,724 ops/sec -3.45% | 25 cold samples
-    prepare all Steam targets | 144.03 ms | 7 ops/sec +2.35% | 15 cold samples
-    first "e" raw Steam targets | 182.47 ms | 5 ops/sec +0.21% | 15 cold samples
-    first "e" prepared Steam targets | 15.15 ms | 66 ops/sec +2.07% | 15 cold samples
-    second "e" prepared Steam targets | 6.30 ms | 159 ops/sec +3.52% | 15 cold samples
-    go prepared limit 1 x 3,023 ops/sec +3.22% | 10 runs sampled
-    go prepared limit 10 x 2,995 ops/sec -0.32% | 10 runs sampled
-    go prepared limit 100 focused x 2,706 ops/sec +3.32% | 9 runs sampled
-    go prepared unlimited focused x 2,378 ops/sec +2.86% | 10 runs sampled
-    go prepared threshold x 3,015 ops/sec +2.96% | 10 runs sampled
-    go Steam "e" limit 10 x 150.81 ops/sec -0.28% | 18 runs sampled
-    go Steam "e" limit 100 x 148.34 ops/sec +0.39% | 9 runs sampled
-    go Steam "e" unlimited x 12.49 ops/sec +1.04% | 2 runs sampled
-    type "elder" prepared Steam targets | 62.18 ms | 16 ops/sec -5.12% | 15 cold samples
-    go Steam "el" unlimited x 51.09 ops/sec | 12 runs sampled
-    go raw cached limit 10 x 1,498 ops/sec +9.17% | 17 runs sampled
-    go raw cold cache limit 10 x 158.64 ops/sec +2.28% | 8 runs sampled
-    go key direct x 1,300 ops/sec +5.28% | 8 runs sampled
-    go key dotted x 939.06 ops/sec +5.84% | 12 runs sampled
-    go key array x 997.15 ops/sec +2.83% | 11 runs sampled
-    go key function x 1,337 ops/sec -1.53% | 8 runs sampled
-    go keys focused x 675.36 ops/sec +1.65% | 13 runs sampled
-    go keys scoreFn x 731.64 ops/sec -0.72% | 11 runs sampled
-    go results unread x 3,000 ops/sec +2.88% | 10 runs sampled
-    go results score read x 2,961 ops/sec +6.54% | 10 runs sampled
-    go results indexes read x 2,998 ops/sec +5.55% | 10 runs sampled
-    spaces & keys x 4,093 ops/sec +9.47% | 12 runs sampled
-    highlight x 212,020 ops/sec -6.88% | 23 runs sampled
-    highlight callback x 124,148 ops/sec -8.3% | 16 runs sampled
-    tricky x 6,990,769 ops/sec -0.75% | 12 runs sampled
-    tricky space x 2,164,427 ops/sec +0.45% | 10 runs sampled
-    tricky lot of space x 1,664,719 ops/sec +0.43% | 9 runs sampled
-    go prepared spaces x 389.74 ops/sec +0.07% | 12 runs sampled
-    go key spaces x 228.79 ops/sec -1.48% | 11 runs sampled
-    go prepared x 901.59 ops/sec +3.19% | 13 runs sampled
-    go prepared nolimit x 232.49 ops/sec +1.88% | 10 runs sampled
-    go prepared key x 781.32 ops/sec -0.72% | 13 runs sampled
-    go key x 356.27 ops/sec -2.9% | 11 runs sampled
-    go keys x 298.11 ops/sec -5.11% | 10 runs sampled
-    go str x 403.03 ops/sec -1.92% | 10 runs sampled
-    huge nomatch x 92,778,433 ops/sec -1.48% | 20 runs sampled
-    huge nomatch !bitflags x 3,115,093 ops/sec +2.63% | 11 runs sampled
-    tricky x 7,156,432 ops/sec +1.6% | 13 runs sampled
-    small x 24,724,164 ops/sec -8.22% | 12 runs sampled
-    somematch x 33,894,630 ops/sec +3.48% | 14 runs sampled
+    single raw cached target x 9,548,532 ops/sec -14.67% | 19 runs sampled
+    single successful non-substring x 5,511,430 ops/sec -24.13% | 14 runs sampled
+    single unsuccessful bitflags x 55,094,589 ops/sec -42.36% | 17 runs sampled
+    single unsuccessful scan x 16,846,446 ops/sec -18.23% | 10 runs sampled
+    single character x 23,801,213 ops/sec -38.95% | 12 runs sampled
+    snapshot + go ascii target x 903,604 ops/sec | 17 runs sampled
+    snapshot + go unicode target x 292,019 ops/sec | 10 runs sampled
+    snapshot all UE4 targets | 6.09 ms | 164 ops/sec | 25 cold samples
+    first go raw UE4 targets | 4.29 ms | 233 ops/sec +0.06% | 25 cold samples
+    first go prepared UE4 targets | 6.86 ms | 146 ops/sec -88.49% | 25 cold samples
+    second go prepared UE4 targets | 0.10 ms | 9,671 ops/sec +460.92% | 25 cold samples
+    snapshot all Steam targets | 165.11 ms | 6 ops/sec | 15 cold samples
+    first "e" raw Steam targets | 186.98 ms | 5 ops/sec -2.42% | 15 cold samples
+    first "e" prepared Steam targets | 179.76 ms | 6 ops/sec -91.58% | 15 cold samples
+    second "e" prepared Steam targets | 8.18 ms | 122 ops/sec -22.99% | 15 cold samples
+    cold first "e" ready Steam snapshot | 15.56 ms | 64 ops/sec | 7 cold samples
+    cold first "el" ready Steam snapshot | 11.67 ms | 86 ops/sec | 7 cold samples
+    cold first "eld" ready Steam snapshot | 17.81 ms | 56 ops/sec | 7 cold samples
+    cold type "eld" raw Steam strings | 298.55 ms | 3 ops/sec | 7 cold samples
+    cold type "eld" new Steam snapshot | 199.53 ms | 5 ops/sec | 7 cold samples
+    cold type "eld" ready Steam snapshot | 39.13 ms | 26 ops/sec | 7 cold samples
+    go prepared limit 1 x 38,333 ops/sec +1168.04% | 12 runs sampled
+    go prepared limit 10 x 23,021 ops/sec +668.64% | 9 runs sampled
+    go prepared limit 100 focused x 12,114 ops/sec +347.66% | 8 runs sampled
+    go prepared unlimited focused x 9,165 ops/sec +285.41% | 11 runs sampled
+    go prepared threshold x 17,069 ops/sec +466.14% | 9 runs sampled
+    go Steam "e" limit 10 x 135.79 ops/sec -9.97% | 12 runs sampled
+    go Steam "e" limit 100 x 129.83 ops/sec -12.48% | 8 runs sampled
+    go Steam "e" unlimited x 9.07 ops/sec -27.42% | 2 runs sampled
+    go Steam "el" unlimited x 95.76 ops/sec +87.43% | 12 runs sampled
+    go raw cached limit 10 x 1,393 ops/sec -7.02% | 20 runs sampled
+    go raw cold cache limit 10 x 174.41 ops/sec +9.94% | 9 runs sampled
+    go key direct x 1,265 ops/sec -2.72% | 14 runs sampled
+    go key dotted x 958.30 ops/sec +2.04% | 14 runs sampled
+    go key array x 1,046 ops/sec +4.86% | 11 runs sampled
+    go key function x 1,379 ops/sec +3.16% | 8 runs sampled
+    go keys focused x 690.29 ops/sec +2.21% | 12 runs sampled
+    go keys scoreFn x 684.99 ops/sec -6.38% | 11 runs sampled
+    go results unread x 23,395 ops/sec +679.84% | 10 runs sampled
+    go results score read x 23,121 ops/sec +680.86% | 9 runs sampled
+    go results indexes read x 21,861 ops/sec +629.17% | 9 runs sampled
+    spaces & keys x 2,899 ops/sec -29.17% | 11 runs sampled
+    highlight x 230,885 ops/sec +8.89% | 10 runs sampled
+    highlight callback x 141,817 ops/sec +14.23% | 8 runs sampled
+    tricky x 5,821,413 ops/sec -16.73% | 14 runs sampled
+    tricky space x 1,702,399 ops/sec -21.35% | 9 runs sampled
+    tricky lot of space x 1,165,765 ops/sec -29.98% | 12 runs sampled
+    go prepared spaces x 330.87 ops/sec -15.11% | 11 runs sampled
+    go key spaces x 189.10 ops/sec -17.35% | 23 runs sampled
+    go prepared x 829.53 ops/sec -8% | 11 runs sampled
+    go prepared nolimit x 271.72 ops/sec +16.87% | 10 runs sampled
+    go prepared key x 708.50 ops/sec -9.32% | 17 runs sampled
+    go key x 337.63 ops/sec -5.24% | 11 runs sampled
+    go keys x 227.55 ops/sec -23.67% | 10 runs sampled
+    go str x 384.17 ops/sec -4.68% | 10 runs sampled
+    huge nomatch x 60,116,287 ops/sec -35.21% | 16 runs sampled
+    huge nomatch !bitflags x 2,977,028 ops/sec -4.44% | 11 runs sampled
+    tricky x 5,806,193 ops/sec -16.95% | 12 runs sampled
+    small x 19,674,642 ops/sec -20.43% | 10 runs sampled
+    somematch x 25,371,312 ops/sec -25.15% | 11 runs sampled
   `
   const escapeRegex = str => str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
   // Normal benchmarks store throughput after "x". Cold benchmarks store the

@@ -161,7 +161,7 @@ fuzzysort.remap({',': '.'}) // 12,5 = 12.5
 - Added `fuzzysort.snapshot()` for the best search performance
 - Added `fuzzysort.score()` and `fuzzysort.highlight()` for Web Worker support
 - Added `fuzzysort.remap()` for custom normalization
-- Automatically remaps common lookalike characters
+- Automatically remap common lookalike characters
 - Added default `threshold` and `limit`
 - Changed `highlight()` to only highlight `keys` with a good match
 - Changed scoring: substring matches are even more relevant

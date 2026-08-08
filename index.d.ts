@@ -74,10 +74,12 @@ declare namespace Fuzzysort {
   interface SnapshotKeyOptions<T> {
     /** Key to search */
     key: Key<T>
+    keys?: never
   }
   interface SnapshotKeysOptions<T> {
     /** Keys to search */
     keys: ReadonlyArray<Key<T>>
+    key?: never
   }
   interface KeyOptions<T> extends Options<KeyResult<T>>, SnapshotKeyOptions<T> {}
   interface KeysOptions<T> extends Options<KeysResult<T>>, SnapshotKeysOptions<T> {}
