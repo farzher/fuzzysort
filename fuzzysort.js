@@ -64,7 +64,7 @@ export function highlight(result, open = '<b>', close = '</b>', threshold = .5) 
   let indexes = raw === undefined
     ? result.indexes
     : raw.slice(0, raw.len ?? raw.length).sort((a, b) => a - b)
-  if(!indexes.length) return callback ? [] : target
+  if(!indexes.length) return callback ? [target] : target
 
   let output = callback ? [] : ''
   let lastIndex = 0
@@ -521,7 +521,9 @@ function algorithm2(search, target, beginnings = null, start = 0, end = 0, cutof
   resultScore -= lengthPenalty
   if(substring) resultScore /= 5
   if(substringStart) resultScore /= 5
-  target._score = resultScore - lengthPenalty
+  resultScore -= lengthPenalty
+  let substringEnd = substring && second === first + 1 && (second + 1 === targetLen || isBeginning(beginnings, start, end, second + 1))
+  target._score = substringEnd ? resultScore + Math.min(4, -resultScore / 2) : resultScore
   target._indexes[0] = first
   target._indexes[1] = second
   target._indexes.len = 2
@@ -655,7 +657,11 @@ function algorithm(search, target, spaces = false, partial = false, changed = fa
     matches = simpleMatch
   } else matches = strictMatch
 
-  target._score = calculateScore(matches, searchLen, targetLen, strict, beginningLen, isSubstring, substringStart)
+  let matchEnd = matches[searchLen - 1] + 1
+  let substringEnd = isSubstring && matchEnd - matches[0] === searchLen && (matchEnd === targetLen || (beginnings
+    ? isBeginning(beginnings, start, end, matchEnd)
+    : next[matchEnd - 1] === matchEnd))
+  target._score = calculateScore(matches, searchLen, targetLen, strict, beginningLen, isSubstring, substringStart, substringEnd)
   for(let i = 0; i < searchLen; i++) target._indexes[i] = matches[i]
   target._indexes.len = searchLen
   return target
@@ -680,7 +686,7 @@ function mergeScores(results, length) {
   return total
 }
 
-function calculateScore(matches, searchLen, targetLen, strict, beginningLen, substring, substringStart) {
+function calculateScore(matches, searchLen, targetLen, strict, beginningLen, substring, substringStart, substringEnd) {
   let score = 0
   let groups = 0
   for(let i = 1; i < searchLen; i++) if(matches[i] - matches[i - 1] !== 1) {
@@ -698,7 +704,8 @@ function calculateScore(matches, searchLen, targetLen, strict, beginningLen, sub
   let substringBonus = 1 + searchLen * searchLen
   if(substring) score /= substringBonus
   if(substringStart) score /= substringBonus
-  return score - lengthPenalty
+  score -= lengthPenalty
+  return substringEnd ? score + Math.min(4, -score / 2) : score
 }
 
 function algorithmSpaces(search, target, partial) {
@@ -1317,7 +1324,8 @@ function makeGetter(key) {
 function scoreCeiling(searchLen, targetLen) {
   let lengthPenalty = (targetLen - searchLen) / 2
   let bonus = 1 + searchLen * searchLen
-  return -lengthPenalty - lengthPenalty / (bonus * bonus)
+  let score = -lengthPenalty - lengthPenalty / (bonus * bonus)
+  return score + Math.min(4, -score / 2)
 }
 
 function bitCount(value) {
