@@ -56,13 +56,14 @@ export function go(search, targets, options) {
   return finishResults(resultCount, limited)
 }
 
-export function highlight(result, open = '<b>', close = '</b>') {
+export function highlight(result, open = '<b>', close = '</b>', threshold = .5) {
   let callback = typeof open === 'function' ? open : null
+  let target = result.target
+  if(result._bestKeyScore !== undefined && normalizeScore(result._score) < normalizeScore(result._bestKeyScore) * threshold) return callback ? [target] : target
   let raw = result._indexes
   let indexes = raw === undefined
     ? result.indexes
     : raw.slice(0, raw.len ?? raw.length).sort((a, b) => a - b)
-  let target = result.target
   if(!indexes.length) return callback ? [] : target
 
   let output = callback ? [] : ''
@@ -406,7 +407,9 @@ function finishResults(length, limited, transform) {
   let results = new Array(length)
   for(let i = length - 1; i >= 0; i--) {
     let result = heap.poll()
-    results[i] = transform ? transform(result) : result
+    if(transform) result = transform(result)
+    if(result instanceof KeysResult) markBestKeyScore(result)
+    results[i] = result
   }
   results.total = length + limited
   return results
@@ -1012,7 +1015,7 @@ class SnapshotTargets {
     let last = history[history.length - 1]
     if(last && !value.startsWith(last.query)) history.length = 0
     else if(last?.query === value && last.limit === limit) history.pop()
-    history.push({query:value, limit, results:value.length <= 64 ? copyResults(results) : null})
+    history.push({query:value, limit, results:value.length <= 32 ? copyResults(results) : null})
   }
 
   _resetSearch() {
@@ -1050,6 +1053,7 @@ function copyResult(result) {
   copy.target = result.target
   copy.obj = result.obj
   copy._score = result._score
+  if(result._bestKeyScore !== undefined) copy._bestKeyScore = result._bestKeyScore
   let indexes = result._indexes
   copy._indexes = indexes.slice(0, indexes.len ?? indexes.length)
   copy._indexes.len = copy._indexes.length
@@ -1240,7 +1244,7 @@ function lowerInfo(value) {
 class Result {
   get ['indexes']() { return this._indexes.slice(0, this._indexes.len).sort((a, b) => a - b) }
   set ['indexes'](value) { this._indexes = value }
-  ['highlight'](open, close) { return highlight(this, open, close) }
+  ['highlight'](open, close, threshold) { return highlight(this, open, close, threshold) }
   get ['score']() { return normalizeScore(this._score) }
   set ['score'](value) { this._score = denormalizeScore(value) }
 }
@@ -1273,6 +1277,13 @@ function materialize(prepared, obj = null) {
   result.obj = obj
   result._score = prepared._score
   result._indexes = prepared._indexes
+  return result
+}
+
+function markBestKeyScore(result) {
+  let best = -INF
+  for(let i = 0; i < result.length; i++) if(result[i] !== noTarget && result[i]._score > best) best = result[i]._score
+  for(let i = 0; i < result.length; i++) if(result[i] !== noTarget) result[i]._bestKeyScore = best
   return result
 }
 

@@ -46,6 +46,18 @@
 <script type="module">
 import './test.js'
 
+// Keep large, browser-only datasets separate from testdata.js. This can become
+// an on-demand loader when testdata.js is split into lightweight/heavy data.
+const [emoji, movieQuotes] = await Promise.all([
+  fetch('./emoji.json').then(response => response.json()),
+  fetch('./movie_quotes.json').then(response => response.json()),
+])
+
+for(const [key, targets] of Object.entries({emoji, movie_quotes: movieQuotes})) {
+  testdata[key] = targets
+  testdata_prepared[key] = fuzzysort.snapshot(targets, {keys: Object.keys(targets[0])})
+}
+
 // // Keep the normal steam_games collection beside raw and mutable-array versions.
 // const rawSteamKey = 'steam_games_raw'
 // testdata[rawSteamKey] = testdata.steam_games
@@ -104,13 +116,13 @@ import './test.js'
           // keys: vue.keys,
         })
 
-        vue.duration = formatscore(getms()-startms)
+        vue.duration = Math.floor((getms()-startms)*1000)/1000
       },
     },
 
   }).mount('#vue')
 
-  function formatscore(score) { return Math.floor(Math.abs(score)*1000)/1000 }
+  function formatscore(score) { return (Math.floor(Math.abs(score)*1000)/1000).toFixed(3) }
   function getms() { return performance.now() }
   function mapnumber(e,n,r,a,t,u){var b,m,o,p;b=r-n,m=t-a,o=(e-n)/b,u?.ex&&(p=o<0,o=Math.pow(Math.abs(o),u.ex),p&&(o=-o));let x=m*o+a;return x}
 
