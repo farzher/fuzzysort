@@ -1,5 +1,3 @@
-/*! https://github.com/farzher/fuzzysort v4.0.0 */
-
 export function single(search, target) {
   if(!search || !target) return null
   let query = getQuery(search)
