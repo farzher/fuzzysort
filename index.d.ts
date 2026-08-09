@@ -118,5 +118,14 @@ declare namespace Fuzzysort {
   }
 }
 
+export const single: Fuzzysort.Fuzzysort['single']
+export const go: Fuzzysort.Fuzzysort['go']
+export const highlight: Fuzzysort.Fuzzysort['highlight']
+export const score: Fuzzysort.Fuzzysort['score']
+export const remap: Fuzzysort.Fuzzysort['remap']
+export const prepare: Fuzzysort.Fuzzysort['prepare']
+export const snapshot: Fuzzysort.Fuzzysort['snapshot']
+export const cleanup: Fuzzysort.Fuzzysort['cleanup']
+
 declare const fuzzysort: Fuzzysort.Fuzzysort
 export default fuzzysort
