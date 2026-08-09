@@ -11,9 +11,9 @@
 
 
 
-## [Demo](https://rawgit.com/farzher/fuzzysort/master/test/test.html)
+## [Demo](https://farzher.github.io/fuzzysort/test/test.html)
 
-[https://rawgit.com/farzher/fuzzysort/master/test/test.html](https://rawgit.com/farzher/fuzzysort/master/test/test.html)
+[https://farzher.github.io/fuzzysort/test/test.html](https://farzher.github.io/fuzzysort/test/test.html)
 
 ![](https://i.imgur.com/muaw363.gif)
 
@@ -69,7 +69,7 @@ fuzzysort.go(search, targets, {
 
 
 
-## What's a `result`
+## Results
 
 ```js
 const result = fuzzysort.single('query', 'some string that contains my query.')
