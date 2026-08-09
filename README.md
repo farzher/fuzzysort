@@ -170,7 +170,7 @@ Structured cloning can remove the getters on results. For cloned results use:
 ```js
 fuzzysort.score(result)
 fuzzysort.highlight(result)
-````
+```
 
 
 ### Changelog
@@ -184,5 +184,5 @@ fuzzysort.highlight(result)
 - Added default `threshold` and `limit`
 - Improved multi-key highlighting
 - Improved substring scoring
-- Removed `options.all`; empty search now return results
+- Removed `options.all`; empty search now returns results
 - `scoreFn` now works with all search modes
