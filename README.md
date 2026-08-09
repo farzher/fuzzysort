@@ -1,27 +1,23 @@
-<p align="center"><a href="https://raw.github.com/farzher/fuzzysort/master/fuzzysort.js">
+<div align="center">
+<a href="https://raw.github.com/farzher/fuzzysort/master/fuzzysort.js">
   <img src="https://i.imgur.com/axkOMVs.png" alt="fuzzysort" />
-</a></p>
+</a>
 
-<p align="center">
-  <b>Fast, tiny, good fuzzy search for JavaScript.</b><br>
-  &lt;1ms for 13,000 files · 0 dependencies · clean ranking
-</p>
+
+<b>Fast, tiny, good fuzzy search for JavaScript.</b>
+<br>
+&lt;1ms for 13,000 files · 0 dependencies · clean ranking
 
 
 
 
 ## [Demo](https://rawgit.com/farzher/fuzzysort/master/test/test.html)
 
-https://rawgit.com/farzher/fuzzysort/master/test/test.html
+[https://rawgit.com/farzher/fuzzysort/master/test/test.html](https://rawgit.com/farzher/fuzzysort/master/test/test.html)
 
 ![](https://i.imgur.com/muaw363.gif)
 
-![](https://i.imgur.com/SXC9A3q.png)
-
-![](https://i.imgur.com/fUkJ7G3.png)
-
-![](https://i.imgur.com/CnVXRbf.png)
-
+</div>
 
 
 
@@ -47,21 +43,26 @@ Browser:
 ## Quick start
 
 ```js
-const files = [{file: 'Apple.cpp'}, {file: 'Banana.cpp'}]
+const files = [
+  {file: 'Guide.cpp'},
+  {file: 'UserInterface.cpp'},
+]
 
-const results = fuzzysort.go('a', files, {key: 'file'})
-// [{score: 0.81, obj: files[0]}, {score: 0.59, obj: files[1]}]
+const results = fuzzysort.go('ui', files, {key: 'file'})
+
+results[0].obj.file // 'UserInterface.cpp'
 ```
 
-### `fuzzysort.go(search, targets, options)`
+
+
 
 ```js
 fuzzysort.go(search, targets, {
-  key       : null,  // Search one property
-  keys      : null,  // Search multiple properties
-  limit     : 10,    // Max results; 0 = unlimited
-  threshold : .5,    // Minimum score; 0 = any match
-  scoreFn   : null,  // Override result scoring
+  limit     : 10,   // Max results; 0 = unlimited
+  threshold : .5,   // Minimum score; 0 = any match
+  key       : null, // Search one property
+  keys      : null, // Search multiple properties
+  scoreFn   : null, // Override result scoring
 })
 ```
 
@@ -74,68 +75,81 @@ fuzzysort.go(search, targets, {
 const result = fuzzysort.single('query', 'some string that contains my query.')
 result.score   // .80 (1 is a perfect match. 0.5 is a good match. 0 is no match.)
 result.target  // 'some string that contains my query.'
-result.obj     // reference to your original obj when using options.key
 result.indexes // [29, 30, 31, 32, 33]
+result.obj     // reference to your original obj when using options.key
 
 result.highlight('<b>', '</b>') // 'some string that contains my <b>query</b>.'
 result.highlight((m, i) => <react key={i}>{m}</react>)
 ```
 
-### Advanced Usage - objects, multiple complex keys, custom scoring
+### Advanced Usage - multiple complex keys - custom scoring
 
 ```js
-let objects = [{
-  title: 'Liechi Berry',
-  meta: {desc: 'Raises Attack when HP is low.'},
-  tags: ['berries', 'items'],
-  bookmarked: true,
-}, {
+const objects = [{
   title: 'Petaya Berry',
   meta: {desc: 'Raises Special Attack when HP is low.'},
+  tags: ['berries', 'items'],
+}, {
+  title: 'Liechi Berry',
+  meta: {desc: 'Raises Attack when HP is low.'},
+  favorite: true,
 }]
 
-let results = fuzzysort.go('attack berry', objects, {
+const targets = fuzzysort.snapshot(objects, {
   keys: ['title', 'meta.desc', obj => obj.tags?.join()],
-  scoreFn: r => r.score * (r.obj.bookmarked ? 2 : 1), // if the item is bookmarked, boost its score
 })
 
-// When using multiple `keys`, results are different. They're indexable to get each normal result
-var keysResult = results[0]
-keysResult[0].highlight() // 'Liechi <b>Berry</b>'
-keysResult[1].highlight() // 'Raises <b>Attack</b> when HP is low.'
-keysResult.score          // .84
-keysResult.obj.title      // 'Liechi Berry'
+const results = fuzzysort.go('attack berry', targets, {
+  scoreFn: r => r.score * (r.obj.favorite ? 2 : 1),
+})
+
+const result = results[0]
+result[0].highlight() // 'Liechi <b>Berry</b>'
+result[1].highlight() // 'Raises <b>Attack</b> when HP is low.'
+result.obj.title      // 'Liechi Berry'
 ```
 
 
 
-## How To Go Fast · Performance Tips · `fuzzysort.snapshot`
+
+
+
+## How To Go Fast! - Performance Tips!
+
+Filter out targets you don't need to search! Especially long ones!
 
 ```js
-let targets = [{file: 'Monitor.cpp'}, {file: 'MeshRenderer.cpp'}]
-
-let options = {
-  limit: 100,    // don't return more results than you need!
-  threshold: .5, // don't return bad results!
-}
-
-// filter out targets that you don't need to search! especially long ones!
-targets = targets.filter(t => t.file.length < 1000)
-
-// BEST: if your targets don't change, take an immutable snapshot!
-let canSnapshot = true
-if(canSnapshot) targets = fuzzysort.snapshot(targets, {key: 'file'})
-
-// FALLBACK: if you can't snapshot, provide prepared targets instead of raw strings!
-if(!canSnapshot) {
-  targets.forEach(t => t.filePrepared = fuzzysort.prepare(t.file))
-  options.key = 'filePrepared'
-}
-
-fuzzysort.go('gotta', targets, options)
-fuzzysort.go('go',    targets, options)
-fuzzysort.go('fast',  targets, options)
+let targets = [
+  {file: 'Guide.cpp'},
+  {file: 'UserInterface.cpp'},
+].filter(t => t.file.length < 1000)
 ```
+
+If your targets don't change, take an immutable `snapshot()` for the best performance!
+
+```js
+targets = fuzzysort.snapshot(targets, {key: 'file'})
+
+fuzzysort.go('gotta', targets)
+fuzzysort.go('go',    targets)
+fuzzysort.go('fast',  targets)
+```
+
+If you can't snapshot, provide prepared targets instead of raw strings!
+
+```js
+targets.forEach(t => t.filePrepared = fuzzysort.prepare(t.file))
+
+fuzzysort.go('fast', targets, {key: 'filePrepared'})
+```
+
+
+
+
+
+
+
+
 
 
 ### Character remapping
@@ -149,9 +163,14 @@ fuzzysort.remap({',': '.'}) // 12,5 = 12.5
 ```
 
 
-### Gotcha · Web Workers / cloned results
+### Web Workers / cloned results
 
-`result.score` is a getter/setter backed by an internal score representation. Structured cloning can remove those getters. For cloned results, use: `fuzzysort.score(result)` and `fuzzysort.highlight(result)`
+Structured cloning can remove the getters on results. For cloned results use:
+
+```js
+fuzzysort.score(result)
+fuzzysort.highlight(result)
+````
 
 
 ### Changelog
@@ -161,62 +180,9 @@ fuzzysort.remap({',': '.'}) // 12,5 = 12.5
 - Added `fuzzysort.snapshot()` for the best search performance
 - Added `fuzzysort.score()` and `fuzzysort.highlight()` for Web Worker support
 - Added `fuzzysort.remap()` for custom normalization
-- Automatically remap common lookalike characters
+- Automatically remaps common lookalike characters
 - Added default `threshold` and `limit`
-- Changed `highlight()` to only highlight `keys` with a good match
-- Changed scoring: substring matches are even more relevant
-- Removed `options.all`; empty search now always returns all results
+- Improved multi-key highlighting
+- Improved substring scoring
+- Removed `options.all`; empty search now return results
 - `scoreFn` now works with all search modes
-
-#### v3.1.0
-- Automatically handle diacritics / accents / ligatures
-
-#### v3.0.0
-- Added new behavior when using `keys` and your search contains spaces!
-- Added `options.key` can now be a function `{key: obj => obj.tags.join()}`
-- Removed `fuzzysort.indexes` & Added `result.indexes` (as a getter/setter for GC perf)
-- Removed `fuzzysort.highlight()` & Added `result.highlight()`
-- Changed scoring: score is now a number from 0 to 1 instead of from -Infinity to 0
-- Changed scoring: substring matches are even more relevant
-- Changed scoring: `straw berry` now matches great against `strawberry`
-- Changed scoring: tweaked the scoring quite a bit
-- `result.score` is behind a getter/setter for performance reasons
-- Fixed minor issues
-
-#### v2.0.0
-- Added new behavior when your search contains spaces!
-- Added fuzzysort.min.js
-- Now depends on ES6 features
-- Removed `result.indexes` & Added `fuzzysort.indexes` (improved GC performance)
-- Completely Removed `options.allowTypo`
-- Completely Removed `fuzzysort.goAsync`
-- Completely Removed `fuzzysort.new`
-- Rewrote the demo
-
-#### v1.9.0
-- Even faster
-- Added `options.all`
-- Deprecated/Removed `options.allowTypo`
-- Deprecated/Removed `fuzzysort.goAsync`
-- Changed scoring: boosted substring matches
-- Changed scoring: targets with too many beginning indexes lose points for being a bad target
-- Changed scoring: penality for not starting near the beginning
-- Changed scoring: penality for more groups
-- Fixed "Exponential backtracking hangs browser"
-
-#### v1.2.0
-- Added `fuzzysort.highlight(result, callback)`
-
-#### v1.1.0
-- Added `allowTypo` as an option
-
-#### v1.0.0
-
-- Inverted scores; they're now negative instead of positive, so that higher scores are better
-- Added ability to search objects by `key`/`keys` with custom weights
-- Removed the option to automatically highlight and exposed `fuzzysort.highlight`
-- Removed all options from `fuzzysort` and moved them into `fuzzysort.go` optional params
-
-#### v0.x.x
-
-- init
