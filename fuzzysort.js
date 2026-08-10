@@ -1274,12 +1274,10 @@ class Result {
   set ['indexes'](value) { this._indexes = value }
   ['highlight'](open, close, threshold) { return highlight(this, open, close, threshold) }
   get ['score']() { return normalizeScore(this._score) }
-  set ['score'](value) { this._score = denormalizeScore(value) }
 }
 
 class KeysResult extends Array {
   get ['score']() { return normalizeScore(this._score) }
-  set ['score'](value) { this._score = denormalizeScore(value) }
 }
 
 function newResult(target, score = -INF, obj = null, lower = '', lowerCodes = null, bitflags = 0) {
