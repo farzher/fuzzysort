@@ -31,9 +31,10 @@
   "scripts": {
     "test"      : "node test/test.js",
     "test-min"  : "node test/test.js min",
+    "test-mods" : "node test/import.mjs && node test/require.cjs",
 
     "minify"    : "terser fuzzysort.js -o fuzzysort.min.js --config-file terser.config.json",
-    "check"     : "npm test && npm run test-min",
+    "check"     : "npm test && npm run test-min && npm run test-mods",
     "build"     : "npm run minify && npm run check"
   },
 
