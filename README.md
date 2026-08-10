@@ -35,7 +35,7 @@ Browser:
 
 ```html
 <script type="module">
-  import fuzzysort from 'https://cdn.jsdelivr.net/npm/fuzzysort@4.0.0/fuzzysort.min.js'
+  import fuzzysort from 'https://cdn.jsdelivr.net/npm/fuzzysort@4.0.1/fuzzysort.min.js'
 </script>
 ```
 
