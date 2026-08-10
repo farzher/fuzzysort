@@ -1119,7 +1119,8 @@ function copyResults(results) {
 }
 
 function prepTarget(target) {
-  if(typeof target === 'number') target = '' + target
+  if(isPrepared(target)) target = target.target
+  else if(typeof target === 'number') target = '' + target
   else if(typeof target !== 'string') target = ''
   let info = lowerInfo(target)
   return newResult(target, -INF, null, info._lower, info.lowerCodes, info.bitflags)

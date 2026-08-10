@@ -102,6 +102,16 @@ async function tests() {
     assert(fuzzysortApi.go('sup', weakTargets, {key:'a', threshold:0, limit:0}).length === 1, 'default overrides')
   }
 
+  { // prepared targets can be prepared again or captured in a snapshot
+    var preparedTarget = fuzzysortApi.prepare('prepared target')
+    var preparedAgain = fuzzysortApi.prepare(preparedTarget)
+    assert(preparedAgain !== preparedTarget && preparedAgain.target === preparedTarget.target, 'prepare prepared target creates a fresh target')
+
+    var preparedSnapshot = fuzzysortApi.snapshot([preparedTarget])
+    var preparedSnapshotResult = fuzzysortApi.go('prepared', preparedSnapshot)[0]
+    assert(preparedSnapshotResult?.target === preparedTarget.target, 'snapshot prepared target')
+  }
+
   { // urls with garbage ids in them match everything too well
     var targets = ['jQuery Zoom', 'aBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYzaBcDeFgHiJkLmNoPqRsTuVwXyZAbCdEfGhIjKlMnOpQrStUvWxYz']
     var tmp = fuzzysort.go('zom', targets)

@@ -94,10 +94,10 @@ export interface Fuzzysort {
   go<T>(search: string, targets: SnapshotKeys<T>, options?: Options<KeysResult<T>>): KeysResults<T>
 
   /** Prepare one target for fast searching */
-  prepare(target: string): Prepared
+  prepare(target: Target): Prepared
 
   /** Create an immutable snapshot for the best search performance; use when targets don't change */
-  snapshot(targets: ReadonlyArray<string>): Snapshot
+  snapshot(targets: ReadonlyArray<Target>): Snapshot
   snapshot<T>(targets: ReadonlyArray<T>, options: SnapshotKeyOptions<T>): SnapshotKey<T>
   snapshot<T>(targets: ReadonlyArray<T>, options: SnapshotKeysOptions<T>): SnapshotKeys<T>
 
