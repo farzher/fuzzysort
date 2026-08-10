@@ -19,7 +19,7 @@
   "exports": {
     ".": {
       "types"   : "./index.d.ts",
-      "import"  : "./fuzzysort.js"
+      "default" : "./fuzzysort.js"
     }
   },
 
