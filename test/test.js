@@ -260,6 +260,19 @@ async function tests() {
     assert(fuzzysort.single('.', '…'), '. matches …')
     assert(fuzzysort.single('…', '.'), '… matches .')
 
+    // compatibility characters that normalize to whitespace must not recurse forever
+    for(const query of ['´', '¨', '¸', '¯', '˚']) {
+      assert(fuzzysort.go(query, ['anything']).length === 0, `${query} does not overflow the call stack`)
+    }
+
+    // Normalized leading whitespace must be trimmed before snapshot candidate narrowing.
+    // Otherwise typing "˚" first narrows the next "˚t" search to zero candidates.
+    var normalizedWhitespaceSnapshot = fuzzysort.snapshot(['team'])
+    assert(fuzzysort.go('˚', normalizedWhitespaceSnapshot).length === 0, 'normalized whitespace query has no results')
+    assert(fuzzysort.go('˚t', normalizedWhitespaceSnapshot).length === 1, 'normalized leading whitespace does not hide snapshot results')
+    assert(fuzzysort.go('˚tt', normalizedWhitespaceSnapshot).length === 0, 'extended normalized query has no results')
+    assert(fuzzysort.go('˚t', normalizedWhitespaceSnapshot).length === 1, 'backtracking normalized query restores results')
+
     // semantic, context-dependent symbols remain distinct
     assert(!fuzzysort.single('+', '&'), '+ does not match &')
     assert(!fuzzysort.single('.', ','), '. does not match ,')

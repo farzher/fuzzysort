@@ -1031,7 +1031,7 @@ class SnapshotTargets {
   _endSearch(query) {
     this._lastRowsLen = this._matchedRowsLen
     this._matchedRowsLen = 0
-    this._lastQuery = query._lower
+    this._lastQuery = query._lower || null
     this._candidateRows = null
     this._candidateLength = 0
   }
@@ -1129,10 +1129,10 @@ function prepTarget(target) {
 function prepQuery(search) {
   if(typeof search === 'number') search = '' + search
   else if(typeof search !== 'string') search = ''
-  search = search.trim()
-  let info = lowerInfo(search)
+  search = remapChars(search).trim()
+  let info = lowerInfoRemapped(search)
   info.bitflags &= ~SPACE_BIT
-  info.parts = info.hasSpace ? [...new Set(search.split(/\s+/))].map(prepQuery) : []
+  info.parts = info.hasSpace ? [...new Set(info._lower.split(/\s+/))].map(prepQuery) : []
   return info
 }
 
@@ -1247,7 +1247,10 @@ function remapChars(value) {
 }
 
 function lowerInfo(value) {
-  value = remapChars(value)
+  return lowerInfoRemapped(remapChars(value))
+}
+
+function lowerInfoRemapped(value) {
   let lower = value.toLowerCase()
   let lowerCodes = []
   let bitflags = 0
