@@ -783,6 +783,57 @@ async function tests() {
     })
     assert(scoreFnCalls === 2 && preparedScoreResults[0].obj.rank === 3, 'prepared keys scoreFn')
 
+    for(var recoveryOptions of [{}, {key:'name'}, {keys:['name', 'description']}]) {
+      for(var useSnapshot of [false, true]) {
+        fuzzysort.cleanup()
+        var objectTargets = recoveryOptions.key || recoveryOptions.keys
+        var failingTargets = objectTargets ? [{name:'a'}, {name:'ab'}] : ['a', 'ab']
+        var nextTargets = objectTargets ? [{name:'x'}] : ['x']
+        var searchOptions = useSnapshot ? {} : recoveryOptions
+        var searchMode = (recoveryOptions.key ? 'key' : recoveryOptions.keys ? 'keys' : 'strings') + (useSnapshot ? ' snapshot' : '')
+        var scoreError = new Error('scoreFn failed')
+        var caughtScoreError
+        var recoveryScoreCalls = 0
+        try {
+          fuzzysort.go('a', useSnapshot ? fuzzysort.snapshot(failingTargets, recoveryOptions) : failingTargets, {
+            ...searchOptions,
+            limit:1,
+            scoreFn: result => {
+              if(++recoveryScoreCalls === 2) throw scoreError
+              return result.score
+            },
+          })
+        } catch(error) { caughtScoreError = error }
+        assert(caughtScoreError === scoreError, 'scoreFn preserves thrown error', searchMode)
+
+        var recovered = fuzzysort.go('x', useSnapshot ? fuzzysort.snapshot(nextTargets, recoveryOptions) : nextTargets, {...searchOptions, limit:1})
+        var recoveredMatch = recoveryOptions.keys ? recovered[0]?.[0] : recovered[0]
+        assert(recovered.length === 1 && recovered.total === 1 && recoveredMatch?.target === 'x', 'search after scoreFn error has only its own result', searchMode)
+        assert(recoveredMatch?.score === 1 && JSON.stringify(recoveredMatch.indexes) === '[0]', 'search after scoreFn error preserves score and indexes', searchMode)
+        if(objectTargets) assert(recovered[0]?.obj === nextTargets[0], 'search after scoreFn error preserves object', searchMode)
+      }
+    }
+    fuzzysort.cleanup()
+
+    var nestedScoreError = new Error('nested scoreFn failed')
+    for(var [nestedLabel, nestedSearch] of [
+      ['no match', () => fuzzysort.go('z', ['x'])],
+      ['empty search', () => fuzzysort.go('', ['x'])],
+      ['caught validation error', () => { try { fuzzysort.go('x', [{name:'x'}]) } catch(error) {} }],
+      ['caught scoreFn error', () => {
+        try { fuzzysort.go('x', ['x'], {scoreFn: () => { throw nestedScoreError }}) }
+        catch(error) { assert(error === nestedScoreError, 'nested scoreFn preserves thrown error') }
+      }],
+    ]) {
+      var nestedScored = fuzzysort.go('a', ['a', 'ab'], {
+        scoreFn: result => {
+          nestedSearch()
+          return result.score
+        },
+      })
+      assert(nestedScored.length === 2 && nestedScored.total === 2 && nestedScored[0]?.target === 'a' && nestedScored[1]?.target === 'ab', 'nested searches without heap entries preserve outer results', nestedLabel)
+    }
+
     var unread = fuzzysort.go('render', ['PreRender/render target'], {limit:1})[0]
     var rawScore = unread._score
     var rawIndexes = unread._indexes
