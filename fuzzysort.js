@@ -8,6 +8,18 @@ export function single(search, target) {
 }
 
 export function go(search, targets, options) {
+  goDepth++
+  try {
+    return goSearch(search, targets, options)
+  } catch(error) {
+    if(goDepth === 1) heap.clear()
+    throw error
+  } finally {
+    goDepth--
+  }
+}
+
+function goSearch(search, targets, options) {
   if(targets instanceof SnapshotTargets) return goSnapshot(search, targets, options)
   let key = options?.key
   let keys = !key && options?.keys
@@ -1464,6 +1476,7 @@ for(let i = 0; i < remapFrom.length; i++) remappings[remapFrom[i]] = remapTo[i]
 let customAsciiRemappings = false
 
 let heap = createHeap()
+let goDepth = 0
 
 let noTarget = prepTarget('')
 let prunedMatch = {}
